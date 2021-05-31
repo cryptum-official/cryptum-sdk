@@ -102,3 +102,9 @@ dist
 
 # TernJS port file
 .tern-port
+
+# SO files
+.DS_STORE
+
+# Lock files
+*.lock
