@@ -1,0 +1,13 @@
+{
+  "name": "cryptum-sdk",
+  "version": "1.0.0",
+  "description": "SDK to sync your application with cryptum services",
+  "main": "index.js",
+  "repository": "https://github.com/blockforce-official/cryptum-sdk",
+  "author": "blockforce",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "dotenv": "^10.0.0"
+  }
+}
