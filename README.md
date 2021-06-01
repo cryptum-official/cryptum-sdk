@@ -23,8 +23,7 @@
 
 ## About Project
 
-This project aims make an integration between [RecipePuppy](http://www.recipepuppy.com/about/api/) and [Giphy](https://developers.giphy.com/).
-
+This project is to provide an integration with the Cryptum backend. This project calls Cryptum terminals using Clean Architecture and NodeJS.
 ## Starting
 ### Installation
 #### Requirements for install
