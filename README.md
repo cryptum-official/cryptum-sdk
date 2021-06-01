@@ -24,7 +24,7 @@
 
 ## About Project
 
-This project is to provide an integration with the Cryptum backend. This project calls Cryptum terminals using Clean Architecture and NodeJS.
+This project is to provide an integration with the Cryptum backend. This project calls Cryptum API using Clean Architecture and NodeJS.
 ## Starting
 ### Installation
 #### Requirements for install
