@@ -97,4 +97,4 @@ Distributed under the MIT license. See `LICENSE` for more information.
 
 ## Contact
 
-Blockforce - [Site](https://blockforce.in/) - **HELLO@BLOCKFORCE.IN**
+Blockforce - [SITE](https://blockforce.in/) - **HELLO@BLOCKFORCE.IN**
