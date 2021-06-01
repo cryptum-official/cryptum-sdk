@@ -18,7 +18,7 @@
     - [Configuration](#configuration)
     - [Authentication](#authentication)
 - [Contributing](#contributing)
-  - [If my Pull request need ?](#if-my-pull-request-need-)
+  - [What does my PR need to be accepted ? 🤔](#what-does-my-pr-need-to-be-accepted--)
 - [License](#license)
 - [Contact](#contact)
 
@@ -91,7 +91,7 @@ Contributions are what make the open source community an incredible place to lea
 5. Push the branch (`git push origin feature/amazing-feature`)
 6. Open a Pull Request
 
-### If my Pull request need ?
+### What does my PR need to be accepted ? 🤔
 
 In order for us to accept your PR, you need to adhere to the following standards.
 
