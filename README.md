@@ -18,6 +18,7 @@
     - [Configuration](#configuration)
     - [Authentication](#authentication)
 - [Contributing](#contributing)
+  - [If my Pull request need ?](#if-my-pull-request-need-)
 - [License](#license)
 - [Contact](#contact)
 
@@ -90,6 +91,14 @@ Contributions are what make the open source community an incredible place to lea
 5. Push the branch (`git push origin feature/amazing-feature`)
 6. Open a Pull Request
 
+### If my Pull request need ?
+
+In order for us to accept your PR, you need to adhere to the following standards.
+
+1. Create using the code pattern currently used in cryptum-sk
+2. Test your update and show artifacts in PR.
+
+It's all 🤷🏻‍♂️
 ## License
 
 Distributed under the MIT license. See `LICENSE` for more information.
