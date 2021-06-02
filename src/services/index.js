@@ -28,11 +28,15 @@ const handleRequestError = error => {
   if (!error.response) return error
   if (!error || !error.response.data.error)
     throw new Error('An error not mapped has occurred')
-  
+
   if (error.response.status == 401) throw new UnauthorizedException()
 
   const mappedError = error.response.data.error
   throw new GenericException(mappedError.code, mappedError.type)
 }
 
-module.exports = { getApiMethod, handleRequestError }
+const mountTokenHeaders = userCryptum => ({
+  Authorization: `Bearer ${userCryptum.token}`,
+})
+
+module.exports = { getApiMethod, handleRequestError, mountTokenHeaders }

@@ -18,6 +18,18 @@ class UserCryptum {
     this.language = language
     this.institution = institution
   }
+
+  /**
+   * Method to validate if an user is UserCryptum valid
+   *
+   * @param {*} user to validate if is an UserCryptum valid
+   */
+  isUserCryptum(user) {
+    if (!(user instanceof UserCryptum)) return false
+    if (!user.token || !user.id) return false
+
+    return true
+  }
 }
 
 module.exports = UserCryptum

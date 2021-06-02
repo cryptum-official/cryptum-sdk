@@ -17,6 +17,7 @@
   - [How To Use](#how-to-use)
     - [Configuration](#configuration)
     - [Authentication](#authentication)
+    - [Get my API Keys](#get-my-api-keys)
 - [Contributing](#contributing)
   - [What does my PR need to be accepted ? 🤔](#what-does-my-pr-need-to-be-accepted--)
 - [License](#license)
@@ -80,6 +81,19 @@ userController.auth(credentials).then(user => console.log(user))
 ```
 
 ps.: If your credentials are invalid, the Cryptum sdk return an exception.
+
+#### Get my API Keys
+
+You need only instantiate API keys controller and send user cryptum 🚀
+
+```
+const apiKeyController = cryptum.getApiKeyController()
+
+apiKeyController.getApiKeys(userCryptum).then(apiKeys => console.log(apiKeys))
+// Log your ApiKeyCryptum list
+```
+
+ps.: If you not provide an UserCryptum valid, the Cryptum sdk return an exception.
 
 ## Contributing
 
