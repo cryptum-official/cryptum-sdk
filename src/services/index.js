@@ -1,5 +1,11 @@
 const AxiosApi = require('../../axios')
-const { UnauthorizedException, GenericException } = require('../../errors')
+const {
+  UnauthorizedException,
+  GenericException,
+  NotCanMountException,
+  NotImplementedException,
+  InvalidTypeException,
+} = require('../../errors')
 
 /**
  * Method to get an specific api method how get, post, put and delete
@@ -25,6 +31,10 @@ const getApiMethod = ({ requests, key, config }) => {
  * @param {*} error
  */
 const handleRequestError = error => {
+  if (error instanceof NotCanMountException) throw error
+  if (error instanceof NotImplementedException) throw error
+  if (error instanceof InvalidTypeException) throw error
+
   if (!error.response) return error
   if (!error || !error.response.data.error)
     throw new Error('An error not mapped has occurred')

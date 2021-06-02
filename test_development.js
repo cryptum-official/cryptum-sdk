@@ -22,10 +22,11 @@ const testUserCryptum = async () => {
 
 const testApiKeys = async () => {
   const userController = sdk.getUserController()
-  const userCryptum = await userController.auth(credentials)
+  const userCryptum = await userController.auth(credentialsTest)
 
   const apiKeyController = sdk.getApiKeyController()
   const apiKeys = await apiKeyController.getApiKeys(userCryptum)
+  // const apiKeys = await apiKeyController.getApiKeys({id: "32432432", token: "342432432"})
   console.log(apiKeys)
 }
 

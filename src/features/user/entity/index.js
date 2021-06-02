@@ -24,7 +24,7 @@ class UserCryptum {
    *
    * @param {*} user to validate if is an UserCryptum valid
    */
-  isUserCryptum(user) {
+  static isUserCryptum(user) {
     if (!(user instanceof UserCryptum)) return false
     if (!user.token || !user.id) return false
 
