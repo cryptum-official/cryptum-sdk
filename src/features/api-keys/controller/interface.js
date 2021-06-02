@@ -13,7 +13,7 @@ class Interface {
   }
 
   /**
-   * Is an async method to check user and get your respective data, how token, name, email and more.
+   * Is an async method to get api keys and your respective data, how key, name, accessLevel and more.
    *
    * @param {UserCryptum} user an object UserCryptum returned of the login
    */

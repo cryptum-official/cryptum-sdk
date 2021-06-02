@@ -1,3 +1,6 @@
+/**
+ * Error used when an type is invalid.
+ */
 class InvalidTypeException extends Error {
   constructor(paramName, paramType) {
     super(

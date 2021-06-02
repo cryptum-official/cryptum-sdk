@@ -7,6 +7,8 @@ const {
   InvalidTypeException,
 } = require('../../errors')
 
+const UserCryptum = require('../features/user/entity')
+
 /**
  * Method to get an specific api method how get, post, put and delete
  *
@@ -28,7 +30,7 @@ const getApiMethod = ({ requests, key, config }) => {
 
 /**
  * Method to handle errors and throw an error by response
- * @param {*} error
+ * @param {*} error Error for analysis
  */
 const handleRequestError = error => {
   if (error instanceof NotCanMountException) throw error
@@ -45,6 +47,12 @@ const handleRequestError = error => {
   throw new GenericException(mappedError.code, mappedError.type)
 }
 
+/**
+ * Method to mount an hearders with user token
+ * 
+ * @param {UserCryptum} userCryptum need an user cryptum to add bearer token
+ * @returns an object with Authorization value
+ */
 const mountTokenHeaders = userCryptum => ({
   Authorization: `Bearer ${userCryptum.token}`,
 })
