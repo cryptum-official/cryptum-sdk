@@ -36,12 +36,17 @@ const handleRequestError = error => {
   if (error instanceof NotCanMountException) throw error
   if (error instanceof NotImplementedException) throw error
   if (error instanceof InvalidTypeException) throw error
+  if (error instanceof GenericException) throw error
 
-  if (!error.response) return error
-  if (!error || !error.response.data.error)
+  if (
+    !error ||
+    !error.response ||
+    !error.response.data ||
+    !error.response.data.error
+  )
     throw new Error('An error not mapped has occurred')
 
-  if (error.response.status == 401) throw new UnauthorizedException()
+  if (error.response.status === 401) throw new UnauthorizedException()
 
   const mappedError = error.response.data.error
   throw new GenericException(mappedError.code, mappedError.type)
@@ -49,12 +54,15 @@ const handleRequestError = error => {
 
 /**
  * Method to mount an hearders with user token
- * 
+ *
  * @param {UserCryptum} userCryptum need an user cryptum to add bearer token
  * @returns an object with Authorization value
  */
-const mountTokenHeaders = userCryptum => ({
-  Authorization: `Bearer ${userCryptum.token}`,
-})
+const mountTokenHeaders = userCryptum => {
+  if (!UserCryptum.isUserCryptum(userCryptum))
+    throw new InvalidTypeException('userCryptum', 'UserCryptum')
+
+  return { Authorization: `Bearer ${userCryptum.token}` }
+}
 
 module.exports = { getApiMethod, handleRequestError, mountTokenHeaders }

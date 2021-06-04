@@ -39,6 +39,7 @@ class UserCryptum {
    * @returns true if can mount and false if not
    */
   static validateMandatoryValues(object) {
+    if (!object) return false
     if (!object.token || !object.id) return false
 
     return true

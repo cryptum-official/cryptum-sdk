@@ -29,6 +29,7 @@ class ApiKeyCryptum {
    * @returns true if can mount and false if not
    */
   static validateMandatoryValues(object) {
+    if (!object) return false
     if (!object.key || !object.id || !object.accessLevel) return false
 
     return true

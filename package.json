@@ -7,10 +7,14 @@
   "author": "blockforce",
   "license": "MIT",
   "node-version": "14.17.0",
+  "scripts": {
+    "test": "mocha 'tests/**/*.js' --recursive --timeout 60000 --exit"
+  },
   "dependencies": {
     "axios": "^0.21.1"
   },
   "devDependencies": {
-    "mocha": "^8.4.0"
+    "mocha": "^8.4.0",
+    "nock": "^13.1.0"
   }
 }
