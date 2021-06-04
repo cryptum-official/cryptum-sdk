@@ -2,7 +2,6 @@ const assert = require('assert')
 const nock = require('nock')
 
 const UserAdapter = require('../../src/features/user/adapter')
-const UserCryptum = require('../../src/features/user/entity')
 
 describe.only('Test Suite of the User (Adapter)', function () {
   this.beforeAll(() => {

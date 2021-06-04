@@ -3,7 +3,7 @@ const UserUseCases = require('../../src/features/user/use-cases')
 const UserCryptum = require('../../src/features/user/entity')
 
 describe.only('Test Suite of the User (Use Cases)', function () {
-  it('Check UseCases to mount an Cryptum user valid data', async () => {
+  it('Check UseCases to mount an Cryptum user with valid data', async () => {
     const validData = {
       token:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1OGIxNGEzMC1hNjc1LTRkNjEtOGFmYi1lM2M2ZDM3NzQzZmYiLCJjcmVhdGVUaW1lIjoiMjAyMS0wNi0wNFQxNDoxMzoyNC4zMzlaIiwiaWF0IjoxNjIyODE2MDA0fQ.oSS_6pd6CxNE_9tYL-hsLt1n9ui5vGfZhjhGDC02ma0',
@@ -21,7 +21,7 @@ describe.only('Test Suite of the User (Use Cases)', function () {
     assert.deepStrictEqual(result, expectedResult)
   })
 
-  it('Check UseCases to mount an Cryptum user invalid data (null)', async () => {
+  it('Check UseCases to mount an Cryptum user with invalid data (null)', async () => {
     const expectedResult = 'Not can mount UserCryptum entity'
     try {
       UserUseCases.mount(null)
@@ -30,7 +30,7 @@ describe.only('Test Suite of the User (Use Cases)', function () {
     }
   })
 
-  it('Check UseCases to mount an Cryptum user invalid data (undefined)', async () => {
+  it('Check UseCases to mount an Cryptum user with invalid data (undefined)', async () => {
     const expectedResult = 'Not can mount UserCryptum entity'
     try {
       UserUseCases.mount(undefined)
@@ -39,7 +39,7 @@ describe.only('Test Suite of the User (Use Cases)', function () {
     }
   })
 
-  it('Check UseCases to mount an Cryptum user invvalid data (Without token param)', async () => {
+  it('Check UseCases to mount an Cryptum user with invalid data (Without token param)', async () => {
     const invalidData = {
       token: null,
       name: 'Example User',
@@ -59,7 +59,7 @@ describe.only('Test Suite of the User (Use Cases)', function () {
     }
   })
 
-  it('Check UseCases to mount an Cryptum user invalid data (Without id param)', async () => {
+  it('Check UseCases to mount an Cryptum user with invalid data (Without id param)', async () => {
     const invalidData = {
       token:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1OGIxNGEzMC1hNjc1LTRkNjEtOGFmYi1lM2M2ZDM3NzQzZmYiLCJjcmVhdGVUaW1lIjoiMjAyMS0wNi0wNFQxNDoxMzoyNC4zMzlaIiwiaWF0IjoxNjIyODE2MDA0fQ.oSS_6pd6CxNE_9tYL-hsLt1n9ui5vGfZhjhGDC02ma0',

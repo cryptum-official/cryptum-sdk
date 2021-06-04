@@ -18,19 +18,31 @@ class ApiKeyCryptum {
   static isApiKey(apiKey) {
     if (!(apiKey instanceof ApiKeyCryptum)) return false
     if (!apiKey.key || !apiKey.id || !apiKey.accessLevel) return false
+    if (
+      apiKey.accessLevel !== 'fullaccess' &&
+      apiKey.accessLevel !== 'read' &&
+      apiKey.accessLevel !== 'write'
+    )
+      return false
 
     return true
   }
 
   /**
    * Validate if an object can mount an ApiKeyCryptum
-   * 
+   *
    * @param {*} object generic object with mandatory values: key, id, accessLevel
    * @returns true if can mount and false if not
    */
   static validateMandatoryValues(object) {
     if (!object) return false
     if (!object.key || !object.id || !object.accessLevel) return false
+    if (
+      object.accessLevel !== 'fullaccess' &&
+      object.accessLevel !== 'read' &&
+      object.accessLevel !== 'write'
+    )
+      return false
 
     return true
   }

@@ -5,6 +5,8 @@ const Interface = require('./interface')
 
 class UseCases extends Interface {
   mountApiKeys(apiKeys) {
+    if (!apiKeys) throw new NotCanMountException('ApiKeyCryptum')
+
     const keys = apiKeys.map(apiKey => {
       if (!ApiKeyCryptum.validateMandatoryValues(apiKey))
         throw new NotCanMountException('ApiKeyCryptum')

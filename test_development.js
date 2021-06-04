@@ -2,7 +2,7 @@ const CryptumSDK = require('./index')
 
 const credentialsTest = {
   email: 'yury@sample.com',
-  password: '12344',
+  password: '1234',
 }
 
 const configuration = {
@@ -24,10 +24,9 @@ const testApiKeys = async () => {
   const userController = sdk.getUserController()
   const userCryptum = await userController.auth(credentialsTest)
 
-  // const apiKeyController = sdk.getApiKeyController()
-  // const apiKeys = await apiKeyController.getApiKeys(userCryptum)
-  // const apiKeys = await apiKeyController.getApiKeys({id: "32432432", token: "342432432"})
-  // console.log(apiKeys)
+  const apiKeyController = sdk.getApiKeyController()
+  const apiKeys = await apiKeyController.getApiKeys(userCryptum)
+  console.log(apiKeys)
 }
 
 testApiKeys()
