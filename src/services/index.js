@@ -7,7 +7,7 @@ const {
   InvalidTypeException,
 } = require('../../errors')
 
-const UserCryptum = require('../features/user/entity')
+const UserCryptum = require('../features/users/entity')
 const ApiKeyCryptum = require('../features/api-keys/entity')
 
 /**

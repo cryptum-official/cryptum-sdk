@@ -2,7 +2,7 @@ const assert = require('assert')
 const nock = require('nock')
 
 const ApiKeyAdapter = require('../../src/features/api-keys/adapter')
-const UserCryptum = require('../../src/features/user/entity')
+const UserCryptum = require('../../src/features/users/entity')
 
 describe.only('Test Suite of the Api Key (Adapter)', function () {
   this.beforeAll(() => {

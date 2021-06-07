@@ -1,8 +1,8 @@
 const assert = require('assert')
 const nock = require('nock')
 
-const UserController = require('../../src/features/user/controller')
-const UserCryptum = require('../../src/features/user/entity')
+const UserController = require('../../src/features/users/controller')
+const UserCryptum = require('../../src/features/users/entity')
 
 describe.only('Test Suite of the User (Controller)', function () {
   this.beforeAll(() => {

@@ -1,4 +1,4 @@
-const UserController = require('./src/features/user/controller')
+const UserController = require('./src/features/users/controller')
 const ApiKeyController = require('./src/features/api-keys/controller')
 
 class CryptumSDK {

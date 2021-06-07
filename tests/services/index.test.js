@@ -13,7 +13,7 @@ const {
   handleRequestError,
 } = require('../../src/services')
 
-const UserCryptum = require('../../src/features/user/entity')
+const UserCryptum = require('../../src/features/users/entity')
 const ApiKeyCryptum = require('../../src/features/api-keys/entity')
 
 describe.only('Test Suite of the Services (All project)', function () {

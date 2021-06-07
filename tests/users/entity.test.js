@@ -1,5 +1,5 @@
 const assert = require('assert')
-const UserCryptum = require('../../src/features/user/entity')
+const UserCryptum = require('../../src/features/users/entity')
 
 describe.only('Test Suite of the User (Entity)', function () {
   it('Check if an valid UserCryptum is an UserCryptum', async () => {

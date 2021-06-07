@@ -1,6 +1,6 @@
 const assert = require('assert')
-const UserUseCases = require('../../src/features/user/use-cases')
-const UserCryptum = require('../../src/features/user/entity')
+const UserUseCases = require('../../src/features/users/use-cases')
+const UserCryptum = require('../../src/features/users/entity')
 
 describe.only('Test Suite of the User (Use Cases)', function () {
   it('Check UseCases to mount an Cryptum user with valid data', async () => {

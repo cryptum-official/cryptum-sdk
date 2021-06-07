@@ -3,7 +3,7 @@ const nock = require('nock')
 
 const ApiKeyController = require('../../src/features/api-keys/controller')
 
-const UserCryptum = require('../../src/features/user/entity')
+const UserCryptum = require('../../src/features/users/entity')
 const ApiKeyCryptum = require('../../src/features/api-keys/entity')
 
 describe.only('Test Suite of the Api Key (Controller)', function () {
