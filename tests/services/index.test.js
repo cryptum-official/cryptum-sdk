@@ -7,12 +7,14 @@ const {
   InvalidTypeException,
 } = require('../../errors')
 const {
-  mountTokenHeaders,
-  handleRequestError,
   getApiMethod,
+  mountTokenHeaders,
+  mountApiKeyHeaders,
+  handleRequestError,
 } = require('../../src/services')
 
 const UserCryptum = require('../../src/features/user/entity')
+const ApiKeyCryptum = require('../../src/features/api-keys/entity')
 
 describe.only('Test Suite of the Services (All project)', function () {
   this.beforeAll(() => {
@@ -238,5 +240,125 @@ describe.only('Test Suite of the Services (All project)', function () {
     })
     const result = await deleteMethod('/sampleDELETE')
     assert.deepStrictEqual(result.data, expectedResult)
+  })
+
+  it('Check if an services can mount an header (With valid ApiKeyCryptum) - method: mountApiKeyHeaders', async () => {
+    const expectedResult = {
+      'x-api-key': 'QViCLRuuHlexTyBnwQTySrY2izWHBT5pj5fbAI4jzCg=',
+    }
+
+    const apiKey = new ApiKeyCryptum({
+      id: '143c07af-cc73-4d46-9e0a-8d96624a082e',
+      name: 'Sample Key With created at',
+      key: 'QViCLRuuHlexTyBnwQTySrY2izWHBT5pj5fbAI4jzCg=',
+      active: 1,
+      ownerId: '58b14a30-a675-4d61-8afb-e3c6d37743ff',
+      createdAt: '2021-05-21T17:54:32.000Z',
+      accessLevel: 'fullaccess',
+    })
+
+    const result = mountApiKeyHeaders(apiKey)
+    assert.deepStrictEqual(result, expectedResult)
+  })
+
+  it('Check if an services can mount an header (With invalid ApiKeyCryptum without key) - method: mountApiKeyHeaders', async () => {
+    const expectedResult =
+      'The "apiKeyCryptum" parameter must be of the "ApiKeyCryptum" type'
+
+    const apiKey = new ApiKeyCryptum({
+      id: '143c07af-cc73-4d46-9e0a-8d96624a082e',
+      name: 'Sample Key With created at',
+      active: 1,
+      ownerId: '58b14a30-a675-4d61-8afb-e3c6d37743ff',
+      createdAt: '2021-05-21T17:54:32.000Z',
+      accessLevel: 'fullaccess',
+    })
+
+    try {
+      mountApiKeyHeaders(apiKey)
+    } catch (error) {
+      assert.deepStrictEqual(error.message, expectedResult)
+    }
+  })
+
+  it('Check if an services can mount an header (With invalid ApiKeyCryptum without id) - method: mountApiKeyHeaders', async () => {
+    const expectedResult =
+      'The "apiKeyCryptum" parameter must be of the "ApiKeyCryptum" type'
+
+    const apiKey = new ApiKeyCryptum({
+      name: 'Sample Key With created at',
+      key: 'QViCLRuuHlexTyBnwQTySrY2izWHBT5pj5fbAI4jzCg=',
+      active: 1,
+      ownerId: '58b14a30-a675-4d61-8afb-e3c6d37743ff',
+      createdAt: '2021-05-21T17:54:32.000Z',
+      accessLevel: 'fullaccess',
+    })
+
+    try {
+      mountApiKeyHeaders(apiKey)
+    } catch (error) {
+      assert.deepStrictEqual(error.message, expectedResult)
+    }
+  })
+
+  it('Check if an services can mount an header (With valid JSON, but require ApiKeyCryptum) - method: mountApiKeyHeaders', async () => {
+    const expectedResult =
+      'The "apiKeyCryptum" parameter must be of the "ApiKeyCryptum" type'
+
+    const apiKey = {
+      id: '143c07af-cc73-4d46-9e0a-8d96624a082e',
+      name: 'Sample Key With created at',
+      key: 'QViCLRuuHlexTyBnwQTySrY2izWHBT5pj5fbAI4jzCg=',
+      active: 1,
+      ownerId: '58b14a30-a675-4d61-8afb-e3c6d37743ff',
+      createdAt: '2021-05-21T17:54:32.000Z',
+      accessLevel: 'fullaccess',
+    }
+
+    try {
+      mountApiKeyHeaders(apiKey)
+    } catch (error) {
+      assert.deepStrictEqual(error.message, expectedResult)
+    }
+  })
+
+  it('Check if an services can mount an header (With invalid JSON without key) - method: mountApiKeyHeaders', async () => {
+    const expectedResult =
+      'The "apiKeyCryptum" parameter must be of the "ApiKeyCryptum" type'
+
+    const apiKey = {
+      id: '143c07af-cc73-4d46-9e0a-8d96624a082e',
+      name: 'Sample Key With created at',
+      active: 1,
+      ownerId: '58b14a30-a675-4d61-8afb-e3c6d37743ff',
+      createdAt: '2021-05-21T17:54:32.000Z',
+      accessLevel: 'fullaccess',
+    }
+
+    try {
+      mountApiKeyHeaders(apiKey)
+    } catch (error) {
+      assert.deepStrictEqual(error.message, expectedResult)
+    }
+  })
+
+  it('Check if an services can mount an header (With invalid JSON without id) - method: mountApiKeyHeaders', async () => {
+    const expectedResult =
+      'The "apiKeyCryptum" parameter must be of the "ApiKeyCryptum" type'
+
+    const apiKey = {
+      name: 'Sample Key With created at',
+      key: 'QViCLRuuHlexTyBnwQTySrY2izWHBT5pj5fbAI4jzCg=',
+      active: 1,
+      ownerId: '58b14a30-a675-4d61-8afb-e3c6d37743ff',
+      createdAt: '2021-05-21T17:54:32.000Z',
+      accessLevel: 'fullaccess',
+    }
+
+    try {
+      mountApiKeyHeaders(apiKey)
+    } catch (error) {
+      assert.deepStrictEqual(error.message, expectedResult)
+    }
   })
 })

@@ -8,6 +8,7 @@ const {
 } = require('../../errors')
 
 const UserCryptum = require('../features/user/entity')
+const ApiKeyCryptum = require('../features/api-keys/entity')
 
 /**
  * Method to get an specific api method how get, post, put and delete
@@ -65,4 +66,22 @@ const mountTokenHeaders = userCryptum => {
   return { Authorization: `Bearer ${userCryptum.token}` }
 }
 
-module.exports = { getApiMethod, handleRequestError, mountTokenHeaders }
+/**
+ * Method to mount an hearders with api key
+ *
+ * @param {ApiKeyCryptum} apiKeyCryptum need an api key cryptum to add key
+ * @returns an object with x-api-key value
+ */
+const mountApiKeyHeaders = apiKeyCryptum => {
+  if (!ApiKeyCryptum.isApiKey(apiKeyCryptum))
+    throw new InvalidTypeException('apiKeyCryptum', 'ApiKeyCryptum')
+
+  return { 'x-api-key': apiKeyCryptum.key }
+}
+
+module.exports = {
+  getApiMethod,
+  handleRequestError,
+  mountApiKeyHeaders,
+  mountTokenHeaders,
+}
