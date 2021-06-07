@@ -1,51 +1,72 @@
-class ApiKeyCryptum {
-  constructor({ id, name, key, active, ownerId, createdAt, accessLevel }) {
+class WebhookCryptum {
+  constructor({ id, asset, event, url, address, confirmations, protocol }) {
     this.id = id
-    this.name = name
-    this.key = key
-    this.active = active
-    this.ownerId = ownerId
-    this.createdAt = createdAt
-    this.accessLevel = accessLevel
+    this.asset = asset
+    this.event = event
+    this.url = url
+    this.address = address
+    this.confirmations = confirmations
+    this.protocol = protocol
   }
 
   /**
-   * Method to validate if an api key is valid
+   * Method to validate if an webhook is valid
    *
-   * @param {*} apiKey to validate if is an ApiKeyCryptum valid
+   * @param {*} webhook to validate if is an WebhookCryptum valid, to your webhook are valid.
+   * The webhook need are registered in Cryptum and has  { id, event, url, address, confirmations } attributes
+   * 
    * @returns true if is valid and false if not
    */
-  static isApiKey(apiKey) {
-    if (!(apiKey instanceof ApiKeyCryptum)) return false
-    if (!apiKey.key || !apiKey.id || !apiKey.accessLevel) return false
-    if (
-      apiKey.accessLevel !== 'fullaccess' &&
-      apiKey.accessLevel !== 'read' &&
-      apiKey.accessLevel !== 'write'
-    )
-      return false
+  static isWebhookCryptum(webhook) {
+    if (!(webhook instanceof WebhookCryptum)) return false
 
-    return true
+    return this.validateMandatoryValues(webhook)
   }
 
   /**
-   * Validate if an object can mount an ApiKeyCryptum
+   * Validate if an object can mount an WebhookCryptum, not create
+   * if you need attributes to create an webhook in cryptum call canCreate method
    *
-   * @param {*} object generic object with mandatory values: key, id, accessLevel
+   * @param {*} object generic object with mandatory values: id, event, url, address, and confirmations
    * @returns true if can mount and false if not
    */
   static validateMandatoryValues(object) {
     if (!object) return false
-    if (!object.key || !object.id || !object.accessLevel) return false
-    if (
-      object.accessLevel !== 'fullaccess' &&
-      object.accessLevel !== 'read' &&
-      object.accessLevel !== 'write'
-    )
-      return false
 
-    return true
+    const { id, event, url, address, confirmations } = object
+    return !!id && !!event && !!url && !!address && !!confirmations
+  }
+
+  /**
+   * Method to validate if you can create an Webhook in cryptum
+   *
+   * @param {Object} webhook with this attributes: { asset, event, address, confirmations, protocol: ['BITCOIN' or 'ETHEREUM'] }
+   * @returns
+   */
+  static canCreate(webhook) {
+    if (!webhook) return false
+
+    const { asset, url, event, address, confirmations, protocol } = webhook
+    return (
+      !!asset &&
+      !!url &&
+      !!event &&
+      !!address &&
+      !!confirmations &&
+      !!protocol &&
+      !!this.isValidProtocol(protocol)
+    )
+  }
+
+  /**
+   * Method to protocol is valid to create an webhook with cryptum
+   *
+   * @param {String} protocol string with protocol enum, you can use only ['ETHEREUM' or 'BITCOIN'] protocols
+   * @returns true if protocol is valid, and false if not
+   */
+  static isValidProtocol(protocol) {
+    return protocol === 'ETHEREUM' || protocol === 'BITCOIN'
   }
 }
 
-module.exports = ApiKeyCryptum
+module.exports = WebhookCryptum
