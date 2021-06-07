@@ -1,0 +1,6 @@
+{
+  "getApiKeys": {
+    "method": "GET",
+    "url": "/apiKey"
+  }
+}

@@ -1,14 +1,32 @@
 const CryptumSDK = require('./index')
 
-const sdk = new CryptumSDK({
+const credentialsTest = {
+  email: 'yury@sample.com',
+  password: '1234',
+}
+
+const configuration = {
   config: {
     enviroment: 'development',
   },
-})
+}
 
-const userController = sdk.getUserController()
+const sdk = new CryptumSDK(configuration)
 
-userController.auth({
-  email: 'yury@sample.com',
-  password: '12344',
-}).then(user => console.log(user))
+const testUserCryptum = async () => {
+  const userController = sdk.getUserController()
+  const userCryptum = await userController.auth(credentialsTest)
+
+  console.log(userCryptum)
+}
+
+const testApiKeys = async () => {
+  const userController = sdk.getUserController()
+  const userCryptum = await userController.auth(credentialsTest)
+
+  const apiKeyController = sdk.getApiKeyController()
+  const apiKeys = await apiKeyController.getApiKeys(userCryptum)
+  console.log(apiKeys)
+}
+
+testApiKeys()

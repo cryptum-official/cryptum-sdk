@@ -5,7 +5,8 @@ const Interface = require('./interface')
 
 class UseCases extends Interface {
   mount(user) {
-    if (!user || !user.token || !user.id) throw new NotCanMountException('User')
+    if (!UserCryptum.validateMandatoryValues(user))
+      throw new NotCanMountException('UserCryptum')
 
     return new UserCryptum(user)
   }

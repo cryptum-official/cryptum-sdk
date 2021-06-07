@@ -1,3 +1,6 @@
+/**
+ * Error used when is an generic or API response.
+ */
 class GenericException extends Error {
   constructor(code, type) {
     super(

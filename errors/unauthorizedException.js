@@ -1,3 +1,6 @@
+/**
+ * Error used when an api response contains 401 code.
+ */
 class UnauthorizedException extends Error {
   constructor() {
     super(
