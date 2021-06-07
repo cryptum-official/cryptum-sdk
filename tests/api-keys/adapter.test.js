@@ -137,7 +137,7 @@ describe.only('Test Suite of the Api Key (Adapter)', function () {
 
   it('Check if an adapter can get apikeys (With invalid data - null)', async () => {
     const expectedResult =
-      'The "userCryptum" parameter must be of the "UserCryptum" type'
+      'The "userCryptum" parameter must be of the "UserCryptum" type, or not is an valid object'
 
     try {
       await ApiKeyAdapter.getApiKeys(null, { enviroment: 'development' })
@@ -148,7 +148,7 @@ describe.only('Test Suite of the Api Key (Adapter)', function () {
 
   it('Check if an adapter can get apikeys (With invalid data - undefined)', async () => {
     const expectedResult =
-      'The "userCryptum" parameter must be of the "UserCryptum" type'
+      'The "userCryptum" parameter must be of the "UserCryptum" type, or not is an valid object'
 
     try {
       await ApiKeyAdapter.getApiKeys(undefined, { enviroment: 'development' })

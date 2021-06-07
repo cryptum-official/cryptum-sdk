@@ -59,7 +59,7 @@ describe.only('Test Suite of the Services (All project)', function () {
 
   it('Check if an services can mount an header (With invalid UserCryptum) - method: mountTokenHeaders', async () => {
     const expectedResult =
-      'The "userCryptum" parameter must be of the "UserCryptum" type'
+      'The "userCryptum" parameter must be of the "UserCryptum" type, or not is an valid object'
 
     const user = new UserCryptum({
       token: null,
@@ -81,7 +81,7 @@ describe.only('Test Suite of the Services (All project)', function () {
 
   it('Check if an services can mount an header (With null UserCryptum) - method: mountTokenHeaders', async () => {
     const expectedResult =
-      'The "userCryptum" parameter must be of the "UserCryptum" type'
+      'The "userCryptum" parameter must be of the "UserCryptum" type, or not is an valid object'
 
     try {
       mountTokenHeaders(null)
@@ -92,7 +92,7 @@ describe.only('Test Suite of the Services (All project)', function () {
 
   it('Check if an services can mount an header (With undefined UserCryptum) - method: mountTokenHeaders', async () => {
     const expectedResult =
-      'The "userCryptum" parameter must be of the "UserCryptum" type'
+      'The "userCryptum" parameter must be of the "UserCryptum" type, or not is an valid object'
 
     try {
       mountTokenHeaders(undefined)
@@ -157,7 +157,7 @@ describe.only('Test Suite of the Services (All project)', function () {
 
   it('Check if an services throw respective error (With InvalidTypeException error param) - method: handleRequestError', async () => {
     const expectedResult =
-      'The "user" parameter must be of the "UserCryptum" type'
+      'The "user" parameter must be of the "UserCryptum" type, or not is an valid object'
 
     try {
       handleRequestError(new InvalidTypeException('user', 'UserCryptum'))
@@ -263,7 +263,7 @@ describe.only('Test Suite of the Services (All project)', function () {
 
   it('Check if an services can mount an header (With invalid ApiKeyCryptum without key) - method: mountApiKeyHeaders', async () => {
     const expectedResult =
-      'The "apiKeyCryptum" parameter must be of the "ApiKeyCryptum" type'
+      'The "apiKeyCryptum" parameter must be of the "ApiKeyCryptum" type, or not is an valid object'
 
     const apiKey = new ApiKeyCryptum({
       id: '143c07af-cc73-4d46-9e0a-8d96624a082e',
@@ -283,7 +283,7 @@ describe.only('Test Suite of the Services (All project)', function () {
 
   it('Check if an services can mount an header (With invalid ApiKeyCryptum without id) - method: mountApiKeyHeaders', async () => {
     const expectedResult =
-      'The "apiKeyCryptum" parameter must be of the "ApiKeyCryptum" type'
+      'The "apiKeyCryptum" parameter must be of the "ApiKeyCryptum" type, or not is an valid object'
 
     const apiKey = new ApiKeyCryptum({
       name: 'Sample Key With created at',
@@ -303,7 +303,7 @@ describe.only('Test Suite of the Services (All project)', function () {
 
   it('Check if an services can mount an header (With valid JSON, but require ApiKeyCryptum) - method: mountApiKeyHeaders', async () => {
     const expectedResult =
-      'The "apiKeyCryptum" parameter must be of the "ApiKeyCryptum" type'
+      'The "apiKeyCryptum" parameter must be of the "ApiKeyCryptum" type, or not is an valid object'
 
     const apiKey = {
       id: '143c07af-cc73-4d46-9e0a-8d96624a082e',
@@ -324,7 +324,7 @@ describe.only('Test Suite of the Services (All project)', function () {
 
   it('Check if an services can mount an header (With invalid JSON without key) - method: mountApiKeyHeaders', async () => {
     const expectedResult =
-      'The "apiKeyCryptum" parameter must be of the "ApiKeyCryptum" type'
+      'The "apiKeyCryptum" parameter must be of the "ApiKeyCryptum" type, or not is an valid object'
 
     const apiKey = {
       id: '143c07af-cc73-4d46-9e0a-8d96624a082e',
@@ -344,7 +344,7 @@ describe.only('Test Suite of the Services (All project)', function () {
 
   it('Check if an services can mount an header (With invalid JSON without id) - method: mountApiKeyHeaders', async () => {
     const expectedResult =
-      'The "apiKeyCryptum" parameter must be of the "ApiKeyCryptum" type'
+      'The "apiKeyCryptum" parameter must be of the "ApiKeyCryptum" type, or not is an valid object'
 
     const apiKey = {
       name: 'Sample Key With created at',

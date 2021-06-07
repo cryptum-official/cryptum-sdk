@@ -4,7 +4,7 @@
 class InvalidTypeException extends Error {
   constructor(paramName, paramType) {
     super(
-      `The "${paramName}" parameter must be of the "${paramType}" type`
+      `The "${paramName}" parameter must be of the "${paramType}" type, or not is an valid object`
     )
   }
 }

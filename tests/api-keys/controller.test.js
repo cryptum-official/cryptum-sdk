@@ -133,7 +133,7 @@ describe.only('Test Suite of the Api Key (Controller)', function () {
     }
 
     const expectedResult =
-      'The "user" parameter must be of the "UserCryptum" type'
+      'The "user" parameter must be of the "UserCryptum" type, or not is an valid object'
 
     try {
       const controller = new ApiKeyController({ enviroment: 'development' })
@@ -156,7 +156,7 @@ describe.only('Test Suite of the Api Key (Controller)', function () {
     })
 
     const expectedResult =
-      'The "user" parameter must be of the "UserCryptum" type'
+      'The "user" parameter must be of the "UserCryptum" type, or not is an valid object'
 
     try {
       const controller = new ApiKeyController({ enviroment: 'development' })
