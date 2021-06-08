@@ -376,7 +376,7 @@ describe.only('Test Suite of the Webhook (Entity)', function () {
     assert.deepStrictEqual(result, expectedResult)
   })
 
-  it('Check if with WebhookCryptum can create an WebhookCryptum in API (With valid data) : isWebhookCryptum', async () => {
+  it('Check if with WebhookCryptum can create an WebhookCryptum in API (With valid data) : canCreate', async () => {
     const data = {
       asset: 'BTC',
       event: 'tx-confirmation',
@@ -393,7 +393,7 @@ describe.only('Test Suite of the Webhook (Entity)', function () {
     assert.deepStrictEqual(result, expectedResult)
   })
 
-  it('Check if with JSON can create an WebhookCryptum (With valid data) : isWebhookCryptum', async () => {
+  it('Check if with JSON can create an WebhookCryptum (With valid data) : canCreate', async () => {
     const data = {
       asset: 'BTC',
       event: 'tx-confirmation',
@@ -408,7 +408,7 @@ describe.only('Test Suite of the Webhook (Entity)', function () {
     assert.deepStrictEqual(result, expectedResult)
   })
 
-  it('Check if with JSON can create an WebhookCryptum (Without asset) : isWebhookCryptum', async () => {
+  it('Check if with JSON can create an WebhookCryptum (Without asset) : canCreate', async () => {
     const data = {
       event: 'tx-confirmation',
       url: 'https://site.com',
@@ -422,7 +422,7 @@ describe.only('Test Suite of the Webhook (Entity)', function () {
     assert.deepStrictEqual(result, expectedResult)
   })
 
-  it('Check if with JSON can create an WebhookCryptum (Without event) : isWebhookCryptum', async () => {
+  it('Check if with JSON can create an WebhookCryptum (Without event) : canCreate', async () => {
     const data = {
       asset: 'BTC',
       url: 'https://site.com',
@@ -436,7 +436,7 @@ describe.only('Test Suite of the Webhook (Entity)', function () {
     assert.deepStrictEqual(result, expectedResult)
   })
 
-  it('Check if with JSON can create an WebhookCryptum (Without url) : isWebhookCryptum', async () => {
+  it('Check if with JSON can create an WebhookCryptum (Without url) : canCreate', async () => {
     const data = {
       asset: 'BTC',
       event: 'tx-confirmation',
@@ -450,7 +450,7 @@ describe.only('Test Suite of the Webhook (Entity)', function () {
     assert.deepStrictEqual(result, expectedResult)
   })
 
-  it('Check if with JSON can create an WebhookCryptum (Without address) : isWebhookCryptum', async () => {
+  it('Check if with JSON can create an WebhookCryptum (Without address) : canCreate', async () => {
     const data = {
       asset: 'BTC',
       event: 'tx-confirmation',
@@ -464,7 +464,7 @@ describe.only('Test Suite of the Webhook (Entity)', function () {
     assert.deepStrictEqual(result, expectedResult)
   })
 
-  it('Check if with JSON can create an WebhookCryptum (Without confirmations) : isWebhookCryptum', async () => {
+  it('Check if with JSON can create an WebhookCryptum (Without confirmations) : canCreate', async () => {
     const data = {
       asset: 'BTC',
       event: 'tx-confirmation',
@@ -478,7 +478,7 @@ describe.only('Test Suite of the Webhook (Entity)', function () {
     assert.deepStrictEqual(result, expectedResult)
   })
 
-  it('Check if with JSON can create an WebhookCryptum (Without protocol) : isWebhookCryptum', async () => {
+  it('Check if with JSON can create an WebhookCryptum (Without protocol) : canCreate', async () => {
     const data = {
       asset: 'BTC',
       event: 'tx-confirmation',
@@ -489,6 +489,33 @@ describe.only('Test Suite of the Webhook (Entity)', function () {
 
     const expectedResult = false
     const result = WebhookCryptum.canCreate(data)
+    assert.deepStrictEqual(result, expectedResult)
+  })
+
+  it('Check if with JSON can create an WebhookCryptum (With invalid event) : canCreate', async () => {
+    const data = {
+      asset: 'BTC',
+      event: 'tx-confirmations',
+      url: 'https://site.com',
+      address: '0x0c99adab65a55df5faf53ab923f43d9eb9368772',
+      confirmations: 6,
+      protocol: 'BITCOIN',
+    }
+
+    const expectedResult = false
+    const result = WebhookCryptum.canCreate(data)
+    assert.deepStrictEqual(result, expectedResult)
+  })
+
+  it('Check if is valid event to one WebhookCryptum (Invalid) : isValidEvent', async () => {
+    const expectedResult = false
+    const result = WebhookCryptum.isValidEvent('tx-confirmations')
+    assert.deepStrictEqual(result, expectedResult)
+  })
+
+  it('Check if is valid event to one WebhookCryptum (Valid) : isValidEvent', async () => {
+    const expectedResult = true
+    const result = WebhookCryptum.isValidEvent('tx-confirmation')
     assert.deepStrictEqual(result, expectedResult)
   })
 })

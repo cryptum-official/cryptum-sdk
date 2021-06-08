@@ -34,13 +34,13 @@ class WebhookCryptum {
     if (!object) return false
 
     const { id, event, url, address, confirmations } = object
-    return !!id && !!event && !!url && !!address && !!confirmations
+    return !!id && !!event && !!url && !!address && !!confirmations && this.isValidEvent(event)
   }
 
   /**
    * Method to validate if you can create an Webhook in cryptum
    *
-   * @param {Object} webhook with this attributes: { asset, event, address, confirmations, protocol: ['BITCOIN' or 'ETHEREUM'] }
+   * @param {Object} webhook with this attributes: { asset, event: 'tx-confirmation', address, confirmations, protocol: ['BITCOIN' or 'ETHEREUM'] }
    * @returns
    */
   static canCreate(webhook) {
@@ -54,18 +54,29 @@ class WebhookCryptum {
       !!address &&
       !!confirmations &&
       !!protocol &&
-      !!this.isValidProtocol(protocol)
+      this.isValidProtocol(protocol) &&
+      this.isValidEvent(event)
     )
   }
 
   /**
-   * Method to protocol is valid to create an webhook with cryptum
+   * Mehtod to verify if protocol is valid to create an webhook wih cryptum
    *
-   * @param {String} protocol string with protocol enum, you can use only ['ETHEREUM' or 'BITCOIN'] protocols
+   * @param {string} protocol string with protocol enum, you can use only ['ETHEREUM' or 'BITCOIN'] protocols
    * @returns true if protocol is valid, and false if not
    */
   static isValidProtocol(protocol) {
     return protocol === 'ETHEREUM' || protocol === 'BITCOIN'
+  }
+
+  /**
+   * Mehtod to verify if event is valid to create an webhook wih cryptum
+   * 
+   * @param {string} event string with event valid, unique event valid is tx-confirmation
+   * @returns true if event is valid, and false if not 
+   */
+  static isValidEvent(event) {
+    return event === 'tx-confirmation'
   }
 }
 

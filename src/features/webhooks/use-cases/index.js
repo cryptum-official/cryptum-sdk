@@ -1,20 +1,23 @@
 const { NotCanMountException } = require('../../../../errors')
 
-const ApiKeyCryptum = require('../entity')
+const WebhookCryptum = require('../entity')
 const Interface = require('./interface')
 
 class UseCases extends Interface {
-  mountApiKeys(apiKeys) {
-    if (!apiKeys) throw new NotCanMountException('ApiKeyCryptum')
+  mountWebhookToCreate(webhook) {
+    if (!webhook) throw new NotCanMountException('WebhookCryptum')
+    if (!WebhookCryptum.canCreate(webhook))
+      throw new NotCanMountException('WebhookCryptum')
 
-    const keys = apiKeys.map(apiKey => {
-      if (!ApiKeyCryptum.validateMandatoryValues(apiKey))
-        throw new NotCanMountException('ApiKeyCryptum')
+    return new WebhookCryptum(webhook)
+  }
 
-      return new ApiKeyCryptum(apiKey)
-    })
+  mountWebhook(webhook) {
+    if (!webhook) throw new NotCanMountException('WebhookCryptum')
+    if (!WebhookCryptum.validateMandatoryValues(webhook))
+      throw new NotCanMountException('WebhookCryptum')
 
-    return keys
+    return new WebhookCryptum(webhook)
   }
 }
 
