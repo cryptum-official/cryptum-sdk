@@ -19,19 +19,19 @@ const ApiKeyCryptum = require('../../src/features/api-keys/entity')
 
 describe.only('Test Suite of the Services (All project)', function () {
   this.beforeAll(() => {
-    nock('http://localhost:8080')
+    nock('https://api-dev.cryptum.io')
       .post('/samplePOST', { test: 'post' })
       .reply(200, { tested: 'post_method' })
 
-    nock('http://localhost:8080')
+    nock('https://api-dev.cryptum.io')
       .put('/samplePUT', { test: 'put' })
       .reply(200, { tested: 'put_method' })
 
-    nock('http://localhost:8080')
+    nock('https://api-dev.cryptum.io')
       .get('/sampleGET')
       .reply(200, { tested: 'get_method' })
 
-    nock('http://localhost:8080')
+    nock('https://api-dev.cryptum.io')
       .delete('/sampleDELETE')
       .reply(200, { tested: 'delete_method' })
   })

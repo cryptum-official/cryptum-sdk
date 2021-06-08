@@ -25,14 +25,14 @@ describe.only('Test Suite of the User (Controller)', function () {
       },
     }
 
-    nock('http://localhost:8080')
+    nock('https://api-dev.cryptum.io')
       .post('/check-user', {
         email: 'example@blockforce.in',
         password: 'secret',
       })
       .reply(200, successResponse)
 
-    nock('http://localhost:8080')
+    nock('https://api-dev.cryptum.io')
       .post('/check-user', {
         email: 'example@blockforce.in',
         password: 'error',

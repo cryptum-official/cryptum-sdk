@@ -45,7 +45,7 @@ describe.only('Test Suite of the Api Key (Adapter)', function () {
       },
     }
 
-    nock('http://localhost:8080', {
+    nock('https://api-dev.cryptum.io', {
       reqheaders: {
         Authorization:
           'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1OGIxNGEzMC1hNjc1LTRkNjEtOGFmYi1lM2M2ZDM3NzQzZmYiLCJjcmVhdGVUaW1lIjoiMjAyMS0wNi0wNFQxNDoxMzoyNC4zMzlaIiwiaWF0IjoxNjIyODE2MDA0fQ.oSS_6pd6CxNE_9tYL-hsLt1n9ui5vGfZhjhGDC02ma0',
@@ -54,7 +54,7 @@ describe.only('Test Suite of the Api Key (Adapter)', function () {
       .get('/apiKey/58b14a30-a675-4d61-8afb-e3c6d37743ff')
       .reply(200, successResponse)
 
-    nock('http://localhost:8080', {
+    nock('https://api-dev.cryptum.io', {
       reqheaders: {
         Authorization: 'Bearer fail',
       },
