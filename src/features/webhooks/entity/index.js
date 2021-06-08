@@ -1,3 +1,4 @@
+const { isValidProtocol } = require('../../../services')
 class WebhookCryptum {
   constructor({ id, asset, event, url, address, confirmations, protocol }) {
     this.id = id
@@ -54,19 +55,9 @@ class WebhookCryptum {
       !!address &&
       !!confirmations &&
       !!protocol &&
-      this.isValidProtocol(protocol) &&
+      isValidProtocol(protocol) &&
       this.isValidEvent(event)
     )
-  }
-
-  /**
-   * Mehtod to verify if protocol is valid to create an webhook wih cryptum
-   *
-   * @param {string} protocol string with protocol enum, you can use only ['ETHEREUM' or 'BITCOIN'] protocols
-   * @returns true if protocol is valid, and false if not
-   */
-  static isValidProtocol(protocol) {
-    return protocol === 'ETHEREUM' || protocol === 'BITCOIN'
   }
 
   /**

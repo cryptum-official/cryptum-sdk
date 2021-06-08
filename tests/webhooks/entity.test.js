@@ -346,36 +346,6 @@ describe.only('Test Suite of the Webhook (Entity)', function () {
     assert.deepStrictEqual(result, expectedResult)
   })
 
-  it('Check if an ETHEREUM is an valid protocol to WebhookCryptum : isValidProtocol', async () => {
-    const expectedResult = true
-    const result = WebhookCryptum.isValidProtocol('ETHEREUM')
-    assert.deepStrictEqual(result, expectedResult)
-  })
-
-  it('Check if an BITCOIN is an valid protocol to WebhookCryptum : isValidProtocol', async () => {
-    const expectedResult = true
-    const result = WebhookCryptum.isValidProtocol('BITCOIN')
-    assert.deepStrictEqual(result, expectedResult)
-  })
-
-  it('Check if an STELLAR is an invalid protocol to WebhookCryptum : isValidProtocol', async () => {
-    const expectedResult = false
-    const result = WebhookCryptum.isValidProtocol('STELLAR')
-    assert.deepStrictEqual(result, expectedResult)
-  })
-
-  it('Check if an null is an invalid protocol to WebhookCryptum : isValidProtocol', async () => {
-    const expectedResult = false
-    const result = WebhookCryptum.isValidProtocol(null)
-    assert.deepStrictEqual(result, expectedResult)
-  })
-
-  it('Check if an undefined is an invalid protocol to WebhookCryptum : isValidProtocol', async () => {
-    const expectedResult = false
-    const result = WebhookCryptum.isValidProtocol(undefined)
-    assert.deepStrictEqual(result, expectedResult)
-  })
-
   it('Check if with WebhookCryptum can create an WebhookCryptum in API (With valid data) : canCreate', async () => {
     const data = {
       asset: 'BTC',

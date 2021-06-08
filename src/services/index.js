@@ -69,19 +69,30 @@ const mountTokenHeaders = userCryptum => {
 /**
  * Method to mount an hearders with api key
  *
- * @param {ApiKeyCryptum} apiKeyCryptum need an api key cryptum to add key
+ * @param {string} apiKeyCryptum need an api key cryptum to add key
  * @returns an object with x-api-key value
  */
-const mountApiKeyHeaders = apiKeyCryptum => {
-  if (!ApiKeyCryptum.isApiKey(apiKeyCryptum))
-    throw new InvalidTypeException('apiKeyCryptum', 'ApiKeyCryptum')
+const mountHeaders = apiKeyCryptum => {
+  if (!apiKeyCryptum)
+    throw new GenericException('0001', 'Required apiKeyCryptum')
 
-  return { 'x-api-key': apiKeyCryptum.key }
+  return { 'x-api-key': apiKeyCryptum }
+}
+
+/**
+ * Mehtod to verify if protocol is supported by Cryptum
+ *
+ * @param {string} protocol string with protocol enum, you can use only ['ETHEREUM' or 'BITCOIN'] protocols
+ * @returns true if protocol is valid, and false if not
+ */
+const isValidProtocol = protocol => {
+  return protocol === 'ETHEREUM' || protocol === 'BITCOIN'
 }
 
 module.exports = {
   getApiMethod,
   handleRequestError,
-  mountApiKeyHeaders,
+  mountHeaders,
   mountTokenHeaders,
+  isValidProtocol,
 }

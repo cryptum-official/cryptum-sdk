@@ -1,6 +1,14 @@
 {
-  "getApiKeys": {
+  "getWebhooks": {
     "method": "GET",
-    "url": "/apiKey"
+    "url": "/webhook"
+  },
+  "createWebhook": {
+    "method": "POST",
+    "url": "/webhook"
+  },
+  "destroyWebhook": {
+    "method": "DELETE",
+    "url": "/webhook"
   }
 }
