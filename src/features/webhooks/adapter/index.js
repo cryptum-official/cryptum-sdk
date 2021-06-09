@@ -4,13 +4,6 @@ const Interface = require('./interface')
 const requests = require('./requests.json')
 
 class Adapter extends Interface {
-  getApiKeys(user, config) {
-    const method = getApiMethod({ requests, key: 'getApiKeys', config })
-    const headers = mountHeaders(user)
-
-    return method(`${requests.getApiKeys.url}/${user.id}`, { headers })
-  }
-
   createWebhook(webhook, config) {
     const method = getApiMethod({ requests, key: 'createWebhook', config })
     const headers = mountHeaders(config.apiKey)
