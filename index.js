@@ -1,5 +1,6 @@
 const UserController = require('./src/features/user/controller')
 const ApiKeyController = require('./src/features/api-keys/controller')
+const WalletController = require('./src/features/wallet/controller')
 
 class CryptumSDK {
   constructor({ config }) {
@@ -22,6 +23,14 @@ class CryptumSDK {
    */
   getApiKeyController() {
     return new ApiKeyController(this.config)
+  }
+
+  /**
+   * Method to get a controller to manipulate wallets
+   * @returns WalletController instance
+   */
+  getWalletController() {
+    return new WalletController(this.config);
   }
 }
 
