@@ -16,8 +16,10 @@
     - [Commons Steps](#commons-steps)
   - [How To Use](#how-to-use)
     - [Configuration](#configuration)
-    - [Authentication](#authentication)
-    - [Get my API Keys](#get-my-api-keys)
+    - [Webhooks](#webhooks)
+      - [Create an Webhook](#create-an-webhook)
+      - [List you Webhooks](#list-you-webhooks)
+      - [Delete an Webhook](#delete-an-webhook)
 - [Contributing](#contributing)
   - [What does my PR need to be accepted ? 🤔](#what-does-my-pr-need-to-be-accepted--)
 - [License](#license)
@@ -59,6 +61,7 @@ const CryptumSDK = require('cryptum-sdk')
 const cryptum = new CryptumSDK({
   config: {
     enviroment: 'development',
+    apiKey: 'my-secret-api-key'
   },
 })
 ```
@@ -68,32 +71,56 @@ To see environments available you can see here:
 |------------------------|
 | development            |
 | production             |
-#### Authentication
 
-Cryptum sdk was made for you to use its respective controllers, you need only instantiate and use yours methods 🚀
+#### Webhooks
 
-```
-const credentials = { email: 'your@email.com', password: 'secret' }
-const userController = cryptum.getUserController()
+##### Create an Webhook
 
-userController.auth(credentials).then(user => console.log(user))
-// Log your UserCryptum
-```
-
-ps.: If your credentials are invalid, the Cryptum sdk return an exception.
-
-#### Get my API Keys
-
-You need only instantiate API keys controller and send user cryptum 🚀
+You need only instantiate Webhook controller and send your webhook to cryptum 🚀
 
 ```
-const apiKeyController = cryptum.getApiKeyController()
-
-apiKeyController.getApiKeys(userCryptum).then(apiKeys => console.log(apiKeys))
-// Log your ApiKeyCryptum list
+const webhookController = sdk.getWebhooksController()
+const webhook = await webhookController.createWebhook({
+  asset: 'BTC',
+  event: 'tx-confirmation',
+  url: 'https://site.com',
+  address: '0x0c99adab65a55df5faf53ab923f43d9eb9368772',
+  confirmations: 6,
+  protocol: 'BITCOIN',
+})
+console.log(webhook)
+// Log your WebhookCryptum
 ```
 
-ps.: If you not provide an UserCryptum valid, the Cryptum sdk return an exception.
+ps.: If you not provide an WebhookCryptum valid, the Cryptum sdk return an exception.
+
+##### List you Webhooks
+
+You need only instantiate Webhook controller and send your asset and your protocol to cryptum 🚀
+
+```
+const webhookController = sdk.getWebhooksController()
+const webhooks = await webhookController.getWebhooks('BTC', 'BITCOIN')
+console.log(webhooks)
+// Log your WebhookCryptum list
+```
+
+ps.: If you not provide an asset or protocol valid, the Cryptum sdk return an exception.
+
+##### Delete an Webhook
+
+You need only instantiate Webhook controller and send your asset, protocol and webhookId to cryptum 🚀
+
+```
+const webhookController = sdk.getWebhooksController()
+const webhooks = await webhookController.destroyWebhook({
+  asset: 'BTC',
+  protocol: 'BITCOIN',
+  webhookId: 'ba291cc3-1e29-4c70-b716-b4185891c569',
+})
+```
+
+ps.: If you not provide an asset, protocol and webhookId valid, the Cryptum sdk return an exception.
 
 ## Contributing
 
