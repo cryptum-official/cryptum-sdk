@@ -1,11 +1,9 @@
 const { NotImplementedException } = require('../../../../errors')
-const UserCryptum = require('../../users/entity')
 
 class Interface {
-
   /**
    * Method to configure required adapters and general configs
-   * 
+   *
    * @param {Object} config an object with this data: { enviroment: 'development'/'production' }
    */
   constructor(config) {
@@ -13,11 +11,11 @@ class Interface {
   }
 
   /**
-   * Is an async method to get api keys and your respective data, how key, name, accessLevel and more.
+   * Is an sync method to create an ApiKeyCryptum object.
    *
-   * @param {UserCryptum} user an object UserCryptum returned of the login
+   * @param {Object} apikey an object with all data required how: { id, key, accessLevel: ['read' or 'write' or 'fullaccess']}
    */
-  getApiKeys(user) {
+  createApiKey(apikey) {
     throw new NotImplementedException()
   }
 }

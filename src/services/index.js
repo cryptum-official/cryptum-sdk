@@ -7,9 +7,6 @@ const {
   InvalidTypeException,
 } = require('../../errors')
 
-const UserCryptum = require('../features/users/entity')
-const ApiKeyCryptum = require('../features/api-keys/entity')
-
 /**
  * Method to get an specific api method how get, post, put and delete
  *
@@ -54,19 +51,6 @@ const handleRequestError = error => {
 }
 
 /**
- * Method to mount an hearders with user token
- *
- * @param {UserCryptum} userCryptum need an user cryptum to add bearer token
- * @returns an object with Authorization value
- */
-const mountTokenHeaders = userCryptum => {
-  if (!UserCryptum.isUserCryptum(userCryptum))
-    throw new InvalidTypeException('userCryptum', 'UserCryptum')
-
-  return { Authorization: `Bearer ${userCryptum.token}` }
-}
-
-/**
  * Method to mount an hearders with api key
  *
  * @param {string} apiKeyCryptum need an api key cryptum to add key
@@ -93,6 +77,5 @@ module.exports = {
   getApiMethod,
   handleRequestError,
   mountHeaders,
-  mountTokenHeaders,
   isValidProtocol,
 }

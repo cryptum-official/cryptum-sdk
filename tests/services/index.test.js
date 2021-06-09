@@ -14,7 +14,6 @@ const {
   isValidProtocol,
 } = require('../../src/services')
 
-const UserCryptum = require('../../src/features/users/entity')
 const ApiKeyCryptum = require('../../src/features/api-keys/entity')
 
 describe.only('Test Suite of the Services (All project)', function () {
@@ -34,72 +33,6 @@ describe.only('Test Suite of the Services (All project)', function () {
     nock('https://api-dev.cryptum.io')
       .delete('/sampleDELETE')
       .reply(200, { tested: 'delete_method' })
-  })
-
-  it('Check if an services can mount an header (With valid UserCryptum) - method: mountTokenHeaders', async () => {
-    const expectedResult = {
-      Authorization:
-        'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1OGIxNGEzMC1hNjc1LTRkNjEtOGFmYi1lM2M2ZDM3NzQzZmYiLCJjcmVhdGVUaW1lIjoiMjAyMS0wNi0wNFQxNDoxMzoyNC4zMzlaIiwiaWF0IjoxNjIyODE2MDA0fQ.oSS_6pd6CxNE_9tYL-hsLt1n9ui5vGfZhjhGDC02ma0',
-    }
-
-    const user = new UserCryptum({
-      token:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1OGIxNGEzMC1hNjc1LTRkNjEtOGFmYi1lM2M2ZDM3NzQzZmYiLCJjcmVhdGVUaW1lIjoiMjAyMS0wNi0wNFQxNDoxMzoyNC4zMzlaIiwiaWF0IjoxNjIyODE2MDA0fQ.oSS_6pd6CxNE_9tYL-hsLt1n9ui5vGfZhjhGDC02ma0',
-      name: 'Example User',
-      phone: null,
-      email: 'example@blockforce.in',
-      userId: '58b14a30-a675-4d61-8afb-e3c6d37743ff',
-      id: '58b14a30-a675-4d61-8afb-e3c6d37743ff',
-      language: null,
-      institution: null,
-    })
-
-    const result = mountTokenHeaders(user)
-    assert.deepStrictEqual(result, expectedResult)
-  })
-
-  it('Check if an services can mount an header (With invalid UserCryptum) - method: mountTokenHeaders', async () => {
-    const expectedResult =
-      'The "userCryptum" parameter must be of the "UserCryptum" type, or not is an valid object'
-
-    const user = new UserCryptum({
-      token: null,
-      name: 'Example User',
-      phone: null,
-      email: 'example@blockforce.in',
-      userId: '58b14a30-a675-4d61-8afb-e3c6d37743ff',
-      id: '58b14a30-a675-4d61-8afb-e3c6d37743ff',
-      language: null,
-      institution: null,
-    })
-
-    try {
-      mountTokenHeaders(user)
-    } catch (error) {
-      assert.deepStrictEqual(error.message, expectedResult)
-    }
-  })
-
-  it('Check if an services can mount an header (With null UserCryptum) - method: mountTokenHeaders', async () => {
-    const expectedResult =
-      'The "userCryptum" parameter must be of the "UserCryptum" type, or not is an valid object'
-
-    try {
-      mountTokenHeaders(null)
-    } catch (error) {
-      assert.deepStrictEqual(error.message, expectedResult)
-    }
-  })
-
-  it('Check if an services can mount an header (With undefined UserCryptum) - method: mountTokenHeaders', async () => {
-    const expectedResult =
-      'The "userCryptum" parameter must be of the "UserCryptum" type, or not is an valid object'
-
-    try {
-      mountTokenHeaders(undefined)
-    } catch (error) {
-      assert.deepStrictEqual(error.message, expectedResult)
-    }
   })
 
   it('Check if an services throw respective error (With undefined param) - method: handleRequestError', async () => {
@@ -158,10 +91,10 @@ describe.only('Test Suite of the Services (All project)', function () {
 
   it('Check if an services throw respective error (With InvalidTypeException error param) - method: handleRequestError', async () => {
     const expectedResult =
-      'The "user" parameter must be of the "UserCryptum" type, or not is an valid object'
+      'The "webhook" parameter must be of the "WebhookCryptum" type, or not is an valid object'
 
     try {
-      handleRequestError(new InvalidTypeException('user', 'UserCryptum'))
+      handleRequestError(new InvalidTypeException('webhook', 'WebhookCryptum'))
     } catch (error) {
       assert.deepStrictEqual(error.message, expectedResult)
     }

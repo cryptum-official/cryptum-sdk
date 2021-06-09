@@ -1,6 +1,0 @@
-{
-  "auth": {
-    "method": "POST",
-    "url": "/check-user"
-  }
-}

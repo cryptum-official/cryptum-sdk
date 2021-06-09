@@ -1,4 +1,3 @@
-const UserController = require('./src/features/users/controller')
 const ApiKeyController = require('./src/features/api-keys/controller')
 const WebhooksController = require('./src/features/webhooks/controller')
 
@@ -6,15 +5,6 @@ class CryptumSDK {
   constructor({ config, apiKey }) {
     this.config = config
     this.apiKey = apiKey
-  }
-
-  /**
-   * Method to get an controller to manipulate a user using cryptum.
-   *
-   * @returns an UserController instance class to manipulate
-   */
-  getUserController() {
-    return new UserController(this.config)
   }
 
   /**
