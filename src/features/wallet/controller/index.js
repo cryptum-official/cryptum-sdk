@@ -1,35 +1,20 @@
-const { generateMnemonic, mnemonicToSeed, mnemonicToEntropy } = require('bip39')
-const bitcoin = require('bitcoinjs-lib')
-const stellarHdWallet = require('stellar-hd-wallet')
-const rippleKeyPairs = require('ripple-keypairs')
-const binance = require('@binance-chain/javascript-sdk')
-const {
-  Protocol,
-  TESTNET_DERIVATION_PATH,
-  BITCOIN_DERIVATION_PATH,
-  ETHEREUM_DERIVATION_PATH,
-  CELO_DERIVATION_PATH,
-} = require('../constants')
+const { generateMnemonic } = require('bip39')
+
 const Wallet = require('../entity')
 
 const Interface = require('./interface')
 const {
-  derivePathFromMasterSeed,
-  privateKeyToEthAccount,
-  getBitcoinAddressFromPrivateKey,
-  getEthereumAddressFromPrivateKey,
-  getBinancechainAddressFromPrivateKey,
-  getCeloAddressFromPrivateKey,
-} = require('../../../services/blockchain')
+  deriveBitcoinWallet,
+  deriveEthereumWallet,
+  deriveBinancechainWallet,
+  deriveCeloWallet,
+  deriveRippleWallet,
+  deriveStellarWallet,
+} = require('../../../services/wallet')
+const { Protocol } = require('../constants')
 class Controller extends Interface {
-  /**
-   * Generate new random wallet
-   * @param {Protocol} protocol blockchain protocol to generate the wallet for
-   * @param {boolean} testnet true for testnet and false for mainnet
-   * @returns {Promise<Wallet>}
-   */
-  async generateRandomWallet(protocol, testnet = true) {
-    const mnemonic = generateMnemonic(256)
+  async generateWallet({ protocol, testnet = true, mnemonic = '' }) {
+    mnemonic = mnemonic ? mnemonic : generateMnemonic(256)
 
     switch (protocol) {
       case Protocol.BINANCECHAIN:
@@ -50,82 +35,49 @@ class Controller extends Interface {
         throw new Error('Unsupported blockchain protocol')
     }
   }
-  /**
-   * Generate new bitcoin wallet
-   * @param {string} mnemonic mnemonic string
-   * @param {boolean} testnet true for testnet and false for mainnet
-   * @returns {Promise<Wallet>}
-   */
+
   async generateBitcoinWallet(mnemonic, testnet) {
-    const network = testnet
-      ? bitcoin.networks.testnet
-      : bitcoin.networks.bitcoin
-    const derivedPath = derivePathFromMasterSeed(
-      await mnemonicToSeed(mnemonic),
-      testnet ? TESTNET_DERIVATION_PATH : BITCOIN_DERIVATION_PATH,
-      network.bip32
-    )
-    const address = getBitcoinAddressFromPrivateKey(
-      derivedPath.privateKey.toString('hex'),
+    const { address, privateKey, publicKey } = await deriveBitcoinWallet(
+      mnemonic,
       testnet
     )
 
     return new Wallet({
       mnemonic,
-      privateKey: derivedPath.privateKey.toString('hex'),
-      publicKey: derivedPath.publicKey.toString('hex'),
+      privateKey,
+      publicKey,
       address,
       protocol: Protocol.BITCOIN,
     })
   }
-  /**
-   * Generate new ethereum wallet
-   * @param {string} mnemonic mnemonic string
-   * @param {boolean} testnet true for testnet and false for mainnet
-   * @returns {Promise<Wallet>}
-   */
+
   async generateEthereumWallet(mnemonic, testnet) {
-    const derivedPath = derivePathFromMasterSeed(
-      await mnemonicToSeed(mnemonic),
-      testnet ? TESTNET_DERIVATION_PATH : ETHEREUM_DERIVATION_PATH
-    )
-    const address = getEthereumAddressFromPrivateKey(
-      derivedPath.privateKey.toString('hex')
+    const { address, privateKey, publicKey } = await deriveEthereumWallet(
+      mnemonic,
+      testnet
     )
 
     return new Wallet({
       mnemonic,
-      privateKey: derivedPath.privateKey.toString('hex'),
-      publicKey: derivedPath.publicKey.toString('hex'),
+      privateKey,
+      publicKey,
       address,
       protocol: Protocol.ETHEREUM,
     })
   }
-  /**
-   * Generate new binance smart chain wallet
-   * @param {string} mnemonic mnemonic string
-   * @param {boolean} testnet true for testnet and false for mainnet
-   * @returns {Promise<Wallet>}
-   */
+
   async generateBscWallet(mnemonic, testnet) {
     const wallet = await this.generateEthereumWallet(mnemonic, testnet)
     wallet.protocol = Protocol.BSC
     return wallet
   }
-/**
-   * Generate new binance chain wallet
-   * @param {string} mnemonic mnemonic string
-   * @param {boolean} testnet true for testnet and false for mainnet
-   * @returns {Promise<Wallet>}
-   */
+
   async generateBinancechainWallet(mnemonic, testnet) {
-    const privateKey = binance.crypto.getPrivateKeyFromMnemonic(
+    const { address, privateKey, publicKey } = deriveBinancechainWallet(
       mnemonic,
-      true,
-      0
+      testnet
     )
-    const publicKey = binance.crypto.getPublicKeyFromPrivateKey(privateKey)
-    const address = getBinancechainAddressFromPrivateKey(privateKey, testnet)
+
     return new Wallet({
       mnemonic,
       privateKey,
@@ -134,56 +86,37 @@ class Controller extends Interface {
       protocol: Protocol.BINANCECHAIN,
     })
   }
-  /**
-   * Generate new celo wallet
-   * @param {string} mnemonic mnemonic string
-   * @returns {Promise<Wallet>}
-   */
+
   async generateCeloWallet(mnemonic) {
-    const derivedPath = derivePathFromMasterSeed(
-      await mnemonicToSeed(mnemonic),
-      CELO_DERIVATION_PATH
-    )
-    const address = getCeloAddressFromPrivateKey(
-      derivedPath.privateKey.toString('hex')
-    )
+    const { address, privateKey, publicKey } = await deriveCeloWallet(mnemonic)
+
     return new Wallet({
       mnemonic,
-      privateKey: derivedPath.privateKey.toString('hex'),
-      publicKey: derivedPath.publicKey.toString('hex'),
+      privateKey,
+      publicKey,
       address,
       protocol: Protocol.CELO,
     })
   }
-  /**
-   * Generate new stellar wallet
-   * @param {string} mnemonic mnemonic string
-   * @returns {Promise<Wallet>}
-   */
+
   async generateStellarWallet(mnemonic) {
-    const keypair = stellarHdWallet.fromMnemonic(mnemonic)
+    const { privateKey, publicKey } = deriveStellarWallet(mnemonic)
+
     return new Wallet({
       mnemonic,
-      privateKey: keypair.getSecret(0),
-      publicKey: keypair.getPublicKey(0),
+      privateKey,
+      publicKey,
       protocol: Protocol.STELLAR,
     })
   }
-  /**
-   * Generate new ripple wallet
-   * @param {string} mnemonic mnemonic string
-   * @returns {Promise<Wallet>}
-   */
+
   async generateRippleWallet(mnemonic) {
-    const seed = rippleKeyPairs.generateSeed({
-      entropy: mnemonicToEntropy(mnemonic),
-    })
-    const keypair = rippleKeyPairs.deriveKeypair(seed)
-    const address = rippleKeyPairs.deriveAddress(keypair.publicKey)
+    const { address, privateKey, publicKey } = deriveRippleWallet(mnemonic)
+
     return new Wallet({
       mnemonic,
-      privateKey: seed,
-      publicKey: keypair.publicKey,
+      privateKey,
+      publicKey,
       address,
       protocol: Protocol.RIPPLE,
     })

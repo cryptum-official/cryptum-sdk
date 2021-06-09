@@ -1,6 +1,6 @@
 const chai = require('chai')
-var chaiAsPromised = require("chai-as-promised");
-chai.use(chaiAsPromised);
+var chaiAsPromised = require('chai-as-promised')
+chai.use(chaiAsPromised)
 const assert = chai.assert
 const WalletController = require('../../src/features/wallet/controller')
 const { Protocol } = require('../../src/features/wallet/constants')
@@ -11,18 +11,28 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
   describe('Random mnemonic', () => {
     it(' - generate wallet', async () => {
       const controller = new WalletController({ enviroment: 'development' })
-      const wallet = await controller.generateRandomWallet(Protocol.STELLAR)
+      const wallet = await controller.generateWallet({
+        protocol: Protocol.STELLAR,
+      })
       assert.strictEqual(wallet.protocol, Protocol.STELLAR)
     })
     it(' - generate wallet error with unsupported protocol', () => {
       const controller = new WalletController({ enviroment: 'development' })
-      assert.isRejected(controller.generateRandomWallet('TEST'), Error, 'Unsupported blockchain protocol')
+      assert.isRejected(
+        controller.generateWallet({ protocol: 'TEST' }),
+        Error,
+        'Unsupported blockchain protocol'
+      )
     })
   })
   describe('From same mnemonic', () => {
     it(' - generate ethereum wallet', async () => {
       const controller = new WalletController({ enviroment: 'development' })
-      const wallet = await controller.generateEthereumWallet(mnemonic, true)
+      const wallet = await controller.generateWallet({
+        protocol: Protocol.ETHEREUM,
+        mnemonic,
+        testnet: true,
+      })
       assert.strictEqual(wallet.protocol, Protocol.ETHEREUM)
       assert.strictEqual(
         wallet.address,
@@ -31,13 +41,21 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
     })
     it(' - generate bitcoin wallet', async () => {
       const controller = new WalletController({ enviroment: 'development' })
-      const wallet = await controller.generateBitcoinWallet(mnemonic, true)
+      const wallet = await controller.generateWallet({
+        protocol: Protocol.BITCOIN,
+        mnemonic,
+        testnet: true,
+      })
       assert.strictEqual(wallet.protocol, Protocol.BITCOIN)
       assert.strictEqual(wallet.address, 'n1vrMMcNaAig5fgdfdtC5DUu2G4NRodHpi')
     })
     it(' - generate bsc wallet', async () => {
       const controller = new WalletController({ enviroment: 'development' })
-      const wallet = await controller.generateBscWallet(mnemonic, true)
+      const wallet = await controller.generateWallet({
+        protocol: Protocol.BSC,
+        mnemonic,
+        testnet: true,
+      })
       assert.strictEqual(wallet.protocol, Protocol.BSC)
       assert.strictEqual(
         wallet.address,
@@ -46,7 +64,11 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
     })
     it(' - generate celo wallet', async () => {
       const controller = new WalletController({ enviroment: 'development' })
-      const wallet = await controller.generateCeloWallet(mnemonic, true)
+      const wallet = await controller.generateWallet({
+        protocol: Protocol.CELO,
+        mnemonic,
+        testnet: true,
+      })
       assert.strictEqual(wallet.protocol, Protocol.CELO)
       assert.strictEqual(
         wallet.address,
@@ -55,13 +77,19 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
     })
     it(' - generate ripple wallet', async () => {
       const controller = new WalletController({ enviroment: 'development' })
-      const wallet = await controller.generateRippleWallet(mnemonic, true)
+      const wallet = await controller.generateWallet({
+        protocol: Protocol.RIPPLE,
+        mnemonic,
+      })
       assert.strictEqual(wallet.protocol, Protocol.RIPPLE)
       assert.strictEqual(wallet.address, 'rGcqB7ciEfDQpz9znXZSYXgEozqB5Xxhm')
     })
     it(' - generate stellar wallet', async () => {
       const controller = new WalletController({ enviroment: 'development' })
-      const wallet = await controller.generateStellarWallet(mnemonic, true)
+      const wallet = await controller.generateWallet({
+        protocol: Protocol.STELLAR,
+        mnemonic,
+      })
       assert.strictEqual(wallet.protocol, Protocol.STELLAR)
       assert.strictEqual(
         wallet.publicKey,
@@ -70,7 +98,11 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
     })
     it(' - generate binancechain wallet', async () => {
       const controller = new WalletController({ enviroment: 'development' })
-      const wallet = await controller.generateBinancechainWallet(mnemonic, true)
+      const wallet = await controller.generateWallet({
+        protocol: Protocol.BINANCECHAIN,
+        mnemonic,
+        tesnet: true,
+      })
       assert.strictEqual(wallet.protocol, Protocol.BINANCECHAIN)
       assert.strictEqual(
         wallet.address,

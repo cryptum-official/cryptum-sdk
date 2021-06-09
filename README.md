@@ -18,6 +18,7 @@
     - [Configuration](#configuration)
     - [Authentication](#authentication)
     - [Get my API Keys](#get-my-api-keys)
+    - [Wallets](#wallets)
 - [Contributing](#contributing)
   - [What does my PR need to be accepted ? 🤔](#what-does-my-pr-need-to-be-accepted--)
 - [License](#license)
@@ -38,12 +39,12 @@ This project is to provide an integration with the Cryptum backend. This project
 #### Commons Steps
 
 Open your project
-```
+```bash
 cd my-amazing-project/
 ```
 
 Install using npm manager or yarn
-```
+```bash
 npm install cryptum-sdk
 yarn add cryptum-sdk
 ```
@@ -53,7 +54,7 @@ Below is an short description using code how you can use cryptum-sdk to integrat
 #### Configuration
 
 To configure cryptum-sdk you need only provide an config in format JSON.
-```
+```js
 const CryptumSDK = require('cryptum-sdk')
 
 const cryptum = new CryptumSDK({
@@ -94,6 +95,19 @@ apiKeyController.getApiKeys(userCryptum).then(apiKeys => console.log(apiKeys))
 ```
 
 ps.: If you not provide an UserCryptum valid, the Cryptum sdk return an exception.
+
+#### Wallets
+
+You need only to instantiate Wallet controller to manage wallets.
+
+```js
+const walletController = cryptum.getWalletController()
+// generate random wallet for blockchain protocol
+const wallet = await walletController.generateWallet({ protocol: Protocol.STELLAR })
+
+// or using an existing mnemonic
+const wallet = await walletController.generateWallet({ protocol: Protocol.ETHEREUM, mnemonic: '<words>...', testnet: true })
+```
 
 ## Contributing
 
