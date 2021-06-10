@@ -7,8 +7,6 @@ const {
   InvalidTypeException,
 } = require('../../errors')
 
-const UserCryptum = require('../features/user/entity')
-
 /**
  * Method to get an specific api method how get, post, put and delete
  *
@@ -53,16 +51,31 @@ const handleRequestError = error => {
 }
 
 /**
- * Method to mount an hearders with user token
+ * Method to mount an hearders with api key
  *
- * @param {UserCryptum} userCryptum need an user cryptum to add bearer token
- * @returns an object with Authorization value
+ * @param {string} apiKeyCryptum need an api key cryptum to add key
+ * @returns an object with x-api-key value
  */
-const mountTokenHeaders = userCryptum => {
-  if (!UserCryptum.isUserCryptum(userCryptum))
-    throw new InvalidTypeException('userCryptum', 'UserCryptum')
+const mountHeaders = apiKeyCryptum => {
+  if (!apiKeyCryptum)
+    throw new GenericException('0001', 'Required apiKeyCryptum')
 
-  return { Authorization: `Bearer ${userCryptum.token}` }
+  return { 'x-api-key': apiKeyCryptum }
 }
 
-module.exports = { getApiMethod, handleRequestError, mountTokenHeaders }
+/**
+ * Mehtod to verify if protocol is supported by Cryptum
+ *
+ * @param {string} protocol string with protocol enum, you can use only ['ETHEREUM' or 'BITCOIN'] protocols
+ * @returns true if protocol is valid, and false if not
+ */
+const isValidProtocol = protocol => {
+  return protocol === 'ETHEREUM' || protocol === 'BITCOIN'
+}
+
+module.exports = {
+  getApiMethod,
+  handleRequestError,
+  mountHeaders,
+  isValidProtocol,
+}

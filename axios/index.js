@@ -18,7 +18,7 @@ class AxiosApi {
    * @returns an text with base url to instance an new axios
    */
   getBaseUrl(enviroment) {
-    if (enviroment === 'development') return 'http://localhost:8080'
+    if (enviroment === 'development') return 'https://api-dev.cryptum.io'
     if (enviroment === 'production') return 'https://prouction.url.com'
 
     throw new GenericException('000', 'Invalid enviroment')
