@@ -16,6 +16,7 @@
     - [Commons Steps](#commons-steps)
   - [How To Use](#how-to-use)
     - [Configuration](#configuration)
+    - [Wallets](#wallets)
     - [Webhooks](#webhooks)
       - [Create an Webhook](#create-an-webhook)
       - [List you Webhooks](#list-you-webhooks)
@@ -40,12 +41,12 @@ This project is to provide an integration with the Cryptum backend. This project
 #### Commons Steps
 
 Open your project
-```
+```bash
 cd my-amazing-project/
 ```
 
 Install using npm manager or yarn
-```
+```bash
 npm install cryptum-sdk
 yarn add cryptum-sdk
 ```
@@ -55,7 +56,7 @@ Below is an short description using code how you can use cryptum-sdk to integrat
 #### Configuration
 
 To configure cryptum-sdk you need only provide an config in format JSON.
-```
+```js
 const CryptumSDK = require('cryptum-sdk')
 
 const cryptum = new CryptumSDK({
@@ -72,13 +73,28 @@ To see environments available you can see here:
 | development            |
 | production             |
 
+<br>
+
+#### Wallets
+
+You need only to instantiate Wallet controller to manage wallets.
+
+```js
+const walletController = cryptum.getWalletController()
+// generate random wallet for blockchain protocol
+const wallet = await walletController.generateWallet({ protocol: Protocol.STELLAR })
+
+// or using an existing mnemonic
+const wallet = await walletController.generateWallet({ protocol: Protocol.ETHEREUM, mnemonic: '<words>...', testnet: true })
+```
+
 #### Webhooks
 
 ##### Create an Webhook
 
 You need only instantiate Webhook controller and send your webhook to cryptum 🚀
 
-```
+```js
 const webhookController = sdk.getWebhooksController()
 const webhook = await webhookController.createWebhook({
   asset: 'BTC',
@@ -98,7 +114,7 @@ ps.: If you not provide an WebhookCryptum valid, the Cryptum sdk return an excep
 
 You need only instantiate Webhook controller and send your asset and your protocol to cryptum 🚀
 
-```
+```js
 const webhookController = sdk.getWebhooksController()
 const webhooks = await webhookController.getWebhooks('BTC', 'BITCOIN')
 console.log(webhooks)
@@ -111,7 +127,7 @@ ps.: If you not provide an asset or protocol valid, the Cryptum sdk return an ex
 
 You need only instantiate Webhook controller and send your asset, protocol and webhookId to cryptum 🚀
 
-```
+```js
 const webhookController = sdk.getWebhooksController()
 const webhooks = await webhookController.destroyWebhook({
   asset: 'BTC',
@@ -121,6 +137,7 @@ const webhooks = await webhookController.destroyWebhook({
 ```
 
 ps.: If you not provide an asset, protocol and webhookId valid, the Cryptum sdk return an exception.
+
 
 ## Contributing
 
