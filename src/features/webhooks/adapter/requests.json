@@ -1,0 +1,14 @@
+{
+  "getWebhooks": {
+    "method": "GET",
+    "url": "/webhook"
+  },
+  "createWebhook": {
+    "method": "POST",
+    "url": "/webhook"
+  },
+  "destroyWebhook": {
+    "method": "DELETE",
+    "url": "/webhook"
+  }
+}
