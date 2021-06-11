@@ -1,7 +1,13 @@
 const { generateMnemonic } = require('bip39')
-
 const Wallet = require('../entity')
-
+const {
+  getApiMethod,
+  mountHeaders,
+  handleRequestError,
+} = require('../../../services')
+const Interface = require('./interface')
+const requests = require('./requests.json')
+const { InvalidTypeException } = require('../../../../errors')
 const Interface = require('./interface')
 const {
   deriveBitcoinWallet,
@@ -11,7 +17,8 @@ const {
   deriveRippleWallet,
   deriveStellarWallet,
 } = require('../../../services/wallet')
-const { Protocol } = require('../constants')
+const { Protocol } = require('../../../services/blockchain')
+
 class Controller extends Interface {
   async generateWallet({ protocol, testnet = true, mnemonic = '' }) {
     mnemonic = mnemonic ? mnemonic : generateMnemonic(256)
@@ -120,6 +127,39 @@ class Controller extends Interface {
       address,
       protocol: Protocol.RIPPLE,
     })
+  }
+
+  async getWalletInfo(address, protocol) {
+    if (!address || typeof address !== 'string') {
+      throw new InvalidTypeException('address', 'string')
+    }
+    if (!protocol || typeof protocol !== 'string') {
+      throw new InvalidTypeException('protocol', 'string')
+    }
+    try {
+      const apiRequest = getApiMethod({
+        requests,
+        key: 'getWalletInfo',
+        config: this.config,
+      })
+      const headers = mountHeaders(this.config.apiKey)
+      const response = await apiRequest(
+        `${requests.getWalletInfo.url}/${address}?protocol=${protocol}`,
+        {
+          headers,
+        }
+      )
+
+      const walletInfo = { protocol }
+      if (protocol === Protocol.STELLAR) {
+        walletInfo.publicKey = address
+      } else {
+        walletInfo.address = address
+      }
+      return new Wallet({ ...walletInfo, data: response.data })
+    } catch (error) {
+      handleRequestError(error)
+    }
   }
 }
 
