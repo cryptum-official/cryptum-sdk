@@ -42,7 +42,11 @@ async function buildCreateTrustlineStellar({
   const account = new StellarSdk.Account(fromPublicKey, sequence)
   const transaction = new StellarSdk.TransactionBuilder(account, {
     fee,
-	memo: memo ? memo.length > 28 ? StellarSdk.Memo.hash(memo) : StellarSdk.Memo.text(memo) : null;
+    memo: memo
+      ? memo.length > 28
+        ? StellarSdk.Memo.hash(memo)
+        : StellarSdk.Memo.text(memo)
+      : null,
     networkPassphrase: testnet
       ? StellarSdk.Networks.TESTNET
       : StellarSdk.Networks.PUBLIC,
@@ -54,7 +58,7 @@ async function buildCreateTrustlineStellar({
       })
     )
     .setTimeout(100)
-  .build()
+    .build()
   transaction.sign(
     fromPrivateKeys.map(privkey => StellarSdk.Keypair.fromSecret(privkey))
   )
