@@ -8,7 +8,6 @@ const {
 
 class Controller extends Interface {
   async getPrices(asset) {
-    console.log('typeof asset', typeof asset);
     if (!asset || typeof asset !== 'string') {
       throw new InvalidTypeException('asset', 'string');
     }
@@ -24,7 +23,6 @@ class Controller extends Interface {
 
       return new Prices(response.data)
     } catch (error) {
-      console.log('error', error);
       handleRequestError(error)
     }
   }
