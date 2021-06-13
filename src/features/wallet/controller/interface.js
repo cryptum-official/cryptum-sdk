@@ -1,4 +1,5 @@
 const { NotImplementedException } = require('../../../../errors')
+const Wallet = require('../entity')
 
 class Interface {
   /**
@@ -78,6 +79,39 @@ class Interface {
    * @returns {Promise<Wallet>}
    */
   async generateRippleWallet(mnemonic) {
+    throw new NotImplementedException()
+  }
+  /**
+   * Get wallet information from blockchain
+   * @param {object} args
+   * @param {string} args.address
+   * @param {string} args.protocol
+   * @returns {Promise<any>}
+   */
+  async getWalletInfo({ address, protocol }) {
+    throw new NotImplementedException()
+  }
+  /**
+   * Create trustline signed transaction
+   * @param {object} args
+   * @param {Wallet} args.wallet
+   * @param {string} args.assetCode
+   * @param {string} args.issuer
+   * @param {string?} args.fee
+   * @param {string?} args.limit
+   * @param {string?} args.memo
+   * @param {string} args.protocol
+   * @returns {Promise<string>}
+   */
+  async createTrustlineTransaction({
+    wallet,
+    assetCode,
+    issuer,
+    fee,
+    limit,
+    memo,
+    protocol,
+  }) {
     throw new NotImplementedException()
   }
 }
