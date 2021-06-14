@@ -200,7 +200,8 @@ class Controller extends Interface {
         return buildRippleTrustlineTransaction({
           fromAddress: wallet.address,
           fromPrivateKey: wallet.privateKey,
-          sequence: info.sequence,
+          sequence: info.account_data.Sequence,
+          maxLedgerVersion: info.ledger_current_index + 10,
           assetCode,
           issuer,
           fee,

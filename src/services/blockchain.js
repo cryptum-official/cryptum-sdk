@@ -1,5 +1,6 @@
 const StellarSdk = require('stellar-sdk')
 const { RippleAPI } = require('ripple-lib')
+const BigNumber = require('bignumber.js')
 /**
  * Blockchain protocols
  * @enum {string}
@@ -17,16 +18,16 @@ module.exports.Protocol = Protocol
 
 /**
  * Build signed trustline tx for Stellar protocol
- * @param {object} param0
- * @param {string} param0.fromPublicKey
- * @param {string[]} param0.fromPrivateKeys
- * @param {string} param0.sequence
- * @param {string} param0.assetCode
- * @param {string} param0.issuer
- * @param {number?} param0.fee
- * @param {string?} param0.limit
- * @param {memo?} param0.memo
- * @param {boolean?} param0.testnet
+ * @param {object} args
+ * @param {string} args.fromPublicKey account to use for this trustline transaction
+ * @param {string} args.fromPrivateKey account private key to sign the trustline transaction
+ * @param {string} args.sequence account sequence number
+ * @param {string} args.assetCode asset symbol
+ * @param {string} args.issuer issuer account
+ * @param {string?} args.fee fee in stroops
+ * @param {string?} args.limit limit number for the trustline
+ * @param {memo?} args.memo memo string
+ * @param {boolean?} args.testnet
  * @returns {string} signed tx
  */
 async function buildStellarTrustlineTransaction({
@@ -66,23 +67,25 @@ async function buildStellarTrustlineTransaction({
 }
 module.exports.buildStellarTrustlineTransaction =
   buildStellarTrustlineTransaction
+
 /**
  * Build signed trustline tx for Ripple protocol
- * @param {object} param0
- * @param {string} param0.fromAddress
- * @param {string} param0.fromPrivateKey
- * @param {string} param0.sequence
- * @param {string} param0.assetCode
- * @param {string} param0.issuer
- * @param {number?} param0.fee
- * @param {string?} param0.limit
- * @param {memo?} param0.memo
+ * @param {object} args
+ * @param {string} args.fromAddress account address
+ * @param {string} args.fromPrivateKey account private key to sign transaction
+ * @param {string} args.sequence account sequence number
+ * @param {string} args.assetCode asset symbol
+ * @param {string} args.issuer issuer account address
+ * @param {string?} args.fee fee in drops
+ * @param {string?} args.limit limit number
+ * @param {memo?} args.memo memo string
  * @returns {string} signed tx
  */
 async function buildRippleTrustlineTransaction({
   fromAddress,
   fromPrivateKey,
   sequence,
+  maxLedgerVersion,
   assetCode,
   issuer,
   limit = null,
@@ -97,11 +100,11 @@ async function buildRippleTrustlineTransaction({
     memos: memo ? [{ type: 'test', format: 'text/plain', data: memo }] : null,
   }
   const prepared = await rippleAPI.prepareTrustline(fromAddress, trustline, {
-    fee,
+    fee: fee ? new BigNumber(fee).div('1e6').toString() : '0.0001',
     sequence,
+    maxLedgerVersion,
   })
   const { signedTransaction } = rippleAPI.sign(prepared.txJSON, fromPrivateKey)
   return signedTransaction
 }
-
 module.exports.buildRippleTrustlineTransaction = buildRippleTrustlineTransaction

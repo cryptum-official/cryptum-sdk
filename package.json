@@ -18,6 +18,7 @@
     "@binance-chain/javascript-sdk": "^4.1.1",
     "@celo/contractkit": "^1.2.0",
     "axios": "^0.21.1",
+    "bignumber.js": "^9.0.1",
     "bip39": "^3.0.4",
     "bitcoinjs-lib": "^5.2.0",
     "hdkey": "^2.0.1",
