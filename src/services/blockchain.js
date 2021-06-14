@@ -31,7 +31,7 @@ module.exports.Protocol = Protocol
  */
 async function buildStellarTrustlineTransaction({
   fromPublicKey,
-  fromPrivateKeys,
+  fromPrivateKey,
   sequence,
   assetCode,
   issuer,
@@ -60,9 +60,8 @@ async function buildStellarTrustlineTransaction({
     )
     .setTimeout(100)
     .build()
-  transaction.sign(
-    fromPrivateKeys.map(privkey => StellarSdk.Keypair.fromSecret(privkey))
-  )
+
+  transaction.sign(StellarSdk.Keypair.fromSecret(fromPrivateKey))
   return transaction.toEnvelope().toXDR().toString('base64')
 }
 module.exports.buildStellarTrustlineTransaction =

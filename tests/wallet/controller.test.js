@@ -3,7 +3,7 @@ var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 const assert = chai.assert
 const WalletController = require('../../src/features/wallet/controller')
-const { Protocol } = require('../../src/features/wallet/constants')
+const { Protocol } = require('../../src/services/blockchain')
 const mnemonic =
   'coyote cost habit float february version unique balcony pluck always cheese amount river conduct wave wonder north scale series gather skate address invite kidney'
 
@@ -25,6 +25,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       )
     })
   })
+
   describe('From same mnemonic', () => {
     it(' - generate ethereum wallet', async () => {
       const controller = new WalletController({ enviroment: 'development' })
@@ -108,6 +109,95 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         wallet.address,
         'tbnb1ggckn09nkn2kvl28aaksrj7ze5esfx58fsvfep'
       )
+    })
+  })
+
+  describe('create transactions', () => {
+    it(' - create trustline stellar', async () => {
+      const controller = new WalletController({
+        enviroment: 'development',
+        apiKey: process.env.CRYPTUM_APIKEY,
+      })
+      const wallet = await controller.generateWallet({
+        mnemonic,
+        protocol: Protocol.STELLAR,
+        testnet: true,
+      })
+
+      const transaction = await controller.createTrustlineTransaction({
+        wallet,
+        assetCode: 'BRLT',
+        issuer: 'GB7TAYRUZGE6TVT7NHP5SMIZRNQA6PLM423EYISAOAP3MKYIQMVYP2JO',
+        limit: '100000000',
+        fee: '100',
+        memo: 'create-trustline',
+        protocol: Protocol.STELLAR,
+      })
+      console.log(transaction)
+    })
+    it.skip(' - create trustline ripple', async () => {
+      const controller = new WalletController({
+        enviroment: 'development',
+        apiKey: process.env.CRYPTUM_APIKEY,
+      })
+      const wallet = await controller.generateWallet({
+        mnemonic,
+        protocol: Protocol.RIPPLE,
+        testnet: true,
+      })
+
+      const transaction = await controller.createTrustlineTransaction({
+        wallet,
+        assetCode: 'BRLT',
+        issuer: 'GB7TAYRUZGE6TVT7NHP5SMIZRNQA6PLM423EYISAOAP3MKYIQMVYP2JO',
+        limit: '100000000',
+        fee: '100',
+        memo: 'create-trustline',
+        protocol: Protocol.RIPPLE,
+      })
+      console.log(transaction)
+    })
+    it(' - delete trustline stellar', async () => {
+      const controller = new WalletController({
+        enviroment: 'development',
+        apiKey: process.env.CRYPTUM_APIKEY,
+      })
+      const wallet = await controller.generateWallet({
+        mnemonic,
+        protocol: Protocol.STELLAR,
+        testnet: true,
+      })
+      const transaction = await controller.createTrustlineTransaction({
+        wallet,
+        assetCode: 'BRLT',
+        issuer: 'GB7TAYRUZGE6TVT7NHP5SMIZRNQA6PLM423EYISAOAP3MKYIQMVYP2JO',
+        limit: '0',
+        fee: '100',
+        memo: 'delete-trustline',
+        protocol: Protocol.STELLAR,
+      })
+      console.log(transaction)
+    })
+    it.skip(' - delete trustline ripple', async () => {
+      const controller = new WalletController({
+        enviroment: 'development',
+        apiKey: process.env.CRYPTUM_APIKEY,
+      })
+      const wallet = await controller.generateWallet({
+        mnemonic,
+        protocol: Protocol.STELLAR,
+        testnet: true,
+      })
+      const transaction = await controller.createTrustlineTransaction({
+        wallet,
+        assetCode: 'BRLT',
+        issuer: 'GB7TAYRUZGE6TVT7NHP5SMIZRNQA6PLM423EYISAOAP3MKYIQMVYP2JO',
+        limit: '0',
+        fee: '100',
+        memo: 'delete-trustline',
+        protocol: Protocol.STELLAR,
+      })
+      console.log(transaction)
     })
   })
 })

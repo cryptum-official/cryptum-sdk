@@ -8,7 +8,6 @@ const {
 const Interface = require('./interface')
 const requests = require('./requests.json')
 const { InvalidTypeException } = require('../../../../errors')
-const Interface = require('./interface')
 const {
   deriveBitcoinWallet,
   deriveEthereumWallet,
@@ -153,7 +152,7 @@ class Controller extends Interface {
       })
       const headers = mountHeaders(this.config.apiKey)
       const response = await apiRequest(
-        `${requests.getWalletInfo.url}/${address}?protocol=${protocol}`,
+        `${requests.getWalletInfo.url}/${address}/info?protocol=${protocol}`,
         {
           headers,
         }
@@ -182,7 +181,7 @@ class Controller extends Interface {
 
         return buildStellarTrustlineTransaction({
           fromPublicKey: wallet.publicKey,
-          fromPrivateKeys: [wallet.privateKey],
+          fromPrivateKey: wallet.privateKey,
           sequence: info.sequence,
           assetCode,
           issuer,
