@@ -21,8 +21,8 @@ class TransactionCryptum {
   }
 
   /**
-   * Validate if an object can mount an TransactionCryptum, not create
-   * if you need attributes to create an transaction in cryptum call canCreate method
+   * Validate if an object can mount an TransactionCryptum, not sign
+   * if you need attributes to sign an transaction in cryptum call canCreate method
    *
    * @param {*} object generic object with mandatory values: { protocol, hash }
    * @returns true if can mount and false if not
@@ -35,12 +35,12 @@ class TransactionCryptum {
   }
 
   /**
-   * Method to validate if you can create an Transaction in cryptum
+   * Method to validate if you can sign an Transaction in cryptum
    *
    * @param {Object} transaction with this attributes: { signature, protocol } 
    * @returns true if can create and false if not
    */
-  static canCreate(transaction) {
+  static canSign(transaction) {
     if (!transaction) return false
 
     const { signature, protocol } = transaction

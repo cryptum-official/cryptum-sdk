@@ -171,7 +171,7 @@ describe.only('Test Suite of the Transaction (Entity)', function () {
     assert.deepStrictEqual(result, expectedResult)
   })
 
-  it('Check if with TransactionCryptum can create an TransactionCryptum in API (With valid data) : canCreate', async () => {
+  it('Check if with TransactionCryptum can create an TransactionCryptum in API (With valid data) : canSign', async () => {
     const data = {
       signature: 'samplesignaturehere',
       protocol: 'BITCOIN',
@@ -180,42 +180,42 @@ describe.only('Test Suite of the Transaction (Entity)', function () {
     const transaction = new TransactionCryptum(data)
 
     const expectedResult = true
-    const result = TransactionCryptum.canCreate(transaction)
+    const result = TransactionCryptum.canSign(transaction)
     assert.deepStrictEqual(result, expectedResult)
   })
 
-  it('Check if with JSON can create an TransactionCryptum (With valid data) : canCreate', async () => {
+  it('Check if with JSON can create an TransactionCryptum (With valid data) : canSign', async () => {
     const data = {
       signature: 'samplesignaturehere',
       protocol: 'BITCOIN',
     }
 
     const expectedResult = true
-    const result = TransactionCryptum.canCreate(data)
+    const result = TransactionCryptum.canSign(data)
     assert.deepStrictEqual(result, expectedResult)
   })
 
-  it('Check if with JSON can create an TransactionCryptum (Without signature) : canCreate', async () => {
+  it('Check if with JSON can create an TransactionCryptum (Without signature) : canSign', async () => {
     const data = {
       protocol: 'BITCOIN',
     }
 
     const expectedResult = false
-    const result = TransactionCryptum.canCreate(data)
+    const result = TransactionCryptum.canSign(data)
     assert.deepStrictEqual(result, expectedResult)
   })
 
-  it('Check if with JSON can create an TransactionCryptum (Without protocol) : canCreate', async () => {
+  it('Check if with JSON can create an TransactionCryptum (Without protocol) : canSign', async () => {
     const data = {
       signature: 'samplesignaturehere',
     }
 
     const expectedResult = false
-    const result = TransactionCryptum.canCreate(data)
+    const result = TransactionCryptum.canSign(data)
     assert.deepStrictEqual(result, expectedResult)
   })
 
-  it('Check if with TransactionCryptum can create an TransactionCryptum (Without signature) : canCreate', async () => {
+  it('Check if with TransactionCryptum can create an TransactionCryptum (Without signature) : canSign', async () => {
     const data = {
       protocol: 'BITCOIN',
     }
@@ -223,11 +223,11 @@ describe.only('Test Suite of the Transaction (Entity)', function () {
     const transaction = new TransactionCryptum(data)
 
     const expectedResult = false
-    const result = TransactionCryptum.canCreate(transaction)
+    const result = TransactionCryptum.canSign(transaction)
     assert.deepStrictEqual(result, expectedResult)
   })
 
-  it('Check if with TransactionCryptum can create an TransactionCryptum (Without protocol) : canCreate', async () => {
+  it('Check if with TransactionCryptum can create an TransactionCryptum (Without protocol) : canSign', async () => {
     const data = {
       signature: 'samplesignaturehere',
     }
@@ -235,7 +235,7 @@ describe.only('Test Suite of the Transaction (Entity)', function () {
     const transaction = new TransactionCryptum(data)
 
     const expectedResult = false
-    const result = TransactionCryptum.canCreate(transaction)
+    const result = TransactionCryptum.canSign(transaction)
     assert.deepStrictEqual(result, expectedResult)
   })
 })

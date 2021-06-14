@@ -1,23 +1,23 @@
 const { NotCanMountException } = require('../../../../errors')
 
-const WebhookCryptum = require('../entity')
+const TransactionCryptum = require('../entity')
 const Interface = require('./interface')
 
 class UseCases extends Interface {
-  mountWebhookToCreate(webhook) {
-    if (!webhook) throw new NotCanMountException('WebhookCryptum')
-    if (!WebhookCryptum.canCreate(webhook))
-      throw new NotCanMountException('WebhookCryptum')
+  mountTransactionToSign(transaction) {
+    if (!transaction) throw new NotCanMountException('TransactionCryptum')
+    if (!TransactionCryptum.canSign(transaction))
+      throw new NotCanMountException('TransactionCryptum')
 
-    return new WebhookCryptum(webhook)
+    return new TransactionCryptum(transaction)
   }
 
-  mountWebhook(webhook) {
-    if (!webhook) throw new NotCanMountException('WebhookCryptum')
-    if (!WebhookCryptum.validateMandatoryValues(webhook))
-      throw new NotCanMountException('WebhookCryptum')
+  mountTransaction(transaction) {
+    if (!transaction) throw new NotCanMountException('TransactionCryptum')
+    if (!TransactionCryptum.validateMandatoryValues(transaction))
+      throw new NotCanMountException('TransactionCryptum')
 
-    return new WebhookCryptum(webhook)
+    return new TransactionCryptum(transaction)
   }
 }
 

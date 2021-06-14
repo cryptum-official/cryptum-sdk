@@ -2,22 +2,22 @@ const { NotImplementedException } = require('../../../../errors')
 
 class Interface {
   /**
-   * Method to mount and validate an Cryptum Webhook to create in API
+   * Method to mount and validate an Cryptum Transaction to Sign in API
    * 
-   * @param {Object} webhook an Object with { asset, url, event, address, confirmations, protocol }
-   * All data required to create an new webhook
+   * @param {Object} transaction an Object with { protocol, signature }
+   * All data required to Sign an new transaction
    */
-   mountWebhookToCreate(webhook) {
+   mountTransactionToSign(transaction) {
     throw new NotImplementedException()
   }
 
   /**
-   * Method to mount and validate an Cryptum Webhook saved in backend
+   * Method to mount and validate an Cryptum Transaction saved in backend
    * 
-   * @param {Object} webhook an Object with { id, event, url, address, confirmations }
+   * @param {Object} transaction an Object with { hash, protocol, signature: optional }
    * All data returned of the Cryptum API
    */
-   mountWebhook(webhook) {
+   mountTransaction(transaction) {
     throw new NotImplementedException()
   }
 }

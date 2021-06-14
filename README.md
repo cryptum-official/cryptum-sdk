@@ -21,6 +21,8 @@
       - [Create an Webhook](#create-an-webhook)
       - [List you Webhooks](#list-you-webhooks)
       - [Delete an Webhook](#delete-an-webhook)
+  - [Transaction](#transaction)
+      - [Send sign an Transaction](#send-sign-an-transaction)
 - [Contributing](#contributing)
   - [What does my PR need to be accepted ? 🤔](#what-does-my-pr-need-to-be-accepted--)
 - [License](#license)
@@ -138,6 +140,22 @@ const webhooks = await webhookController.destroyWebhook({
 
 ps.: If you not provide an asset, protocol and webhookId valid, the Cryptum sdk return an exception.
 
+
+### Transaction
+
+##### Send sign an Transaction
+
+You need only instantiate Transaction controller and send your sign transaction to cryptum 🚀
+
+```js
+const transactionController = sdk.getTransactionController()
+const transaction = await transactionController.signTransaction({
+  protocol: 'your protocol',
+  signature: 'your-secrete-signature',
+})
+console.log(transaction)
+// Log your TransactionCryptum with hash
+```
 
 ## Contributing
 

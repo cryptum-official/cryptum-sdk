@@ -5,35 +5,12 @@ const Adapter = require('../adapter')
 const Interface = require('./interface')
 
 class Controller extends Interface {
-  async createWebhook(webhook) {
+  async signTransaction(transaction) {
     try {
-      const webhookCryptum = UseCases.mountWebhookToCreate(webhook)
+      const transactionCryptum = UseCases.mountTransactionToSign(transaction)
 
-      const { data } = await Adapter.createWebhook(webhookCryptum, this.config)
-      return UseCases.mountWebhook({ ...webhookCryptum, ...data })
-    } catch (error) {
-      handleRequestError(error)
-    }
-  }
-
-  async getWebhooks(asset, protocol) {
-    try {
-      const { data } = await Adapter.getWebhooks(asset, protocol, this.config)
-
-      const webhooks = data.map(webhook => UseCases.mountWebhook(webhook))
-      return webhooks
-    } catch (error) {
-      handleRequestError(error)
-    }
-  }
-
-  async destroyWebhook({ asset, webhookId, protocol }) {
-    try {
-      const { data } = await Adapter.destroyWebhook(
-        { asset, webhookId, protocol },
-        this.config
-      )
-      return data
+      const { data } = await Adapter.signTransaction(transactionCryptum, this.config)
+      return UseCases.mountTransaction({ ...transactionCryptum, ...data })
     } catch (error) {
       handleRequestError(error)
     }

@@ -1,14 +1,6 @@
 {
-  "getWebhooks": {
-    "method": "GET",
-    "url": "/webhook"
-  },
-  "createWebhook": {
+  "signTransaction": {
     "method": "POST",
-    "url": "/webhook"
-  },
-  "destroyWebhook": {
-    "method": "DELETE",
-    "url": "/webhook"
+    "url": "/transaction"
   }
 }
