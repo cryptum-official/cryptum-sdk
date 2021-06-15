@@ -30,6 +30,7 @@
   "devDependencies": {
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
+    "faker": "^5.5.3",
     "istanbul": "^0.4.5",
     "mocha": "^8.4.0",
     "nock": "^13.1.0"
