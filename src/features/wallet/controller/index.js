@@ -1,8 +1,13 @@
 const { generateMnemonic } = require('bip39')
-
 const Wallet = require('../entity')
-
+const {
+  getApiMethod,
+  mountHeaders,
+  handleRequestError,
+} = require('../../../services')
 const Interface = require('./interface')
+const requests = require('./requests.json')
+const { InvalidTypeException } = require('../../../../errors')
 const {
   deriveBitcoinWallet,
   deriveEthereumWallet,
@@ -11,7 +16,12 @@ const {
   deriveRippleWallet,
   deriveStellarWallet,
 } = require('../../../services/wallet')
-const { Protocol } = require('../constants')
+const {
+  Protocol,
+  buildStellarTrustlineTransaction,
+  buildRippleTrustlineTransaction,
+} = require('../../../services/blockchain')
+
 class Controller extends Interface {
   async generateWallet({ protocol, testnet = true, mnemonic = '' }) {
     mnemonic = mnemonic ? mnemonic : generateMnemonic(256)
@@ -26,11 +36,11 @@ class Controller extends Interface {
       case Protocol.ETHEREUM:
         return await this.generateEthereumWallet(mnemonic, testnet)
       case Protocol.CELO:
-        return await this.generateCeloWallet(mnemonic)
+        return await this.generateCeloWallet(mnemonic, testnet)
       case Protocol.STELLAR:
-        return await this.generateStellarWallet(mnemonic)
+        return await this.generateStellarWallet(mnemonic, testnet)
       case Protocol.RIPPLE:
-        return await this.generateRippleWallet(mnemonic)
+        return await this.generateRippleWallet(mnemonic, testnet)
       default:
         throw new Error('Unsupported blockchain protocol')
     }
@@ -62,6 +72,7 @@ class Controller extends Interface {
       privateKey,
       publicKey,
       address,
+      testnet,
       protocol: Protocol.ETHEREUM,
     })
   }
@@ -83,11 +94,12 @@ class Controller extends Interface {
       privateKey,
       publicKey,
       address,
+      testnet,
       protocol: Protocol.BINANCECHAIN,
     })
   }
 
-  async generateCeloWallet(mnemonic) {
+  async generateCeloWallet(mnemonic, testnet) {
     const { address, privateKey, publicKey } = await deriveCeloWallet(mnemonic)
 
     return new Wallet({
@@ -95,22 +107,24 @@ class Controller extends Interface {
       privateKey,
       publicKey,
       address,
+      testnet,
       protocol: Protocol.CELO,
     })
   }
 
-  async generateStellarWallet(mnemonic) {
+  async generateStellarWallet(mnemonic, testnet) {
     const { privateKey, publicKey } = deriveStellarWallet(mnemonic)
 
     return new Wallet({
       mnemonic,
       privateKey,
       publicKey,
+      testnet,
       protocol: Protocol.STELLAR,
     })
   }
 
-  async generateRippleWallet(mnemonic) {
+  async generateRippleWallet(mnemonic, testnet) {
     const { address, privateKey, publicKey } = deriveRippleWallet(mnemonic)
 
     return new Wallet({
@@ -118,8 +132,86 @@ class Controller extends Interface {
       privateKey,
       publicKey,
       address,
+      testnet,
       protocol: Protocol.RIPPLE,
     })
+  }
+
+  async getWalletInfo({ address, protocol }) {
+    if (!address || typeof address !== 'string') {
+      throw new InvalidTypeException('address', 'string')
+    }
+    if (!protocol || typeof protocol !== 'string') {
+      throw new InvalidTypeException('protocol', 'string')
+    }
+    try {
+      const apiRequest = getApiMethod({
+        requests,
+        key: 'getWalletInfo',
+        config: this.config,
+      })
+      const headers = mountHeaders(this.config.apiKey)
+      const response = await apiRequest(
+        `${requests.getWalletInfo.url}/${address}/info?protocol=${protocol}`,
+        {
+          headers,
+        }
+      )
+      return response.data
+    } catch (error) {
+      handleRequestError(error)
+    }
+  }
+
+  async createTrustlineTransaction({
+    wallet,
+    assetCode,
+    issuer,
+    fee,
+    limit,
+    memo,
+    protocol,
+  }) {
+    switch (protocol) {
+      case Protocol.STELLAR: {
+        const info = await this.getWalletInfo({
+          address: wallet.publicKey,
+          protocol,
+        })
+
+        return buildStellarTrustlineTransaction({
+          fromPublicKey: wallet.publicKey,
+          fromPrivateKey: wallet.privateKey,
+          sequence: info.sequence,
+          assetCode,
+          issuer,
+          fee,
+          limit,
+          memo,
+          testnet: wallet.testnet,
+        })
+      }
+      case Protocol.RIPPLE: {
+        const info = await this.getWalletInfo({
+          address: wallet.address,
+          protocol,
+        })
+
+        return buildRippleTrustlineTransaction({
+          fromAddress: wallet.address,
+          fromPrivateKey: wallet.privateKey,
+          sequence: info.account_data.Sequence,
+          maxLedgerVersion: info.ledger_current_index + 10,
+          assetCode,
+          issuer,
+          fee,
+          limit,
+          memo,
+        })
+      }
+      default:
+        throw new Error('Unsupported protocol')
+    }
   }
 }
 
