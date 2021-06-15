@@ -1,0 +1,6 @@
+{
+  "getWalletInfo": {
+    "url": "/wallet",
+    "method": "GET"
+  }
+}

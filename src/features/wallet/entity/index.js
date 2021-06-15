@@ -1,4 +1,4 @@
-const { Protocol } = require('../constants')
+const { Protocol } = require('../../../services/blockchain')
 
 class Wallet {
   /**
@@ -9,13 +9,15 @@ class Wallet {
    * @param {string} args.publicKey Wallet public key
    * @param {string} args.address Wallet address
    * @param {Protocol} args.protocol blockchain protocol
+   * @param {Protocol} args.testnet blockchain testnet or mainnet
    */
-  constructor({ mnemonic, privateKey, publicKey, address, protocol }) {
+  constructor({ mnemonic, privateKey, publicKey, address, protocol, testnet }) {
     this.mnemonic = mnemonic
     this.protocol = protocol
     this.privateKey = privateKey
     this.publicKey = publicKey
     this.address = address
+    this.testnet = testnet
   }
 }
 

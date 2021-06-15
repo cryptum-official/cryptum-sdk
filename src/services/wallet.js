@@ -5,12 +5,11 @@ const binance = require('@binance-chain/javascript-sdk')
 const { mnemonicToSeed, mnemonicToEntropy } = require('bip39')
 const stellarHdWallet = require('stellar-hd-wallet')
 const rippleKeyPairs = require('ripple-keypairs')
-const {
-  BITCOIN_DERIVATION_PATH,
-  TESTNET_DERIVATION_PATH,
-  ETHEREUM_DERIVATION_PATH,
-  CELO_DERIVATION_PATH,
-} = require('../features/wallet/constants')
+
+const TESTNET_DERIVATION_PATH = "m/44'/1'/0'/0"
+const BITCOIN_DERIVATION_PATH = "m/44'/0'/0'/0"
+const ETHEREUM_DERIVATION_PATH = "m/44'/60'/0'/0"
+const CELO_DERIVATION_PATH = "m/44'/52752'/0'/0"
 
 /**
  * Derive path from master seed for HD wallet
