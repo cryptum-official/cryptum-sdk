@@ -145,16 +145,16 @@ ps.: If you not provide an asset, protocol and webhookId valid, the Cryptum sdk 
 
 ##### Send sign an Transaction
 
-You need only instantiate Transaction controller and send your sign transaction to cryptum 🚀
+You need only instantiate SignedTransaction controller and send your signed transaction to cryptum 🚀
 
 ```js
-const transactionController = sdk.getTransactionController()
+const transactionController = sdk.getSignedTransactionController()
 const transaction = await transactionController.sendSignTransaction({
   protocol: 'your protocol',
-  signature: 'your-secrete-signature',
+  transaction: 'your-secrete-transaction',
 })
 console.log(transaction)
-// Log your TransactionCryptum with hash
+// Log your SignedTransactionCryptum with hash
 ```
 
 ## Contributing
