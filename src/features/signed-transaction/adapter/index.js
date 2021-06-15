@@ -4,10 +4,10 @@ const Interface = require('./interface')
 const requests = require('./requests.json')
 
 class Adapter extends Interface {
-  sendSignTransaction(signedTransaction, config) {
+  sendSignedTransaction(signedTransaction, config) {
     const method = getApiMethod({
       requests,
-      key: 'sendSignTransaction',
+      key: 'sendSignedTransaction',
       config,
     })
     const headers = mountHeaders(config.apiKey)
@@ -15,7 +15,7 @@ class Adapter extends Interface {
     const { protocol, transaction } = signedTransaction
     const payload = { protocol, signedTx: transaction }
 
-    return method(requests.sendSignTransaction.url, payload, {
+    return method(requests.sendSignedTransaction.url, payload, {
       headers,
       params: { protocol: signedTransaction.protocol },
     })

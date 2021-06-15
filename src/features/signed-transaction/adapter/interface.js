@@ -7,7 +7,7 @@ class Interface {
    * @param {Object} signedTransaction object with all signedTransaction data required: { protocol, transaction }
    * @param {Object} config an object with this data: { enviroment: 'development'/'production', apiKey: XXXXXXX }
    */
-   sendSignTransaction(signedTransaction, config) {
+   sendSignedTransaction(signedTransaction, config) {
     throw new NotImplementedException()
   }
 }
