@@ -20,7 +20,7 @@ describe.only('Test Suite of the Transaction (Adapter)', function () {
       .reply(200, transactionResponse)
   })
 
-  it('Check if an Not Implemented Exception in interface (Interface test) : signTransaction', async () => {
+  it('Check if an Not Implemented Exception in interface (Interface test) : sendSignTransaction', async () => {
     const expectedResult = 'Method not implemented'
 
     const data = {
@@ -35,13 +35,13 @@ describe.only('Test Suite of the Transaction (Adapter)', function () {
 
     try {
       const interface = new TransactionCryptumInterface()
-      interface.signTransaction(data, config)
+      interface.sendSignTransaction(data, config)
     } catch (error) {
       assert.deepStrictEqual(error.message, expectedResult)
     }
   })
 
-  it('Check create an transaction with TransactionCryptum valid : signTransaction', async () => {
+  it('Check create an transaction with TransactionCryptum valid : sendSignTransaction', async () => {
     const data = {
       signature: 'samplesignaturehere',
       protocol: 'STELLAR',
@@ -57,7 +57,7 @@ describe.only('Test Suite of the Transaction (Adapter)', function () {
       hash: '9a2716851aeeaee4529c84dce1b2d00c6dbc5fb2e70ae9fe19bb24c5bf93ebd2',
     }
 
-    const result = await TransactionCryptumAdapter.signTransaction(
+    const result = await TransactionCryptumAdapter.sendSignTransaction(
       transaction,
       config
     )

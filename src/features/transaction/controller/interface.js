@@ -15,7 +15,7 @@ class Interface {
    * 
    * @param {Object} transaction object with all transaction data required: { protocol, signature }
    */
-  signTransaction(transaction) {
+   sendSignTransaction(transaction) {
     throw new NotImplementedException()
   }
 }

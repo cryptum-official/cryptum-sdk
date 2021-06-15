@@ -20,7 +20,7 @@ describe.only('Test Suite of the Transaction (Controller)', function () {
       .reply(200, transactionResponse)
   })
 
-  it('Check if an Not Implemented Exception in interface (Interface test) : signTransaction', async () => {
+  it('Check if an Not Implemented Exception in interface (Interface test) : sendSignTransaction', async () => {
     const expectedResult = 'Method not implemented'
 
     const data = {
@@ -30,13 +30,13 @@ describe.only('Test Suite of the Transaction (Controller)', function () {
 
     try {
       const interface = new TransactionCryptumInterface()
-      interface.signTransaction(data)
+      interface.sendSignTransaction(data)
     } catch (error) {
       assert.deepStrictEqual(error.message, expectedResult)
     }
   })
 
-  it('Check create an transaction with TransactionCryptum valid : signTransaction', async () => {
+  it('Check create an transaction with TransactionCryptum valid : sendSignTransaction', async () => {
     const data = {
       signature: 'samplesignaturehere',
       protocol: 'STELLAR',
@@ -52,7 +52,7 @@ describe.only('Test Suite of the Transaction (Controller)', function () {
       enviroment: 'development',
       apiKey: 'apikeyexamplecryptum',
     })
-    const result = await controller.signTransaction(transaction)
+    const result = await controller.sendSignTransaction(transaction)
     assert.deepStrictEqual(result, expectedResult)
   })
 })

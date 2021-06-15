@@ -149,7 +149,7 @@ You need only instantiate Transaction controller and send your sign transaction 
 
 ```js
 const transactionController = sdk.getTransactionController()
-const transaction = await transactionController.signTransaction({
+const transaction = await transactionController.sendSignTransaction({
   protocol: 'your protocol',
   signature: 'your-secrete-signature',
 })
