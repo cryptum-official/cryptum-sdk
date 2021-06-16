@@ -5,7 +5,7 @@ const TransactionCryptum = require('../../src/features/transaction/entity')
 const SignedTransactionCryptumController = require('../../src/features/transaction/controller')
 const TransactionCryptumInterface = require('../../src/features/transaction/controller/interface')
 
-describe.only('Test Suite of the SignedTransaction (Controller)', function () {
+describe.only('Test Suite of the Transaction (Controller)', function () {
   this.beforeAll(() => {
     const transactionResponse = {
       hash: '9a2716851aeeaee4529c84dce1b2d00c6dbc5fb2e70ae9fe19bb24c5bf93ebd2',

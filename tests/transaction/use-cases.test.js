@@ -3,7 +3,7 @@ const TransactionCryptum = require('../../src/features/transaction/entity')
 const SignedTransactionCryptumUseCase = require('../../src/features/transaction/use-cases')
 const TransactionCryptumInterface = require('../../src/features/transaction/use-cases/interface')
 
-describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
+describe.only('Test Suite of the Transaction (Use Cases)', function () {
   it('Check if an Not Implemented Exception in interface (Interface test) : mountSignedTransaction', async () => {
     const expectedResult = 'Method not implemented'
 

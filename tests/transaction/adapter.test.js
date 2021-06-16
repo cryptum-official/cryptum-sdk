@@ -5,7 +5,7 @@ const TransactionCryptum = require('../../src/features/transaction/entity')
 const TransactionCryptumAdapter = require('../../src/features/transaction/adapter')
 const TransactionCryptumInterface = require('../../src/features/transaction/adapter/interface')
 
-describe.only('Test Suite of the SignedTransaction (Adapter)', function () {
+describe.only('Test Suite of the Transaction (Adapter)', function () {
   this.beforeAll(() => {
     const transactionResponse = {
       hash: '9a2716851aeeaee4529c84dce1b2d00c6dbc5fb2e70ae9fe19bb24c5bf93ebd2',

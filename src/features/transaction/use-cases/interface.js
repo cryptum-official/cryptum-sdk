@@ -2,7 +2,7 @@ const { NotImplementedException } = require('../../../../errors')
 
 class Interface {
   /**
-   * Method to mount and validate an Cryptum SignedTransaction to send for API
+   * Method to mount and validate an Cryptum Transaction to send for API
    * 
    * @param {Object} transaction an Object with { protocol, blob }
    * All data required to send an new transaction
@@ -12,7 +12,7 @@ class Interface {
   }
 
   /**
-   * Method to mount and validate an Cryptum SignedTransaction saved in backend
+   * Method to mount and validate an Cryptum Transaction saved in backend
    * 
    * @param {Object} transaction an Object with { hash, protocol, blob: optional }
    * All data returned of the Cryptum API
