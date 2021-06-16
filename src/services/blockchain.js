@@ -104,7 +104,7 @@ async function buildRippleTrustlineTransaction({
     sequence,
     maxLedgerVersion,
   })
-  const { transaction } = rippleAPI.sign(prepared.txJSON, fromPrivateKey)
-  return transaction
+  const { signedTransaction } = rippleAPI.sign(prepared.txJSON, fromPrivateKey)
+  return signedTransaction
 }
 module.exports.buildRippleTrustlineTransaction = buildRippleTrustlineTransaction
