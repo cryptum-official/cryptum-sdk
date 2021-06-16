@@ -1,4 +1,4 @@
-class SignedTransactionCryptum {
+class TransactionCryptum {
   constructor({ protocol, blob, hash }) {
     this.protocol = protocol
     this.blob = blob
@@ -6,22 +6,22 @@ class SignedTransactionCryptum {
   }
 
   /**
-   * Method to validate if to an signedTransaction is valid
+   * Method to validate if to an transaction is valid
    *
-   * @param {*} signedTransaction to validate if is an SignedTransactionCryptum valid, to your signedTransaction are valid.
-   * The send signedTransaction need are registered in Cryptum and has  { blob, protocol, hash } attributes
+   * @param {*} transaction to validate if is an TransactionCryptum valid, to your transaction are valid.
+   * The send transaction need are registered in Cryptum and has  { blob, protocol, hash } attributes
    *
    * @returns true if is valid and false if not
    */
-  static isSignedTransactionCryptum(signedTransaction) {
-    if (!(signedTransaction instanceof SignedTransactionCryptum)) return false
+  static isTransactionCryptum(transaction) {
+    if (!(transaction instanceof TransactionCryptum)) return false
 
-    return this.validateMandatoryValues(signedTransaction)
+    return this.validateMandatoryValues(transaction)
   }
 
   /**
-   * Validate if an object can mount an SignedTransactionCryptum, not send
-   * if you need attributes to send an signedTransaction in cryptum call canSend method
+   * Validate if an object can mount an TransactionCryptum, not send
+   * if you need attributes to send an transaction in cryptum call canSend method
    *
    * @param {*} object generic object with mandatory values: { protocol, hash }
    * @returns true if can mount and false if not
@@ -36,15 +36,15 @@ class SignedTransactionCryptum {
   /**
    * Method to validate if you can send an Transaction in cryptum
    *
-   * @param {Object} signedTransaction with this attributes: { blob, protocol } 
+   * @param {Object} transaction with this attributes: { blob, protocol } 
    * @returns true if can, and false if not
    */
-  static canSend(signedTransaction) {
-    if (!signedTransaction) return false
+  static canSend(transaction) {
+    if (!transaction) return false
 
-    const { blob, protocol } = signedTransaction
+    const { blob, protocol } = transaction
     return !!blob && !!protocol
   }
 }
 
-module.exports = SignedTransactionCryptum
+module.exports = TransactionCryptum

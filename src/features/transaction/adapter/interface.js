@@ -2,12 +2,12 @@ const { NotImplementedException } = require('../../../../errors')
 class Interface {
 
   /**
-   * Method to send an signedTransaction in Cryptum of the backend using axios
+   * Method to send an transaction in Cryptum of the backend using axios
    * 
-   * @param {Object} signedTransaction object with all signedTransaction data required: { protocol, blob }
+   * @param {Object} transaction object with all transaction data required: { protocol, blob }
    * @param {Object} config an object with this data: { enviroment: 'development'/'production', apiKey: XXXXXXX }
    */
-   sendSignedTransaction(signedTransaction, config) {
+   sendTransaction(transaction, config) {
     throw new NotImplementedException()
   }
 }

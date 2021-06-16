@@ -1,7 +1,7 @@
 const assert = require('assert')
-const SignedTransactionCryptum = require('../../src/features/transaction/entity')
+const TransactionCryptum = require('../../src/features/transaction/entity')
 const SignedTransactionCryptumUseCase = require('../../src/features/transaction/use-cases')
-const SignedTransactionCryptumInterface = require('../../src/features/transaction/use-cases/interface')
+const TransactionCryptumInterface = require('../../src/features/transaction/use-cases/interface')
 
 describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
   it('Check if an Not Implemented Exception in interface (Interface test) : mountSignedTransaction', async () => {
@@ -14,7 +14,7 @@ describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
     }
 
     try {
-      const interface = new SignedTransactionCryptumInterface()
+      const interface = new TransactionCryptumInterface()
       interface.mountSignedTransaction(data)
     } catch (error) {
       assert.deepStrictEqual(error.message, expectedResult)
@@ -31,7 +31,7 @@ describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
     }
 
     try {
-      const interface = new SignedTransactionCryptumInterface()
+      const interface = new TransactionCryptumInterface()
       interface.mountTransactionToSend(data)
     } catch (error) {
       assert.deepStrictEqual(error.message, expectedResult)
@@ -44,14 +44,14 @@ describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
       protocol: 'STELLAR',
     }
 
-    const expectedResult = new SignedTransactionCryptum(data)
+    const expectedResult = new TransactionCryptum(data)
 
     const result = SignedTransactionCryptumUseCase.mountTransactionToSend(data)
     assert.deepStrictEqual(result, expectedResult)
   })
 
   it('Check if can mount an Signed Transaction Cryptum to create in Cryptum API (Without protocol) : mountTransactionToSend', async () => {
-    const expectedResult = 'Not can mount SignedTransactionCryptum entity'
+    const expectedResult = 'Not can mount TransactionCryptum entity'
 
     const data = {
       blob: 'sample-secret-transaction',
@@ -65,7 +65,7 @@ describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
   })
 
   it('Check if can mount an Signed Transaction Cryptum to create in Cryptum API (Without transaction) : mountTransactionToSend', async () => {
-    const expectedResult = 'Not can mount SignedTransactionCryptum entity'
+    const expectedResult = 'Not can mount TransactionCryptum entity'
 
     const data = {
       protocol: 'STELLAR',
@@ -78,14 +78,14 @@ describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
     }
   })
 
-  it('Check if can mount an Transaction Cryptum to create in Cryptum API (Valid SignedTransactionCryptum) : mountSignedTransaction', async () => {
+  it('Check if can mount an Transaction Cryptum to create in Cryptum API (Valid TransactionCryptum) : mountSignedTransaction', async () => {
     const data = {
       hash: 'sample-secret-hash-response',
       blob: 'sample-secret-transaction',
       protocol: 'STELLAR',
     }
 
-    const expectedResult = new SignedTransactionCryptum(data)
+    const expectedResult = new TransactionCryptum(data)
     const result = SignedTransactionCryptumUseCase.mountSignedTransaction(expectedResult)
     assert.deepStrictEqual(result, expectedResult)
   })
@@ -96,13 +96,13 @@ describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
       protocol: 'STELLAR',
     }
 
-    const expectedResult = new SignedTransactionCryptum(data)
+    const expectedResult = new TransactionCryptum(data)
     const result = SignedTransactionCryptumUseCase.mountSignedTransaction(data)
     assert.deepStrictEqual(result, expectedResult)
   })
 
   it('Check if can mount an Transaction Cryptum to create in Cryptum API (JSON without protocol) : mountSignedTransaction', async () => {
-    const expectedResult = 'Not can mount SignedTransactionCryptum entity'
+    const expectedResult = 'Not can mount TransactionCryptum entity'
     
     const data = {
       blob: 'sample-secret-blob',
@@ -117,7 +117,7 @@ describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
 
 
   it('Check if can mount an Transaction Cryptum to create in Cryptum API (JSON without hash) : mountSignedTransaction', async () => {
-    const expectedResult = 'Not can mount SignedTransactionCryptum entity'
+    const expectedResult = 'Not can mount TransactionCryptum entity'
     
     const data = {
       protocol: 'STELLAR',
@@ -131,7 +131,7 @@ describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
   })
 
   it('Check if can mount an Transaction Cryptum to create in Cryptum API (With null) : mountSignedTransaction', async () => {
-    const expectedResult = 'Not can mount SignedTransactionCryptum entity'
+    const expectedResult = 'Not can mount TransactionCryptum entity'
 
     try {
       SignedTransactionCryptumUseCase.mountSignedTransaction(null)
@@ -141,7 +141,7 @@ describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
   })
 
   it('Check if can mount an Transaction Cryptum to create in Cryptum API (With undefined) : mountSignedTransaction', async () => {
-    const expectedResult = 'Not can mount SignedTransactionCryptum entity'
+    const expectedResult = 'Not can mount TransactionCryptum entity'
 
     try {
       SignedTransactionCryptumUseCase.mountSignedTransaction(undefined)

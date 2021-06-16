@@ -5,16 +5,17 @@ const Adapter = require('../adapter')
 const Interface = require('./interface')
 
 class Controller extends Interface {
-  async sendSignedTransaction(signedTransaction) {
+  async sendTransaction(transaction) {
     try {
-      const signedTransactionCryptum =
-        UseCases.mountTransactionToSend(signedTransaction)
+      const transactionCryptum =
+        UseCases.mountTransactionToSend(transaction)
 
-      const { data } = await Adapter.sendSignedTransaction(
-        signedTransactionCryptum,
+
+      const { data } = await Adapter.sendTransaction(
+        transactionCryptum,
         this.config
       )
-      return UseCases.mountSignedTransaction({ ...signedTransactionCryptum, ...data })
+      return UseCases.mountSignedTransaction({ ...transactionCryptum, ...data })
     } catch (error) {
       handleRequestError(error)
     }

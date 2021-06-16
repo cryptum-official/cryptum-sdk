@@ -2,7 +2,7 @@ const ApiKeyController = require('./src/features/api-keys/controller')
 const WebhooksController = require('./src/features/webhooks/controller')
 const WalletController = require('./src/features/wallet/controller')
 const PricesController = require('./src/features/prices/controller')
-const SignedTransactionController = require('./src/features/transaction/controller')
+const TransactionController = require('./src/features/transaction/controller')
 
 class CryptumSDK {
   constructor({ config, apiKey }) {
@@ -38,12 +38,12 @@ class CryptumSDK {
   }
 
   /**
-   * Method to get a controller to manipulate signed transactions
+   * Method to get a controller to manipulate transactions
    *
-   * @returns SignedTransactionController instance
+   * @returns TransactionController instance
    */
-  getSignedTransactionController() {
-    return new SignedTransactionController(this.config)
+  getTransactionController() {
+    return new TransactionController(this.config)
   }
 
   /**

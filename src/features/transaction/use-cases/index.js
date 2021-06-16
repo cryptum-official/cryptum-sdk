@@ -1,23 +1,23 @@
 const { NotCanMountException } = require('../../../../errors')
 
-const SignedTransactionCryptum = require('../entity')
+const TransactionCryptum = require('../entity')
 const Interface = require('./interface')
 
 class UseCases extends Interface {
-  mountTransactionToSend(signedTransaction) {
-    if (!signedTransaction) throw new NotCanMountException('SignedTransactionCryptum')
-    if (!SignedTransactionCryptum.canSend(signedTransaction))
-      throw new NotCanMountException('SignedTransactionCryptum')
+  mountTransactionToSend(transaction) {
+    if (!transaction) throw new NotCanMountException('TransactionCryptum')
+    if (!TransactionCryptum.canSend(transaction))
+      throw new NotCanMountException('TransactionCryptum')
 
-    return new SignedTransactionCryptum(signedTransaction)
+    return new TransactionCryptum(transaction)
   }
 
-  mountSignedTransaction(signedTransaction) {
-    if (!signedTransaction) throw new NotCanMountException('SignedTransactionCryptum')
-    if (!SignedTransactionCryptum.validateMandatoryValues(signedTransaction))
-      throw new NotCanMountException('SignedTransactionCryptum')
+  mountSignedTransaction(transaction) {
+    if (!transaction) throw new NotCanMountException('TransactionCryptum')
+    if (!TransactionCryptum.validateMandatoryValues(transaction))
+      throw new NotCanMountException('TransactionCryptum')
 
-    return new SignedTransactionCryptum(signedTransaction)
+    return new TransactionCryptum(transaction)
   }
 }
 

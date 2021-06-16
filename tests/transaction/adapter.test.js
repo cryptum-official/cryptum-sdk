@@ -1,9 +1,9 @@
 const assert = require('assert')
 const nock = require('nock')
 
-const SignedTransactionCryptum = require('../../src/features/transaction/entity')
-const SignedTransactionCryptumAdapter = require('../../src/features/transaction/adapter')
-const SignedTransactionCryptumInterface = require('../../src/features/transaction/adapter/interface')
+const TransactionCryptum = require('../../src/features/transaction/entity')
+const TransactionCryptumAdapter = require('../../src/features/transaction/adapter')
+const TransactionCryptumInterface = require('../../src/features/transaction/adapter/interface')
 
 describe.only('Test Suite of the SignedTransaction (Adapter)', function () {
   this.beforeAll(() => {
@@ -20,7 +20,7 @@ describe.only('Test Suite of the SignedTransaction (Adapter)', function () {
       .reply(200, transactionResponse)
   })
 
-  it('Check if an Not Implemented Exception in interface (Interface test) : sendSignedTransaction', async () => {
+  it('Check if an Not Implemented Exception in interface (Interface test) : sendTransaction', async () => {
     const expectedResult = 'Method not implemented'
 
     const data = {
@@ -34,14 +34,14 @@ describe.only('Test Suite of the SignedTransaction (Adapter)', function () {
     }
 
     try {
-      const interface = new SignedTransactionCryptumInterface()
-      interface.sendSignedTransaction(data, config)
+      const interface = new TransactionCryptumInterface()
+      interface.sendTransaction(data, config)
     } catch (error) {
       assert.deepStrictEqual(error.message, expectedResult)
     }
   })
 
-  it('Check create an transaction with SignedTransactionCryptum valid : sendSignedTransaction', async () => {
+  it('Check create an transaction with TransactionCryptum valid : sendTransaction', async () => {
     const data = {
       blob: 'samplesignaturehere',
       protocol: 'STELLAR',
@@ -52,13 +52,13 @@ describe.only('Test Suite of the SignedTransaction (Adapter)', function () {
       apiKey: 'apikeyexamplecryptum',
     }
 
-    const signedTransaction = new SignedTransactionCryptum(data)
+    const transaction = new TransactionCryptum(data)
     const expectedResult = {
       hash: '9a2716851aeeaee4529c84dce1b2d00c6dbc5fb2e70ae9fe19bb24c5bf93ebd2',
     }
 
-    const result = await SignedTransactionCryptumAdapter.sendSignedTransaction(
-      signedTransaction,
+    const result = await TransactionCryptumAdapter.sendTransaction(
+      transaction,
       config
     )
     assert.deepStrictEqual(result.data, expectedResult)

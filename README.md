@@ -22,7 +22,7 @@
       - [List you Webhooks](#list-you-webhooks)
       - [Delete an Webhook](#delete-an-webhook)
   - [SignedTransaction](#signedtransaction)
-      - [Send an signed Transaction](#send-an-transaction)
+      - [Send an signed Transaction](#send-an-signed-transaction)
 - [Contributing](#contributing)
   - [What does my PR need to be accepted ? 🤔](#what-does-my-pr-need-to-be-accepted--)
 - [License](#license)
@@ -148,13 +148,13 @@ ps.: If you not provide an asset, protocol and webhookId valid, the Cryptum sdk 
 You need only instantiate SignedTransaction controller and send your signed transaction to cryptum 🚀
 
 ```js
-const transactionController = sdk.getSignedTransactionController()
-const transaction = await transactionController.sendSignedTransaction({
+const transactionController = sdk.getTransactionController()
+const transaction = await transactionController.sendTransaction({
   protocol: 'your protocol',
   blob: 'your-secrete-transaction-blob',
 })
 console.log(transaction)
-// Log your SignedTransactionCryptum with hash
+// Log your TransactionCryptum with hash
 ```
 
 ## Contributing

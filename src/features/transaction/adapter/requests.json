@@ -1,5 +1,5 @@
 {
-  "sendSignedTransaction": {
+  "sendTransaction": {
     "method": "POST",
     "url": "/transaction"
   }
