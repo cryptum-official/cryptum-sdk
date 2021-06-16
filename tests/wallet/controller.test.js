@@ -134,7 +134,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
     })
   })
 
-  describe('create transactions', () => {
+  describe('trustline transactions', () => {
     const axiosApi = new AxiosApi(config)
     const baseUrl = axiosApi.getBaseUrl(config.enviroment)
 
@@ -252,6 +252,33 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         }),
         'Issuer is invalid'
       )
+    })
+  })
+
+  describe('transfer transactions', () => {
+    const axiosApi = new AxiosApi(config)
+    const baseUrl = axiosApi.getBaseUrl(config.enviroment)
+
+    it(' - create transfer stellar', async () => {
+      nock(baseUrl)
+        .get(
+          `/wallet/${wallets.stellar.publicKey}/info?protocol=${Protocol.STELLAR}`
+        )
+        .reply(200, {
+          sequence: '6259566941569025',
+        })
+      const controller = new WalletController(config)
+
+      const transaction = await controller.createTransferTransaction({
+        wallet: wallets.stellar,
+        assetSymbol: 'XLM',
+        amount: '0.5',
+        destination: 'GDLCRMXZ66NFDIALVOJCIEOYJTITVNUFVYWT7MK26NO2GJXIBHTVGUIO',
+        fee: '100',
+        memo: 'create-transfer',
+        protocol: Protocol.STELLAR,
+      })
+      assert.include(transaction, 'AAAAAgAAAAAFqv2GZM3flypMrxlnhEDXqISoxW')
     })
   })
 })
