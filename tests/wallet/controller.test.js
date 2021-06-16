@@ -20,7 +20,7 @@ const wallets = {
 }
 const config = {
   enviroment: 'development',
-  apiKey: process.env.CRYPTUM_APIKEY,
+  apiKey: 'apikeyexamplecryptum',
 }
 
 describe.only('Test Suite of the Wallet (Controller)', () => {
