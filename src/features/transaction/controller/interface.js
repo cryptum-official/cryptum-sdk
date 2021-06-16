@@ -13,7 +13,7 @@ class Interface {
   /**
    * Method to send an signedTransaction to Cryptum
    * 
-   * @param {Object} signedTransaction object with all signedTransaction data required: { protocol, transaction }
+   * @param {Object} signedTransaction object with all signedTransaction data required: { protocol, blob }
    */
    sendSignedTransaction(signedTransaction) {
     throw new NotImplementedException()

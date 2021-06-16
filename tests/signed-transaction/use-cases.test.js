@@ -1,7 +1,7 @@
 const assert = require('assert')
-const SignedTransactionCryptum = require('../../src/features/signed-transaction/entity')
-const SignedTransactionCryptumUseCase = require('../../src/features/signed-transaction/use-cases')
-const SignedTransactionCryptumInterface = require('../../src/features/signed-transaction/use-cases/interface')
+const SignedTransactionCryptum = require('../../src/features/transaction/entity')
+const SignedTransactionCryptumUseCase = require('../../src/features/transaction/use-cases')
+const SignedTransactionCryptumInterface = require('../../src/features/transaction/use-cases/interface')
 
 describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
   it('Check if an Not Implemented Exception in interface (Interface test) : mountSignedTransaction', async () => {
@@ -9,7 +9,7 @@ describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
 
     const data = {
       hash: 'sample-secret-hash-response',
-      transaction: 'sample-secret-transaction',
+      blob: 'sample-secret-transaction',
       protocol: 'STELLAR',
     }
 
@@ -26,7 +26,7 @@ describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
 
     const data = {
       hash: 'sample-secret-hash-response',
-      transaction: 'sample-secret-transaction',
+      blob: 'sample-secret-transaction',
       protocol: 'STELLAR',
     }
 
@@ -40,7 +40,7 @@ describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
 
   it('Check if can mount an Signed Transaction Cryptum to create in Cryptum API (Valid Data) : mountTransactionToSend', async () => {
     const data = {
-      transaction: 'sample-secret-transaction',
+      blob: 'sample-secret-transaction',
       protocol: 'STELLAR',
     }
 
@@ -54,7 +54,7 @@ describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
     const expectedResult = 'Not can mount SignedTransactionCryptum entity'
 
     const data = {
-      transaction: 'sample-secret-transaction',
+      blob: 'sample-secret-transaction',
     }
 
     try {
@@ -81,7 +81,7 @@ describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
   it('Check if can mount an Transaction Cryptum to create in Cryptum API (Valid SignedTransactionCryptum) : mountSignedTransaction', async () => {
     const data = {
       hash: 'sample-secret-hash-response',
-      transaction: 'sample-secret-transaction',
+      blob: 'sample-secret-transaction',
       protocol: 'STELLAR',
     }
 
@@ -105,7 +105,7 @@ describe.only('Test Suite of the SignedTransaction (Use Cases)', function () {
     const expectedResult = 'Not can mount SignedTransactionCryptum entity'
     
     const data = {
-      transaction: 'sample-secret-transaction',
+      blob: 'sample-secret-blob',
     }
 
     try {

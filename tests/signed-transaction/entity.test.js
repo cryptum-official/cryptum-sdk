@@ -1,5 +1,5 @@
 const assert = require('assert')
-const SignedTransactionCryptum = require('../../src/features/signed-transaction/entity')
+const SignedTransactionCryptum = require('../../src/features/transaction/entity')
 
 describe.only('Test Suite of the SignedTransaction (Entity)', function () {
   it('Check if an valid SignedTransactionCryptum is an SignedTransactionCryptum (Without transaction): isSignedTransactionCryptum', async () => {
@@ -18,7 +18,7 @@ describe.only('Test Suite of the SignedTransaction (Entity)', function () {
   it('Check if an valid SignedTransactionCryptum is an SignedTransactionCryptum (With FULL DATA) : isSignedTransactionCryptum', async () => {
     const data = {
       protocol: 'BITCOIN',
-      transaction: 'samplesignaturehere',
+      blob: 'samplesignaturehere',
       hash: 'SOAowjdsajoiw321ojodsa',
     }
 
@@ -32,7 +32,7 @@ describe.only('Test Suite of the SignedTransaction (Entity)', function () {
   it('Check if an valid SignedTransactionCryptum is not an SignedTransactionCryptum (Without hash) : isSignedTransactionCryptum', async () => {
     const data = {
       protocol: 'BITCOIN',
-      transaction: 'samplesignaturehere',
+      blob: 'samplesignaturehere',
     }
 
     const transaction = new SignedTransactionCryptum(data)
@@ -44,7 +44,7 @@ describe.only('Test Suite of the SignedTransaction (Entity)', function () {
 
   it('Check if an valid SignedTransactionCryptum is not an SignedTransactionCryptum (Without protocol) : isSignedTransactionCryptum', async () => {
     const data = {
-      transaction: 'samplesignaturehere',
+      blob: 'samplesignaturehere',
       hash: 'SOAowjdsajoiw321ojodsa',
     }
 
@@ -69,7 +69,7 @@ describe.only('Test Suite of the SignedTransaction (Entity)', function () {
   it('Check if an valid JSON not is an SignedTransactionCryptum (With full data) : isSignedTransactionCryptum', async () => {
     const data = {
       protocol: 'BITCOIN',
-      transaction: 'samplesignaturehere',
+      blob: 'samplesignaturehere',
       hash: 'SOAowjdsajoiw321ojodsa',
     }
 
@@ -80,7 +80,7 @@ describe.only('Test Suite of the SignedTransaction (Entity)', function () {
 
   it('Check if an invalid JSON not is an SignedTransactionCryptum (Without protocol) : isSignedTransactionCryptum', async () => {
     const data = {
-      transaction: 'samplesignaturehere',
+      blob: 'samplesignaturehere',
       hash: 'SOAowjdsajoiw321ojodsa',
     }
 
@@ -92,7 +92,7 @@ describe.only('Test Suite of the SignedTransaction (Entity)', function () {
   it('Check if an invalid JSON not is an SignedTransactionCryptum (Without hash) : isSignedTransactionCryptum', async () => {
     const data = {
       protocol: 'BITCOIN',
-      transaction: 'samplesignaturehere',
+      blob: 'samplesignaturehere',
     }
 
     const expectedResult = false
@@ -102,7 +102,7 @@ describe.only('Test Suite of the SignedTransaction (Entity)', function () {
 
   it('Check if an invalid SignedTransactionCryptum contains mandatory values to an valid SignedTransactionCryptum : validateMandatoryValues', async () => {
     const data = {
-      transaction: 'samplesignaturehere',
+      blob: 'samplesignaturehere',
       hash: 'SOAowjdsajoiw321ojodsa',
     }
 
@@ -139,7 +139,7 @@ describe.only('Test Suite of the SignedTransaction (Entity)', function () {
 
   it('Check if an invalid JSON contains mandatory values to an valid SignedTransactionCryptum (Without hash) : validateMandatoryValues', async () => {
     const data = {
-      transaction: 'samplesignaturehere',
+      blob: 'samplesignaturehere',
       protocol: 'BITCOIN',
     }
 
@@ -150,7 +150,7 @@ describe.only('Test Suite of the SignedTransaction (Entity)', function () {
 
   it('Check if an invalid JSON contains mandatory values to an valid SignedTransactionCryptum (Without protocol) : validateMandatoryValues', async () => {
     const data = {
-      transaction: 'samplesignaturehere',
+      blob: 'samplesignaturehere',
       hash: 'SOAowjdsajoiw321ojodsa',
     }
 
@@ -173,7 +173,7 @@ describe.only('Test Suite of the SignedTransaction (Entity)', function () {
 
   it('Check if with SignedTransactionCryptum can create an SignedTransactionCryptum in API (With valid data) : canSend', async () => {
     const data = {
-      transaction: 'samplesignaturehere',
+      blob: 'samplesignaturehere',
       protocol: 'BITCOIN',
     }
 
@@ -186,7 +186,7 @@ describe.only('Test Suite of the SignedTransaction (Entity)', function () {
 
   it('Check if with JSON can create an SignedTransactionCryptum (With valid data) : canSend', async () => {
     const data = {
-      transaction: 'samplesignaturehere',
+      blob: 'samplesignaturehere',
       protocol: 'BITCOIN',
     }
 
@@ -207,7 +207,7 @@ describe.only('Test Suite of the SignedTransaction (Entity)', function () {
 
   it('Check if with JSON can create an SignedTransactionCryptum (Without protocol) : canSend', async () => {
     const data = {
-      transaction: 'samplesignaturehere',
+      blob: 'samplesignaturehere',
     }
 
     const expectedResult = false
@@ -229,7 +229,7 @@ describe.only('Test Suite of the SignedTransaction (Entity)', function () {
 
   it('Check if with SignedTransactionCryptum can create an SignedTransactionCryptum (Without protocol) : canSend', async () => {
     const data = {
-      transaction: 'samplesignaturehere',
+      blob: 'samplesignaturehere',
     }
 
     const transaction = new SignedTransactionCryptum(data)

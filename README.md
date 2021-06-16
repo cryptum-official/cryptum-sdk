@@ -22,7 +22,7 @@
       - [List you Webhooks](#list-you-webhooks)
       - [Delete an Webhook](#delete-an-webhook)
   - [SignedTransaction](#signedtransaction)
-      - [Send an signed Transaction](#send-an-signed-transaction)
+      - [Send an signed Transaction](#send-an-transaction)
 - [Contributing](#contributing)
   - [What does my PR need to be accepted ? 🤔](#what-does-my-pr-need-to-be-accepted--)
 - [License](#license)
@@ -151,7 +151,7 @@ You need only instantiate SignedTransaction controller and send your signed tran
 const transactionController = sdk.getSignedTransactionController()
 const transaction = await transactionController.sendSignedTransaction({
   protocol: 'your protocol',
-  transaction: 'your-secrete-transaction',
+  blob: 'your-secrete-transaction-blob',
 })
 console.log(transaction)
 // Log your SignedTransactionCryptum with hash

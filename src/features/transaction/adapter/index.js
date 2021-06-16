@@ -12,8 +12,8 @@ class Adapter extends Interface {
     })
     const headers = mountHeaders(config.apiKey)
 
-    const { protocol, transaction } = signedTransaction
-    const payload = { protocol, signedTx: transaction }
+    const { protocol, blob } = signedTransaction
+    const payload = { protocol, signedTx: blob }
 
     return method(requests.sendSignedTransaction.url, payload, {
       headers,

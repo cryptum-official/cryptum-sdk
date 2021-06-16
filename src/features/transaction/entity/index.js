@@ -1,7 +1,7 @@
 class SignedTransactionCryptum {
-  constructor({ protocol, transaction, hash }) {
+  constructor({ protocol, blob, hash }) {
     this.protocol = protocol
-    this.transaction = transaction
+    this.blob = blob
     this.hash = hash
   }
 
@@ -9,7 +9,7 @@ class SignedTransactionCryptum {
    * Method to validate if to an signedTransaction is valid
    *
    * @param {*} signedTransaction to validate if is an SignedTransactionCryptum valid, to your signedTransaction are valid.
-   * The send signedTransaction need are registered in Cryptum and has  { transaction, protocol, hash } attributes
+   * The send signedTransaction need are registered in Cryptum and has  { blob, protocol, hash } attributes
    *
    * @returns true if is valid and false if not
    */
@@ -36,14 +36,14 @@ class SignedTransactionCryptum {
   /**
    * Method to validate if you can send an Transaction in cryptum
    *
-   * @param {Object} signedTransaction with this attributes: { transaction, protocol } 
+   * @param {Object} signedTransaction with this attributes: { blob, protocol } 
    * @returns true if can, and false if not
    */
   static canSend(signedTransaction) {
     if (!signedTransaction) return false
 
-    const { transaction, protocol } = signedTransaction
-    return !!transaction && !!protocol
+    const { blob, protocol } = signedTransaction
+    return !!blob && !!protocol
   }
 }
 

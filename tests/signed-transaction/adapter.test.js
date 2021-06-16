@@ -1,9 +1,9 @@
 const assert = require('assert')
 const nock = require('nock')
 
-const SignedTransactionCryptum = require('../../src/features/signed-transaction/entity')
-const SignedTransactionCryptumAdapter = require('../../src/features/signed-transaction/adapter')
-const SignedTransactionCryptumInterface = require('../../src/features/signed-transaction/adapter/interface')
+const SignedTransactionCryptum = require('../../src/features/transaction/entity')
+const SignedTransactionCryptumAdapter = require('../../src/features/transaction/adapter')
+const SignedTransactionCryptumInterface = require('../../src/features/transaction/adapter/interface')
 
 describe.only('Test Suite of the SignedTransaction (Adapter)', function () {
   this.beforeAll(() => {
@@ -24,7 +24,7 @@ describe.only('Test Suite of the SignedTransaction (Adapter)', function () {
     const expectedResult = 'Method not implemented'
 
     const data = {
-      transaction: 'samplesignaturehere',
+      blob: 'samplesignaturehere',
       protocol: 'STELLAR',
     }
 
@@ -43,7 +43,7 @@ describe.only('Test Suite of the SignedTransaction (Adapter)', function () {
 
   it('Check create an transaction with SignedTransactionCryptum valid : sendSignedTransaction', async () => {
     const data = {
-      transaction: 'samplesignaturehere',
+      blob: 'samplesignaturehere',
       protocol: 'STELLAR',
     }
 
