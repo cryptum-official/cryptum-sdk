@@ -1,5 +1,6 @@
 const { NotImplementedException } = require('../../../../errors')
 const Wallet = require('../entity')
+const { Protocol } = require('../../../services/blockchain')
 
 class Interface {
   /**
@@ -85,7 +86,7 @@ class Interface {
    * Get wallet information from blockchain
    * @param {object} args
    * @param {string} args.address
-   * @param {string} args.protocol
+   * @param {Protocol} args.protocol
    * @returns {Promise<any>}
    */
   async getWalletInfo({ address, protocol }) {
@@ -95,20 +96,45 @@ class Interface {
    * Create trustline signed transaction
    * @param {object} args
    * @param {Wallet} args.wallet
-   * @param {string} args.assetCode
+   * @param {string} args.assetSymbol
    * @param {string} args.issuer
    * @param {string?} args.fee
    * @param {string?} args.limit
    * @param {string?} args.memo
-   * @param {string} args.protocol
+   * @param {Protocol} args.protocol
    * @returns {Promise<string>}
    */
   async createTrustlineTransaction({
     wallet,
-    assetCode,
+    assetSymbol,
     issuer,
     fee,
     limit,
+    memo,
+    protocol,
+  }) {
+    throw new NotImplementedException()
+  }
+  /**
+   * Create transfer signed transaction
+   * @param {object} args
+   * @param {Wallet} args.wallet
+   * @param {string} args.assetSymbol
+   * @param {string} args.issuer
+   * @param {string} args.amount
+   * @param {string} args.destination
+   * @param {string?} args.fee
+   * @param {string?} args.memo
+   * @param {Protocol} args.protocol
+   * @returns {Promise<string>}
+   */
+  async createTransferTransaction({
+    wallet,
+    assetSymbol,
+    issuer,
+    fee,
+    amount,
+    destination,
     memo,
     protocol,
   }) {

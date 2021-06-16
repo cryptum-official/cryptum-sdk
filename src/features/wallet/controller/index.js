@@ -16,11 +16,15 @@ const {
   deriveRippleWallet,
   deriveStellarWallet,
 } = require('../../../services/wallet')
+const { Protocol } = require('../../../services/blockchain')
 const {
-  Protocol,
   buildStellarTrustlineTransaction,
   buildRippleTrustlineTransaction,
-} = require('../../../services/blockchain')
+  buildTrustlineTransaction,
+} = require('../../../services/blockchain/trustline')
+const {
+  buildTransferTransaction,
+} = require('../../../services/blockchain/transfer')
 
 class Controller extends Interface {
   async generateWallet({ protocol, testnet = true, mnemonic = '' }) {
@@ -159,59 +163,95 @@ class Controller extends Interface {
       )
       return response.data
     } catch (error) {
+      console.log(error)
       handleRequestError(error)
     }
   }
 
   async createTrustlineTransaction({
     wallet,
-    assetCode,
+    assetSymbol,
     issuer,
     fee,
     limit,
     memo,
     protocol,
   }) {
+    const address =
+      protocol === Protocol.STELLAR ? wallet.publicKey : wallet.address
+
+    const info = await this.getWalletInfo({
+      address,
+      protocol,
+    })
+
+    let sequence, maxLedgerVersion
     switch (protocol) {
-      case Protocol.STELLAR: {
-        const info = await this.getWalletInfo({
-          address: wallet.publicKey,
-          protocol,
-        })
-
-        return buildStellarTrustlineTransaction({
-          fromPublicKey: wallet.publicKey,
-          fromPrivateKey: wallet.privateKey,
-          sequence: info.sequence,
-          assetCode,
-          issuer,
-          fee,
-          limit,
-          memo,
-          testnet: wallet.testnet,
-        })
-      }
-      case Protocol.RIPPLE: {
-        const info = await this.getWalletInfo({
-          address: wallet.address,
-          protocol,
-        })
-
-        return buildRippleTrustlineTransaction({
-          fromAddress: wallet.address,
-          fromPrivateKey: wallet.privateKey,
-          sequence: info.account_data.Sequence,
-          maxLedgerVersion: info.ledger_current_index + 10,
-          assetCode,
-          issuer,
-          fee,
-          limit,
-          memo,
-        })
-      }
-      default:
-        throw new Error('Unsupported protocol')
+      case Protocol.STELLAR:
+        sequence = info.sequence
+        break
+      case Protocol.RIPPLE:
+        sequence = info.account_data.Sequence
+        maxLedgerVersion = info.ledger_current_index + 10
+        break
     }
+
+    return await buildTrustlineTransaction({
+      wallet,
+      assetSymbol,
+      issuer,
+      limit,
+      memo,
+      fee,
+      protocol,
+      sequence,
+      maxLedgerVersion,
+    })
+  }
+
+  async createTransferTransaction({
+    wallet,
+    assetSymbol,
+    issuer,
+    amount,
+    destination,
+    memo,
+    fee,
+    protocol,
+    startingBalance,
+  }) {
+    const address =
+      protocol === Protocol.STELLAR ? wallet.publicKey : wallet.address
+
+    const info = await this.getWalletInfo({
+      address,
+      protocol,
+    })
+
+    let sequence, maxLedgerVersion
+    switch (protocol) {
+      case Protocol.STELLAR:
+        sequence = info.sequence
+        break
+      case Protocol.RIPPLE:
+        sequence = info.account_data.Sequence
+        maxLedgerVersion = info.ledger_current_index + 10
+        break
+    }
+
+    return await buildTransferTransaction({
+      wallet,
+      assetSymbol,
+      issuer,
+      amount,
+      destination,
+      memo,
+      fee,
+      protocol,
+      sequence,
+      maxLedgerVersion,
+      startingBalance,
+    })
   }
 }
 

@@ -150,7 +150,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
 
       const transaction = await controller.createTrustlineTransaction({
         wallet: wallets.stellar,
-        assetCode: 'BRLT',
+        assetSymbol: 'BRLT',
         issuer: 'GB7TAYRUZGE6TVT7NHP5SMIZRNQA6PLM423EYISAOAP3MKYIQMVYP2JO',
         limit: '100000000',
         fee: '100',
@@ -172,7 +172,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
 
       const transaction = await controller.createTrustlineTransaction({
         wallet: wallets.ripple,
-        assetCode: 'FOO',
+        assetSymbol: 'FOO',
         issuer: 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe',
         limit: '100000000',
         fee: '100',
@@ -196,7 +196,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
 
       const transaction = await controller.createTrustlineTransaction({
         wallet: wallets.stellar,
-        assetCode: 'BRLT',
+        assetSymbol: 'BRLT',
         issuer: 'GB7TAYRUZGE6TVT7NHP5SMIZRNQA6PLM423EYISAOAP3MKYIQMVYP2JO',
         limit: '0',
         fee: '100',
@@ -217,7 +217,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const controller = new WalletController(config)
       const transaction = await controller.createTrustlineTransaction({
         wallet: wallets.ripple,
-        assetCode: 'FOO',
+        assetSymbol: 'FOO',
         issuer: 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe',
         limit: '0',
         fee: '100',
@@ -243,7 +243,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       assert.isRejected(
         controller.createTrustlineTransaction({
           wallet: wallets.stellar,
-          assetCode: 'BRLT',
+          assetSymbol: 'BRLT',
           issuer: 'xxxxx',
           limit: '100000000',
           fee: '100',
