@@ -35,7 +35,7 @@ function buildStellarTransferTransaction({
 }) {
   const account = new StellarSdk.Account(fromPublicKey, sequence)
   const builder = new StellarSdk.TransactionBuilder(account, {
-    fee,
+    fee: fee ? fee : '100',
     memo: memo
       ? memo.length > 28
         ? StellarSdk.Memo.hash(memo)
@@ -44,7 +44,7 @@ function buildStellarTransferTransaction({
     networkPassphrase: testnet
       ? StellarSdk.Networks.TESTNET
       : StellarSdk.Networks.PUBLIC,
-  }).setTimeout(100)
+  }).setTimeout(300)
 
   const transaction = startingBalance
     ? builder
@@ -58,7 +58,10 @@ function buildStellarTransferTransaction({
     : builder
         .addOperation(
           StellarSdk.Operation.payment({
-            asset: new StellarSdk.Asset(assetSymbol, issuer),
+            asset:
+              assetSymbol === 'XLM'
+                ? StellarSdk.Asset.native()
+                : new StellarSdk.Asset(assetSymbol, issuer),
             amount,
             destination: destination.trim(),
           })
@@ -101,7 +104,7 @@ async function buildRippleTransferTransaction({
       address: fromAddress,
       maxAmount: {
         currency: assetSymbol,
-        issuer,
+        counterparty: issuer,
         value: amount,
       },
     },
@@ -109,11 +112,11 @@ async function buildRippleTransferTransaction({
       address: destination.trim(),
       amount: {
         currency: assetSymbol,
-        issuer,
+        counterparty: issuer,
         value: amount,
       },
     },
-    memos: memo ? [{ type: 'test', format: 'text/plain', data: memo }] : null,
+    memos: memo ? [{ type: '', format: 'text/plain', data: memo }] : null,
   }
   const prepared = await rippleAPI.preparePayment(fromAddress, transfer, {
     fee: fee ? new BigNumber(fee).div('1e6').toString() : '0.0001',
@@ -151,7 +154,7 @@ module.exports.buildTransferTransaction = async function ({
   memo = null,
   fee = null,
   startingBalance = null,
-  testnet = true
+  testnet = true,
 }) {
   switch (protocol) {
     case Protocol.STELLAR:
@@ -166,7 +169,7 @@ module.exports.buildTransferTransaction = async function ({
         memo,
         fee,
         startingBalance,
-        testnet
+        testnet,
       })
     case Protocol.RIPPLE:
       return await buildRippleTransferTransaction({

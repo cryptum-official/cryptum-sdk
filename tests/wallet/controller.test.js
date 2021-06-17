@@ -22,6 +22,8 @@ const config = {
   enviroment: 'development',
   apiKey: 'apikeyexamplecryptum',
 }
+const axiosApi = new AxiosApi(config)
+const baseUrl = axiosApi.getBaseUrl(config.enviroment)
 
 describe.only('Test Suite of the Wallet (Controller)', () => {
   describe('Random mnemonic', () => {
@@ -135,8 +137,6 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
   })
 
   describe('trustline transactions', () => {
-    const axiosApi = new AxiosApi(config)
-    const baseUrl = axiosApi.getBaseUrl(config.enviroment)
 
     it(' - create trustline stellar', async () => {
       nock(baseUrl)
@@ -229,7 +229,6 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         '120014228000000024005F836E201B0000000B638000000000000000000000000000000000000000464F4F0000000000F667B0CA50CC7709A220B0561B85E53A48461FA8684000000000000064732102C9A41967E29CF6B363D099128CF1F2F72E98589F96CDE7B767C735B5269A951074473045022100CDBA164D1024F0F8AC97901B33467C3B2B0BCAF43ECC4BAD726FB393ADE151A4022063A6AC6E935F98FDC8F628D9BFFB9565EA24E80845101A9EF82535E55CC18BFE811402F4263E604CC4EDF5E76E95436E536B6B87D686F9EA7C04746573747D1064656C6574652D74727573746C696E657E0A746578742F706C61696EE1F1'
       )
     })
-
     it(' - create trustline stellar error with invalid issuer', async () => {
       nock(baseUrl)
         .get(
@@ -256,29 +255,46 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
   })
 
   describe('transfer transactions', () => {
-    const axiosApi = new AxiosApi(config)
-    const baseUrl = axiosApi.getBaseUrl(config.enviroment)
-
     it(' - create transfer stellar', async () => {
       nock(baseUrl)
         .get(
           `/wallet/${wallets.stellar.publicKey}/info?protocol=${Protocol.STELLAR}`
         )
         .reply(200, {
-          sequence: '6259566941569025',
+          sequence: '40072044871681',
         })
       const controller = new WalletController(config)
 
       const transaction = await controller.createTransferTransaction({
         wallet: wallets.stellar,
         assetSymbol: 'XLM',
-        amount: '0.5',
+        amount: '1',
         destination: 'GDLCRMXZ66NFDIALVOJCIEOYJTITVNUFVYWT7MK26NO2GJXIBHTVGUIO',
-        fee: '100',
         memo: 'create-transfer',
         protocol: Protocol.STELLAR,
       })
       assert.include(transaction, 'AAAAAgAAAAAFqv2GZM3flypMrxlnhEDXqISoxW')
+    })
+    it(' - create transfer ripple', async () => {
+      nock(baseUrl)
+        .get(
+          `/wallet/${wallets.ripple.address}/info?protocol=${Protocol.RIPPLE}`
+        )
+        .reply(200, {
+          account_data: { Sequence: 18377273 },
+          ledger_current_index: 18448832,
+        })
+      const controller = new WalletController(config)
+
+      const transaction = await controller.createTransferTransaction({
+        wallet: wallets.ripple,
+        assetSymbol: 'XRP',
+        amount: '0.59',
+        destination: 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe',
+        memo: 'create-transfer',
+        protocol: Protocol.RIPPLE,
+      })
+      assert.strictEqual(transaction, '12000022800000002401186A39201B011981CA6140000000000900B0684000000000000064732102C9A41967E29CF6B363D099128CF1F2F72E98589F96CDE7B767C735B5269A951074463044022077BEE41D9FBC039BEF4627FF1D6B6723918890BF285F48D28321AAAC96B75FBB0220471B7E9A22647B6380B8662A71B5ED35702BF7690AD3A1F3CD6AE8A7899CC5A3811402F4263E604CC4EDF5E76E95436E536B6B87D6868314F667B0CA50CC7709A220B0561B85E53A48461FA8F9EA7D0F6372656174652D7472616E736665727E0A746578742F706C61696EE1F1')
     })
   })
 })

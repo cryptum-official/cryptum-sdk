@@ -95,13 +95,14 @@ class Interface {
   /**
    * Create trustline signed transaction
    * @param {object} args
-   * @param {Wallet} args.wallet
-   * @param {string} args.assetSymbol
-   * @param {string} args.issuer
-   * @param {string?} args.fee
-   * @param {string?} args.limit
-   * @param {string?} args.memo
-   * @param {Protocol} args.protocol
+   * @param {Wallet} args.wallet wallet to make the transfer from
+   * @param {string} args.assetSymbol asset symbol to transfer
+   * @param {string?} args.issuer asset issuer to create the trustline from
+   * @param {string} args.limit limit amount
+   * @param {Protocol} args.protocol protocol
+   * @param {string?} args.memo memo string
+   * @param {string?} args.fee transaction fee in small unit
+   * @param {boolean?} args.testnet
    * @returns {Promise<string>}
    */
   async createTrustlineTransaction({
@@ -112,31 +113,36 @@ class Interface {
     limit,
     memo,
     protocol,
+    testnet
   }) {
     throw new NotImplementedException()
   }
   /**
    * Create transfer signed transaction
    * @param {object} args
-   * @param {Wallet} args.wallet
-   * @param {string} args.assetSymbol
-   * @param {string} args.issuer
-   * @param {string} args.amount
-   * @param {string} args.destination
-   * @param {string?} args.fee
-   * @param {string?} args.memo
-   * @param {Protocol} args.protocol
+   * @param {Wallet} args.wallet wallet to make the transfer from
+   * @param {string} args.assetSymbol asset symbol to transfer
+   * @param {string?} args.issuer asset issuer if this is a custom asset
+   * @param {string} args.amount amount to transfer
+   * @param {string} args.destination destination address
+   * @param {Protocol} args.protocol protocol
+   * @param {string?} args.memo memo string
+   * @param {string?} args.fee transaction fee in small unit
+   * @param {string?} args.startingBalance starting amount to create account in blockchain (stellar only)
+   * @param {boolean?} args.testnet
    * @returns {Promise<string>}
    */
   async createTransferTransaction({
     wallet,
     assetSymbol,
     issuer,
-    fee,
     amount,
     destination,
     memo,
+    fee,
     protocol,
+    startingBalance,
+    testnet
   }) {
     throw new NotImplementedException()
   }

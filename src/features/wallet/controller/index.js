@@ -176,6 +176,7 @@ class Controller extends Interface {
     limit,
     memo,
     protocol,
+    testnet
   }) {
     const address =
       protocol === Protocol.STELLAR ? wallet.publicKey : wallet.address
@@ -206,6 +207,7 @@ class Controller extends Interface {
       protocol,
       sequence,
       maxLedgerVersion,
+      testnet: testnet !== undefined ? testnet : wallet.testnet
     })
   }
 
@@ -219,6 +221,7 @@ class Controller extends Interface {
     fee,
     protocol,
     startingBalance,
+    testnet
   }) {
     const address =
       protocol === Protocol.STELLAR ? wallet.publicKey : wallet.address
@@ -251,6 +254,7 @@ class Controller extends Interface {
       sequence,
       maxLedgerVersion,
       startingBalance,
+      testnet: testnet !== undefined ? testnet : wallet.testnet
     })
   }
 }

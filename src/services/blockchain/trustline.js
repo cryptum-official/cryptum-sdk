@@ -30,7 +30,7 @@ async function buildStellarTrustlineTransaction({
 }) {
   const account = new StellarSdk.Account(fromPublicKey, sequence)
   const transaction = new StellarSdk.TransactionBuilder(account, {
-    fee,
+    fee: fee ? fee : '100',
     memo: memo
       ? memo.length > 28
         ? StellarSdk.Memo.hash(memo)
@@ -46,7 +46,7 @@ async function buildStellarTrustlineTransaction({
         limit,
       })
     )
-    .setTimeout(100)
+    .setTimeout(300)
     .build()
 
   transaction.sign(StellarSdk.Keypair.fromSecret(fromPrivateKey))
