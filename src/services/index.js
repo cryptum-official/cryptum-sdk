@@ -47,7 +47,10 @@ const handleRequestError = error => {
   if (error.response.status === 401) throw new UnauthorizedException()
 
   const mappedError = error.response.data.error
-  throw new GenericException(mappedError.code, mappedError.type)
+  throw new GenericException(
+    mappedError.code ?? mappedError.type,
+    mappedError.message ?? mappedError.type
+  )
 }
 
 /**

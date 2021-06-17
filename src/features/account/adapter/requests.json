@@ -1,0 +1,10 @@
+{
+  "create": {
+    "method": "POST",
+    "url": "/account"
+  },
+  "update": {
+    "method": "PUT",
+    "url": "/account"
+  }
+}
