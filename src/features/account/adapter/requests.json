@@ -5,6 +5,7 @@
   },
   "update": {
     "method": "PUT",
-    "url": "/account"
+    "url": "/account/{internalId}/info",
+    "replace": "{internalId}"
   }
 }

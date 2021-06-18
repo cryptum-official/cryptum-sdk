@@ -22,8 +22,11 @@ class Adapter extends Interface {
       config,
     })
     const headers = mountHeaders(config.apiKey)
+    
+    const { url, replace } = requests.update
+    const requestUrl = url.replace(replace, account.internalId)
 
-    return method(`${requests.update.url}/${account.internalId}`, account, { headers })
+    return method(requestUrl, account, { headers })
   }
 }
 
