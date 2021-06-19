@@ -35,40 +35,6 @@ describe.only('Test Suite of the Services (All project)', function () {
       .reply(200, { tested: 'delete_method' })
   })
 
-  it('Check if an services throw respective error (With undefined param) - method: handleRequestError', async () => {
-    const expectedResult = 'An error not mapped has occurred'
-
-    try {
-      handleRequestError(undefined)
-    } catch (error) {
-      assert.deepStrictEqual(error.message, expectedResult)
-    }
-  })
-
-  it('Check if an services throw respective error (With null param) - method: handleRequestError', async () => {
-    const expectedResult = 'An error not mapped has occurred'
-
-    try {
-      handleRequestError(null)
-    } catch (error) {
-      assert.deepStrictEqual(error.message, expectedResult)
-    }
-  })
-
-  it('Check if an services throw respective error (With status 401 param) - method: handleRequestError', async () => {
-    const expectedResult =
-      'You dont have permission or not provided correct credentials or token'
-
-    try {
-      const error = {
-        response: { data: { error: 'RESPONSE ERROR' }, status: 401 },
-      }
-      handleRequestError(error)
-    } catch (error) {
-      assert.deepStrictEqual(error.message, expectedResult)
-    }
-  })
-
   it('Check if an services throw respective error (With NotCanMountException error param) - method: handleRequestError', async () => {
     const expectedResult = 'Not can mount SampleEntity entity'
 
@@ -176,56 +142,6 @@ describe.only('Test Suite of the Services (All project)', function () {
     assert.deepStrictEqual(result.data, expectedResult)
   })
 
-  it('Check if an services can mount an header (With valid ApiKeyCryptum key) - method: mountHeaders', async () => {
-    const expectedResult = {
-      'x-api-key': 'QViCLRuuHlexTyBnwQTySrY2izWHBT5pj5fbAI4jzCg=',
-    }
-
-    const apiKey = new ApiKeyCryptum({
-      id: '143c07af-cc73-4d46-9e0a-8d96624a082e',
-      name: 'Sample Key With created at',
-      key: 'QViCLRuuHlexTyBnwQTySrY2izWHBT5pj5fbAI4jzCg=',
-      active: 1,
-      ownerId: '58b14a30-a675-4d61-8afb-e3c6d37743ff',
-      createdAt: '2021-05-21T17:54:32.000Z',
-      accessLevel: 'fullaccess',
-    })
-
-    const result = mountHeaders(apiKey.key)
-    assert.deepStrictEqual(result, expectedResult)
-  })
-
-  it('Check if an services can mount an header (With invalid ApiKeyCryptum without key) - method: mountHeaders', async () => {
-    const expectedResult =
-      'An error with this code: 0001 and this type: Required apiKeyCryptum has occurred'
-
-    const apiKey = new ApiKeyCryptum({
-      id: '143c07af-cc73-4d46-9e0a-8d96624a082e',
-      name: 'Sample Key With created at',
-      active: 1,
-      ownerId: '58b14a30-a675-4d61-8afb-e3c6d37743ff',
-      createdAt: '2021-05-21T17:54:32.000Z',
-      accessLevel: 'fullaccess',
-    })
-
-    try {
-      mountHeaders(apiKey.key)
-    } catch (error) {
-      assert.deepStrictEqual(error.message, expectedResult)
-    }
-  })
-
-  it('Check if an services can mount an header (With null) - method: mountHeaders', async () => {
-    const expectedResult =
-      'An error with this code: 0001 and this type: Required apiKeyCryptum has occurred'
-
-    try {
-      mountHeaders(null)
-    } catch (error) {
-      assert.deepStrictEqual(error.message, expectedResult)
-    }
-  })
-
   it('Check if an services can mount an header (With valid string) - method: mountHeaders', async () => {
     const expectedResult = {
       'x-api-key': 'QViCLRuuHlexTyBnwQTySrY2izWHBT5pj5fbAI4jzCg=',
@@ -233,17 +149,6 @@ describe.only('Test Suite of the Services (All project)', function () {
 
     const result = mountHeaders('QViCLRuuHlexTyBnwQTySrY2izWHBT5pj5fbAI4jzCg=')
     assert.deepStrictEqual(result, expectedResult)
-  })
-
-  it('Check if an services can mount an header (With undefined) - method: mountHeaders', async () => {
-    const expectedResult =
-      'An error with this code: 0001 and this type: Required apiKeyCryptum has occurred'
-
-    try {
-      mountHeaders(undefined)
-    } catch (error) {
-      assert.deepStrictEqual(error.message, expectedResult)
-    }
   })
 
   it('Check if an ETHEREUM is an valid protocol : isValidProtocol', async () => {

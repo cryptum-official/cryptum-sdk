@@ -1,8 +1,8 @@
 const assert = require('assert')
 const nock = require('nock')
 
-const TransactionCryptum = require('../../src/features/transaction/entity')
-const SignedTransactionCryptumController = require('../../src/features/transaction/controller')
+const { TransactionCryptum, TransactionResponse } = require('../../src/features/transaction/entity')
+const TransactionController = require('../../src/features/transaction/controller')
 const TransactionCryptumInterface = require('../../src/features/transaction/controller/interface')
 
 describe.only('Test Suite of the Transaction (Controller)', function () {
@@ -42,17 +42,15 @@ describe.only('Test Suite of the Transaction (Controller)', function () {
       protocol: 'STELLAR',
     }
 
-    const transaction = new TransactionCryptum(data)
-    const expectedResult = new TransactionCryptum({
-      ...transaction,
+    const expectedResult = new TransactionResponse({
       hash: '9a2716851aeeaee4529c84dce1b2d00c6dbc5fb2e70ae9fe19bb24c5bf93ebd2',
     })
 
-    const controller = new SignedTransactionCryptumController({
+    const controller = new TransactionController({
       enviroment: 'development',
       apiKey: 'apikeyexamplecryptum',
     })
-    const result = await controller.sendTransaction(transaction)
+    const result = await controller.sendTransaction(data)
     assert.deepStrictEqual(result, expectedResult)
   })
 })

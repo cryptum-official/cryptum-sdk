@@ -4,7 +4,7 @@ var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 const assert = chai.assert
 const WalletController = require('../../src/features/wallet/controller')
-const { Protocol } = require('../../src/services/blockchain')
+const { Protocol } = require('../../src/services/blockchain/constants')
 const { config, mnemonic } = require('./constants')
 
 describe.only('Test Suite of the Wallet (Controller)', () => {

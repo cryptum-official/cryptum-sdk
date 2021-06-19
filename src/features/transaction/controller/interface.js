@@ -18,6 +18,12 @@ class Interface {
    sendTransaction(transaction) {
     throw new NotImplementedException()
   }
+  /**
+   * Method to get fee info
+   */
+  async getFee({ type, from, destination, assetSymbol, protocol }) {
+    throw new NotImplementedException()
+  }
 }
 
 module.exports = Interface

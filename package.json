@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "@binance-chain/javascript-sdk": "^4.1.1",
-    "@celo/contractkit": "^1.2.0",
+    "@celo-tools/celo-ethers-wrapper": "^0.0.5",
+    "@ethereumjs/tx": "^3.2.1",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
     "bip39": "^3.0.4",

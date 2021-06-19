@@ -1,5 +1,5 @@
 const WalletController = require('../../src/features/wallet/controller')
-const { Protocol } = require('../../src/services/blockchain')
+const { Protocol } = require('../../src/services/blockchain/constants')
 
 const mnemonic =
   'coyote cost habit float february version unique balcony pluck always cheese amount river conduct wave wonder north scale series gather skate address invite kidney'

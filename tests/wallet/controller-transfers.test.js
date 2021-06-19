@@ -5,7 +5,7 @@ chai.use(chaiAsPromised)
 const assert = chai.assert
 const AxiosApi = require('../../axios')
 const WalletController = require('../../src/features/wallet/controller')
-const { Protocol } = require('../../src/services/blockchain')
+const { Protocol } = require('../../src/services/blockchain/constants')
 const { getWallets, config } = require('./constants')
 
 const axiosApi = new AxiosApi(config)
@@ -55,11 +55,52 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         destination: 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe',
         memo: 'create-transfer',
         protocol: Protocol.RIPPLE,
+        testnet: true
       })
       assert.strictEqual(
         transaction,
         '12000022800000002401186A39201B011981CA6140000000000900B0684000000000000064732102C9A41967E29CF6B363D099128CF1F2F72E98589F96CDE7B767C735B5269A951074463044022077BEE41D9FBC039BEF4627FF1D6B6723918890BF285F48D28321AAAC96B75FBB0220471B7E9A22647B6380B8662A71B5ED35702BF7690AD3A1F3CD6AE8A7899CC5A3811402F4263E604CC4EDF5E76E95436E536B6B87D6868314F667B0CA50CC7709A220B0561B85E53A48461FA8F9EA7D0F6372656174652D7472616E736665727E0A746578742F706C61696EE1F1'
       )
+    })
+    it(' - create transfer celo', async () => {
+      nock(baseUrl)
+        .get(
+          `/wallet/${wallets.celo.address}/info?protocol=${Protocol.CELO}`
+        )
+        .reply(200, {
+          nonce: '2'
+        })
+      nock(baseUrl)
+        .get(
+          [
+            `/fee?`,
+            `from=${wallets.celo.address}&`,
+            `destination=0x3f2f3D45196D7B99D0a615e8f530165eCb93e772&`,
+            `contractAddress=&`,
+            `amount=0.1&`,
+            `type=transfer&`,
+            `asset=CELO&`,
+            `method=&`,
+            `params=&`,
+            `protocol=CELO`,
+          ].join('')
+        )
+        .reply(200, {
+          gas: 21000,
+          gasPrice: '4000000',
+          chainId: 444
+        })
+      const controller = new WalletController(config)
+      const transaction = await controller.createTransferTransaction({
+        wallet: wallets.celo,
+        assetSymbol: 'CELO',
+        amount: '0.1',
+        destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
+        memo: 'create-transfer',
+        protocol: Protocol.CELO,
+        testnet: true
+      })
+      assert.include(transaction, '0x')
     })
   })
 })

@@ -1,6 +1,6 @@
 const { NotImplementedException } = require('../../../../errors')
 const Wallet = require('../entity')
-const { Protocol } = require('../../../services/blockchain')
+const { Protocol } = require('../../../services/blockchain/constants')
 
 class Interface {
   /**

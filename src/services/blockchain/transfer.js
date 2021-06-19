@@ -1,8 +1,19 @@
 const StellarSdk = require('stellar-sdk')
 const { RippleAPI } = require('ripple-lib')
+const {
+  CeloWallet,
+  serializeCeloTransaction,
+} = require('@celo-tools/celo-ethers-wrapper')
 const BigNumber = require('bignumber.js')
-const { Protocol } = require('.')
+const Web3 = require('web3')
+const { Protocol } = require('./constants')
 const Wallet = require('../../features/wallet/entity')
+const {
+  CUSD_CONTRACT_ADDRESS,
+  CEUR_CONTRACT_ADDRESS,
+  TRANSFER_METHOD_ABI,
+  TRANSFER_COMMENT_METHOD_ABI,
+} = require('./constants')
 
 /**
  * Build signed transfer tx for Stellar protocol
@@ -44,7 +55,7 @@ function buildStellarTransferTransaction({
     networkPassphrase: testnet
       ? StellarSdk.Networks.TESTNET
       : StellarSdk.Networks.PUBLIC,
-  }).setTimeout(300)
+  }).setTimeout(180)
 
   const transaction = startingBalance
     ? builder
@@ -127,6 +138,67 @@ async function buildRippleTransferTransaction({
   return signedTransaction
 }
 
+async function buildCeloTransferTransaction({
+  fromAddress,
+  fromPrivateKey,
+  nonce,
+  assetSymbol,
+  contractAddress,
+  amount,
+  destination,
+  fee,
+  feeCurrency = null,
+  feeCurrencyContractAddress = null,
+  memo = null,
+  testnet = true,
+}) {
+  const network = testnet ? 'testnet' : 'mainnet'
+  const { gas, gasPrice, chainId } = fee
+  const rawTransaction = {
+    chainId,
+    nonce: Web3.utils.toHex(nonce),
+    gasPrice: Web3.utils.toHex(gasPrice),
+    to: '',
+    value: undefined,
+    data: undefined,
+    gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(1000000)),
+    feeCurrency:
+      feeCurrency === 'cUSD'
+        ? CUSD_CONTRACT_ADDRESS[network]
+        : feeCurrency === 'cEUR'
+        ? CEUR_CONTRACT_ADDRESS[network]
+        : feeCurrencyContractAddress,
+  }
+  const value = Web3.utils.toWei(amount, 'ether')
+  if (assetSymbol === 'CELO') {
+    rawTransaction.to = destination
+    rawTransaction.value = Web3.utils.toHex(value)
+  } else {
+    if (assetSymbol === 'cUSD') {
+      rawTransaction.to = CUSD_CONTRACT_ADDRESS[network]
+    } else if (assetSymbol === 'cEUR') {
+      rawTransaction.to = CEUR_CONTRACT_ADDRESS[network]
+    } else {
+      rawTransaction.to = contractAddress
+    }
+
+    const token = new (new Web3()).eth.Contract(
+      memo ? TRANSFER_COMMENT_METHOD_ABI : TRANSFER_METHOD_ABI,
+      rawTransaction.to
+    )
+    rawTransaction.data = memo
+      ? token.methods.transferWithComment(destination, value, memo).encodeABI()
+      : token.methods.transfer(destination, value).encodeABI()
+  }
+  console.log(rawTransaction, fromPrivateKey)
+
+  const celoWallet = new CeloWallet(fromPrivateKey)
+  const signature = celoWallet
+    ._signingKey()
+    .signDigest(Web3.utils.sha3(serializeCeloTransaction(rawTransaction)))
+  return serializeCeloTransaction(rawTransaction, signature)
+}
+
 /**
  * Build signed transfer tx
  * @param {object} args
@@ -137,52 +209,66 @@ async function buildRippleTransferTransaction({
  * @param {string} args.amount amount number
  * @param {string} args.destination destination address
  * @param {string} args.protocol protocol
- * @param {string?} args.fee fee in drops
- * @param {string?} args.memo memo string
- * @param {string?} args.startingBalance starting amount for creation of stellar account
+ * @param {string | {gas, gasPrice, chainId} | null} args.fee fee
+ * @param {string?} args.memo (stellar, ripple, celo only) memo string
+ * @param {string?} args.startingBalance (stellar only) starting amount for creation of stellar account
+ * @param {string?} args.maxLedgerVersion (ripple only)
+ * @param {string?} args.contractAddress (celo, ethereum, bsc only) token contract address to make token transfer
+ * @param {string?} args.feeCurrency (celo only) currency to pay for transaction fees
+ * @param {string?} args.feeCurrencyContractAddress (celo only) currency address
  * @returns {Promise<string>} signed tx
  */
 module.exports.buildTransferTransaction = async function ({
   wallet,
   sequence,
-  maxLedgerVersion,
   assetSymbol,
   issuer,
   amount,
   destination,
   protocol,
-  memo = null,
-  fee = null,
-  startingBalance = null,
+  memo,
+  fee,
   testnet = true,
+  maxLedgerVersion,
+  startingBalance,
+  contractAddress,
+  feeCurrency,
+  feeCurrencyContractAddress,
 }) {
+  const payload = {
+    fromAddress: wallet.address,
+    fromPrivateKey: wallet.privateKey,
+    assetSymbol,
+    issuer,
+    amount,
+    destination,
+    fee,
+  }
   switch (protocol) {
     case Protocol.STELLAR:
       return buildStellarTransferTransaction({
+        ...payload,
         fromPublicKey: wallet.publicKey,
-        fromPrivateKey: wallet.privateKey,
         sequence,
-        assetSymbol,
-        issuer,
-        amount,
-        destination,
         memo,
-        fee,
         startingBalance,
         testnet,
       })
     case Protocol.RIPPLE:
       return await buildRippleTransferTransaction({
-        fromAddress: wallet.address,
-        fromPrivateKey: wallet.privateKey,
+        ...payload,
         sequence,
         maxLedgerVersion,
-        assetSymbol,
-        issuer,
-        amount,
-        destination,
         memo,
-        fee,
+      })
+    case Protocol.CELO:
+      return await buildCeloTransferTransaction({
+        ...payload,
+        nonce: sequence,
+        memo,
+        contractAddress,
+        feeCurrency,
+        feeCurrencyContractAddress,
       })
     default:
       throw new Error('Unsupported protocol')

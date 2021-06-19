@@ -47,4 +47,29 @@ class TransactionCryptum {
   }
 }
 
-module.exports = TransactionCryptum
+class TransactionRequest {
+  constructor({ signedTx }) {
+    this.signedTx = signedTx
+  }
+}
+class TransactionResponse {
+  constructor({ hash }) {
+    this.hash = hash
+  }
+}
+class FeeResponse {
+  constructor({ estimateValue, currency, gas, gasPrice, chainId }) {
+    this.estimateValue = estimateValue
+    this.currency = currency
+    this.gas = gas
+    this.gasPrice = gasPrice
+    this.chainId = chainId
+  }
+}
+
+module.exports = {
+  TransactionCryptum,
+  TransactionRequest,
+  TransactionResponse,
+  FeeResponse
+}

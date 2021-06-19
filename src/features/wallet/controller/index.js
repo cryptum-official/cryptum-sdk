@@ -1,5 +1,5 @@
 const { generateMnemonic } = require('bip39')
-const Wallet = require('../entity')
+const { Wallet, WalletInfoResponse } = require('../entity')
 const {
   getApiMethod,
   mountHeaders,
@@ -16,15 +16,15 @@ const {
   deriveRippleWallet,
   deriveStellarWallet,
 } = require('../../../services/wallet')
-const { Protocol } = require('../../../services/blockchain')
+const { Protocol } = require('../../../services/blockchain/constants')
+const { getTokenAddress } = require('../../../services/blockchain/utils')
 const {
-  buildStellarTrustlineTransaction,
-  buildRippleTrustlineTransaction,
   buildTrustlineTransaction,
 } = require('../../../services/blockchain/trustline')
 const {
   buildTransferTransaction,
 } = require('../../../services/blockchain/transfer')
+const TransactionController = require('../../transaction/controller')
 
 class Controller extends Interface {
   async generateWallet({ protocol, testnet = true, mnemonic = '' }) {
@@ -161,9 +161,8 @@ class Controller extends Interface {
           headers,
         }
       )
-      return response.data
+      return new WalletInfoResponse(response.data)
     } catch (error) {
-      console.log(error)
       handleRequestError(error)
     }
   }
@@ -176,7 +175,7 @@ class Controller extends Interface {
     limit,
     memo,
     protocol,
-    testnet
+    testnet,
   }) {
     const address =
       protocol === Protocol.STELLAR ? wallet.publicKey : wallet.address
@@ -195,6 +194,8 @@ class Controller extends Interface {
         sequence = info.account_data.Sequence
         maxLedgerVersion = info.ledger_current_index + 10
         break
+      default:
+        throw new Error('Unsupported protocol')
     }
 
     return await buildTrustlineTransaction({
@@ -207,7 +208,7 @@ class Controller extends Interface {
       protocol,
       sequence,
       maxLedgerVersion,
-      testnet: testnet !== undefined ? testnet : wallet.testnet
+      testnet: testnet !== undefined ? testnet : wallet.testnet,
     })
   }
 
@@ -220,8 +221,11 @@ class Controller extends Interface {
     memo,
     fee,
     protocol,
-    startingBalance,
-    testnet
+    testnet,
+    contractAddress = null,
+    startingBalance = null,
+    feeCurrency = null,
+    feeCurrencyContractAddress = null,
   }) {
     const address =
       protocol === Protocol.STELLAR ? wallet.publicKey : wallet.address
@@ -240,6 +244,23 @@ class Controller extends Interface {
         sequence = info.account_data.Sequence
         maxLedgerVersion = info.ledger_current_index + 10
         break
+      case Protocol.CELO:
+      case Protocol.ETHEREUM:
+      case Protocol.BSC: {
+        sequence = info.nonce
+        if (!fee || !fee.gas || !fee.gasPrice) {
+          fee = await new TransactionController(this.config).getFee({
+            type: 'transfer',
+            from: address,
+            destination,
+            amount,
+            assetSymbol,
+            contractAddress: contractAddress || getTokenAddress(protocol, assetSymbol, testnet),
+            protocol,
+          })
+        }
+        break
+      }
     }
 
     return await buildTransferTransaction({
@@ -252,9 +273,12 @@ class Controller extends Interface {
       fee,
       protocol,
       sequence,
+      testnet: testnet !== undefined ? testnet : wallet.testnet,
       maxLedgerVersion,
       startingBalance,
-      testnet: testnet !== undefined ? testnet : wallet.testnet
+      contractAddress,
+      feeCurrency,
+      feeCurrencyContractAddress,
     })
   }
 }

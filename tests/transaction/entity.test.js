@@ -1,5 +1,5 @@
 const assert = require('assert')
-const TransactionCryptum = require('../../src/features/transaction/entity')
+const { TransactionCryptum } = require('../../src/features/transaction/entity')
 
 describe.only('Test Suite of the Transaction (Entity)', function () {
   it('Check if an valid TransactionCryptum is an TransactionCryptum (Without transaction): isTransactionCryptum', async () => {

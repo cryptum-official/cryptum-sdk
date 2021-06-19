@@ -1,4 +1,4 @@
-const { Protocol } = require('../../../services/blockchain')
+const { Protocol } = require('../../../services/blockchain/constants')
 
 class Wallet {
   /**
@@ -21,4 +21,10 @@ class Wallet {
   }
 }
 
-module.exports = Wallet
+class WalletInfoResponse {
+  constructor(info) {
+    Object.assign(this, info)
+  }
+}
+
+module.exports = { Wallet, WalletInfoResponse }

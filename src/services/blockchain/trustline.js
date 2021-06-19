@@ -1,7 +1,7 @@
 const StellarSdk = require('stellar-sdk')
 const { RippleAPI } = require('ripple-lib')
 const BigNumber = require('bignumber.js')
-const { Protocol } = require('.')
+const { Protocol } = require('./constants')
 
 /**
  * Build signed trustline tx for Stellar protocol

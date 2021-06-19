@@ -2,5 +2,9 @@
   "sendTransaction": {
     "method": "POST",
     "url": "/transaction"
+  },
+  "getFee": {
+    "method": "GET",
+    "url": "/fee"
   }
 }
