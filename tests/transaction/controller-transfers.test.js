@@ -15,17 +15,67 @@ let wallets = {}
 describe.only('Test Suite of the Wallet (Controller)', () => {
   before(async () => {
     wallets = await getWallets()
+
+    nock(baseUrl)
+      .get(
+        `/wallet/${wallets.stellar.publicKey}/info?protocol=${Protocol.STELLAR}`
+      )
+      .reply(200, {
+        sequence: '40072044871681',
+      })
+    nock(baseUrl)
+      .get(`/wallet/${wallets.ripple.address}/info?protocol=${Protocol.RIPPLE}`)
+      .reply(200, {
+        account_data: { Sequence: 18377273 },
+        ledger_current_index: 18448832,
+      })
+    nock(baseUrl)
+      .get(`/wallet/${wallets.celo.address}/info?protocol=${Protocol.CELO}`)
+      .reply(200, {
+        nonce: '2',
+      })
+    nock(baseUrl)
+      .get(
+        `/fee?${new URLSearchParams({
+          from: wallets.celo.address,
+          destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
+          amount: '0.1',
+          type: 'transfer',
+          assetSymbol: 'CELO',
+          protocol: Protocol.CELO,
+        }).toString()}`
+      )
+      .reply(200, {
+        gas: 21000,
+        gasPrice: '4000000',
+        chainId: 444,
+      })
+    nock(baseUrl)
+      .get(
+        `/wallet/${wallets.ethereum.address}/info?protocol=${Protocol.ETHEREUM}`
+      )
+      .reply(200, {
+        nonce: '2',
+      })
+    nock(baseUrl)
+      .get(
+        `/fee?${new URLSearchParams({
+          from: wallets.ethereum.address,
+          destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
+          amount: '0.1',
+          type: 'transfer',
+          assetSymbol: 'ETH',
+          protocol: Protocol.ETHEREUM,
+        }).toString()}`
+      )
+      .reply(200, {
+        gas: 21000,
+        gasPrice: '4000000',
+        chainId: 444,
+      })
   })
   describe('transfer transactions', () => {
     it(' - create transfer stellar', async () => {
-      nock(baseUrl)
-        .get(
-          `/wallet/${wallets.stellar.publicKey}/info?protocol=${Protocol.STELLAR}`
-        )
-        .reply(200, {
-          sequence: '40072044871681',
-        })
-
       const transaction = await new TransactionController(
         config
       ).createStellarTransferTransaction({
@@ -38,15 +88,6 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       assert.include(transaction, 'AAAAAgAAAAAFqv2GZM3flypMrxlnhEDXqISoxW')
     })
     it(' - create transfer ripple', async () => {
-      nock(baseUrl)
-        .get(
-          `/wallet/${wallets.ripple.address}/info?protocol=${Protocol.RIPPLE}`
-        )
-        .reply(200, {
-          account_data: { Sequence: 18377273 },
-          ledger_current_index: 18448832,
-        })
-
       const transaction = await new TransactionController(
         config
       ).createRippleTransferTransaction({
@@ -63,27 +104,6 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       )
     })
     it(' - create transfer celo', async () => {
-      nock(baseUrl)
-        .get(`/wallet/${wallets.celo.address}/info?protocol=${Protocol.CELO}`)
-        .reply(200, {
-          nonce: '2',
-        })
-      nock(baseUrl)
-        .get(
-          `/fee?${new URLSearchParams({
-            from: wallets.celo.address,
-            destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
-            amount: '0.1',
-            type: 'transfer',
-            assetSymbol: 'CELO',
-            protocol: 'CELO',
-          }).toString()}`
-        )
-        .reply(200, {
-          gas: 21000,
-          gasPrice: '4000000',
-          chainId: 444,
-        })
       const transaction = await new TransactionController(
         config
       ).createCeloTransferTransaction({
@@ -92,6 +112,19 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         amount: '0.1',
         destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
         memo: 'create-transfer',
+        testnet: true,
+      })
+      console.log(transaction)
+      assert.include(transaction, '0x')
+    })
+    it(' - create transfer eth', async () => {
+      const transaction = await new TransactionController(
+        config
+      ).createEthereumTransferTransaction({
+        wallet: wallets.ethereum,
+        tokenSymbol: 'ETH',
+        amount: '0.1',
+        destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
         testnet: true,
       })
       console.log(transaction)

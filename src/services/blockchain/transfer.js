@@ -4,10 +4,9 @@ const {
   CeloWallet,
   serializeCeloTransaction,
 } = require('@celo-tools/celo-ethers-wrapper')
+const { Transaction: EthereumTransaction } = require('@ethereumjs/tx')
 const BigNumber = require('bignumber.js')
 const Web3 = require('web3')
-const { Protocol } = require('./constants')
-const Wallet = require('../../features/wallet/entity')
 const {
   CUSD_CONTRACT_ADDRESS,
   CEUR_CONTRACT_ADDRESS,
@@ -139,10 +138,9 @@ module.exports.buildRippleTransferTransaction = async function ({
 }
 
 module.exports.buildCeloTransferTransaction = async function ({
-  fromAddress,
   fromPrivateKey,
   nonce,
-  assetSymbol,
+  tokenSymbol,
   contractAddress,
   amount,
   destination,
@@ -170,13 +168,13 @@ module.exports.buildCeloTransferTransaction = async function ({
         : feeCurrencyContractAddress,
   }
   const value = Web3.utils.toWei(amount, 'ether')
-  if (assetSymbol === 'CELO') {
+  if (tokenSymbol === 'CELO') {
     rawTransaction.to = destination
     rawTransaction.value = Web3.utils.toHex(value)
   } else {
-    if (assetSymbol === 'cUSD') {
+    if (tokenSymbol === 'cUSD') {
       rawTransaction.to = CUSD_CONTRACT_ADDRESS[network]
-    } else if (assetSymbol === 'cEUR') {
+    } else if (tokenSymbol === 'cEUR') {
       rawTransaction.to = CEUR_CONTRACT_ADDRESS[network]
     } else {
       rawTransaction.to = contractAddress
@@ -190,7 +188,6 @@ module.exports.buildCeloTransferTransaction = async function ({
       ? token.methods.transferWithComment(destination, value, memo).encodeABI()
       : token.methods.transfer(destination, value).encodeABI()
   }
-  console.log(rawTransaction, fromPrivateKey)
 
   const celoWallet = new CeloWallet(fromPrivateKey)
   const signature = celoWallet
@@ -199,78 +196,40 @@ module.exports.buildCeloTransferTransaction = async function ({
   return serializeCeloTransaction(rawTransaction, signature)
 }
 
-/**
- * Build signed transfer tx
- * @param {object} args
- * @param {Wallet} args.wallet wallet
- * @param {string} args.sequence account sequence number
- * @param {string} args.assetSymbol asset symbol
- * @param {string?} args.issuer issuer account address
- * @param {string} args.amount amount number
- * @param {string} args.destination destination address
- * @param {string} args.protocol protocol
- * @param {string | {gas, gasPrice, chainId} | null} args.fee fee
- * @param {string?} args.memo (stellar, ripple, celo only) memo string
- * @param {string?} args.startingBalance (stellar only) starting amount for creation of stellar account
- * @param {string?} args.maxLedgerVersion (ripple only)
- * @param {string?} args.contractAddress (celo, ethereum, bsc only) token contract address to make token transfer
- * @param {string?} args.feeCurrency (celo only) currency to pay for transaction fees
- * @param {string?} args.feeCurrencyContractAddress (celo only) currency address
- * @returns {Promise<string>} signed tx
- */
-module.exports.buildTransferTransaction = async function ({
-  wallet,
-  sequence,
-  assetSymbol,
-  issuer,
+module.exports.buildEthereumTransferTransaction = async function ({
+  fromPrivateKey,
+  nonce,
+  tokenSymbol,
+  contractAddress,
   amount,
   destination,
-  protocol,
-  memo,
   fee,
-  testnet = true,
-  maxLedgerVersion,
-  startingBalance,
-  contractAddress,
-  feeCurrency,
-  feeCurrencyContractAddress,
 }) {
-  const payload = {
-    fromAddress: wallet.address,
-    fromPrivateKey: wallet.privateKey,
-    assetSymbol,
-    issuer,
-    amount,
-    destination,
-    fee,
+  const { gas, gasPrice, chainId } = fee
+  const rawTransaction = {
+    chainId,
+    nonce: Web3.utils.toHex(nonce),
+    gasPrice: Web3.utils.toHex(gasPrice),
+    to: '',
+    value: undefined,
+    data: undefined,
+    gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(1000000)),
   }
-  switch (protocol) {
-    case Protocol.STELLAR:
-      return buildStellarTransferTransaction({
-        ...payload,
-        fromPublicKey: wallet.publicKey,
-        sequence,
-        memo,
-        startingBalance,
-        testnet,
-      })
-    case Protocol.RIPPLE:
-      return await buildRippleTransferTransaction({
-        ...payload,
-        sequence,
-        maxLedgerVersion,
-        memo,
-      })
-    case Protocol.CELO:
-      return await buildCeloTransferTransaction({
-        ...payload,
-        nonce: sequence,
-        memo,
-        contractAddress,
-        feeCurrency,
-        feeCurrencyContractAddress,
-      })
-    default:
-      throw new Error('Unsupported protocol')
+  const value = Web3.utils.toWei(amount, 'ether')
+  if (tokenSymbol === 'ETH') {
+    rawTransaction.to = destination
+    rawTransaction.value = Web3.utils.toHex(value)
+  } else {
+    rawTransaction.to = contractAddress
+
+    const token = new new Web3().eth.Contract(
+      TRANSFER_METHOD_ABI,
+      rawTransaction.to
+    )
+    rawTransaction.data = token.methods.transfer(destination, value).encodeABI()
   }
+
+  const tx = new EthereumTransaction(rawTransaction)
+  const signedTx = tx.sign(Buffer.from(fromPrivateKey, 'hex'))
+  return signedTx.serialize().toString('hex')
 }

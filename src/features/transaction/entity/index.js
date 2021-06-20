@@ -108,7 +108,32 @@ class RippleTransferTransactionInput extends TransferTransactionInput {
     this.assetSymbol = assetSymbol
   }
 }
-class CeloTransferTransactionInput extends TransferTransactionInput {
+class EthereumTransferTransactionInput extends TransferTransactionInput {
+  /**
+   * Creates an instance of EthereumTransferTransactionInput.
+   * @param {object} args
+   * @param {Wallet} args.wallet
+   * @param {string} args.tokenSymbol
+   * @param {string} args.amount
+   * @param {string} args.destination
+   * @param {string?} args.memo
+   * @param {object?} args.fee
+   * @param {number?} args.fee.gas
+   * @param {string?} args.fee.gasPrice
+   * @param {boolean} args.testnet
+   * @param {string?} args.contractAddress
+   */
+  constructor({
+    tokenSymbol,
+    contractAddress,
+    ...args
+  }) {
+    super(args)
+    this.tokenSymbol = tokenSymbol
+    this.contractAddress = contractAddress
+  }
+}
+class CeloTransferTransactionInput extends EthereumTransferTransactionInput {
   /**
    * Creates an instance of CeloTransferTransactionInput.
    * @param {object} args
@@ -126,15 +151,11 @@ class CeloTransferTransactionInput extends TransferTransactionInput {
    * @param {string?} args.feeCurrencyContractAddress
    */
   constructor({
-    tokenSymbol,
-    contractAddress,
     feeCurrency,
     feeCurrencyContractAddress,
     ...args
   }) {
     super(args)
-    this.tokenSymbol = tokenSymbol
-    this.contractAddress = contractAddress
     this.feeCurrency = feeCurrency
     this.feeCurrencyContractAddress = feeCurrencyContractAddress
   }
@@ -146,6 +167,7 @@ module.exports = {
   FeeResponse,
   StellarTrustlineTransactionInput,
   RippleTransferTransactionInput,
+  EthereumTransferTransactionInput,
   CeloTransferTransactionInput,
   StellarTransferTransactionInput,
   RippleTransferTransactionInput,

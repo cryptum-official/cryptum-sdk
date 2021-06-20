@@ -15,6 +15,7 @@ const {
   buildStellarTransferTransaction,
   buildRippleTransferTransaction,
   buildCeloTransferTransaction,
+  buildEthereumTransferTransaction,
 } = require('../../../services/blockchain/transfer')
 const TransactionController = require('../../transaction/controller')
 const { FeeResponse, TransactionResponse } = require('../entity')
@@ -201,24 +202,16 @@ class Controller extends Interface {
       feeCurrency,
       feeCurrencyContractAddress,
     } = input
-    const info = await new WalletController(this.config).getWalletInfo({
-      address: wallet.address,
+    const { info, networkFee } = await this._getFeeInfo({
+      wallet,
+      destination,
+      amount,
+      tokenSymbol,
+      contractAddress,
+      testnet,
+      fee,
       protocol: Protocol.CELO,
     })
-
-    if (!fee || !fee.gas || !fee.gasPrice) {
-      fee = await this.getFee({
-        type: 'transfer',
-        from: wallet.address,
-        destination,
-        amount,
-        assetSymbol: tokenSymbol,
-        contractAddress:
-          contractAddress ||
-          getTokenAddress(Protocol.CELO, tokenSymbol, testnet),
-        protocol: Protocol.CELO,
-      })
-    }
     return await buildCeloTransferTransaction({
       fromAddress: wallet.address,
       fromPrivateKey: wallet.privateKey,
@@ -226,13 +219,76 @@ class Controller extends Interface {
       amount,
       destination,
       memo,
-      fee,
+      fee: networkFee,
       nonce: info.nonce,
       testnet: testnet !== undefined ? testnet : wallet.testnet,
       contractAddress,
       feeCurrency,
       feeCurrencyContractAddress,
     })
+  }
+  async createEthereumTransferTransaction(input) {
+    const {
+      wallet,
+      tokenSymbol,
+      amount,
+      destination,
+      fee,
+      testnet,
+      contractAddress,
+    } = input
+
+    const { info, networkFee } = await this._getFeeInfo({
+      wallet,
+      destination,
+      amount,
+      tokenSymbol,
+      contractAddress,
+      testnet,
+      fee,
+      protocol: Protocol.ETHEREUM,
+    })
+    return await buildEthereumTransferTransaction({
+      fromAddress: wallet.address,
+      fromPrivateKey: wallet.privateKey,
+      tokenSymbol,
+      amount,
+      destination,
+      fee: networkFee,
+      nonce: info.nonce,
+      testnet: testnet !== undefined ? testnet : wallet.testnet,
+      contractAddress,
+    })
+  }
+  async _getFeeInfo({
+    wallet,
+    destination,
+    amount,
+    tokenSymbol,
+    contractAddress,
+    testnet,
+    fee,
+    protocol,
+  }) {
+    const info = await new WalletController(this.config).getWalletInfo({
+      address: wallet.address,
+      protocol,
+    })
+
+    let networkFee = { gas: 0, gasPrice: '0', chainId: '' }
+    if (!fee || !fee.gas || !fee.gasPrice) {
+      networkFee = await this.getFee({
+        type: 'transfer',
+        from: wallet.address,
+        destination,
+        amount,
+        assetSymbol: tokenSymbol,
+        contractAddress:
+          contractAddress || getTokenAddress(protocol, tokenSymbol, testnet),
+        protocol,
+      })
+    }
+    return { info, networkFee }
   }
 }
 
