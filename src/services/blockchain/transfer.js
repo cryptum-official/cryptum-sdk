@@ -31,7 +31,7 @@ const {
  * @param {boolean?} args.testnet
  * @returns {string} signed tx
  */
-function buildStellarTransferTransaction({
+module.exports.buildStellarTransferTransaction = function ({
   fromPublicKey,
   fromPrivateKey,
   sequence,
@@ -97,7 +97,7 @@ function buildStellarTransferTransaction({
  * @param {string?} args.memo memo string
  * @returns {Promise<string>} signed tx
  */
-async function buildRippleTransferTransaction({
+module.exports.buildRippleTransferTransaction = async function ({
   fromAddress,
   fromPrivateKey,
   sequence,
@@ -138,7 +138,7 @@ async function buildRippleTransferTransaction({
   return signedTransaction
 }
 
-async function buildCeloTransferTransaction({
+module.exports.buildCeloTransferTransaction = async function ({
   fromAddress,
   fromPrivateKey,
   nonce,
@@ -182,7 +182,7 @@ async function buildCeloTransferTransaction({
       rawTransaction.to = contractAddress
     }
 
-    const token = new (new Web3()).eth.Contract(
+    const token = new new Web3().eth.Contract(
       memo ? TRANSFER_COMMENT_METHOD_ABI : TRANSFER_METHOD_ABI,
       rawTransaction.to
     )

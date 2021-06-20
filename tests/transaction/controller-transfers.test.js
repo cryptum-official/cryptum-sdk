@@ -4,9 +4,9 @@ var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 const assert = chai.assert
 const AxiosApi = require('../../axios')
-const WalletController = require('../../src/features/wallet/controller')
+const TransactionController = require('../../src/features/transaction/controller')
 const { Protocol } = require('../../src/services/blockchain/constants')
-const { getWallets, config } = require('./constants')
+const { getWallets, config } = require('../wallet/constants')
 
 const axiosApi = new AxiosApi(config)
 const baseUrl = axiosApi.getBaseUrl(config.enviroment)
@@ -25,15 +25,15 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         .reply(200, {
           sequence: '40072044871681',
         })
-      const controller = new WalletController(config)
 
-      const transaction = await controller.createTransferTransaction({
+      const transaction = await new TransactionController(
+        config
+      ).createStellarTransferTransaction({
         wallet: wallets.stellar,
         assetSymbol: 'XLM',
         amount: '1',
         destination: 'GDLCRMXZ66NFDIALVOJCIEOYJTITVNUFVYWT7MK26NO2GJXIBHTVGUIO',
         memo: 'create-transfer',
-        protocol: Protocol.STELLAR,
       })
       assert.include(transaction, 'AAAAAgAAAAAFqv2GZM3flypMrxlnhEDXqISoxW')
     })
@@ -46,16 +46,16 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
           account_data: { Sequence: 18377273 },
           ledger_current_index: 18448832,
         })
-      const controller = new WalletController(config)
 
-      const transaction = await controller.createTransferTransaction({
+      const transaction = await new TransactionController(
+        config
+      ).createRippleTransferTransaction({
         wallet: wallets.ripple,
         assetSymbol: 'XRP',
         amount: '0.59',
         destination: 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe',
         memo: 'create-transfer',
-        protocol: Protocol.RIPPLE,
-        testnet: true
+        testnet: true,
       })
       assert.strictEqual(
         transaction,
@@ -64,42 +64,37 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
     })
     it(' - create transfer celo', async () => {
       nock(baseUrl)
-        .get(
-          `/wallet/${wallets.celo.address}/info?protocol=${Protocol.CELO}`
-        )
+        .get(`/wallet/${wallets.celo.address}/info?protocol=${Protocol.CELO}`)
         .reply(200, {
-          nonce: '2'
+          nonce: '2',
         })
       nock(baseUrl)
         .get(
-          [
-            `/fee?`,
-            `from=${wallets.celo.address}&`,
-            `destination=0x3f2f3D45196D7B99D0a615e8f530165eCb93e772&`,
-            `contractAddress=&`,
-            `amount=0.1&`,
-            `type=transfer&`,
-            `asset=CELO&`,
-            `method=&`,
-            `params=&`,
-            `protocol=CELO`,
-          ].join('')
+          `/fee?${new URLSearchParams({
+            from: wallets.celo.address,
+            destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
+            amount: '0.1',
+            type: 'transfer',
+            assetSymbol: 'CELO',
+            protocol: 'CELO',
+          }).toString()}`
         )
         .reply(200, {
           gas: 21000,
           gasPrice: '4000000',
-          chainId: 444
+          chainId: 444,
         })
-      const controller = new WalletController(config)
-      const transaction = await controller.createTransferTransaction({
+      const transaction = await new TransactionController(
+        config
+      ).createCeloTransferTransaction({
         wallet: wallets.celo,
-        assetSymbol: 'CELO',
+        tokenSymbol: 'CELO',
         amount: '0.1',
         destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
         memo: 'create-transfer',
-        protocol: Protocol.CELO,
-        testnet: true
+        testnet: true,
       })
+      console.log(transaction)
       assert.include(transaction, '0x')
     })
   })

@@ -1,5 +1,8 @@
 const { generateMnemonic } = require('bip39')
-const { Wallet, WalletInfoResponse } = require('../entity')
+const {
+  Wallet,
+  WalletInfoResponse,
+} = require('../entity')
 const {
   getApiMethod,
   mountHeaders,
@@ -17,14 +20,6 @@ const {
   deriveStellarWallet,
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
-const { getTokenAddress } = require('../../../services/blockchain/utils')
-const {
-  buildTrustlineTransaction,
-} = require('../../../services/blockchain/trustline')
-const {
-  buildTransferTransaction,
-} = require('../../../services/blockchain/transfer')
-const TransactionController = require('../../transaction/controller')
 
 class Controller extends Interface {
   async generateWallet({ protocol, testnet = true, mnemonic = '' }) {
@@ -55,7 +50,6 @@ class Controller extends Interface {
       mnemonic,
       testnet
     )
-
     return new Wallet({
       mnemonic,
       privateKey,
@@ -70,7 +64,6 @@ class Controller extends Interface {
       mnemonic,
       testnet
     )
-
     return new Wallet({
       mnemonic,
       privateKey,
@@ -92,7 +85,6 @@ class Controller extends Interface {
       mnemonic,
       testnet
     )
-
     return new Wallet({
       mnemonic,
       privateKey,
@@ -105,7 +97,6 @@ class Controller extends Interface {
 
   async generateCeloWallet(mnemonic, testnet) {
     const { address, privateKey, publicKey } = await deriveCeloWallet(mnemonic)
-
     return new Wallet({
       mnemonic,
       privateKey,
@@ -118,7 +109,6 @@ class Controller extends Interface {
 
   async generateStellarWallet(mnemonic, testnet) {
     const { privateKey, publicKey } = deriveStellarWallet(mnemonic)
-
     return new Wallet({
       mnemonic,
       privateKey,
@@ -130,7 +120,6 @@ class Controller extends Interface {
 
   async generateRippleWallet(mnemonic, testnet) {
     const { address, privateKey, publicKey } = deriveRippleWallet(mnemonic)
-
     return new Wallet({
       mnemonic,
       privateKey,
@@ -165,121 +154,6 @@ class Controller extends Interface {
     } catch (error) {
       handleRequestError(error)
     }
-  }
-
-  async createTrustlineTransaction({
-    wallet,
-    assetSymbol,
-    issuer,
-    fee,
-    limit,
-    memo,
-    protocol,
-    testnet,
-  }) {
-    const address =
-      protocol === Protocol.STELLAR ? wallet.publicKey : wallet.address
-
-    const info = await this.getWalletInfo({
-      address,
-      protocol,
-    })
-
-    let sequence, maxLedgerVersion
-    switch (protocol) {
-      case Protocol.STELLAR:
-        sequence = info.sequence
-        break
-      case Protocol.RIPPLE:
-        sequence = info.account_data.Sequence
-        maxLedgerVersion = info.ledger_current_index + 10
-        break
-      default:
-        throw new Error('Unsupported protocol')
-    }
-
-    return await buildTrustlineTransaction({
-      wallet,
-      assetSymbol,
-      issuer,
-      limit,
-      memo,
-      fee,
-      protocol,
-      sequence,
-      maxLedgerVersion,
-      testnet: testnet !== undefined ? testnet : wallet.testnet,
-    })
-  }
-
-  async createTransferTransaction({
-    wallet,
-    assetSymbol,
-    issuer,
-    amount,
-    destination,
-    memo,
-    fee,
-    protocol,
-    testnet,
-    contractAddress = null,
-    startingBalance = null,
-    feeCurrency = null,
-    feeCurrencyContractAddress = null,
-  }) {
-    const address =
-      protocol === Protocol.STELLAR ? wallet.publicKey : wallet.address
-
-    const info = await this.getWalletInfo({
-      address,
-      protocol,
-    })
-
-    let sequence, maxLedgerVersion
-    switch (protocol) {
-      case Protocol.STELLAR:
-        sequence = info.sequence
-        break
-      case Protocol.RIPPLE:
-        sequence = info.account_data.Sequence
-        maxLedgerVersion = info.ledger_current_index + 10
-        break
-      case Protocol.CELO:
-      case Protocol.ETHEREUM:
-      case Protocol.BSC: {
-        sequence = info.nonce
-        if (!fee || !fee.gas || !fee.gasPrice) {
-          fee = await new TransactionController(this.config).getFee({
-            type: 'transfer',
-            from: address,
-            destination,
-            amount,
-            assetSymbol,
-            contractAddress: contractAddress || getTokenAddress(protocol, assetSymbol, testnet),
-            protocol,
-          })
-        }
-        break
-      }
-    }
-
-    return await buildTransferTransaction({
-      wallet,
-      assetSymbol,
-      issuer,
-      amount,
-      destination,
-      memo,
-      fee,
-      protocol,
-      sequence,
-      testnet: testnet !== undefined ? testnet : wallet.testnet,
-      maxLedgerVersion,
-      startingBalance,
-      contractAddress,
-      feeCurrency,
-      feeCurrencyContractAddress,
-    })
   }
 }
 

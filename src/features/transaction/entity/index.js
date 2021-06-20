@@ -1,51 +1,4 @@
-class TransactionCryptum {
-  constructor({ protocol, blob, hash }) {
-    this.protocol = protocol
-    this.blob = blob
-    this.hash = hash
-  }
-
-  /**
-   * Method to validate if to an transaction is valid
-   *
-   * @param {*} transaction to validate if is an TransactionCryptum valid, to your transaction are valid.
-   * The send transaction need are registered in Cryptum and has  { blob, protocol, hash } attributes
-   *
-   * @returns true if is valid and false if not
-   */
-  static isTransactionCryptum(transaction) {
-    if (!(transaction instanceof TransactionCryptum)) return false
-
-    return this.validateMandatoryValues(transaction)
-  }
-
-  /**
-   * Validate if an object can mount an TransactionCryptum, not send
-   * if you need attributes to send an transaction in cryptum call canSend method
-   *
-   * @param {*} object generic object with mandatory values: { protocol, hash }
-   * @returns true if can mount and false if not
-   */
-  static validateMandatoryValues(object) {
-    if (!object) return false
-
-    const { protocol, hash } = object
-    return !!protocol && !!hash
-  }
-
-  /**
-   * Method to validate if you can send an Transaction in cryptum
-   *
-   * @param {Object} transaction with this attributes: { blob, protocol } 
-   * @returns true if can, and false if not
-   */
-  static canSend(transaction) {
-    if (!transaction) return false
-
-    const { blob, protocol } = transaction
-    return !!blob && !!protocol
-  }
-}
+const { Wallet } = require("../../wallet/entity")
 
 class TransactionRequest {
   constructor({ signedTx }) {
@@ -66,10 +19,134 @@ class FeeResponse {
     this.chainId = chainId
   }
 }
+class TrustlineTransactionInput {
+  /**
+   * Creates an instance of TrustlineTransactionInput.
+   * @param {object} args
+   * @param {Wallet} args.wallet
+   * @param {string} args.assetSymbol
+   * @param {string} args.issuer
+   * @param {string?} args.limit
+   * @param {string?} args.memo
+   * @param {object|string} args.fee
+   * @param {boolean} args.testnet
+   */
+  constructor({ wallet, assetSymbol, issuer, limit, memo, fee, testnet }) {
+    this.wallet = wallet
+    this.limit = limit
+    this.issuer = issuer
+    this.assetSymbol = assetSymbol
+    this.memo = memo
+    this.fee = fee
+    this.testnet = testnet
+  }
+}
+class StellarTrustlineTransactionInput extends TrustlineTransactionInput {
+  constructor(args) {
+    super(args)
+  }
+}
+class RippleTrustlineTransactionInput extends TrustlineTransactionInput {
+  constructor(args) {
+    super(args)
+  }
+}
+
+class TransferTransactionInput {
+  /**
+   * Creates an instance of TransferTransactionInput.
+   * @param {object} args
+   * @param {Wallet} args.wallet
+   * @param {string} args.amount
+   * @param {string} args.destination
+   * @param {string?} args.memo
+   * @param {object|string} args.fee
+   * @param {boolean} args.testnet
+   */
+  constructor({ wallet, amount, destination, memo, fee, testnet }) {
+    this.wallet = wallet
+    this.amount = amount
+    this.destination = destination
+    this.memo = memo
+    this.fee = fee
+    this.testnet = testnet
+  }
+}
+class StellarTransferTransactionInput extends TransferTransactionInput {
+  /**
+   * Creates an instance of StellarTransferTransactionInput.
+   * @param {object} args
+   * @param {Wallet} args.wallet
+   * @param {string} args.assetSymbol
+   * @param {string} args.amount
+   * @param {string} args.destination
+   * @param {string?} args.memo
+   * @param {string?} args.fee
+   * @param {boolean} args.testnet
+   * @param {string?} args.startingBalance
+   */
+  constructor({ assetSymbol, startingBalance, ...args }) {
+    super(args)
+    this.assetSymbol = assetSymbol
+    this.startingBalance = startingBalance
+  }
+}
+class RippleTransferTransactionInput extends TransferTransactionInput {
+  /**
+   * Creates an instance of CeloTransferTransactionInput.
+   * @param {object} args
+   * @param {Wallet} args.wallet
+   * @param {string} args.assetSymbol
+   * @param {string} args.amount
+   * @param {string} args.destination
+   * @param {string?} args.memo
+   * @param {string?} args.fee
+   * @param {boolean} args.testnet
+   */
+  constructor({ assetSymbol, ...args }) {
+    super(args)
+    this.assetSymbol = assetSymbol
+  }
+}
+class CeloTransferTransactionInput extends TransferTransactionInput {
+  /**
+   * Creates an instance of CeloTransferTransactionInput.
+   * @param {object} args
+   * @param {Wallet} args.wallet
+   * @param {string} args.tokenSymbol
+   * @param {string} args.amount
+   * @param {string} args.destination
+   * @param {string?} args.memo
+   * @param {object?} args.fee
+   * @param {number?} args.fee.gas
+   * @param {string?} args.fee.gasPrice
+   * @param {boolean} args.testnet
+   * @param {string?} args.contractAddress
+   * @param {string?} args.feeCurrency
+   * @param {string?} args.feeCurrencyContractAddress
+   */
+  constructor({
+    tokenSymbol,
+    contractAddress,
+    feeCurrency,
+    feeCurrencyContractAddress,
+    ...args
+  }) {
+    super(args)
+    this.tokenSymbol = tokenSymbol
+    this.contractAddress = contractAddress
+    this.feeCurrency = feeCurrency
+    this.feeCurrencyContractAddress = feeCurrencyContractAddress
+  }
+}
 
 module.exports = {
-  TransactionCryptum,
   TransactionRequest,
   TransactionResponse,
-  FeeResponse
+  FeeResponse,
+  StellarTrustlineTransactionInput,
+  RippleTransferTransactionInput,
+  CeloTransferTransactionInput,
+  StellarTransferTransactionInput,
+  RippleTransferTransactionInput,
 }

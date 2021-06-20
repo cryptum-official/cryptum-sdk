@@ -85,65 +85,11 @@ class Interface {
   /**
    * Get wallet information from blockchain
    * @param {object} args
-   * @param {string} args.address
-   * @param {Protocol} args.protocol
+   * @param {string} args.address wallet address or public key
+   * @param {Protocol} args.protocol blockchain protocol
    * @returns {Promise<any>}
    */
   async getWalletInfo({ address, protocol }) {
-    throw new NotImplementedException()
-  }
-  /**
-   * Create trustline signed transaction
-   * @param {object} args
-   * @param {Wallet} args.wallet wallet to make the transfer from
-   * @param {string} args.assetSymbol asset symbol to transfer
-   * @param {string?} args.issuer asset issuer to create the trustline from
-   * @param {string} args.limit limit amount
-   * @param {Protocol} args.protocol protocol
-   * @param {string?} args.memo memo string
-   * @param {string?} args.fee transaction fee in small unit
-   * @param {boolean?} args.testnet
-   * @returns {Promise<string>}
-   */
-  async createTrustlineTransaction({
-    wallet,
-    assetSymbol,
-    issuer,
-    fee,
-    limit,
-    memo,
-    protocol,
-    testnet
-  }) {
-    throw new NotImplementedException()
-  }
-  /**
-   * Create transfer signed transaction
-   * @param {object} args
-   * @param {Wallet} args.wallet wallet to make the transfer from
-   * @param {string} args.assetSymbol asset symbol to transfer
-   * @param {string?} args.issuer asset issuer if this is a custom asset
-   * @param {string} args.amount amount to transfer
-   * @param {string} args.destination destination address
-   * @param {Protocol} args.protocol protocol
-   * @param {string?} args.memo memo string
-   * @param {string?} args.fee transaction fee in small unit
-   * @param {string?} args.startingBalance starting amount to create account in blockchain (stellar only)
-   * @param {boolean?} args.testnet
-   * @returns {Promise<string>}
-   */
-  async createTransferTransaction({
-    wallet,
-    assetSymbol,
-    issuer,
-    amount,
-    destination,
-    memo,
-    fee,
-    protocol,
-    startingBalance,
-    testnet
-  }) {
     throw new NotImplementedException()
   }
 }

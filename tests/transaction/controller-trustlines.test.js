@@ -4,9 +4,9 @@ var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 const assert = chai.assert
 const AxiosApi = require('../../axios')
-const WalletController = require('../../src/features/wallet/controller')
+const TransactionController = require('../../src/features/transaction/controller')
 const { Protocol } = require('../../src/services/blockchain/constants')
-const { config, getWallets } = require('./constants')
+const { config, getWallets } = require('../wallet/constants')
 
 const axiosApi = new AxiosApi(config)
 const baseUrl = axiosApi.getBaseUrl(config.enviroment)
@@ -25,16 +25,16 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         .reply(200, {
           sequence: '6259566941569025',
         })
-      const controller = new WalletController(config)
 
-      const transaction = await controller.createTrustlineTransaction({
+      const transaction = await new TransactionController(
+        config
+      ).createStellarTrustlineTransaction({
         wallet: wallets.stellar,
         assetSymbol: 'BRLT',
         issuer: 'GB7TAYRUZGE6TVT7NHP5SMIZRNQA6PLM423EYISAOAP3MKYIQMVYP2JO',
         limit: '100000000',
         fee: '100',
         memo: 'create-trustline',
-        protocol: Protocol.STELLAR,
       })
       assert.include(transaction, 'AAAAAgAAAAAFqv2GZM3flypMrxlnhEDXqISoxW')
     })
@@ -47,16 +47,16 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
           account_data: { Sequence: 6259566 },
           ledger_current_index: 1,
         })
-      const controller = new WalletController(config)
 
-      const transaction = await controller.createTrustlineTransaction({
+      const transaction = await new TransactionController(
+        config
+      ).createRippleTrustlineTransaction({
         wallet: wallets.ripple,
         assetSymbol: 'FOO',
         issuer: 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe',
         limit: '100000000',
         fee: '100',
         memo: 'create-trustline',
-        protocol: Protocol.RIPPLE,
       })
       assert.strictEqual(
         transaction,
@@ -71,16 +71,16 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         .reply(200, {
           sequence: '6259566941569025',
         })
-      const controller = new WalletController(config)
 
-      const transaction = await controller.createTrustlineTransaction({
+      const transaction = await new TransactionController(
+        config
+      ).createStellarTrustlineTransaction({
         wallet: wallets.stellar,
         assetSymbol: 'BRLT',
         issuer: 'GB7TAYRUZGE6TVT7NHP5SMIZRNQA6PLM423EYISAOAP3MKYIQMVYP2JO',
         limit: '0',
         fee: '100',
         memo: 'delete-trustline',
-        protocol: Protocol.STELLAR,
       })
       assert.include(transaction, 'AAAAAgAAAAAFqv2GZM3flypMrxlnhEDXqISoxW')
     })
@@ -93,8 +93,9 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
           account_data: { Sequence: 6259566 },
           ledger_current_index: 1,
         })
-      const controller = new WalletController(config)
-      const transaction = await controller.createTrustlineTransaction({
+      const transaction = await new TransactionController(
+        config
+      ).createRippleTrustlineTransaction({
         wallet: wallets.ripple,
         assetSymbol: 'FOO',
         issuer: 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe',
@@ -116,17 +117,15 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         .reply(200, {
           sequence: '6259566941569025',
         })
-      const controller = new WalletController(config)
 
       assert.isRejected(
-        controller.createTrustlineTransaction({
+        new TransactionController(config).createStellarTrustlineTransaction({
           wallet: wallets.stellar,
           assetSymbol: 'BRLT',
           issuer: 'xxxxx',
           limit: '100000000',
           fee: '100',
           memo: 'create-trustline',
-          protocol: Protocol.STELLAR,
         }),
         'Issuer is invalid'
       )

@@ -1,7 +1,6 @@
 const StellarSdk = require('stellar-sdk')
 const { RippleAPI } = require('ripple-lib')
 const BigNumber = require('bignumber.js')
-const { Protocol } = require('./constants')
 
 /**
  * Build signed trustline tx for Stellar protocol
@@ -17,7 +16,7 @@ const { Protocol } = require('./constants')
  * @param {boolean?} args.testnet
  * @returns {string} signed tx
  */
-async function buildStellarTrustlineTransaction({
+module.exports.buildStellarTrustlineTransaction = async function ({
   fromPublicKey,
   fromPrivateKey,
   sequence,
@@ -66,7 +65,7 @@ async function buildStellarTrustlineTransaction({
  * @param {memo?} args.memo memo string
  * @returns {Promise<string>} signed tx
  */
-async function buildRippleTrustlineTransaction({
+module.exports.buildRippleTrustlineTransaction = async function ({
   fromAddress,
   fromPrivateKey,
   sequence,
@@ -91,46 +90,4 @@ async function buildRippleTrustlineTransaction({
   })
   const { signedTransaction } = rippleAPI.sign(prepared.txJSON, fromPrivateKey)
   return signedTransaction
-}
-
-module.exports.buildTrustlineTransaction = async function ({
-  wallet,
-  sequence,
-  maxLedgerVersion,
-  assetSymbol,
-  issuer,
-  protocol,
-  limit = null,
-  memo = null,
-  fee = null,
-  testnet = true,
-}) {
-  switch (protocol) {
-    case Protocol.STELLAR:
-      return buildStellarTrustlineTransaction({
-        fromPublicKey: wallet.publicKey,
-        fromPrivateKey: wallet.privateKey,
-        sequence,
-        assetSymbol,
-        issuer,
-        limit,
-        memo,
-        fee,
-        testnet
-      })
-    case Protocol.RIPPLE:
-      return await buildRippleTrustlineTransaction({
-        fromAddress: wallet.address,
-        fromPrivateKey: wallet.privateKey,
-        sequence,
-        maxLedgerVersion,
-        assetSymbol,
-        issuer,
-        limit,
-        memo,
-        fee,
-      })
-    default:
-      throw new Error('Unsupported protocol')
-  }
 }
