@@ -9,14 +9,14 @@ const { config, mnemonic } = require('./constants')
 
 describe.only('Test Suite of the Wallet (Controller)', () => {
   describe('Random mnemonic', () => {
-    it(' - generate wallet', async () => {
+    it('generate wallet', async () => {
       const controller = new WalletController(config)
       const wallet = await controller.generateWallet({
         protocol: Protocol.STELLAR,
       })
       assert.strictEqual(wallet.protocol, Protocol.STELLAR)
     })
-    it(' - generate wallet error with unsupported protocol', () => {
+    it('generate wallet error with unsupported protocol', () => {
       const controller = new WalletController(config)
       assert.isRejected(
         controller.generateWallet({ protocol: 'TEST' }),
@@ -27,7 +27,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
   })
 
   describe('From same mnemonic', () => {
-    it(' - generate ethereum wallet', async () => {
+    it('generate ethereum wallet', async () => {
       const controller = new WalletController(config)
       const wallet = await controller.generateWallet({
         protocol: Protocol.ETHEREUM,
@@ -40,7 +40,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         '0x481B542b7419D8Ba305B5cc5029C12d5a68B4f69'
       )
     })
-    it(' - generate bitcoin wallet', async () => {
+    it('generate bitcoin wallet', async () => {
       const controller = new WalletController(config)
       const wallet = await controller.generateWallet({
         protocol: Protocol.BITCOIN,
@@ -53,7 +53,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         'n1vrMMcNaAig5fgdfdtC5DUu2G4NRodHpi'
       )
     })
-    it(' - generate bsc wallet', async () => {
+    it('generate bsc wallet', async () => {
       const controller = new WalletController(config)
       const wallet = await controller.generateWallet({
         protocol: Protocol.BSC,
@@ -66,7 +66,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         '0x481B542b7419D8Ba305B5cc5029C12d5a68B4f69'
       )
     })
-    it(' - generate celo wallet', async () => {
+    it('generate celo wallet', async () => {
       const controller = new WalletController(config)
       const wallet = await controller.generateWallet({
         protocol: Protocol.CELO,
@@ -79,7 +79,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         '0x8C33DB44a78629cF60C88383d436EEc356884625'
       )
     })
-    it(' - generate ripple wallet', async () => {
+    it('generate ripple wallet', async () => {
       const controller = new WalletController(config)
       const wallet = await controller.generateWallet({
         protocol: Protocol.RIPPLE,
@@ -91,7 +91,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         'rGcqB7ciEfDQpz9znXZSYXgEozqB5Xxhm'
       )
     })
-    it(' - generate stellar wallet', async () => {
+    it('generate stellar wallet', async () => {
       const controller = new WalletController(config)
       const wallet = await controller.generateWallet({
         protocol: Protocol.STELLAR,
@@ -103,7 +103,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         'GAC2V7MGMTG57FZKJSXRSZ4EIDL2RBFIYVXZJMTJZ232XPZQUCTYUCWL'
       )
     })
-    it(' - generate binancechain wallet', async () => {
+    it('generate binancechain wallet', async () => {
       const controller = new WalletController(config)
       const wallet = await controller.generateWallet({
         protocol: Protocol.BINANCECHAIN,

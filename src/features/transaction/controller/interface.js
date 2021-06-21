@@ -6,6 +6,8 @@ const {
   RippleTransferTransactionInput,
   StellarTransferTransactionInput,
   CeloTransferTransactionInput,
+  SignedTransaction,
+  EthereumTransferTransactionInput,
 } = require('../entity')
 class Interface {
   /**
@@ -21,8 +23,7 @@ class Interface {
   /**
    * Method to send an transaction to Cryptum
    *
-   * @param {Object} transaction object with all transaction data required: { protocol, blob }
-   * @param {string} transaction.blob transaction blob
+   * @param {SignedTransaction} transaction object with all transaction data
    * @param {Protocol} transaction.protocol
    * @returns {Promise<TransactionResponse>}
    */
@@ -47,6 +48,7 @@ class Interface {
   /**
    * Create stellar trustline transaction
    * @param {StellarTrustlineTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createStellarTrustlineTransaction(input) {
     throw new NotImplementedException()
@@ -54,6 +56,7 @@ class Interface {
   /**
    * Create ripple trustline transaction
    * @param {RippleTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createRippleTrustlineTransaction(input) {
     throw new NotImplementedException()
@@ -61,7 +64,7 @@ class Interface {
   /**
    * Create stellar transfer transaction
    * @param {StellarTransferTransactionInput} input
-   * @returns {Promise<string>}
+   * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createStellarTransferTransaction(input) {
     throw new NotImplementedException()
@@ -69,7 +72,7 @@ class Interface {
   /**
    * Create ripple transfer transaction
    * @param {RippleTransferTransactionInput} input
-   * @returns {Promise<string>}
+   * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createRippleTransferTransaction(input) {
     throw new NotImplementedException()
@@ -77,11 +80,28 @@ class Interface {
   /**
    * Create celo transfer transaction
    * @param {CeloTransferTransactionInput} input
-   * @returns {Promise<string>}
+   * @returns {Promise<SignedTransaction>} signed transaction data
    */
-   async createCeloTransferTransaction(input) {
+  async createCeloTransferTransaction(input) {
     throw new NotImplementedException()
-   }
+  }
+  /**
+   * Create ethereum transfer transaction
+   * @param {EthereumTransferTransactionInput} input
+   * @param {Protocol} protocol
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
+  async createEthereumTransferTransaction(input, protocol) {
+    throw new NotImplementedException()
+  }
+  /**
+   * Create bsc transfer transaction
+   * @param {EthereumTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
+  async createBscTransferTransaction(input) {
+    throw new NotImplementedException()
+  }
 }
 
 module.exports = Interface

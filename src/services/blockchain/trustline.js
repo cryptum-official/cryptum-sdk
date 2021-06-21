@@ -14,7 +14,7 @@ const BigNumber = require('bignumber.js')
  * @param {string?} args.limit limit number for the trustline
  * @param {memo?} args.memo memo string
  * @param {boolean?} args.testnet
- * @returns {string} signed tx
+ * @returns {Promise<string>} signed tx
  */
 module.exports.buildStellarTrustlineTransaction = async function ({
   fromPublicKey,

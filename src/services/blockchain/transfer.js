@@ -5,6 +5,7 @@ const {
   serializeCeloTransaction,
 } = require('@celo-tools/celo-ethers-wrapper')
 const { Transaction: EthereumTransaction } = require('@ethereumjs/tx')
+const { default: EthereumCommon } = require('@ethereumjs/common')
 const BigNumber = require('bignumber.js')
 const Web3 = require('web3')
 const {
@@ -12,6 +13,7 @@ const {
   CEUR_CONTRACT_ADDRESS,
   TRANSFER_METHOD_ABI,
   TRANSFER_COMMENT_METHOD_ABI,
+  BSC_COMMON_CHAIN,
 } = require('./constants')
 
 /**
@@ -28,9 +30,9 @@ const {
  * @param {string?} args.fee fee in stroops
  * @param {string?} args.memo memo string
  * @param {boolean?} args.testnet
- * @returns {string} signed tx
+ * @returns {Promise<string>} signed tx
  */
-module.exports.buildStellarTransferTransaction = function ({
+module.exports.buildStellarTransferTransaction = async function ({
   fromPublicKey,
   fromPrivateKey,
   sequence,
@@ -159,7 +161,7 @@ module.exports.buildCeloTransferTransaction = async function ({
     to: '',
     value: undefined,
     data: undefined,
-    gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(1000000)),
+    gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
     feeCurrency:
       feeCurrency === 'cUSD'
         ? CUSD_CONTRACT_ADDRESS[network]
@@ -213,7 +215,7 @@ module.exports.buildEthereumTransferTransaction = async function ({
     to: '',
     value: undefined,
     data: undefined,
-    gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(1000000)),
+    gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
   }
   const value = Web3.utils.toWei(amount, 'ether')
   if (tokenSymbol === 'ETH') {
@@ -228,8 +230,54 @@ module.exports.buildEthereumTransferTransaction = async function ({
     )
     rawTransaction.data = token.methods.transfer(destination, value).encodeABI()
   }
-
-  const tx = new EthereumTransaction(rawTransaction)
+  const tx = new EthereumTransaction(rawTransaction, {
+    common: new EthereumCommon({ chain: chainId }),
+  })
   const signedTx = tx.sign(Buffer.from(fromPrivateKey, 'hex'))
-  return signedTx.serialize().toString('hex')
+  return `0x${signedTx.serialize().toString('hex')}`
+}
+
+module.exports.buildBscTransferTransaction = async function ({
+  fromPrivateKey,
+  nonce,
+  tokenSymbol,
+  contractAddress,
+  amount,
+  destination,
+  fee,
+  testnet,
+}) {
+  const { gas, gasPrice, chainId } = fee
+  const rawTransaction = {
+    chainId,
+    nonce: Web3.utils.toHex(nonce),
+    gasPrice: Web3.utils.toHex(gasPrice),
+    to: '',
+    value: undefined,
+    data: undefined,
+    gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
+  }
+  const value = Web3.utils.toWei(amount, 'ether')
+  if (tokenSymbol === 'BNB') {
+    rawTransaction.to = destination
+    rawTransaction.value = Web3.utils.toHex(value)
+  } else {
+    rawTransaction.to = contractAddress
+
+    const token = new new Web3().eth.Contract(
+      TRANSFER_METHOD_ABI,
+      rawTransaction.to
+    )
+    rawTransaction.data = token.methods.transfer(destination, value).encodeABI()
+  }
+  const network = testnet ? 'testnet' : 'mainnet'
+  const tx = new EthereumTransaction(rawTransaction, {
+    common: EthereumCommon.forCustomChain(
+      BSC_COMMON_CHAIN[network].base,
+      BSC_COMMON_CHAIN[network].chain
+    ),
+  })
+
+  const signedTx = tx.sign(Buffer.from(fromPrivateKey, 'hex'))
+  return `0x${signedTx.serialize().toString('hex')}`
 }

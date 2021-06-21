@@ -22,26 +22,47 @@ module.exports.CEUR_CONTRACT_ADDRESS = {
   mainnet: '0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73',
 }
 
-module.exports.TRANSFER_METHOD_ABI = [{
-  constant: false,
-  inputs: [
-    { name: 'to', type: 'address' },
-    { name: 'value', type: 'uint256' },
-  ],
-  name: 'transfer',
-  outputs: [{ name: '', type: 'bool' }],
-  payable: false,
-  stateMutability: 'nonpayable',
-  type: 'function',
-}]
-module.exports.TRANSFER_COMMENT_METHOD_ABI = [{
-  inputs: [
-    { internalType: 'address', name: '_to', type: 'address' },
-    { internalType: 'uint256', name: '_value', type: 'uint256' },
-    { internalType: 'string', name: '_comment', type: 'string' },
-  ],
-  name: 'transferWithComment',
-  outputs: [{ internalType: 'bool', name: 'success', type: 'bool' }],
-  stateMutability: 'nonpayable',
-  type: 'function',
-}]
+module.exports.BSC_COMMON_CHAIN = {
+  testnet: {
+    base: 'rinkeby',
+    chain: {
+      chainId: 97,
+      networkId: 97,
+    },
+  },
+  mainnet: {
+    base: 'mainnet',
+    chain: {
+      chainId: 56,
+      networkId: 56,
+    },
+  },
+}
+
+module.exports.TRANSFER_METHOD_ABI = [
+  {
+    constant: false,
+    inputs: [
+      { name: 'to', type: 'address' },
+      { name: 'value', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ name: '', type: 'bool' }],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+]
+module.exports.TRANSFER_COMMENT_METHOD_ABI = [
+  {
+    inputs: [
+      { internalType: 'address', name: '_to', type: 'address' },
+      { internalType: 'uint256', name: '_value', type: 'uint256' },
+      { internalType: 'string', name: '_comment', type: 'string' },
+    ],
+    name: 'transferWithComment',
+    outputs: [{ internalType: 'bool', name: 'success', type: 'bool' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+]

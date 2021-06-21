@@ -1,11 +1,24 @@
-const { Wallet } = require("../../wallet/entity")
+const { Protocol } = require('../../../services/blockchain/constants')
+const { Wallet } = require('../../wallet/entity')
 
-class TransactionRequest {
-  constructor({ signedTx }) {
+class SignedTransaction {
+  /**
+   * Creates an instance of SignedTransaction
+   * @param {object} signedTxArgs
+   * @param {string} signedTxArgs.signedTx signed transaction data
+   * @param {Protocol} signedTxArgs.protocol blockchain protocol
+   */
+  constructor({ signedTx, protocol }) {
     this.signedTx = signedTx
+    this.protocol = protocol
   }
 }
 class TransactionResponse {
+  /**
+   * Creates an instance of TransactionResponse
+   * @param {object} response
+   * @param {string} response.hash transaction hash
+   */
   constructor({ hash }) {
     this.hash = hash
   }
@@ -123,11 +136,7 @@ class EthereumTransferTransactionInput extends TransferTransactionInput {
    * @param {boolean} args.testnet
    * @param {string?} args.contractAddress
    */
-  constructor({
-    tokenSymbol,
-    contractAddress,
-    ...args
-  }) {
+  constructor({ tokenSymbol, contractAddress, ...args }) {
     super(args)
     this.tokenSymbol = tokenSymbol
     this.contractAddress = contractAddress
@@ -150,11 +159,7 @@ class CeloTransferTransactionInput extends EthereumTransferTransactionInput {
    * @param {string?} args.feeCurrency
    * @param {string?} args.feeCurrencyContractAddress
    */
-  constructor({
-    feeCurrency,
-    feeCurrencyContractAddress,
-    ...args
-  }) {
+  constructor({ feeCurrency, feeCurrencyContractAddress, ...args }) {
     super(args)
     this.feeCurrency = feeCurrency
     this.feeCurrencyContractAddress = feeCurrencyContractAddress
@@ -162,7 +167,7 @@ class CeloTransferTransactionInput extends EthereumTransferTransactionInput {
 }
 
 module.exports = {
-  TransactionRequest,
+  SignedTransaction,
   TransactionResponse,
   FeeResponse,
   StellarTrustlineTransactionInput,

@@ -55,6 +55,7 @@ class Controller extends Interface {
       privateKey,
       publicKey,
       address,
+      testnet,
       protocol: Protocol.BITCOIN,
     })
   }
