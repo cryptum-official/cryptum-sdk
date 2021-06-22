@@ -3,6 +3,14 @@
     "method": "POST",
     "url": "/transaction"
   },
+  "getTransactionByHash": {
+    "method": "GET",
+    "url": "/transaction"
+  },
+  "getUTXOs": {
+    "method": "GET",
+    "url": "/transaction/utxo"
+  },
   "getFee": {
     "method": "GET",
     "url": "/fee"

@@ -32,6 +32,19 @@ class FeeResponse {
     this.chainId = chainId
   }
 }
+
+class UTXO {
+  constructor({ value, txHash, index, height }) {
+    this.value = value
+    this.txHash = txHash
+    this.index = index
+    this.height = height
+  }
+}
+class Output {
+  address = ''
+  value = 0
+}
 class TrustlineTransactionInput {
   /**
    * Creates an instance of TrustlineTransactionInput.
@@ -165,15 +178,34 @@ class CeloTransferTransactionInput extends EthereumTransferTransactionInput {
     this.feeCurrencyContractAddress = feeCurrencyContractAddress
   }
 }
+class BitcoinTransferTransactionInput extends TransferTransactionInput {
+  /**
+   * Creates an instance of BitcoinTransferTransactionInput.
+   * @param {object} args
+   * @param {Wallet?} args.wallet
+   * @param {string?} args.amount
+   * @param {Array<UTXO>} args.fromUTXOs
+   * @param {Array<string>} args.fromPrivateKeys
+   * @param {Array<Output>} args.outputs
+   * @param {string?} args.memo
+   * @param {object?} args.fee
+   * @param {boolean} args.testnet
+   */
+  constructor({ outputs, fromUTXOs, fromPrivateKeys, ...args }) {
+    super(args)
+  }
+}
 
 module.exports = {
   SignedTransaction,
   TransactionResponse,
   FeeResponse,
+  UTXO,
   StellarTrustlineTransactionInput,
-  RippleTransferTransactionInput,
+  RippleTrustlineTransactionInput,
   EthereumTransferTransactionInput,
   CeloTransferTransactionInput,
   StellarTransferTransactionInput,
   RippleTransferTransactionInput,
+  BitcoinTransferTransactionInput,
 }

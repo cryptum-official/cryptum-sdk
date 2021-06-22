@@ -1,8 +1,4 @@
-const {
-  handleRequestError,
-  getApiMethod,
-  mountHeaders,
-} = require('../../../services')
+const { handleRequestError, getApiMethod, mountHeaders } = require('../../../services')
 const requests = require('./requests.json')
 const Interface = require('./interface')
 const { Protocol } = require('../../../services/blockchain/constants')
@@ -18,13 +14,11 @@ const {
   buildEthereumTransferTransaction,
   buildBscTransferTransaction,
 } = require('../../../services/blockchain/transfer')
-const {
-  FeeResponse,
-  TransactionResponse,
-  SignedTransaction,
-} = require('../entity')
+const { FeeResponse, TransactionResponse, SignedTransaction, UTXO } = require('../entity')
 const WalletController = require('../../wallet/controller')
 const BigNumber = require('bignumber.js')
+const { buildBitcoinTransferTransaction } = require('../../../services/blockchain/bitcoin')
+const { GenericException } = require('../../../../errors')
 
 class Controller extends Interface {
   async sendTransaction(transaction) {
@@ -84,6 +78,40 @@ class Controller extends Interface {
       })
 
       return new FeeResponse(response.data)
+    } catch (error) {
+      handleRequestError(error)
+    }
+  }
+  async getUTXOs({ address, protocol }) {
+    try {
+      const apiRequest = getApiMethod({
+        requests,
+        key: 'getUTXOs',
+        config: this.config,
+      })
+      const headers = mountHeaders(this.config.apiKey)
+      const response = await apiRequest(`${requests.getUTXOs.url}/${address}?protocol=${protocol}`, {
+        headers,
+      })
+
+      return Array.isArray(response.data) && response.data.map((utxo) => new UTXO(utxo))
+    } catch (error) {
+      handleRequestError(error)
+    }
+  }
+  async getTransactionByHash({ hash, protocol }) {
+    try {
+      const apiRequest = getApiMethod({
+        requests,
+        key: 'getTransactionByHash',
+        config: this.config,
+      })
+      const headers = mountHeaders(this.config.apiKey)
+      const response = await apiRequest(`${requests.getTransactionByHash.url}/${hash}?protocol=${protocol}`, {
+        headers,
+      })
+
+      return response.data
     } catch (error) {
       handleRequestError(error)
     }
@@ -151,17 +179,7 @@ class Controller extends Interface {
   }
 
   async createStellarTransferTransaction(input) {
-    const {
-      wallet,
-      assetSymbol,
-      issuer,
-      amount,
-      destination,
-      memo,
-      fee,
-      testnet,
-      startingBalance,
-    } = input
+    const { wallet, assetSymbol, issuer, amount, destination, memo, fee, testnet, startingBalance } = input
     const protocol = Protocol.STELLAR
     const info = await new WalletController(this.config).getWalletInfo({
       address: wallet.publicKey,
@@ -192,16 +210,7 @@ class Controller extends Interface {
   }
 
   async createRippleTransferTransaction(input) {
-    const {
-      wallet,
-      assetSymbol,
-      issuer,
-      amount,
-      destination,
-      memo,
-      fee,
-      testnet,
-    } = input
+    const { wallet, assetSymbol, issuer, amount, destination, memo, fee, testnet } = input
     const protocol = Protocol.RIPPLE
     const info = await new WalletController(this.config).getWalletInfo({
       address: wallet.address,
@@ -275,15 +284,7 @@ class Controller extends Interface {
     return new SignedTransaction({ signedTx, protocol })
   }
   async createEthereumTransferTransaction(input) {
-    const {
-      wallet,
-      tokenSymbol,
-      amount,
-      destination,
-      fee,
-      testnet,
-      contractAddress,
-    } = input
+    const { wallet, tokenSymbol, amount, destination, fee, testnet, contractAddress } = input
     const protocol = Protocol.ETHEREUM
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
@@ -310,15 +311,7 @@ class Controller extends Interface {
   }
 
   async createBscTransferTransaction(input) {
-    const {
-      wallet,
-      tokenSymbol,
-      amount,
-      destination,
-      fee,
-      testnet,
-      contractAddress,
-    } = input
+    const { wallet, tokenSymbol, amount, destination, fee, testnet, contractAddress } = input
     const protocol = Protocol.BSC
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
@@ -340,6 +333,49 @@ class Controller extends Interface {
       nonce: info.nonce,
       testnet: testnet !== undefined ? testnet : wallet.testnet,
       contractAddress,
+    })
+    return new SignedTransaction({ signedTx, protocol })
+  }
+
+  async createBitcoinTransferTransaction(input) {
+    let { wallet, fromUTXOs, fromPrivateKeys, outputs, fee, testnet } = input
+    const protocol = Protocol.BITCOIN
+    let networkFee = fee
+    if (!networkFee) {
+      networkFee = await this.getFee({
+        type: 'transfer',
+        protocol,
+      })
+    }
+
+    if (wallet && fromUTXOs) {
+      throw new GenericException('Parameters wallet and fromUTXOs can not be sent at the same time', 'INVALID_PARAM')
+    }
+    if (wallet) {
+      fromUTXOs = await this.getUTXOs({ address: wallet.address, protocol })
+      fromPrivateKeys = fromUTXOs.map((utxo) => wallet.privateKey)
+    }
+    if (!Array.isArray(fromUTXOs) || !fromUTXOs.length) {
+      throw new GenericException(
+        'Invalid parameter fromUTXOs, it should be an array with length larger than 0',
+        'INVALID_PARAM'
+      )
+    }
+
+    const utxos = []
+    for (const utxo of fromUTXOs) {
+      const tx = await this.getTransactionByHash({ hash: utxo.txHash, protocol })
+      utxos.push({
+        ...utxo,
+        hex: tx.hex
+      })
+    }
+    const signedTx = await buildBitcoinTransferTransaction({
+      fromUTXOs: utxos,
+      fromPrivateKeys,
+      outputs,
+      fee: networkFee,
+      testnet,
     })
     return new SignedTransaction({ signedTx, protocol })
   }
@@ -369,8 +405,7 @@ class Controller extends Interface {
         amount,
         method,
         params,
-        contractAddress:
-          contractAddress || getTokenAddress(protocol, tokenSymbol, testnet),
+        contractAddress: contractAddress || getTokenAddress(protocol, tokenSymbol, testnet),
         protocol,
       })
     }

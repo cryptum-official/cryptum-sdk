@@ -8,6 +8,7 @@ const {
   CeloTransferTransactionInput,
   SignedTransaction,
   EthereumTransferTransactionInput,
+  UTXOResponse,
 } = require('../entity')
 class Interface {
   /**
@@ -43,6 +44,16 @@ class Interface {
    * @param {Protocol} input.protocol
    */
   async getFee(input) {
+    throw new NotImplementedException()
+  }
+  /**
+   * Get UTXOs from address
+   * @param {object} input
+   * @param {string} input.address
+   * @param {Protocol} input.protocol
+   * @returns {Array<UTXOResponse>}
+   */
+  async getUTXOs({ address, protocol }) {
     throw new NotImplementedException()
   }
   /**
@@ -100,6 +111,14 @@ class Interface {
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createBscTransferTransaction(input) {
+    throw new NotImplementedException()
+  }
+  /**
+   * Create bitcoin transfer transaction
+   * @param {BitcoinTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
+  async createBitcoinTransferTransaction(input) {
     throw new NotImplementedException()
   }
 }

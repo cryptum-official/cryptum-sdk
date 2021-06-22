@@ -1,13 +1,6 @@
 const { generateMnemonic } = require('bip39')
-const {
-  Wallet,
-  WalletInfoResponse,
-} = require('../entity')
-const {
-  getApiMethod,
-  mountHeaders,
-  handleRequestError,
-} = require('../../../services')
+const { Wallet, WalletInfoResponse } = require('../entity')
+const { getApiMethod, mountHeaders, handleRequestError } = require('../../../services')
 const Interface = require('./interface')
 const requests = require('./requests.json')
 const { InvalidTypeException } = require('../../../../errors')
@@ -46,10 +39,7 @@ class Controller extends Interface {
   }
 
   async generateBitcoinWallet(mnemonic, testnet) {
-    const { address, privateKey, publicKey } = await deriveBitcoinWallet(
-      mnemonic,
-      testnet
-    )
+    const { address, privateKey, publicKey } = await deriveBitcoinWallet(mnemonic, testnet)
     return new Wallet({
       mnemonic,
       privateKey,
@@ -61,10 +51,7 @@ class Controller extends Interface {
   }
 
   async generateEthereumWallet(mnemonic, testnet) {
-    const { address, privateKey, publicKey } = await deriveEthereumWallet(
-      mnemonic,
-      testnet
-    )
+    const { address, privateKey, publicKey } = await deriveEthereumWallet(mnemonic, testnet)
     return new Wallet({
       mnemonic,
       privateKey,
@@ -82,10 +69,7 @@ class Controller extends Interface {
   }
 
   async generateBinancechainWallet(mnemonic, testnet) {
-    const { address, privateKey, publicKey } = deriveBinancechainWallet(
-      mnemonic,
-      testnet
-    )
+    const { address, privateKey, publicKey } = deriveBinancechainWallet(mnemonic, testnet)
     return new Wallet({
       mnemonic,
       privateKey,
@@ -145,12 +129,9 @@ class Controller extends Interface {
         config: this.config,
       })
       const headers = mountHeaders(this.config.apiKey)
-      const response = await apiRequest(
-        `${requests.getWalletInfo.url}/${address}/info?protocol=${protocol}`,
-        {
-          headers,
-        }
-      )
+      const response = await apiRequest(`${requests.getWalletInfo.url}/${address}/info?protocol=${protocol}`, {
+        headers,
+      })
       return new WalletInfoResponse(response.data)
     } catch (error) {
       handleRequestError(error)
