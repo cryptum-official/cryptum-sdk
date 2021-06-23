@@ -16,14 +16,10 @@
     - [Commons Steps](#commons-steps)
   - [How To Use](#how-to-use)
     - [Configuration](#configuration)
-    - [Wallets](#wallets)
-    - [Webhooks](#webhooks)
-      - [Create an Webhook](#create-an-webhook)
-      - [List you Webhooks](#list-you-webhooks)
-      - [Delete an Webhook](#delete-an-webhook)
-  - [Transaction](#transaction)
-    - [Create and sign Transaction](#create-and-sign-transaction)
-    - [Send an signed Transaction](#send-an-signed-transaction)
+    - [Wallets](docs/wallets)
+    - [Webhooks](docs/webhooks)
+    - [Transactions](docs/transactions)
+    - [Prices](docs/prices)
 - [Contributing](#contributing)
   - [What does my PR need to be accepted ? 🤔](#what-does-my-pr-need-to-be-accepted--)
 - [License](#license)
@@ -72,7 +68,7 @@ To configure cryptum-sdk you need only provide an config in format JSON.
 ```js
 const CryptumSDK = require('cryptum-sdk')
 
-const cryptum = new CryptumSDK({
+const sdk = new CryptumSDK({
   config: {
     enviroment: 'development',
     apiKey: 'my-secret-api-key',
@@ -88,104 +84,6 @@ To see environments available you can see here:
 
 <br>
 
-#### Wallets
-
-You need only to instantiate Wallet controller to manage wallets.
-
-```js
-const walletController = cryptum.getWalletController()
-// generate random wallet for blockchain protocol
-const wallet = await walletController.generateWallet({ protocol: Protocol.STELLAR })
-
-// or using an existing mnemonic
-const wallet = await walletController.generateWallet({
-  protocol: Protocol.ETHEREUM,
-  mnemonic: '<words>...',
-  testnet: true,
-})
-```
-
-#### Webhooks
-
-##### Create an Webhook
-
-You need only instantiate Webhook controller and send your webhook to cryptum 🚀
-
-```js
-const webhookController = sdk.getWebhooksController()
-const webhook = await webhookController.createWebhook({
-  asset: 'BTC',
-  event: 'tx-confirmation',
-  url: 'https://site.com',
-  address: '0x0c99adab65a55df5faf53ab923f43d9eb9368772',
-  confirmations: 6,
-  protocol: 'BITCOIN',
-})
-console.log(webhook)
-// Log your WebhookCryptum
-```
-
-ps.: If you not provide an WebhookCryptum valid, the Cryptum sdk return an exception.
-
-##### List you Webhooks
-
-You need only instantiate Webhook controller and send your asset and your protocol to cryptum 🚀
-
-```js
-const webhookController = sdk.getWebhooksController()
-const webhooks = await webhookController.getWebhooks('BTC', 'BITCOIN')
-console.log(webhooks)
-// Log your WebhookCryptum list
-```
-
-ps.: If you not provide an asset or protocol valid, the Cryptum sdk return an exception.
-
-##### Delete an Webhook
-
-You need only instantiate Webhook controller and send your asset, protocol and webhookId to cryptum 🚀
-
-```js
-const webhookController = sdk.getWebhooksController()
-const webhooks = await webhookController.destroyWebhook({
-  asset: 'BTC',
-  protocol: 'BITCOIN',
-  webhookId: 'ba291cc3-1e29-4c70-b716-b4185891c569',
-})
-```
-
-ps.: If you not provide an asset, protocol and webhookId valid, the Cryptum sdk return an exception.
-
-### Transaction
-
-##### Create and sign Transaction
-
-```js
-const transactionController = sdk.getTransactionController()
-
-// Bitcoin
-const transaction = await txController.createBitcoinTransferTransaction({
-  wallet,
-  outputs: [
-    { address: 'btc-address1', amount: '0.05' },
-    { address: 'btc-address2', amount: '0.449996' },
-  ],
-  testnet: true,
-})
-```
-
-##### Send an signed Transaction
-
-You need only instantiate Transaction controller and send your signed transaction blob to cryptum 🚀
-
-```js
-const transactionController = sdk.getTransactionController()
-const { hash } = await transactionController.sendTransaction({
-  protocol: 'your protocol',
-  signedTx: 'your-secrete-transaction-blob',
-})
-console.log(hash)
-// Log transaction hash
-```
 
 ## Contributing
 

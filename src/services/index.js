@@ -1,11 +1,5 @@
 const AxiosApi = require('../../axios')
-const {
-  UnauthorizedException,
-  GenericException,
-  NotCanMountException,
-  NotImplementedException,
-  InvalidTypeException,
-} = require('../../errors')
+const { GenericException } = require('../../errors')
 
 /**
  * Method to get an specific api method how get, post, put and delete
@@ -30,15 +24,12 @@ const getApiMethod = ({ requests, key, config }) => {
  * Method to handle errors and throw an error by response
  * @param {*} error Error for analysis
  */
-const handleRequestError = error => {
+const handleRequestError = (error) => {
   if (error) {
     if (error.response) {
       const message =
-        (error.response.data.error && error.response.data.error.message) ||
-        'Service unavailable at the moment'
-      const code =
-        (error.response.data.error && error.response.data.error.code) ||
-        'INTERNAL_ERROR'
+        (error.response.data.error && error.response.data.error.message) || 'Service unavailable at the moment'
+      const code = (error.response.data.error && error.response.data.error.code) || 'INTERNAL_ERROR'
       throw new GenericException(message, code)
     }
   }
@@ -51,9 +42,8 @@ const handleRequestError = error => {
  * @param {string} apiKeyCryptum need an api key cryptum to add key
  * @returns an object with x-api-key value
  */
-const mountHeaders = apiKeyCryptum => {
-  if (!apiKeyCryptum)
-    throw new GenericException('0001', 'Required apiKeyCryptum')
+const mountHeaders = (apiKeyCryptum) => {
+  if (!apiKeyCryptum) throw new GenericException('0001', 'Required apiKeyCryptum')
 
   return { 'x-api-key': apiKeyCryptum }
 }
@@ -64,7 +54,7 @@ const mountHeaders = apiKeyCryptum => {
  * @param {string} protocol string with protocol enum, you can use only ['ETHEREUM' or 'BITCOIN'] protocols
  * @returns true if protocol is valid, and false if not
  */
-const isValidProtocol = protocol => {
+const isValidProtocol = (protocol) => {
   return protocol === 'ETHEREUM' || protocol === 'BITCOIN'
 }
 

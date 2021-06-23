@@ -1,38 +1,18 @@
 const assert = require('assert')
 const nock = require('nock')
 
-const {
-  NotCanMountException,
-  NotImplementedException,
-  InvalidTypeException,
-} = require('../../errors')
-const {
-  getApiMethod,
-  mountTokenHeaders,
-  mountHeaders,
-  handleRequestError,
-  isValidProtocol,
-} = require('../../src/services')
-
-const ApiKeyCryptum = require('../../src/features/api-keys/entity')
+const { NotCanMountException, NotImplementedException, InvalidTypeException } = require('../../errors')
+const { getApiMethod, mountHeaders, handleRequestError, isValidProtocol } = require('../../src/services')
 
 describe.only('Test Suite of the Services (All project)', function () {
   this.beforeAll(() => {
-    nock('https://api-dev.cryptum.io')
-      .post('/samplePOST', { test: 'post' })
-      .reply(200, { tested: 'post_method' })
+    nock('https://api-dev.cryptum.io').post('/samplePOST', { test: 'post' }).reply(200, { tested: 'post_method' })
 
-    nock('https://api-dev.cryptum.io')
-      .put('/samplePUT', { test: 'put' })
-      .reply(200, { tested: 'put_method' })
+    nock('https://api-dev.cryptum.io').put('/samplePUT', { test: 'put' }).reply(200, { tested: 'put_method' })
 
-    nock('https://api-dev.cryptum.io')
-      .get('/sampleGET')
-      .reply(200, { tested: 'get_method' })
+    nock('https://api-dev.cryptum.io').get('/sampleGET').reply(200, { tested: 'get_method' })
 
-    nock('https://api-dev.cryptum.io')
-      .delete('/sampleDELETE')
-      .reply(200, { tested: 'delete_method' })
+    nock('https://api-dev.cryptum.io').delete('/sampleDELETE').reply(200, { tested: 'delete_method' })
   })
 
   it('Check if an services throw respective error (With NotCanMountException error param) - method: handleRequestError', async () => {
@@ -56,8 +36,7 @@ describe.only('Test Suite of the Services (All project)', function () {
   })
 
   it('Check if an services throw respective error (With InvalidTypeException error param) - method: handleRequestError', async () => {
-    const expectedResult =
-      'The "webhook" parameter must be of the "WebhookCryptum" type, or not is an valid object'
+    const expectedResult = 'The "webhook" parameter must be of the "WebhookCryptum" type, or not is an valid object'
 
     try {
       handleRequestError(new InvalidTypeException('webhook', 'WebhookCryptum'))
