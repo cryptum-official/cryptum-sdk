@@ -12,7 +12,7 @@ const axiosApi = new AxiosApi(config)
 const baseUrl = axiosApi.getBaseUrl(config.enviroment)
 let wallets = {}
 
-describe('Stellar transfer transactions', () => {
+describe.only('Stellar transfer transactions', () => {
   before(async () => {
     wallets = await getWallets()
 
@@ -21,6 +21,13 @@ describe('Stellar transfer transactions', () => {
       .query({ protocol: Protocol.STELLAR })
       .reply(200, {
         sequence: '40072044871681',
+      })
+      .persist()
+      nock(baseUrl)
+      .post(`/fee?protocol=${Protocol.STELLAR}`, { type: 'transfer' })
+      .reply(200, {
+        estimateValue: '100',
+        unit: 'stroop'
       })
       .persist()
   })

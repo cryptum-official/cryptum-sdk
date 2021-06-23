@@ -65,16 +65,15 @@ class Controller extends Interface {
         config: this.config,
       })
       const headers = mountHeaders(this.config.apiKey)
-      const qsParams = { protocol }
-      if (type) qsParams.type = type
-      if (from) qsParams.from = from
-      if (destination) qsParams.destination = destination
-      if (amount) qsParams.amount = amount
-      if (contractAddress) qsParams.contractAddress = contractAddress
-      if (method) qsParams.method = method
-      if (params) qsParams.params = JSON.stringify(params)
-      const qs = new URLSearchParams(qsParams).toString()
-      const response = await apiRequest(`${requests.getFee.url}?${qs}`, {
+      const data = {}
+      if (type) data.type = type
+      if (from) data.from = from
+      if (destination) data.destination = destination
+      if (amount) data.amount = amount
+      if (contractAddress) data.contractAddress = contractAddress
+      if (method) data.method = method
+      if (params) data.params = params
+      const response = await apiRequest(`${requests.getFee.url}?protocol=${protocol}`, data, {
         headers,
       })
 
@@ -260,6 +259,7 @@ class Controller extends Interface {
     const params = memo ? [destination, amountWei, memo] : [destination, amountWei]
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
+      type: 'transfer',
       destination,
       amount,
       contractAddress,
@@ -289,6 +289,7 @@ class Controller extends Interface {
     const protocol = Protocol.ETHEREUM
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
+      type: 'transfer',
       destination,
       amount,
       contractAddress,
@@ -316,6 +317,7 @@ class Controller extends Interface {
     const protocol = Protocol.BSC
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
+      type: 'transfer',
       destination,
       amount,
       contractAddress,
@@ -375,6 +377,7 @@ class Controller extends Interface {
 
   async _getFeeInfo({
     wallet,
+    type,
     destination,
     amount,
     tokenSymbol,
@@ -393,6 +396,7 @@ class Controller extends Interface {
     let networkFee = { gas: 0, gasPrice: '0', chainId: '' }
     if (!fee || !fee.gas || !fee.gasPrice) {
       networkFee = await this.getFee({
+        type,
         from: wallet.address,
         destination,
         amount,

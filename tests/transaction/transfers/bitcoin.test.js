@@ -12,15 +12,13 @@ const axiosApi = new AxiosApi(config)
 const baseUrl = axiosApi.getBaseUrl(config.enviroment)
 let wallets = {}
 
-describe('Bitcoin transfer transactions', () => {
+describe.only('Bitcoin transfer transactions', () => {
   before(async () => {
     wallets = await getWallets()
 
     nock(baseUrl)
-      .get(`/fee`)
-      .query({
+      .post(`/fee?protocol=${Protocol.BITCOIN}`, {
         type: 'transfer',
-        protocol: Protocol.BITCOIN,
       })
       .reply(200, {
         estimateValue: '80',

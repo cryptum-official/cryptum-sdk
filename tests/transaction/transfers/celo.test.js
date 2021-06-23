@@ -24,14 +24,13 @@ describe.only('Celo transfer transactions', () => {
       })
       .persist()
     nock(baseUrl)
-      .get(`/fee`)
-      .query({
-        from: wallets.celo.address,
+      .post(`/fee?protocol=${Protocol.CELO}`, {
+        type: 'transfer',
+        from: '0x8C33DB44a78629cF60C88383d436EEc356884625',
         destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
         amount: '0.1',
         method: 'transferWithComment',
         params: ['0x3f2f3D45196D7B99D0a615e8f530165eCb93e772', '100000000000000000', 'create-transfer'],
-        protocol: Protocol.CELO,
       })
       .reply(200, {
         gas: 21000,
@@ -40,15 +39,13 @@ describe.only('Celo transfer transactions', () => {
       })
       .persist()
     nock(baseUrl)
-      .get(`/fee`)
-      .query({
-        from: wallets.celo.address,
+      .post(`/fee?protocol=${Protocol.CELO}`, {
+        type: 'transfer',
+        from: '0x8C33DB44a78629cF60C88383d436EEc356884625',
         destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
         amount: '0.01',
-        contractAddress: CUSD_CONTRACT_ADDRESS.testnet,
         method: 'transfer',
         params: ['0x3f2f3D45196D7B99D0a615e8f530165eCb93e772', '10000000000000000'],
-        protocol: Protocol.CELO,
       })
       .reply(200, {
         gas: 21000,
@@ -57,15 +54,14 @@ describe.only('Celo transfer transactions', () => {
       })
       .persist()
     nock(baseUrl)
-      .get(`/fee`)
-      .query({
-        from: wallets.celo.address,
+      .post(`/fee?protocol=${Protocol.CELO}`, {
+        type: 'transfer',
+        from: '0x8C33DB44a78629cF60C88383d436EEc356884625',
         destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
         amount: '0.01',
         contractAddress: '0x07274039422F722076863ADa0b4dB77ad6c163dc',
         method: 'transfer',
         params: ['0x3f2f3D45196D7B99D0a615e8f530165eCb93e772', '10000000000000000'],
-        protocol: Protocol.CELO,
       })
       .reply(200, {
         gas: 21000,
@@ -88,7 +84,7 @@ describe.only('Celo transfer transactions', () => {
       testnet: true,
     })
     assert.include(transaction.signedTx, '0x')
-    console.log(await txController.sendTransaction(transaction))
+    // console.log(await txController.sendTransaction(transaction))
   })
   it('create transfer celo and pay fee with cusd', async () => {
     const transaction = await txController.createCeloTransferTransaction({
@@ -100,7 +96,7 @@ describe.only('Celo transfer transactions', () => {
       testnet: true,
     })
     assert.include(transaction.signedTx, '0x')
-    console.log(await txController.sendTransaction(transaction))
+    // console.log(await txController.sendTransaction(transaction))
   })
   it('create transfer token', async () => {
     const transaction = await txController.createCeloTransferTransaction({
@@ -112,6 +108,6 @@ describe.only('Celo transfer transactions', () => {
       testnet: true,
     })
     assert.include(transaction.signedTx, '0x')
-    console.log(await txController.sendTransaction(transaction))
+    // console.log(await txController.sendTransaction(transaction))
   })
 })

@@ -12,7 +12,7 @@
     "url": "/transaction/utxo"
   },
   "getFee": {
-    "method": "GET",
+    "method": "POST",
     "url": "/fee"
   }
 }

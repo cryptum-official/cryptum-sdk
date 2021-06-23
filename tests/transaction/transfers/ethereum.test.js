@@ -24,13 +24,13 @@ describe.only('Ethereum transfer transactions', () => {
       })
       .persist()
     nock(baseUrl)
-      .get(`/fee`)
-      .query({
-        from: wallets.ethereum.address,
+      .post(`/fee?protocol=${Protocol.ETHEREUM}`, {
+        type: 'transfer',
+        from: '0x481B542b7419D8Ba305B5cc5029C12d5a68B4f69',
         destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
         amount: '0.01',
-        type: 'transfer',
-        protocol: Protocol.ETHEREUM,
+        method: 'transfer',
+        params: ['0x3f2f3D45196D7B99D0a615e8f530165eCb93e772', '10000000000000000'],
       })
       .reply(200, {
         gas: 21000,
@@ -39,16 +39,14 @@ describe.only('Ethereum transfer transactions', () => {
       })
       .persist()
     nock(baseUrl)
-      .get(`/fee`)
-      .query({
-        from: wallets.ethereum.address,
+      .post(`/fee?protocol=${Protocol.ETHEREUM}`, {
+        type: 'transfer',
+        from: '0x481B542b7419D8Ba305B5cc5029C12d5a68B4f69',
         destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
         amount: '0.01',
-        type: 'transfer',
         contractAddress: '0xcf1caf3f6aa5e5206b2d50dd1206a7cc3c76dc10',
         method: 'transfer',
         params: ['0x3f2f3D45196D7B99D0a615e8f530165eCb93e772', '10000000000000000'],
-        protocol: Protocol.ETHEREUM,
       })
       .reply(200, {
         gas: 21000,

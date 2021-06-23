@@ -12,7 +12,7 @@ const axiosApi = new AxiosApi(config)
 const baseUrl = axiosApi.getBaseUrl(config.enviroment)
 let wallets = {}
 
-describe('Bsc transfer transactions', () => {
+describe.only('Bsc transfer transactions', () => {
   before(async () => {
     wallets = await getWallets()
 
@@ -24,14 +24,28 @@ describe('Bsc transfer transactions', () => {
       })
       .persist()
     nock(baseUrl)
-      .get(`/fee`)
-      .query({
-        from: wallets.bsc.address,
+      .post(`/fee?protocol=${Protocol.BSC}`, {
+        type: 'transfer',
+        from: '0x481B542b7419D8Ba305B5cc5029C12d5a68B4f69',
         destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
         amount: '0.01',
+        method: 'transfer',
+        params: ['0x3f2f3D45196D7B99D0a615e8f530165eCb93e772', '10000000000000000'],
+      })
+      .reply(200, {
+        gas: 2100,
+        gasPrice: '4000000',
+        chainId: 97,
+      })
+      .persist()
+      .post(`/fee?protocol=${Protocol.BSC}`, {
         type: 'transfer',
-        assetSymbol: 'BNB',
-        protocol: Protocol.BSC,
+        from: '0x481B542b7419D8Ba305B5cc5029C12d5a68B4f69',
+        destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
+        amount: '0.01',
+        contractAddress: '0xfd78c660ee04357526c62e427cc2c3ff22fe5bdc',
+        method: 'transfer',
+        params: ['0x3f2f3D45196D7B99D0a615e8f530165eCb93e772', '10000000000000000'],
       })
       .reply(200, {
         gas: 2100,
