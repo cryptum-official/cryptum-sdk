@@ -14,16 +14,16 @@ const {
   buildEthereumTransferTransaction,
   buildBscTransferTransaction,
 } = require('../../../services/blockchain/transfer')
-const { FeeResponse, TransactionResponse, SignedTransaction, UTXO } = require('../entity')
+const { FeeResponse, TransactionResponse, SignedTransaction, UTXO, TransactionType } = require('../entity')
 const WalletController = require('../../wallet/controller')
 const BigNumber = require('bignumber.js')
 const { buildBitcoinTransferTransaction } = require('../../../services/blockchain/bitcoin')
-const { GenericException } = require('../../../../errors')
-const { validateBitcoinTransferTransactionParams } = require('../../../services/validation')
+const { validateBitcoinTransferTransactionParams, validateSignedTransaction } = require('../../../services/validation')
 
 class Controller extends Interface {
   async sendTransaction(transaction) {
     try {
+      validateSignedTransaction(transaction)
       const apiRequest = getApiMethod({
         requests,
         key: 'sendTransaction',
@@ -31,11 +31,11 @@ class Controller extends Interface {
       })
       const headers = mountHeaders(this.config.apiKey)
 
-      const { protocol, signedTx } = transaction
+      const { protocol, signedTx, type } = transaction
 
       const response = await apiRequest(
         requests.sendTransaction.url,
-        { signedTx },
+        { signedTx, type },
         {
           headers,
           params: { protocol },
@@ -144,7 +144,7 @@ class Controller extends Interface {
       sequence: info.sequence,
       testnet: testnet !== undefined ? testnet : wallet.testnet,
     })
-    return new SignedTransaction({ signedTx, protocol })
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.CHANGE_TRUST })
   }
 
   async createRippleTrustlineTransaction(input) {
@@ -175,7 +175,7 @@ class Controller extends Interface {
       maxLedgerVersion: info.ledger_current_index + 10,
       testnet: testnet !== undefined ? testnet : wallet.testnet,
     })
-    return new SignedTransaction({ signedTx, protocol })
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.CHANGE_TRUST })
   }
 
   async createStellarTransferTransaction(input) {
@@ -206,7 +206,7 @@ class Controller extends Interface {
       testnet: testnet !== undefined ? testnet : wallet.testnet,
       startingBalance,
     })
-    return new SignedTransaction({ signedTx, protocol })
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
 
   async createRippleTransferTransaction(input) {
@@ -237,7 +237,7 @@ class Controller extends Interface {
       maxLedgerVersion: info.ledger_current_index + 10,
       testnet: testnet !== undefined ? testnet : wallet.testnet,
     })
-    return new SignedTransaction({ signedTx, protocol })
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
 
   async createCeloTransferTransaction(input) {
@@ -282,7 +282,7 @@ class Controller extends Interface {
       feeCurrency,
       feeCurrencyContractAddress,
     })
-    return new SignedTransaction({ signedTx, protocol })
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
   async createEthereumTransferTransaction(input) {
     const { wallet, tokenSymbol, amount, destination, fee, testnet, contractAddress } = input
@@ -309,7 +309,7 @@ class Controller extends Interface {
       testnet: testnet !== undefined ? testnet : wallet.testnet,
       contractAddress,
     })
-    return new SignedTransaction({ signedTx, protocol })
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
 
   async createBscTransferTransaction(input) {
@@ -337,7 +337,7 @@ class Controller extends Interface {
       testnet: testnet !== undefined ? testnet : wallet.testnet,
       contractAddress,
     })
-    return new SignedTransaction({ signedTx, protocol })
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
 
   async createBitcoinTransferTransaction(input) {
@@ -351,7 +351,7 @@ class Controller extends Interface {
 
     let networkFee = fee
     if (!networkFee) {
-      ({ estimateValue: networkFee } = await this.getFee({
+      ;({ estimateValue: networkFee } = await this.getFee({
         type: 'transfer',
         protocol,
       }))
@@ -372,7 +372,7 @@ class Controller extends Interface {
       fee: networkFee,
       testnet,
     })
-    return new SignedTransaction({ signedTx, protocol })
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
 
   async _getFeeInfo({

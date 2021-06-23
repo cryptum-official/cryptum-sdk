@@ -1,5 +1,15 @@
 const { Protocol } = require('../../../services/blockchain/constants')
 const { Wallet } = require('../../wallet/entity')
+/**
+ * Transaction type
+ * @enum {string}
+ */
+const TransactionType = {
+  TRANSFER: 'TRANSFER',
+  CALL_CONTRACT_METHOD: 'CALL_CONTRACT_METHOD',
+  DEPLOY_CONTRACT: 'DEPLOY_CONTRACT',
+  CHANGE_TRUST: 'CHANGE_TRUST',
+}
 
 class SignedTransaction {
   /**
@@ -7,10 +17,12 @@ class SignedTransaction {
    * @param {object} signedTxArgs
    * @param {string} signedTxArgs.signedTx signed transaction data
    * @param {Protocol} signedTxArgs.protocol blockchain protocol
+   * @param {TransactionType} signedTxArgs.type transaction type
    */
-  constructor({ signedTx, protocol }) {
+  constructor({ signedTx, protocol, type }) {
     this.signedTx = signedTx
     this.protocol = protocol
+    this.type = type
   }
 }
 class TransactionResponse {
@@ -186,7 +198,7 @@ class BitcoinTransferTransactionInput extends TransferTransactionInput {
    * @param {object} args
    * @param {Wallet?} args.wallet wallet to transfer from
    * @param {Array<UTXO>} args.fromUTXOs inputs from UTXOs to transfer from
-   * @param {Array<string>} args.fromPrivateKeys input private keys to sign from 
+   * @param {Array<string>} args.fromPrivateKeys input private keys to sign from
    * @param {Array<Output>} args.outputs outputs to transfer to
    * @param {string?} args.fee fee per byte in satoshi
    * @param {boolean} args.testnet
@@ -197,6 +209,7 @@ class BitcoinTransferTransactionInput extends TransferTransactionInput {
 }
 
 module.exports = {
+  TransactionType,
   SignedTransaction,
   TransactionResponse,
   FeeResponse,

@@ -1,4 +1,5 @@
 const { GenericException } = require('../../errors')
+const { TransactionType } = require('../features/transaction/entity')
 
 module.exports.validateBitcoinTransferTransactionParams = ({ wallet, fromUTXOs, outputs }) => {
   if (wallet && fromUTXOs) {
@@ -18,5 +19,17 @@ module.exports.validateBitcoinTransferTransactionParams = ({ wallet, fromUTXOs, 
       'Invalid parameter outputs, it should be an array with length larger than 0',
       'INVALID_PARAM'
     )
+  }
+}
+
+module.exports.validateSignedTransaction = ({ signedTx, protocol, type }) => {
+  if (!protocol || typeof protocol !== 'string') {
+    throw new GenericException('Invalid protocol', 'INVALID_PARAM')
+  }
+  if (!signedTx || typeof signedTx !== 'string') {
+    throw new GenericException('Invalid signedTx parameter', 'INVALID_PARAM')
+  }
+  if (!type || !TransactionType[type]) {
+    throw new GenericException('Invalid transaction type', 'INVALID_PARAM')
   }
 }
