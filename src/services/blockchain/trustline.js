@@ -1,20 +1,6 @@
 const StellarSdk = require('stellar-sdk')
 const { RippleAPI } = require('ripple-lib')
 const BigNumber = require('bignumber.js')
-/**
- * Blockchain protocols
- * @enum {string}
- */
-const Protocol = {
-  BITCOIN: 'BITCOIN',
-  BINANCECHAIN: 'BINANCECHAIN',
-  BSC: 'BSC',
-  CELO: 'CELO',
-  ETHEREUM: 'ETHEREUM',
-  STELLAR: 'STELLAR',
-  RIPPLE: 'RIPPLE',
-}
-module.exports.Protocol = Protocol
 
 /**
  * Build signed trustline tx for Stellar protocol
@@ -22,19 +8,19 @@ module.exports.Protocol = Protocol
  * @param {string} args.fromPublicKey account to use for this trustline transaction
  * @param {string} args.fromPrivateKey account private key to sign the trustline transaction
  * @param {string} args.sequence account sequence number
- * @param {string} args.assetCode asset symbol
+ * @param {string} args.assetSymbol asset symbol
  * @param {string} args.issuer issuer account
  * @param {string?} args.fee fee in stroops
  * @param {string?} args.limit limit number for the trustline
  * @param {memo?} args.memo memo string
  * @param {boolean?} args.testnet
- * @returns {string} signed tx
+ * @returns {Promise<string>} signed tx
  */
-async function buildStellarTrustlineTransaction({
+module.exports.buildStellarTrustlineTransaction = async function ({
   fromPublicKey,
   fromPrivateKey,
   sequence,
-  assetCode,
+  assetSymbol,
   issuer,
   fee = null,
   limit = null,
@@ -43,7 +29,7 @@ async function buildStellarTrustlineTransaction({
 }) {
   const account = new StellarSdk.Account(fromPublicKey, sequence)
   const transaction = new StellarSdk.TransactionBuilder(account, {
-    fee,
+    fee: fee ? fee : '100',
     memo: memo
       ? memo.length > 28
         ? StellarSdk.Memo.hash(memo)
@@ -55,18 +41,16 @@ async function buildStellarTrustlineTransaction({
   })
     .addOperation(
       StellarSdk.Operation.changeTrust({
-        asset: new StellarSdk.Asset(assetCode, issuer),
+        asset: new StellarSdk.Asset(assetSymbol, issuer),
         limit,
       })
     )
-    .setTimeout(100)
+    .setTimeout(300)
     .build()
 
   transaction.sign(StellarSdk.Keypair.fromSecret(fromPrivateKey))
   return transaction.toEnvelope().toXDR().toString('base64')
 }
-module.exports.buildStellarTrustlineTransaction =
-  buildStellarTrustlineTransaction
 
 /**
  * Build signed trustline tx for Ripple protocol
@@ -74,19 +58,19 @@ module.exports.buildStellarTrustlineTransaction =
  * @param {string} args.fromAddress account address
  * @param {string} args.fromPrivateKey account private key to sign transaction
  * @param {string} args.sequence account sequence number
- * @param {string} args.assetCode asset symbol
+ * @param {string} args.assetSymbol asset symbol
  * @param {string} args.issuer issuer account address
  * @param {string?} args.fee fee in drops
  * @param {string?} args.limit limit number
  * @param {memo?} args.memo memo string
- * @returns {string} signed tx
+ * @returns {Promise<string>} signed tx
  */
-async function buildRippleTrustlineTransaction({
+module.exports.buildRippleTrustlineTransaction = async function ({
   fromAddress,
   fromPrivateKey,
   sequence,
   maxLedgerVersion,
-  assetCode,
+  assetSymbol,
   issuer,
   limit = null,
   memo = null,
@@ -94,7 +78,7 @@ async function buildRippleTrustlineTransaction({
 }) {
   const rippleAPI = new RippleAPI()
   const trustline = {
-    currency: assetCode,
+    currency: assetSymbol,
     counterparty: issuer,
     limit,
     memos: memo ? [{ type: 'test', format: 'text/plain', data: memo }] : null,
@@ -107,4 +91,3 @@ async function buildRippleTrustlineTransaction({
   const { signedTransaction } = rippleAPI.sign(prepared.txJSON, fromPrivateKey)
   return signedTransaction
 }
-module.exports.buildRippleTrustlineTransaction = buildRippleTrustlineTransaction

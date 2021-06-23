@@ -1,6 +1,0 @@
-{
-  "sendTransaction": {
-    "method": "POST",
-    "url": "/transaction"
-  }
-}

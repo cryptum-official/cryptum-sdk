@@ -1,4 +1,4 @@
-const { Protocol } = require('../../../services/blockchain')
+const { Protocol } = require('../../../services/blockchain/constants')
 
 class Wallet {
   /**
@@ -9,7 +9,7 @@ class Wallet {
    * @param {string} args.publicKey Wallet public key
    * @param {string} args.address Wallet address
    * @param {Protocol} args.protocol blockchain protocol
-   * @param {Protocol} args.testnet blockchain testnet or mainnet
+   * @param {boolean} args.testnet blockchain testnet or mainnet
    */
   constructor({ mnemonic, privateKey, publicKey, address, protocol, testnet }) {
     this.mnemonic = mnemonic
@@ -21,4 +21,13 @@ class Wallet {
   }
 }
 
-module.exports = Wallet
+class WalletInfoResponse {
+  constructor(info) {
+    Object.assign(this, info)
+  }
+}
+
+module.exports = {
+  Wallet,
+  WalletInfoResponse
+}

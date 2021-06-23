@@ -31,23 +31,18 @@ const getApiMethod = ({ requests, key, config }) => {
  * @param {*} error Error for analysis
  */
 const handleRequestError = error => {
-  if (error instanceof NotCanMountException) throw error
-  if (error instanceof NotImplementedException) throw error
-  if (error instanceof InvalidTypeException) throw error
-  if (error instanceof GenericException) throw error
-
-  if (
-    !error ||
-    !error.response ||
-    !error.response.data ||
-    !error.response.data.error
-  )
-    throw new Error('An error not mapped has occurred')
-
-  if (error.response.status === 401) throw new UnauthorizedException()
-
-  const mappedError = error.response.data.error
-  throw new GenericException(mappedError.code, mappedError.type)
+  if (error) {
+    if (error.response) {
+      const message =
+        (error.response.data.error && error.response.data.error.message) ||
+        'Service unavailable at the moment'
+      const code =
+        (error.response.data.error && error.response.data.error.code) ||
+        'INTERNAL_ERROR'
+      throw new GenericException(message, code)
+    }
+  }
+  throw error
 }
 
 /**
