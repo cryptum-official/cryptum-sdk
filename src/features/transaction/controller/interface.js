@@ -8,6 +8,7 @@ const {
   CeloTransferTransactionInput,
   SignedTransaction,
   EthereumTransferTransactionInput,
+  BitcoinTransferTransactionInput,
   UTXOResponse,
 } = require('../entity')
 class Interface {

@@ -42,8 +42,10 @@ class UTXO {
   }
 }
 class Output {
-  address = ''
-  value = 0
+  constructor(output) {
+    this.address = output.address
+    this.amount = output.amount
+  }
 }
 class TrustlineTransactionInput {
   /**
@@ -182,13 +184,11 @@ class BitcoinTransferTransactionInput extends TransferTransactionInput {
   /**
    * Creates an instance of BitcoinTransferTransactionInput.
    * @param {object} args
-   * @param {Wallet?} args.wallet
-   * @param {string?} args.amount
-   * @param {Array<UTXO>} args.fromUTXOs
-   * @param {Array<string>} args.fromPrivateKeys
-   * @param {Array<Output>} args.outputs
-   * @param {string?} args.memo
-   * @param {object?} args.fee
+   * @param {Wallet?} args.wallet wallet to transfer from
+   * @param {Array<UTXO>} args.fromUTXOs inputs from UTXOs to transfer from
+   * @param {Array<string>} args.fromPrivateKeys input private keys to sign from 
+   * @param {Array<Output>} args.outputs outputs to transfer to
+   * @param {string?} args.fee fee per byte in satoshi
    * @param {boolean} args.testnet
    */
   constructor({ outputs, fromUTXOs, fromPrivateKeys, ...args }) {
@@ -201,6 +201,7 @@ module.exports = {
   TransactionResponse,
   FeeResponse,
   UTXO,
+  Output,
   StellarTrustlineTransactionInput,
   RippleTrustlineTransactionInput,
   EthereumTransferTransactionInput,

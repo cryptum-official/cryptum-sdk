@@ -22,7 +22,8 @@
       - [List you Webhooks](#list-you-webhooks)
       - [Delete an Webhook](#delete-an-webhook)
   - [Transaction](#transaction)
-      - [Send an signed Transaction](#send-an-signed-transaction)
+    - [Create and sign Transaction](#create-and-sign-transaction)
+    - [Send an signed Transaction](#send-an-signed-transaction)
 - [Contributing](#contributing)
   - [What does my PR need to be accepted ? 🤔](#what-does-my-pr-need-to-be-accepted--)
 - [License](#license)
@@ -31,40 +32,50 @@
 ## About Project
 
 This project is to provide an integration with the Cryptum backend. This project calls Cryptum API using Clean Architecture and NodeJS.
+
 ## Starting
+
 ### Installation
+
 #### Requirements for install
 
 - NPM installed
 - Node version: ^14.17.0
+
 #### Language used
 
 - Javascript
+
 #### Commons Steps
 
 Open your project
+
 ```bash
 cd my-amazing-project/
 ```
 
 Install using npm manager or yarn
+
 ```bash
 npm install cryptum-sdk
 yarn add cryptum-sdk
 ```
+
 ### How To Use
 
 Below is an short description using code how you can use cryptum-sdk to integrate your amazing application with us.
+
 #### Configuration
 
 To configure cryptum-sdk you need only provide an config in format JSON.
+
 ```js
 const CryptumSDK = require('cryptum-sdk')
 
 const cryptum = new CryptumSDK({
   config: {
     enviroment: 'development',
-    apiKey: 'my-secret-api-key'
+    apiKey: 'my-secret-api-key',
   },
 })
 ```
@@ -72,8 +83,8 @@ const cryptum = new CryptumSDK({
 To see environments available you can see here:
 | Environments available |
 |------------------------|
-| development            |
-| production             |
+| development |
+| production |
 
 <br>
 
@@ -87,7 +98,11 @@ const walletController = cryptum.getWalletController()
 const wallet = await walletController.generateWallet({ protocol: Protocol.STELLAR })
 
 // or using an existing mnemonic
-const wallet = await walletController.generateWallet({ protocol: Protocol.ETHEREUM, mnemonic: '<words>...', testnet: true })
+const wallet = await walletController.generateWallet({
+  protocol: Protocol.ETHEREUM,
+  mnemonic: '<words>...',
+  testnet: true,
+})
 ```
 
 #### Webhooks
@@ -140,8 +155,23 @@ const webhooks = await webhookController.destroyWebhook({
 
 ps.: If you not provide an asset, protocol and webhookId valid, the Cryptum sdk return an exception.
 
-
 ### Transaction
+
+##### Create and sign Transaction
+
+```js
+const transactionController = sdk.getTransactionController()
+
+// Bitcoin
+const transaction = await txController.createBitcoinTransferTransaction({
+  wallet,
+  outputs: [
+    { address: 'btc-address1', amount: '0.05' },
+    { address: 'btc-address2', amount: '0.449996' },
+  ],
+  testnet: true,
+})
+```
 
 ##### Send an signed Transaction
 
@@ -149,17 +179,18 @@ You need only instantiate Transaction controller and send your signed transactio
 
 ```js
 const transactionController = sdk.getTransactionController()
-const transaction = await transactionController.sendTransaction({
+const { hash } = await transactionController.sendTransaction({
   protocol: 'your protocol',
-  blob: 'your-secrete-transaction-blob',
+  signedTx: 'your-secrete-transaction-blob',
 })
-console.log(transaction)
-// Log your TransactionCryptum with hash
+console.log(hash)
+// Log transaction hash
 ```
 
 ## Contributing
 
 Contributions are what make the open source community an incredible place to learn, inspire and create. Any contribution you make will be **much appreciated**.
+
 1. Make a project Fork
 2. Create a Branch for your feature (`git checkout -b feature/amazing-feature`)
 3. Insert your changes (`git add .`)
@@ -175,6 +206,7 @@ In order for us to accept your PR, you need to adhere to the following standards
 2. Test your update and show artifacts in PR.
 
 It's all 🤷🏻‍♂️
+
 ## License
 
 Distributed under the MIT license. See `LICENSE` for more information.

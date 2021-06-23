@@ -19,6 +19,7 @@ const WalletController = require('../../wallet/controller')
 const BigNumber = require('bignumber.js')
 const { buildBitcoinTransferTransaction } = require('../../../services/blockchain/bitcoin')
 const { GenericException } = require('../../../../errors')
+const { validateBitcoinTransferTransactionParams } = require('../../../services/validation')
 
 class Controller extends Interface {
   async sendTransaction(transaction) {
@@ -339,38 +340,30 @@ class Controller extends Interface {
 
   async createBitcoinTransferTransaction(input) {
     let { wallet, fromUTXOs, fromPrivateKeys, outputs, fee, testnet } = input
+    validateBitcoinTransferTransactionParams(input)
     const protocol = Protocol.BITCOIN
-    let networkFee = fee
-    if (!networkFee) {
-      networkFee = await this.getFee({
-        type: 'transfer',
-        protocol,
-      })
-    }
-
-    if (wallet && fromUTXOs) {
-      throw new GenericException('Parameters wallet and fromUTXOs can not be sent at the same time', 'INVALID_PARAM')
-    }
     if (wallet) {
       fromUTXOs = await this.getUTXOs({ address: wallet.address, protocol })
-      fromPrivateKeys = fromUTXOs.map((utxo) => wallet.privateKey)
-    }
-    if (!Array.isArray(fromUTXOs) || !fromUTXOs.length) {
-      throw new GenericException(
-        'Invalid parameter fromUTXOs, it should be an array with length larger than 0',
-        'INVALID_PARAM'
-      )
+      fromPrivateKeys = fromUTXOs.map(() => wallet.privateKey)
     }
 
+    let networkFee = fee
+    if (!networkFee) {
+      ({ estimateValue: networkFee } = await this.getFee({
+        type: 'transfer',
+        protocol,
+      }))
+    }
     const utxos = []
     for (const utxo of fromUTXOs) {
       const tx = await this.getTransactionByHash({ hash: utxo.txHash, protocol })
       utxos.push({
         ...utxo,
-        hex: tx.hex
+        hex: tx.hex,
       })
     }
     const signedTx = await buildBitcoinTransferTransaction({
+      wallet,
       fromUTXOs: utxos,
       fromPrivateKeys,
       outputs,
