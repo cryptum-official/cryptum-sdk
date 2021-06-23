@@ -1,4 +1,3 @@
-const nock = require('nock')
 const chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
@@ -23,6 +22,56 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         Error,
         'Unsupported blockchain protocol'
       )
+    })
+  })
+  describe('From private key', () => {
+    it('stellar', async () => {
+      const controller = new WalletController(config)
+      const wallet = await controller.generateWalletFromPrivateKey({
+        protocol: Protocol.STELLAR,
+        privateKey: 'SA6EEJRPDG2KNYMYCUJEWPUVDA3PGPUNX6JKNN2CX2K5LH34BWPKODYM'
+      })
+      assert.strictEqual(wallet.publicKey, 'GAC2V7MGMTG57FZKJSXRSZ4EIDL2RBFIYVXZJMTJZ232XPZQUCTYUCWL')
+    })
+    it('ripple', async () => {
+      const controller = new WalletController(config)
+      const wallet = await controller.generateWalletFromPrivateKey({
+        protocol: Protocol.RIPPLE,
+        privateKey: 'spjjDoTPjCrdRvVBrTcVGo4ouYG9X'
+      })
+      assert.strictEqual(wallet.address, 'rGcqB7ciEfDQpz9znXZSYXgEozqB5Xxhm')
+    })
+    it('bitcoin', async () => {
+      const controller = new WalletController(config)
+      const wallet = await controller.generateWalletFromPrivateKey({
+        protocol: Protocol.BITCOIN,
+        privateKey: '351dafbabc1e7211e44c744cab1ea0ef6ee621be6f0be363c275ed1d8f3a7772'
+      })
+      assert.strictEqual(wallet.address, 'n1vrMMcNaAig5fgdfdtC5DUu2G4NRodHpi')
+    })
+    it('ethereum', async () => {
+      const controller = new WalletController(config)
+      const wallet = await controller.generateWalletFromPrivateKey({
+        protocol: Protocol.ETHEREUM,
+        privateKey: '351dafbabc1e7211e44c744cab1ea0ef6ee621be6f0be363c275ed1d8f3a7772'
+      })
+      assert.strictEqual(wallet.address, '0x481B542b7419D8Ba305B5cc5029C12d5a68B4f69')
+    })
+    it('celo', async () => {
+      const controller = new WalletController(config)
+      const wallet = await controller.generateWalletFromPrivateKey({
+        protocol: Protocol.CELO,
+        privateKey: '121498c189793c9f7f2beae35d681a797eb22484760701e0de5d5c9904499618'
+      })
+      assert.strictEqual(wallet.address, '0x8C33DB44a78629cF60C88383d436EEc356884625')
+    })
+    it('binancechain', async () => {
+      const controller = new WalletController(config)
+      const wallet = await controller.generateWalletFromPrivateKey({
+        protocol: Protocol.BINANCECHAIN,
+        privateKey: '6e615aa358a7b7ab0e226e6ce436709bf00d7a6050f1337639c4fc1e35167393'
+      })
+      assert.strictEqual(wallet.address, 'tbnb1ggckn09nkn2kvl28aaksrj7ze5esfx58fsvfep')
     })
   })
 

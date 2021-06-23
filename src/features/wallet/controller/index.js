@@ -11,6 +11,13 @@ const {
   deriveCeloWallet,
   deriveRippleWallet,
   deriveStellarWallet,
+  getBinancechainAddressFromPrivateKey,
+  getBitcoinAddressFromPrivateKey,
+  getBscAddressFromPrivateKey,
+  getEthereumAddressFromPrivateKey,
+  getCeloAddressFromPrivateKey,
+  getStellarPublicKeyFromPrivateKey,
+  getRippleAddressFromPrivateKey,
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
 
@@ -36,6 +43,36 @@ class Controller extends Interface {
       default:
         throw new Error('Unsupported blockchain protocol')
     }
+  }
+
+  async generateWalletFromPrivateKey({ privateKey, protocol, testnet = true }) {
+    let walletData = { address: null, publicKey: null, privateKey, protocol, testnet }
+    switch (protocol) {
+      case Protocol.BINANCECHAIN:
+        walletData.address = getBinancechainAddressFromPrivateKey(privateKey, testnet)
+        break
+      case Protocol.BITCOIN:
+        walletData.address = getBitcoinAddressFromPrivateKey(privateKey, testnet)
+        break
+      case Protocol.BSC:
+        walletData.address = getBscAddressFromPrivateKey(privateKey)
+        break
+      case Protocol.ETHEREUM:
+        walletData.address = getEthereumAddressFromPrivateKey(privateKey)
+        break
+      case Protocol.CELO:
+        walletData.address = getCeloAddressFromPrivateKey(privateKey)
+        break
+      case Protocol.STELLAR:
+        walletData.publicKey = getStellarPublicKeyFromPrivateKey(privateKey)
+        break
+      case Protocol.RIPPLE:
+        walletData.address = getRippleAddressFromPrivateKey(privateKey)
+        break
+      default:
+        throw new Error('Unsupported blockchain protocol')
+    }
+    return new Wallet(walletData)
   }
 
   async generateBitcoinWallet(mnemonic, testnet) {
