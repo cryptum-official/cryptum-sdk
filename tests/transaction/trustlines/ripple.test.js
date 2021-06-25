@@ -20,8 +20,8 @@ describe.only('Ripple trustline transactions', () => {
       .get(`/wallet/${wallets.ripple.address}/info`)
       .query({ protocol: Protocol.RIPPLE })
       .reply(200, {
-        account_data: { Sequence: 6259566 },
-        ledger_current_index: 1,
+        sequence: 6259566,
+        ledgerCurrentIndex: 1,
       })
       .persist()
   })

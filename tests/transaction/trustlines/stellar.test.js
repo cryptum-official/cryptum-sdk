@@ -23,14 +23,6 @@ describe.only('Stellar trustline transactions', () => {
         sequence: '6259566941569025',
       })
       .persist()
-    nock(baseUrl)
-      .get(`/wallet/${wallets.ripple.address}/info`)
-      .query({ protocol: Protocol.RIPPLE })
-      .reply(200, {
-        account_data: { Sequence: 6259566 },
-        ledger_current_index: 1,
-      })
-      .persist()
   })
   after(() => {
     nock.isDone()

@@ -13,6 +13,10 @@ const Protocol = {
 }
 module.exports.Protocol = Protocol
 
+module.exports.CELO_CONTRACT_ADDRESS = {
+  testnet: '0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9',
+  mainnet: '0xA87710B8DC870483a2bE526EBca9F5048720eDce',
+}
 module.exports.CUSD_CONTRACT_ADDRESS = {
   testnet: '0x874069fa1eb16d44d622f2e0ca25eea172369bc1',
   mainnet: '0x765de816845861e75a25fca122bb6898b8b1282a',

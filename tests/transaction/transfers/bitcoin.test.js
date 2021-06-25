@@ -7,6 +7,7 @@ const AxiosApi = require('../../../axios')
 const TransactionController = require('../../../src/features/transaction/controller')
 const { Protocol } = require('../../../src/services/blockchain/constants')
 const { getWallets, config } = require('../../wallet/constants')
+const { TransactionType } = require('../../../src/features/transaction/entity')
 const txController = new TransactionController(config)
 const axiosApi = new AxiosApi(config)
 const baseUrl = axiosApi.getBaseUrl(config.enviroment)
@@ -18,7 +19,7 @@ describe.only('Bitcoin transfer transactions', () => {
 
     nock(baseUrl)
       .post(`/fee?protocol=${Protocol.BITCOIN}`, {
-        type: 'transfer',
+        type: TransactionType.TRANSFER,
       })
       .reply(200, {
         estimateValue: '80',

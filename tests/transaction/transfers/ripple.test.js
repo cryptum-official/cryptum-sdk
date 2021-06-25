@@ -7,6 +7,7 @@ const AxiosApi = require('../../../axios')
 const TransactionController = require('../../../src/features/transaction/controller')
 const { Protocol } = require('../../../src/services/blockchain/constants')
 const { getWallets, config } = require('../../wallet/constants')
+const { TransactionType } = require('../../../src/features/transaction/entity')
 const txController = new TransactionController(config)
 const axiosApi = new AxiosApi(config)
 const baseUrl = axiosApi.getBaseUrl(config.enviroment)
@@ -20,12 +21,12 @@ describe.only('Ripple transfer transactions', () => {
       .get(`/wallet/${wallets.ripple.address}/info`)
       .query({ protocol: Protocol.RIPPLE })
       .reply(200, {
-        account_data: { Sequence: 18377273 },
-        ledger_current_index: 18448832,
+        sequence: 18377273,
+        ledgerCurrentIndex: 18448832,
       })
       .persist()
     nock(baseUrl)
-      .post(`/fee?protocol=${Protocol.RIPPLE}`, { type: 'transfer' })
+      .post(`/fee?protocol=${Protocol.RIPPLE}`, { type: TransactionType.TRANSFER })
       .reply(200, {
         estimateValue: '10',
         unit: 'drop'

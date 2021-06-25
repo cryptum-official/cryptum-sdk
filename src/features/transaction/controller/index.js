@@ -2,7 +2,7 @@ const { handleRequestError, getApiMethod, mountHeaders } = require('../../../ser
 const requests = require('./requests.json')
 const Interface = require('./interface')
 const { Protocol } = require('../../../services/blockchain/constants')
-const { getTokenAddress } = require('../../../services/blockchain/utils')
+const { getTokenAddress, toWei } = require('../../../services/blockchain/utils')
 const {
   buildStellarTrustlineTransaction,
   buildRippleTrustlineTransaction,
@@ -127,7 +127,7 @@ class Controller extends Interface {
     let networkFee = fee
     if (!networkFee) {
       const { estimateValue } = await this.getFee({
-        type: 'transfer',
+        type: TransactionType.CHANGE_TRUST,
         protocol,
       })
       networkFee = estimateValue
@@ -157,7 +157,7 @@ class Controller extends Interface {
     let networkFee = fee
     if (!networkFee) {
       const { estimateValue } = await this.getFee({
-        type: 'transfer',
+        type: TransactionType.CHANGE_TRUST,
         protocol,
       })
       networkFee = estimateValue
@@ -171,8 +171,8 @@ class Controller extends Interface {
       limit,
       memo,
       fee: networkFee,
-      sequence: info.account_data.Sequence,
-      maxLedgerVersion: info.ledger_current_index + 10,
+      sequence: info.sequence,
+      maxLedgerVersion: info.ledgerCurrentIndex + 10,
       testnet: testnet !== undefined ? testnet : wallet.testnet,
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.CHANGE_TRUST })
@@ -188,7 +188,7 @@ class Controller extends Interface {
     let networkFee = fee
     if (!networkFee) {
       const { estimateValue } = await this.getFee({
-        type: 'transfer',
+        type: TransactionType.TRANSFER,
         protocol,
       })
       networkFee = estimateValue
@@ -219,7 +219,7 @@ class Controller extends Interface {
     let networkFee = fee
     if (!networkFee) {
       const { estimateValue } = await this.getFee({
-        type: 'transfer',
+        type: TransactionType.TRANSFER,
         protocol,
       })
       networkFee = estimateValue
@@ -233,15 +233,15 @@ class Controller extends Interface {
       destination,
       memo,
       fee: networkFee,
-      sequence: info.account_data.Sequence,
-      maxLedgerVersion: info.ledger_current_index + 10,
+      sequence: info.sequence,
+      maxLedgerVersion: info.ledgerCurrentIndex + 10,
       testnet: testnet !== undefined ? testnet : wallet.testnet,
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
 
   async createCeloTransferTransaction(input) {
-    const {
+    let {
       wallet,
       tokenSymbol,
       amount,
@@ -254,14 +254,29 @@ class Controller extends Interface {
       feeCurrencyContractAddress,
     } = input
     const protocol = Protocol.CELO
-    const method = memo ? 'transferWithComment' : 'transfer'
-    const amountWei = new BigNumber(amount).times('1e18').toString()
-    const params = memo ? [destination, amountWei, memo] : [destination, amountWei]
+    let type, method, params, value
+    const amountWei = toWei(amount).toString()
+    if (tokenSymbol === 'CELO') {
+      type = memo ? TransactionType.CALL_CONTRACT_METHOD : TransactionType.TRANSFER
+      method = memo ? 'transferWithComment' : null
+      params = memo ? [destination, amountWei, memo] : null
+      value = memo ? null : amount
+      contractAddress = memo ? getTokenAddress(Protocol.CELO, tokenSymbol, testnet) : null
+    } else {
+      type = TransactionType.CALL_CONTRACT_METHOD
+      method = memo ? 'transferWithComment' : 'transfer'
+      params = memo ? [destination, amountWei, memo] : [destination, amountWei]
+
+      if (['cUSD', 'cEUR'].includes(tokenSymbol)) {
+        contractAddress = getTokenAddress(Protocol.CELO, tokenSymbol, testnet)
+      }
+    }
+
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
-      type: 'transfer',
+      type,
       destination,
-      amount,
+      amount: value,
       contractAddress,
       method,
       params,
@@ -289,12 +304,12 @@ class Controller extends Interface {
     const protocol = Protocol.ETHEREUM
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
-      type: 'transfer',
+      type: tokenSymbol === 'ETH' ? TransactionType.TRANSFER : TransactionType.CALL_CONTRACT_METHOD,
       destination,
-      amount,
+      amount: tokenSymbol === 'ETH' ? amount : null,
       contractAddress,
-      method: 'transfer',
-      params: [destination, new BigNumber(amount).times('1e18').toString()],
+      method: tokenSymbol === 'ETH' ? null : 'transfer',
+      params: tokenSymbol === 'ETH' ? null : [destination, toWei(amount).toString()],
       testnet,
       fee,
       protocol,
@@ -317,12 +332,12 @@ class Controller extends Interface {
     const protocol = Protocol.BSC
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
-      type: 'transfer',
+      type: tokenSymbol === 'BNB' ? TransactionType.TRANSFER : TransactionType.CALL_CONTRACT_METHOD,
       destination,
-      amount,
+      amount: tokenSymbol === 'BNB' ? amount : null,
       contractAddress,
-      method: 'transfer',
-      params: [destination, new BigNumber(amount).times('1e18').toString()],
+      method: tokenSymbol === 'BNB' ? null : 'transfer',
+      params: tokenSymbol === 'BNB' ? null : [destination, toWei(amount).toString()],
       testnet,
       fee,
       protocol,
@@ -352,7 +367,7 @@ class Controller extends Interface {
     let networkFee = fee
     if (!networkFee) {
       ;({ estimateValue: networkFee } = await this.getFee({
-        type: 'transfer',
+        type: TransactionType.TRANSFER,
         protocol,
       }))
     }
@@ -402,7 +417,7 @@ class Controller extends Interface {
         amount,
         method,
         params,
-        contractAddress: contractAddress || getTokenAddress(protocol, tokenSymbol, testnet),
+        contractAddress,
         protocol,
       })
     }
