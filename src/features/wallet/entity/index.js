@@ -1,8 +1,8 @@
-const { Protocol } = require('../../../services/blockchain/constants')
 
 class Wallet {
   /**
    * Constructor
+   *
    * @param {object} args
    * @param {string} args.mnemonic Wallet mnemonic seed
    * @param {string} args.privateKey Wallet private key

@@ -3,6 +3,10 @@ const bitcoin = require('bitcoinjs-lib')
 const { GenericException } = require('../../../errors')
 const { toSatoshi } = require('./utils')
 
+/**
+ * @param numInputs
+ * @param numOutputs
+ */
 function calculateTransactionSize(numInputs, numOutputs) {
   return numInputs * 148 + numOutputs * 34 + 10
 }

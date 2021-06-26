@@ -2,6 +2,7 @@ const { Protocol } = require('../../../services/blockchain/constants')
 const { Wallet } = require('../../wallet/entity')
 /**
  * Transaction type
+ *
  * @enum {string}
  */
 const TransactionType = {
@@ -14,6 +15,7 @@ const TransactionType = {
 class SignedTransaction {
   /**
    * Creates an instance of SignedTransaction
+   *
    * @param {object} signedTxArgs
    * @param {string} signedTxArgs.signedTx signed transaction data
    * @param {Protocol} signedTxArgs.protocol blockchain protocol
@@ -28,6 +30,7 @@ class SignedTransaction {
 class TransactionResponse {
   /**
    * Creates an instance of TransactionResponse
+   *
    * @param {object} response
    * @param {string} response.hash transaction hash
    */
@@ -44,7 +47,11 @@ class FeeResponse {
     this.chainId = chainId
   }
 }
-
+class SmartContractCallResponse {
+  constructor({ result  }) {
+    this.result = result
+  }
+}
 class UTXO {
   constructor({ value, txHash, index, height }) {
     this.value = value
@@ -62,6 +69,7 @@ class Output {
 class TrustlineTransactionInput {
   /**
    * Creates an instance of TrustlineTransactionInput.
+   *
    * @param {object} args
    * @param {Wallet} args.wallet
    * @param {string} args.assetSymbol
@@ -95,6 +103,7 @@ class RippleTrustlineTransactionInput extends TrustlineTransactionInput {
 class TransferTransactionInput {
   /**
    * Creates an instance of TransferTransactionInput.
+   *
    * @param {object} args
    * @param {Wallet} args.wallet
    * @param {string} args.amount
@@ -115,6 +124,7 @@ class TransferTransactionInput {
 class StellarTransferTransactionInput extends TransferTransactionInput {
   /**
    * Creates an instance of StellarTransferTransactionInput.
+   *
    * @param {object} args
    * @param {Wallet} args.wallet
    * @param {string} args.assetSymbol
@@ -134,6 +144,7 @@ class StellarTransferTransactionInput extends TransferTransactionInput {
 class RippleTransferTransactionInput extends TransferTransactionInput {
   /**
    * Creates an instance of CeloTransferTransactionInput.
+   *
    * @param {object} args
    * @param {Wallet} args.wallet
    * @param {string} args.assetSymbol
@@ -151,6 +162,7 @@ class RippleTransferTransactionInput extends TransferTransactionInput {
 class EthereumTransferTransactionInput extends TransferTransactionInput {
   /**
    * Creates an instance of EthereumTransferTransactionInput.
+   *
    * @param {object} args
    * @param {Wallet} args.wallet
    * @param {string} args.tokenSymbol
@@ -169,9 +181,33 @@ class EthereumTransferTransactionInput extends TransferTransactionInput {
     this.contractAddress = contractAddress
   }
 }
+class SmartContractCallTransactionInput {
+  /**
+   * Creates an instance of SmartContractCallTransactionInput.
+   *
+   * @param {object} args
+   * @param {Wallet} args.wallet
+   * @param {string} args.contractAddress
+   * @param {string} args.method
+   * @param {Array} args.params
+   * @param {object?} args.fee
+   * @param {number?} args.fee.gas
+   * @param {string?} args.fee.gasPrice
+   * @param {boolean} args.testnet
+   */
+  constructor({ wallet, contractAddress, method, params, fee, testnet }) {
+    this.wallet = wallet
+    this.contractAddress = contractAddress
+    this.method = method
+    this.params = params
+    this.fee = fee
+    this.testnet = testnet
+  }
+}
 class CeloTransferTransactionInput extends EthereumTransferTransactionInput {
   /**
    * Creates an instance of CeloTransferTransactionInput.
+   *
    * @param {object} args
    * @param {Wallet} args.wallet
    * @param {string} args.tokenSymbol
@@ -195,6 +231,7 @@ class CeloTransferTransactionInput extends EthereumTransferTransactionInput {
 class BitcoinTransferTransactionInput extends TransferTransactionInput {
   /**
    * Creates an instance of BitcoinTransferTransactionInput.
+   *
    * @param {object} args
    * @param {Wallet?} args.wallet wallet to transfer from
    * @param {Array<UTXO>} args.fromUTXOs inputs from UTXOs to transfer from
@@ -222,4 +259,6 @@ module.exports = {
   StellarTransferTransactionInput,
   RippleTransferTransactionInput,
   BitcoinTransferTransactionInput,
+  SmartContractCallTransactionInput,
+  SmartContractCallResponse
 }

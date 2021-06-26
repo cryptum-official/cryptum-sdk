@@ -1,26 +1,50 @@
+/* eslint-disable no-unused-vars */
 const { handleRequestError, getApiMethod, mountHeaders } = require('../../../services')
 const requests = require('./requests.json')
 const Interface = require('./interface')
 const { Protocol } = require('../../../services/blockchain/constants')
 const { getTokenAddress, toWei } = require('../../../services/blockchain/utils')
 const {
-  buildStellarTrustlineTransaction,
-  buildRippleTrustlineTransaction,
-} = require('../../../services/blockchain/trustline')
+  FeeResponse,
+  TransactionResponse,
+  SignedTransaction,
+  UTXO,
+  TransactionType,
+  StellarTrustlineTransactionInput,
+  RippleTransferTransactionInput,
+  StellarTransferTransactionInput,
+  CeloTransferTransactionInput,
+  EthereumTransferTransactionInput,
+  BitcoinTransferTransactionInput,
+  UTXOResponse,
+  SmartContractCallTransactionInput,
+} = require('../entity')
 const {
   buildStellarTransferTransaction,
+  buildStellarTrustlineTransaction,
+} = require('../../../services/blockchain/stellar')
+const {
   buildRippleTransferTransaction,
+  buildRippleTrustlineTransaction,
+} = require('../../../services/blockchain/ripple')
+const {
+  buildBscTransferTransaction,
   buildCeloTransferTransaction,
   buildEthereumTransferTransaction,
-  buildBscTransferTransaction,
-} = require('../../../services/blockchain/transfer')
-const { FeeResponse, TransactionResponse, SignedTransaction, UTXO, TransactionType } = require('../entity')
-const WalletController = require('../../wallet/controller')
-const BigNumber = require('bignumber.js')
+  buildSmartContractTransaction,
+} = require('../../../services/blockchain/ethereum')
 const { buildBitcoinTransferTransaction } = require('../../../services/blockchain/bitcoin')
+const WalletController = require('../../wallet/controller')
 const { validateBitcoinTransferTransactionParams, validateSignedTransaction } = require('../../../services/validation')
 
 class Controller extends Interface {
+  /**
+   * Method to send an transaction to Cryptum
+   *
+   * @param {SignedTransaction} transaction object with all transaction data
+   * @param {Protocol} transaction.protocol
+   * @returns {Promise<TransactionResponse>}
+   */
   async sendTransaction(transaction) {
     try {
       validateSignedTransaction(transaction)
@@ -30,9 +54,7 @@ class Controller extends Interface {
         config: this.config,
       })
       const headers = mountHeaders(this.config.apiKey)
-
       const { protocol, signedTx, type } = transaction
-
       const response = await apiRequest(
         requests.sendTransaction.url,
         { signedTx, type },
@@ -41,13 +63,25 @@ class Controller extends Interface {
           params: { protocol },
         }
       )
-
       return new TransactionResponse(response.data)
     } catch (error) {
       handleRequestError(error)
     }
   }
-
+  /**
+   * Method to get fee info
+   *
+   * @param {object} input
+   * @param {string} input.type
+   * @param {string?} input.from
+   * @param {string?} input.destination
+   * @param {string?} input.assetSymbol
+   * @param {string?} input.contractAddress
+   * @param {string?} input.method
+   * @param {Array?} input.params
+   * @param {Protocol} input.protocol
+   * @param input.amount
+   */
   async getFee({
     type = null,
     from = null,
@@ -76,12 +110,19 @@ class Controller extends Interface {
       const response = await apiRequest(`${requests.getFee.url}?protocol=${protocol}`, data, {
         headers,
       })
-
       return new FeeResponse(response.data)
     } catch (error) {
       handleRequestError(error)
     }
   }
+  /**
+   * Get UTXOs from address
+   *
+   * @param {object} input
+   * @param {string} input.address
+   * @param {Protocol} input.protocol
+   * @returns {Array<UTXOResponse>}
+   */
   async getUTXOs({ address, protocol }) {
     try {
       const apiRequest = getApiMethod({
@@ -93,12 +134,18 @@ class Controller extends Interface {
       const response = await apiRequest(`${requests.getUTXOs.url}/${address}?protocol=${protocol}`, {
         headers,
       })
-
       return Array.isArray(response.data) && response.data.map((utxo) => new UTXO(utxo))
     } catch (error) {
       handleRequestError(error)
     }
   }
+  /**
+   * Get transaction by hash (tx id)
+   *
+   * @param {object} input
+   * @param {string} input.hash transaction hash
+   * @param {Protocol} input.protocol blockchain protocol
+   */
   async getTransactionByHash({ hash, protocol }) {
     try {
       const apiRequest = getApiMethod({
@@ -110,13 +157,17 @@ class Controller extends Interface {
       const response = await apiRequest(`${requests.getTransactionByHash.url}/${hash}?protocol=${protocol}`, {
         headers,
       })
-
       return response.data
     } catch (error) {
       handleRequestError(error)
     }
   }
-
+  /**
+   * Create stellar trustline transaction
+   *
+   * @param {StellarTrustlineTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
   async createStellarTrustlineTransaction(input) {
     const { wallet, assetSymbol, issuer, fee, limit, memo, testnet } = input
     const protocol = Protocol.STELLAR
@@ -132,7 +183,6 @@ class Controller extends Interface {
       })
       networkFee = estimateValue
     }
-
     const signedTx = await buildStellarTrustlineTransaction({
       fromPublicKey: wallet.publicKey,
       fromPrivateKey: wallet.privateKey,
@@ -146,7 +196,12 @@ class Controller extends Interface {
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.CHANGE_TRUST })
   }
-
+  /**
+   * Create ripple trustline transaction
+   *
+   * @param {RippleTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
   async createRippleTrustlineTransaction(input) {
     const { wallet, assetSymbol, issuer, fee, limit, memo, testnet } = input
     const protocol = Protocol.RIPPLE
@@ -162,7 +217,6 @@ class Controller extends Interface {
       })
       networkFee = estimateValue
     }
-
     const signedTx = await buildRippleTrustlineTransaction({
       fromAddress: wallet.address,
       fromPrivateKey: wallet.privateKey,
@@ -177,7 +231,12 @@ class Controller extends Interface {
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.CHANGE_TRUST })
   }
-
+  /**
+   * Create stellar transfer transaction
+   *
+   * @param {StellarTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
   async createStellarTransferTransaction(input) {
     const { wallet, assetSymbol, issuer, amount, destination, memo, fee, testnet, startingBalance } = input
     const protocol = Protocol.STELLAR
@@ -208,7 +267,12 @@ class Controller extends Interface {
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
-
+  /**
+   * Create ripple transfer transaction
+   *
+   * @param {RippleTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
   async createRippleTransferTransaction(input) {
     const { wallet, assetSymbol, issuer, amount, destination, memo, fee, testnet } = input
     const protocol = Protocol.RIPPLE
@@ -239,7 +303,12 @@ class Controller extends Interface {
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
-
+  /**
+   * Create celo transfer transaction
+   *
+   * @param {CeloTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
   async createCeloTransferTransaction(input) {
     let {
       wallet,
@@ -271,7 +340,6 @@ class Controller extends Interface {
         contractAddress = getTokenAddress(Protocol.CELO, tokenSymbol, testnet)
       }
     }
-
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
       type,
@@ -299,6 +367,12 @@ class Controller extends Interface {
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
+  /**
+   * Create ethereum transfer transaction
+   *
+   * @param {EthereumTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
   async createEthereumTransferTransaction(input) {
     const { wallet, tokenSymbol, amount, destination, fee, testnet, contractAddress } = input
     const protocol = Protocol.ETHEREUM
@@ -326,7 +400,12 @@ class Controller extends Interface {
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
-
+  /**
+   * Create bsc transfer transaction
+   *
+   * @param {EthereumTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
   async createBscTransferTransaction(input) {
     const { wallet, tokenSymbol, amount, destination, fee, testnet, contractAddress } = input
     const protocol = Protocol.BSC
@@ -354,7 +433,12 @@ class Controller extends Interface {
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
-
+  /**
+   * Create bitcoin transfer transaction
+   *
+   * @param {BitcoinTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
   async createBitcoinTransferTransaction(input) {
     let { wallet, fromUTXOs, fromPrivateKeys, outputs, fee, testnet } = input
     validateBitcoinTransferTransactionParams(input)
@@ -363,10 +447,9 @@ class Controller extends Interface {
       fromUTXOs = await this.getUTXOs({ address: wallet.address, protocol })
       fromPrivateKeys = fromUTXOs.map(() => wallet.privateKey)
     }
-
     let networkFee = fee
     if (!networkFee) {
-      ;({ estimateValue: networkFee } = await this.getFee({
+      ({ estimateValue: networkFee } = await this.getFee({
         type: TransactionType.TRANSFER,
         protocol,
       }))
@@ -389,17 +472,44 @@ class Controller extends Interface {
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
+  /**
+   * Create call transaction to smart contract
+   *
+   * @param {SmartContractCallTransactionInput} input
+   * @returns {Promise<SmartContractCallResponse | TransactionResponse>}
+   */
+  async createSmartContractTransaction(input) {
+    const { wallet, fee, testnet, contractAddress, method, params, protocol } = input
+    const { info, networkFee } = await this._getFeeInfo({
+      wallet,
+      type: TransactionType.CALL_CONTRACT_METHOD,
+      contractAddress,
+      method,
+      params,
+      testnet,
+      fee,
+      protocol,
+    })
+    const signedTx = await buildSmartContractTransaction({
+      fromPrivateKey: wallet.privateKey,
+      nonce: info.nonce,
+      contractAddress,
+      method,
+      params,
+      fee: networkFee,
+      testnet: testnet !== undefined ? testnet : wallet.testnet,
+    })
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.CALL_CONTRACT_METHOD })
+  }
 
   async _getFeeInfo({
     wallet,
     type,
     destination,
     amount,
-    tokenSymbol,
     contractAddress,
     method,
     params,
-    testnet,
     fee,
     protocol,
   }) {
@@ -407,7 +517,6 @@ class Controller extends Interface {
       address: wallet.address,
       protocol,
     })
-
     let networkFee = { gas: 0, gasPrice: '0', chainId: '' }
     if (!fee || !fee.gas || !fee.gasPrice) {
       networkFee = await this.getFee({

@@ -5,7 +5,7 @@ class AxiosApi {
   /**
    * Constructor to initialize configs
    *
-   * @param {Object} config an object with this data: { enviroment: 'development'/'production' }
+   * @param {object} config an object with this data: { enviroment: 'development'/'production' }
    */
   constructor(config) {
     this.config = config
@@ -14,7 +14,7 @@ class AxiosApi {
   /**
    * Method to get baseUrl to new axios instance
    *
-   * @param {String} enviroment text with development or production to select specific url to test
+   * @param {string} enviroment text with development or production to select specific url to test
    * @returns an text with base url to instance an new axios
    */
   getBaseUrl(enviroment) {

@@ -1,5 +1,6 @@
 /**
  * Blockchain protocols
+ *
  * @enum {string}
  */
 const Protocol = {

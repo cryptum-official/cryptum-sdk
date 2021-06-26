@@ -7,6 +7,11 @@ const {
 } = require('../../../../errors')
 
 class Controller extends Interface {
+  /**
+   * Async method to retrieve prices of the given asset
+   *
+   * @param {string} asset string with the symbol of the asset
+   */
   async getPrices(asset) {
     if (!asset || typeof asset !== 'string') {
       throw new InvalidTypeException('asset', 'string');
