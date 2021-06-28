@@ -3,9 +3,15 @@ const WalletController = require('./src/features/wallet/controller')
 const PricesController = require('./src/features/prices/controller')
 const TransactionController = require('./src/features/transaction/controller')
 /**
+ * @typedef {object} AzureConfig
+ * @property {string} keyVaultUrl
+ * @property {string} secretName
+ * @property {string} secretVersion
+ * 
  * @typedef {object} Config
  * @property {string} environment
  * @property {string} apiKey
+ * @property {AzureConfig} azureConfig
  */
 
 class CryptumSDK {
