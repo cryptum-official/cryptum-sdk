@@ -1,15 +1,9 @@
-const { CeloWallet, serializeCeloTransaction } = require('@celo-tools/celo-ethers-wrapper')
 const { Transaction: EthereumTransaction } = require('@ethereumjs/tx')
 const { default: EthereumCommon } = require('@ethereumjs/common')
 const BigNumber = require('bignumber.js')
 const Web3 = require('web3')
-const {
-  CUSD_CONTRACT_ADDRESS,
-  CEUR_CONTRACT_ADDRESS,
-  TRANSFER_METHOD_ABI,
-  TRANSFER_COMMENT_METHOD_ABI,
-  BSC_COMMON_CHAIN,
-} = require('./constants')
+const { TRANSFER_METHOD_ABI, BSC_COMMON_CHAIN, Protocol } = require('./constants')
+const { GenericException } = require('../../../errors')
 
 module.exports.buildEthereumTransferTransaction = async function ({
   fromPrivateKey,
@@ -86,71 +80,42 @@ module.exports.buildBscTransferTransaction = async function ({
   return `0x${signedTx.serialize().toString('hex')}`
 }
 
-module.exports.buildCeloTransferTransaction = async function ({
+module.exports.buildEthereumSmartContractTransaction = async ({
   fromPrivateKey,
   nonce,
-  tokenSymbol,
   contractAddress,
-  amount,
-  destination,
+  contractAbi,
+  method,
+  params,
+  value,
   fee,
-  feeCurrency = null,
-  feeCurrencyContractAddress = null,
-  memo = null,
-  testnet = true,
-}) {
+  testnet,
+  protocol,
+}) => {
   const network = testnet ? 'testnet' : 'mainnet'
   const { gas, gasPrice, chainId } = fee
   const rawTransaction = {
     chainId,
     nonce: Web3.utils.toHex(nonce),
     gasPrice: Web3.utils.toHex(gasPrice),
-    to: '',
-    value: undefined,
+    to: contractAddress,
+    value: Web3.utils.toHex(value),
     data: undefined,
     gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
-    feeCurrency:
-      feeCurrency === 'cUSD'
-        ? CUSD_CONTRACT_ADDRESS[network]
-        : feeCurrency === 'cEUR'
-        ? CEUR_CONTRACT_ADDRESS[network]
-        : feeCurrencyContractAddress,
   }
-  const value = Web3.utils.toWei(amount, 'ether')
-  if (tokenSymbol === 'CELO') {
-    rawTransaction.to = destination
-    rawTransaction.value = Web3.utils.toHex(value)
+  const web3 = new Web3()
+  const contract = new web3.eth.Contract(contractAddress, contractAbi)
+  rawTransaction.data = contract.methods[method](...params).encodeABI()
+
+  let common = null
+  if (protocol === Protocol.ETHEREUM) {
+    common = new EthereumCommon({ chain: chainId })
+  } else if (protocol === Protocol.BSC) {
+    common = EthereumCommon.forCustomChain(BSC_COMMON_CHAIN[network].base, BSC_COMMON_CHAIN[network].chain)
   } else {
-    if (tokenSymbol === 'cUSD') {
-      rawTransaction.to = CUSD_CONTRACT_ADDRESS[network]
-    } else if (tokenSymbol === 'cEUR') {
-      rawTransaction.to = CEUR_CONTRACT_ADDRESS[network]
-    } else {
-      rawTransaction.to = contractAddress
-    }
-
-    const token = new new Web3().eth.Contract(
-      memo ? TRANSFER_COMMENT_METHOD_ABI : TRANSFER_METHOD_ABI,
-      rawTransaction.to
-    )
-    rawTransaction.data = memo
-      ? token.methods.transferWithComment(destination, value, memo).encodeABI()
-      : token.methods.transfer(destination, value).encodeABI()
+    throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
-
-  const celoWallet = new CeloWallet(fromPrivateKey)
-  const signature = celoWallet._signingKey().signDigest(Web3.utils.sha3(serializeCeloTransaction(rawTransaction)))
-  return serializeCeloTransaction(rawTransaction, signature)
-}
-
-module.exports.buildSmartContractTransaction = async ({
-  fromPrivateKey,
-  nonce,
-  contractAddress,
-  method,
-  params,
-  fee,
-  testnet
-}) => {
-  return ''
+  const tx = new EthereumTransaction(rawTransaction, { common })
+  const signedTx = tx.sign(Buffer.from(fromPrivateKey, 'hex'))
+  return `0x${signedTx.serialize().toString('hex')}`
 }
