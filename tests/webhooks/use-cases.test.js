@@ -1,48 +1,8 @@
 const assert = require('assert')
 const WebhookCryptum = require('../../src/features/webhooks/entity')
 const WebhookCryptumUseCase = require('../../src/features/webhooks/use-cases')
-const WebhookCryptumInterface = require('../../src/features/webhooks/use-cases/interface')
 
 describe.only('Test Suite of the Webhook (Use Cases)', function () {
-  it('Check if an Not Implemented Exception in interface (Interface test) : mountWebhookToCreate', async () => {
-    const expectedResult = 'Method not implemented'
-
-    const data = {
-      asset: 'BTC',
-      url: 'https://site.com',
-      event: 'tx-confirmation',
-      address: '0x0c99adab65a55df5faf53ab923f43d9eb9368772',
-      confirmations: '6',
-      protocol: 'BITCOIN',
-    }
-
-    try {
-      const interface = new WebhookCryptumInterface()
-      interface.mountWebhookToCreate(data)
-    } catch (error) {
-      assert.deepStrictEqual(error.message, expectedResult)
-    }
-  })
-
-  it('Check if an Not Implemented Exception in interface (Interface test) : mountWebhook', async () => {
-    const expectedResult = 'Method not implemented'
-
-    const data = {
-      asset: 'BTC',
-      url: 'https://site.com',
-      event: 'tx-confirmation',
-      address: '0x0c99adab65a55df5faf53ab923f43d9eb9368772',
-      confirmations: '6',
-      protocol: 'BITCOIN',
-    }
-
-    try {
-      const interface = new WebhookCryptumInterface()
-      interface.mountWebhook(data)
-    } catch (error) {
-      assert.deepStrictEqual(error.message, expectedResult)
-    }
-  })
 
   it('Check if can mount an Webhook Cryptum to create in Cryptum API (With valid data) : mountWebhookToCreate', async () => {
     const data = {

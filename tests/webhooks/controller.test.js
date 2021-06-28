@@ -3,7 +3,6 @@ const nock = require('nock')
 
 const WebhookCryptum = require('../../src/features/webhooks/entity')
 const WebhookCryptumController = require('../../src/features/webhooks/controller')
-const WebhookCryptumInterface = require('../../src/features/webhooks/controller/interface')
 
 describe.only('Test Suite of the Webhook (Controller)', function () {
   this.beforeAll(() => {
@@ -50,54 +49,6 @@ describe.only('Test Suite of the Webhook (Controller)', function () {
       .reply(200)
   })
 
-  it('Check if an Not Implemented Exception in interface (Interface test) : createWebhook', async () => {
-    const expectedResult = 'Method not implemented'
-
-    const data = {
-      asset: 'BTC',
-      url: 'https://site.com',
-      event: 'tx-confirmation',
-      address: '0x0c99adab65a55df5faf53ab923f43d9eb9368772',
-      confirmations: '6',
-      protocol: 'BITCOIN',
-    }
-
-    try {
-      const interface = new WebhookCryptumInterface()
-      interface.createWebhook(data)
-    } catch (error) {
-      assert.deepStrictEqual(error.message, expectedResult)
-    }
-  })
-
-  it('Check if an Not Implemented Exception in interface (Interface test) : destroyWebhook', async () => {
-    const expectedResult = 'Method not implemented'
-
-    const data = {
-      asset: 'BTC',
-      webhookId: 'ed34b1e3-9689-4976-8277-c8e97768beaa',
-      protocol: 'BITCOIN',
-    }
-
-    try {
-      const interface = new WebhookCryptumInterface()
-      interface.destroyWebhook(data)
-    } catch (error) {
-      assert.deepStrictEqual(error.message, expectedResult)
-    }
-  })
-
-  it('Check if an Not Implemented Exception in interface (Interface test) : getWebhooks', async () => {
-    const expectedResult = 'Method not implemented'
-
-    try {
-      const interface = new WebhookCryptumInterface()
-      interface.getWebhooks('BTC', 'BITCOIN')
-    } catch (error) {
-      assert.deepStrictEqual(error.message, expectedResult)
-    }
-  })
-
   it('Check create an webhook with WebhookCryptum valid : createWebhook', async () => {
     const data = {
       asset: 'BTC',
@@ -115,7 +66,7 @@ describe.only('Test Suite of the Webhook (Controller)', function () {
     })
 
     const controller = new WebhookCryptumController({
-      enviroment: 'development',
+      environment: 'development',
       apiKey: 'apikeyexamplecryptum',
     })
     const result = await controller.createWebhook(webhook)
@@ -131,7 +82,7 @@ describe.only('Test Suite of the Webhook (Controller)', function () {
     }
 
     const controller = new WebhookCryptumController({
-      enviroment: 'development',
+      environment: 'development',
       apiKey: 'apikeyexamplecryptum',
     })
     const result = await controller.destroyWebhook(data)
@@ -150,7 +101,7 @@ describe.only('Test Suite of the Webhook (Controller)', function () {
     ]
 
     const controller = new WebhookCryptumController({
-      enviroment: 'development',
+      environment: 'development',
       apiKey: 'apikeyexamplecryptum',
     })
     const result = await controller.getWebhooks('BTC', 'BITCOIN')

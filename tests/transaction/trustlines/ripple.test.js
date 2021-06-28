@@ -9,7 +9,7 @@ const { Protocol } = require('../../../src/services/blockchain/constants')
 const { getWallets, config } = require('../../wallet/constants')
 const txController = new TransactionController(config)
 const axiosApi = new AxiosApi(config)
-const baseUrl = axiosApi.getBaseUrl(config.enviroment)
+const baseUrl = axiosApi.getBaseUrl(config.environment)
 let wallets = {}
 
 describe.only('Ripple trustline transactions', () => {

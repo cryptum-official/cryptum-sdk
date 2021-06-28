@@ -5,7 +5,7 @@ class AxiosApi {
   /**
    * Constructor to initialize configs
    *
-   * @param {object} config an object with this data: { enviroment: 'development'/'production' }
+   * @param {object} config an object with this data: { environment: 'development'/'production' }
    */
   constructor(config) {
     this.config = config
@@ -14,14 +14,14 @@ class AxiosApi {
   /**
    * Method to get baseUrl to new axios instance
    *
-   * @param {string} enviroment text with development or production to select specific url to test
+   * @param {string} environment text with development or production to select specific url to test
    * @returns an text with base url to instance an new axios
    */
-  getBaseUrl(enviroment) {
-    if (enviroment === 'development') return 'https://api-dev.cryptum.io'
-    if (enviroment === 'production') return 'https://prouction.url.com'
+  getBaseUrl(environment) {
+    if (environment === 'development') return 'https://api-dev.cryptum.io'
+    if (environment === 'production') return 'https://prouction.url.com'
 
-    throw new GenericException('000', 'Invalid enviroment')
+    throw new GenericException('Invalid environment', 'ConfigException')
   }
 
   /**
@@ -32,7 +32,7 @@ class AxiosApi {
   getInstance() {
     if (this.api) return this.api
 
-    const baseURL = this.getBaseUrl(this.config.enviroment)
+    const baseURL = this.getBaseUrl(this.config.environment)
     this.api = axios.create({ baseURL })
     return this.api
   }

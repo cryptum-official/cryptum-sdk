@@ -33,7 +33,7 @@ module.exports.buildBitcoinTransferTransaction = async function ({
   for (let i = 0; i < fromUTXOs.length; ++i) {
     const utxo = fromUTXOs[i]
     if (utxo.height === 0) {
-      throw new GenericException(`UTXO transaction ${utxo.txHash} is still pending`, 'INVALID_PARAM')
+      throw new GenericException(`UTXO transaction ${utxo.txHash} is still pending`, 'InvalidTypeException')
     }
     tx.addInput({
       hash: utxo.txHash,
@@ -53,7 +53,7 @@ module.exports.buildBitcoinTransferTransaction = async function ({
   for (let i = 0; i < fromUTXOs.length; ++i) {
     tx.signInput(i, bitcoin.ECPair.fromPrivateKey(Buffer.from(fromPrivateKeys[i], 'hex'), { network }))
     if (!tx.validateSignaturesOfInput(i)) {
-      throw new GenericException('Signature validation failed of input', 'INVALID_PARAM')
+      throw new GenericException('Signature validation failed of input', 'InvalidTypeException')
     }
   }
 

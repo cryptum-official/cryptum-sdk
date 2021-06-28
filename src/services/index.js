@@ -33,7 +33,7 @@ const handleRequestError = (error) => {
     if (error.response) {
       const message =
         (error.response.data.error && error.response.data.error.message) || 'Service unavailable at the moment'
-      const code = (error.response.data.error && error.response.data.error.code) || 'INTERNAL_ERROR'
+      const code = (error.response.data.error && error.response.data.error.code) || 'InternalError'
       throw new GenericException(message, code)
     }
   }
@@ -47,7 +47,7 @@ const handleRequestError = (error) => {
  * @returns an object with x-api-key value
  */
 const mountHeaders = (apiKeyCryptum) => {
-  if (!apiKeyCryptum) throw new GenericException('0001', 'Required apiKeyCryptum')
+  if (!apiKeyCryptum) throw new GenericException('Required API Key', 'ConfigException')
 
   return { 'x-api-key': apiKeyCryptum }
 }

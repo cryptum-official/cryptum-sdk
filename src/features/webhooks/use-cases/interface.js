@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const { NotImplementedException } = require('../../../../errors')
 
 class Interface {

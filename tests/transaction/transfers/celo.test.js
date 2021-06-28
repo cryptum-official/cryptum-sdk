@@ -10,7 +10,7 @@ const { getWallets, config } = require('../../wallet/constants')
 const { TransactionType } = require('../../../src/features/transaction/entity')
 const txController = new TransactionController(config)
 const axiosApi = new AxiosApi(config)
-const baseUrl = axiosApi.getBaseUrl(config.enviroment)
+const baseUrl = axiosApi.getBaseUrl(config.environment)
 let wallets = {}
 
 describe.only('Celo transfer transactions', () => {

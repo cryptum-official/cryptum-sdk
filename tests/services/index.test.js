@@ -57,7 +57,7 @@ describe.only('Test Suite of the Services (All project)', function () {
       },
       key: 'auth',
       config: {
-        enviroment: 'development',
+        environment: 'development',
       },
     })
     const result = await post('/samplePOST', { test: 'post' })
@@ -76,7 +76,7 @@ describe.only('Test Suite of the Services (All project)', function () {
       },
       key: 'auth',
       config: {
-        enviroment: 'development',
+        environment: 'development',
       },
     })
     const result = await post('/samplePUT', { test: 'put' })
@@ -95,7 +95,7 @@ describe.only('Test Suite of the Services (All project)', function () {
       },
       key: 'auth',
       config: {
-        enviroment: 'development',
+        environment: 'development',
       },
     })
     const result = await get('/sampleGET')
@@ -114,7 +114,7 @@ describe.only('Test Suite of the Services (All project)', function () {
       },
       key: 'auth',
       config: {
-        enviroment: 'development',
+        environment: 'development',
       },
     })
     const result = await deleteMethod('/sampleDELETE')

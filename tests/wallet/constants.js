@@ -15,7 +15,7 @@ const wallets = {
 }
 exports.mnemonic = mnemonic
 exports.config = {
-  enviroment: 'development',
+  environment: 'development',
   apiKey: 'apikeyexamplecryptum',
 }
 
