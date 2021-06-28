@@ -29,10 +29,10 @@ class AxiosApi {
    *
    * @returns axios instance
    */
-  getInstance() {
+  getInstance(externalBaseUrl) {
     if (this.api) return this.api
 
-    const baseURL = this.getBaseUrl(this.config.environment)
+    const baseURL = externalBaseUrl || this.getBaseUrl(this.config.environment)
     this.api = axios.create({ baseURL })
     return this.api
   }
