@@ -516,7 +516,7 @@ class Controller extends Interface {
     if (protocol === Protocol.CELO) {
       signedTx = await buildCeloSmartContractTransaction(transactionOptions)
     } else if ([Protocol.ETHEREUM, Protocol.BSC].includes(protocol)) {
-      signedTx = await buildEthereumSmartContractTransaction(transactionOptions)
+      signedTx = await buildEthereumSmartContractTransaction({ ...transactionOptions, protocol })
     } else {
       throw new GenericException('Invalid protocol', 'InvalidTypeException')
     }

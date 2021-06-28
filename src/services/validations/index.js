@@ -1,5 +1,6 @@
 const { GenericException } = require('../../../errors')
 const { TransactionType } = require('../../features/transaction/entity')
+const { Protocol } = require('../blockchain/constants')
 
 module.exports.validateCeloTransferTransactionParams = ({
   wallet,
@@ -54,6 +55,7 @@ module.exports.validateSmartContractTransactionParams = ({
   contractAddress,
   feeCurrency,
   feeCurrencyContractAddress,
+  protocol,
 }) => {
   if (!wallet) {
     throw new GenericException('Invalid wallet', 'InvalidTypeException')
@@ -75,6 +77,9 @@ module.exports.validateSmartContractTransactionParams = ({
   }
   if (feeCurrencyContractAddress && typeof feeCurrencyContractAddress !== 'string') {
     throw new GenericException('Invalid fee currency contract address', 'InvalidTypeException')
+  }
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM].includes(protocol)) {
+    throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
 }
 
