@@ -94,7 +94,7 @@ module.exports.buildCeloSmartContractTransaction = async ({
         : feeCurrencyContractAddress,
   }
   const web3 = new Web3()
-  const contract = new web3.eth.Contract(contractAddress, contractAbi)
+  const contract = new web3.eth.Contract(contractAbi, contractAddress)
   rawTransaction.data = contract.methods[method](...params).encodeABI()
 
   const celoWallet = new CeloWallet(fromPrivateKey)

@@ -30,8 +30,8 @@ module.exports.buildEthereumTransferTransaction = async function ({
     rawTransaction.value = Web3.utils.toHex(value)
   } else {
     rawTransaction.to = contractAddress
-
-    const token = new new Web3().eth.Contract(TRANSFER_METHOD_ABI, rawTransaction.to)
+    const web3 = new Web3()
+    const token = new web3.eth.Contract(TRANSFER_METHOD_ABI, rawTransaction.to)
     rawTransaction.data = token.methods.transfer(destination, value).encodeABI()
   }
   const tx = new EthereumTransaction(rawTransaction, {
@@ -67,8 +67,8 @@ module.exports.buildBscTransferTransaction = async function ({
     rawTransaction.value = Web3.utils.toHex(value)
   } else {
     rawTransaction.to = contractAddress
-
-    const token = new new Web3().eth.Contract(TRANSFER_METHOD_ABI, rawTransaction.to)
+    const web3 = new Web3()
+    const token = new web3.eth.Contract(TRANSFER_METHOD_ABI, rawTransaction.to)
     rawTransaction.data = token.methods.transfer(destination, value).encodeABI()
   }
   const network = testnet ? 'testnet' : 'mainnet'
@@ -104,7 +104,7 @@ module.exports.buildEthereumSmartContractTransaction = async ({
     gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
   }
   const web3 = new Web3()
-  const contract = new web3.eth.Contract(contractAddress, contractAbi)
+  const contract = new web3.eth.Contract(contractAbi, contractAddress)
   rawTransaction.data = contract.methods[method](...params).encodeABI()
 
   let common = null

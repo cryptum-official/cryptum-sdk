@@ -29,13 +29,46 @@ module.exports.validateCeloTransferTransactionParams = ({
     throw new GenericException('Invalid memo', 'InvalidTypeException')
   }
   if (fee && (!fee.gas || !fee.gasPrice)) {
-    throw new GenericException('Invalid fee, it should be an object with gas and gasPrice parameters', 'InvalidTypeException')
+    throw new GenericException(
+      'Invalid fee, it should be an object with gas and gasPrice parameters',
+      'InvalidTypeException'
+    )
   }
-  if (testnet && typeof testnet !== 'boolean') {
+  if (testnet !== undefined && typeof testnet !== 'boolean') {
     throw new GenericException('Invalid testnet', 'InvalidTypeException')
   }
-  if (contractAddress && typeof contractAddress !== 'boolean') {
+  if (contractAddress && typeof contractAddress !== 'string') {
+    throw new GenericException('Invalid contract address', 'InvalidTypeException')
+  }
+  if (feeCurrency && typeof feeCurrency !== 'string') {
+    throw new GenericException('Invalid fee currency', 'InvalidTypeException')
+  }
+  if (feeCurrencyContractAddress && typeof feeCurrencyContractAddress !== 'string') {
+    throw new GenericException('Invalid fee currency contract address', 'InvalidTypeException')
+  }
+}
+module.exports.validateSmartContractTransactionParams = ({
+  wallet,
+  fee,
+  testnet,
+  contractAddress,
+  feeCurrency,
+  feeCurrencyContractAddress,
+}) => {
+  if (!wallet) {
+    throw new GenericException('Invalid wallet', 'InvalidTypeException')
+  }
+  if (fee && (!fee.gas || !fee.gasPrice)) {
+    throw new GenericException(
+      'Invalid fee, it should be an object with gas and gasPrice parameters',
+      'InvalidTypeException'
+    )
+  }
+  if (testnet !== undefined && typeof testnet !== 'boolean') {
     throw new GenericException('Invalid testnet', 'InvalidTypeException')
+  }
+  if (contractAddress && typeof contractAddress !== 'string') {
+    throw new GenericException('Invalid contract address', 'InvalidTypeException')
   }
   if (feeCurrency && typeof feeCurrency !== 'string') {
     throw new GenericException('Invalid fee currency', 'InvalidTypeException')
@@ -47,10 +80,16 @@ module.exports.validateCeloTransferTransactionParams = ({
 
 module.exports.validateBitcoinTransferTransactionParams = ({ wallet, fromUTXOs, outputs }) => {
   if (wallet && fromUTXOs) {
-    throw new GenericException('Parameters wallet and fromUTXOs can not be sent at the same time', 'InvalidTypeException')
+    throw new GenericException(
+      'Parameters wallet and fromUTXOs can not be sent at the same time',
+      'InvalidTypeException'
+    )
   }
   if (!wallet && !fromUTXOs) {
-    throw new GenericException('Parameters wallet and fromUTXOs are null, it should send one only', 'InvalidTypeException')
+    throw new GenericException(
+      'Parameters wallet and fromUTXOs are null, it should send one only',
+      'InvalidTypeException'
+    )
   }
   if (fromUTXOs && (!Array.isArray(fromUTXOs) || !fromUTXOs.length)) {
     throw new GenericException(

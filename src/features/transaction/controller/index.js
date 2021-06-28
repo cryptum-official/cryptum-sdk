@@ -25,6 +25,7 @@ const {
   validateCeloTransferTransactionParams,
   validateBitcoinTransferTransactionParams,
   validateSignedTransaction,
+  validateSmartContractTransactionParams,
 } = require('../../../services/validations')
 
 class Controller extends Interface {
@@ -471,16 +472,28 @@ class Controller extends Interface {
   /**
    * Create call transaction to smart contract
    *
-   * @param {SmartContractCallTransactionInput} input
+   * @param {import('../entity').SmartContractCallTransactionInput} input
    * @returns {Promise<SignedTransaction>}
    */
   async createSmartContractTransaction(input) {
-    const { wallet, fee, testnet, contractAddress, method, params, protocol, feeCurrency, feeCurrencyContractAddress } =
-      input
+    validateSmartContractTransactionParams(input)
+    const {
+      wallet,
+      fee,
+      testnet,
+      contractAddress,
+      contractAbi,
+      method,
+      params,
+      protocol,
+      feeCurrency,
+      feeCurrencyContractAddress,
+    } = input
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
       type: TransactionType.CALL_CONTRACT_METHOD,
       contractAddress,
+      contractAbi,
       method,
       params,
       testnet,
@@ -492,6 +505,7 @@ class Controller extends Interface {
       fromPrivateKey: wallet.privateKey,
       nonce: info.nonce,
       contractAddress,
+      contractAbi,
       method,
       params,
       fee: networkFee,
@@ -509,7 +523,18 @@ class Controller extends Interface {
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.CALL_CONTRACT_METHOD })
   }
 
-  async _getFeeInfo({ wallet, type, destination, amount, contractAddress, contractAbi, method, params, fee, protocol }) {
+  async _getFeeInfo({
+    wallet,
+    type,
+    destination,
+    amount,
+    contractAddress,
+    contractAbi,
+    method,
+    params,
+    fee,
+    protocol,
+  }) {
     const [info, networkFee] = await Promise.all([
       new WalletController(this.config).getWalletInfo({
         address: wallet.address,
