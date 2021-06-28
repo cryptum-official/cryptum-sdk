@@ -1,0 +1,6 @@
+{
+  "getAzureSecret": {
+    "url": "",
+    "method": "GET"
+  }
+}
