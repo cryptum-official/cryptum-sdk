@@ -69,10 +69,8 @@ To configure cryptum-sdk you need only provide an config in format JSON.
 const CryptumSDK = require('cryptum-sdk')
 
 const sdk = new CryptumSDK({
-  config: {
-    enviroment: 'development',
-    apiKey: 'my-secret-api-key',
-  },
+  enviroment: 'development',
+  apiKey: 'my-secret-api-key',
 })
 ```
 
@@ -83,7 +81,6 @@ To see environments available you can see here:
 | production |
 
 <br>
-
 
 ## Contributing
 
