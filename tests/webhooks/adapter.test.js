@@ -3,7 +3,6 @@ const nock = require('nock')
 
 const WebhookCryptum = require('../../src/features/webhooks/entity')
 const WebhookCryptumAdapter = require('../../src/features/webhooks/adapter')
-const WebhookCryptumInterface = require('../../src/features/webhooks/adapter/interface')
 
 describe.only('Test Suite of the Webhook (Adapter)', function () {
   this.beforeAll(() => {
@@ -50,34 +49,6 @@ describe.only('Test Suite of the Webhook (Adapter)', function () {
       .reply(200)
   })
 
-  it('Check if an Not Implemented Exception in interface (Interface test) : destroyWebhook', async () => {
-    const expectedResult = 'Method not implemented'
-
-    const data = {
-      asset: 'BTC',
-      webhookId: 'ed34b1e3-9689-4976-8277-c8e97768beaa',
-      protocol: 'BITCOIN',
-    }
-
-    try {
-      const interface = new WebhookCryptumInterface()
-      interface.destroyWebhook(data)
-    } catch (error) {
-      assert.deepStrictEqual(error.message, expectedResult)
-    }
-  })
-
-  it('Check if an Not Implemented Exception in interface (Interface test) : getWebhooks', async () => {
-    const expectedResult = 'Method not implemented'
-
-    try {
-      const interface = new WebhookCryptumInterface()
-      interface.getWebhooks('BTC', 'BITCOIN')
-    } catch (error) {
-      assert.deepStrictEqual(error.message, expectedResult)
-    }
-  })
-
   it('Check create an webhook with WebhookCryptum valid : createWebhook', async () => {
     const expectedResult = {
       id: '143c07af-cc73-4d46-9e0a-8d96624a082e',
@@ -94,7 +65,7 @@ describe.only('Test Suite of the Webhook (Adapter)', function () {
 
     const webhook = new WebhookCryptum(data)
     const result = await WebhookCryptumAdapter.createWebhook(webhook, {
-      enviroment: 'development',
+      environment: 'development',
       apiKey: 'apikeyexamplecryptum',
     })
     assert.deepStrictEqual(result.data, expectedResult)
@@ -109,7 +80,7 @@ describe.only('Test Suite of the Webhook (Adapter)', function () {
     }
 
     const result = await WebhookCryptumAdapter.destroyWebhook(data, {
-      enviroment: 'development',
+      environment: 'development',
       apiKey: 'apikeyexamplecryptum',
     })
     assert.deepStrictEqual(result.data, expectedResult)
@@ -127,7 +98,7 @@ describe.only('Test Suite of the Webhook (Adapter)', function () {
     ]
 
     const result = await WebhookCryptumAdapter.getWebhooks('BTC', 'BITCOIN', {
-      enviroment: 'development',
+      environment: 'development',
       apiKey: 'apikeyexamplecryptum',
     })
     assert.deepStrictEqual(result.data, expectedResult)

@@ -15,7 +15,6 @@ class WebhookCryptum {
    *
    * @param {*} webhook to validate if is an WebhookCryptum valid, to your webhook are valid.
    * The webhook need are registered in Cryptum and has  { id, event, url, address, confirmations } attributes
-   * 
    * @returns true if is valid and false if not
    */
   static isWebhookCryptum(webhook) {
@@ -41,7 +40,7 @@ class WebhookCryptum {
   /**
    * Method to validate if you can create an Webhook in cryptum
    *
-   * @param {Object} webhook with this attributes: { asset, event: 'tx-confirmation', address, confirmations, protocol: ['BITCOIN' or 'ETHEREUM'] }
+   * @param {object} webhook with this attributes: { asset, event: 'tx-confirmation', address, confirmations, protocol: ['BITCOIN' or 'ETHEREUM'] }
    * @returns
    */
   static canCreate(webhook) {

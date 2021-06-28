@@ -1,5 +1,3 @@
-const { Protocol } = require('../../../services/blockchain/constants')
-const { Wallet } = require('../../wallet/entity')
 /**
  * Transaction type
  * @enum {string}
@@ -10,10 +8,16 @@ const TransactionType = {
   DEPLOY_CONTRACT: 'DEPLOY_CONTRACT',
   CHANGE_TRUST: 'CHANGE_TRUST',
 }
+/**
+ * @typedef {object | string} Fee
+ * @property {number} gas 
+ * @property {string} gasPrice
+ */
 
 class SignedTransaction {
   /**
    * Creates an instance of SignedTransaction
+   *
    * @param {object} signedTxArgs
    * @param {string} signedTxArgs.signedTx signed transaction data
    * @param {Protocol} signedTxArgs.protocol blockchain protocol
@@ -28,6 +32,7 @@ class SignedTransaction {
 class TransactionResponse {
   /**
    * Creates an instance of TransactionResponse
+   *
    * @param {object} response
    * @param {string} response.hash transaction hash
    */
@@ -44,7 +49,11 @@ class FeeResponse {
     this.chainId = chainId
   }
 }
-
+class SmartContractCallResponse {
+  constructor({ result  }) {
+    this.result = result
+  }
+}
 class UTXO {
   constructor({ value, txHash, index, height }) {
     this.value = value
@@ -62,13 +71,14 @@ class Output {
 class TrustlineTransactionInput {
   /**
    * Creates an instance of TrustlineTransactionInput.
+   *
    * @param {object} args
-   * @param {Wallet} args.wallet
+   * @param {import('../../wallet/entity').Wallet} args.wallet
    * @param {string} args.assetSymbol
    * @param {string} args.issuer
    * @param {string?} args.limit
    * @param {string?} args.memo
-   * @param {object|string} args.fee
+   * @param {Fee?} args.fee
    * @param {boolean} args.testnet
    */
   constructor({ wallet, assetSymbol, issuer, limit, memo, fee, testnet }) {
@@ -95,12 +105,13 @@ class RippleTrustlineTransactionInput extends TrustlineTransactionInput {
 class TransferTransactionInput {
   /**
    * Creates an instance of TransferTransactionInput.
+   *
    * @param {object} args
-   * @param {Wallet} args.wallet
+   * @param {import('../../wallet/entity').Wallet} args.wallet
    * @param {string} args.amount
    * @param {string} args.destination
    * @param {string?} args.memo
-   * @param {object|string} args.fee
+   * @param {Fee?} args.fee
    * @param {boolean} args.testnet
    */
   constructor({ wallet, amount, destination, memo, fee, testnet }) {
@@ -115,13 +126,14 @@ class TransferTransactionInput {
 class StellarTransferTransactionInput extends TransferTransactionInput {
   /**
    * Creates an instance of StellarTransferTransactionInput.
+   *
    * @param {object} args
-   * @param {Wallet} args.wallet
+   * @param {import('../../wallet/entity').Wallet} args.wallet
    * @param {string} args.assetSymbol
    * @param {string} args.amount
    * @param {string} args.destination
    * @param {string?} args.memo
-   * @param {string?} args.fee
+   * @param {Fee?} args.fee
    * @param {boolean} args.testnet
    * @param {string?} args.startingBalance
    */
@@ -134,13 +146,14 @@ class StellarTransferTransactionInput extends TransferTransactionInput {
 class RippleTransferTransactionInput extends TransferTransactionInput {
   /**
    * Creates an instance of CeloTransferTransactionInput.
+   *
    * @param {object} args
-   * @param {Wallet} args.wallet
+   * @param {import('../../wallet/entity').Wallet} args.wallet
    * @param {string} args.assetSymbol
    * @param {string} args.amount
    * @param {string} args.destination
    * @param {string?} args.memo
-   * @param {string?} args.fee
+   * @param {Fee?} args.fee
    * @param {boolean} args.testnet
    */
   constructor({ assetSymbol, ...args }) {
@@ -151,15 +164,14 @@ class RippleTransferTransactionInput extends TransferTransactionInput {
 class EthereumTransferTransactionInput extends TransferTransactionInput {
   /**
    * Creates an instance of EthereumTransferTransactionInput.
+   *
    * @param {object} args
-   * @param {Wallet} args.wallet
+   * @param {import('../../wallet/entity').Wallet} args.wallet
    * @param {string} args.tokenSymbol
    * @param {string} args.amount
    * @param {string} args.destination
    * @param {string?} args.memo
-   * @param {object?} args.fee
-   * @param {number?} args.fee.gas
-   * @param {string?} args.fee.gasPrice
+   * @param {Fee?} args.fee
    * @param {boolean} args.testnet
    * @param {string?} args.contractAddress
    */
@@ -169,18 +181,38 @@ class EthereumTransferTransactionInput extends TransferTransactionInput {
     this.contractAddress = contractAddress
   }
 }
+class SmartContractCallTransactionInput {
+  /**
+   * Creates an instance of SmartContractCallTransactionInput.
+   *
+   * @param {object} args
+   * @param {import('../../wallet/entity').Wallet} args.wallet
+   * @param {string} args.contractAddress
+   * @param {string} args.method
+   * @param {Array} args.params
+   * @param {Fee?} args.fee
+   * @param {boolean} args.testnet
+   */
+  constructor({ wallet, contractAddress, method, params, fee, testnet }) {
+    this.wallet = wallet
+    this.contractAddress = contractAddress
+    this.method = method
+    this.params = params
+    this.fee = fee
+    this.testnet = testnet
+  }
+}
 class CeloTransferTransactionInput extends EthereumTransferTransactionInput {
   /**
    * Creates an instance of CeloTransferTransactionInput.
+   *
    * @param {object} args
-   * @param {Wallet} args.wallet
+   * @param {import('../../wallet/entity').Wallet} args.wallet
    * @param {string} args.tokenSymbol
    * @param {string} args.amount
    * @param {string} args.destination
    * @param {string?} args.memo
-   * @param {object?} args.fee
-   * @param {number?} args.fee.gas
-   * @param {string?} args.fee.gasPrice
+   * @param {Fee?} args.fee
    * @param {boolean} args.testnet
    * @param {string?} args.contractAddress
    * @param {string?} args.feeCurrency
@@ -195,16 +227,20 @@ class CeloTransferTransactionInput extends EthereumTransferTransactionInput {
 class BitcoinTransferTransactionInput extends TransferTransactionInput {
   /**
    * Creates an instance of BitcoinTransferTransactionInput.
+   *
    * @param {object} args
-   * @param {Wallet?} args.wallet wallet to transfer from
+   * @param {import('../../wallet/entity').Wallet?} args.wallet wallet to transfer from
    * @param {Array<UTXO>} args.fromUTXOs inputs from UTXOs to transfer from
    * @param {Array<string>} args.fromPrivateKeys input private keys to sign from
    * @param {Array<Output>} args.outputs outputs to transfer to
-   * @param {string?} args.fee fee per byte in satoshi
+   * @param {Fee?} args.fee fee per byte in satoshi
    * @param {boolean} args.testnet
    */
   constructor({ outputs, fromUTXOs, fromPrivateKeys, ...args }) {
     super(args)
+    this.outputs = outputs
+    this.fromPrivateKeys = fromPrivateKeys
+    this.fromUTXOs = fromUTXOs
   }
 }
 
@@ -222,4 +258,6 @@ module.exports = {
   StellarTransferTransactionInput,
   RippleTransferTransactionInput,
   BitcoinTransferTransactionInput,
+  SmartContractCallTransactionInput,
+  SmartContractCallResponse
 }

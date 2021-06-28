@@ -1,22 +1,20 @@
-const ApiKeyController = require('./src/features/api-keys/controller')
 const WebhooksController = require('./src/features/webhooks/controller')
 const WalletController = require('./src/features/wallet/controller')
 const PricesController = require('./src/features/prices/controller')
 const TransactionController = require('./src/features/transaction/controller')
+/**
+ * @typedef {object} Config
+ * @property {string} environment
+ * @property {string} apiKey
+ */
 
 class CryptumSDK {
-  constructor({ config, apiKey }) {
-    this.config = config
-    this.apiKey = apiKey
-  }
-
   /**
-   * Method to get an controller to manipulate a api keys using cryptum.
    *
-   * @returns an ApiKeyController instance class to manipulate
+   * @param {Config} config
    */
-  getApiKeyController() {
-    return new ApiKeyController(this.config)
+  constructor(config) {
+    this.config = config
   }
 
   /**
@@ -25,7 +23,7 @@ class CryptumSDK {
    * @returns an WebhooksController instance class to manipulate
    */
   getWebhooksController() {
-    return new WebhooksController(this.config, this.apiKey)
+    return new WebhooksController(this.config)
   }
 
   /**

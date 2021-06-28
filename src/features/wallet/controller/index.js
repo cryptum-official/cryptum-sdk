@@ -22,6 +22,15 @@ const {
 const { Protocol } = require('../../../services/blockchain/constants')
 
 class Controller extends Interface {
+  /**
+   * Generate new wallet
+   *
+   * @param {object} args
+   * @param {Protocol} args.protocol blockchain protocol to generate the wallet for
+   * @param {boolean?} args.testnet true for testnet and false for mainnet
+   * @param {string?} args.mnemonic mnemonic seed
+   * @returns {Promise<Wallet>}
+   */
   async generateWallet({ protocol, testnet = true, mnemonic = '' }) {
     mnemonic = mnemonic ? mnemonic : generateMnemonic(256)
 
@@ -44,7 +53,16 @@ class Controller extends Interface {
         throw new Error('Unsupported blockchain protocol')
     }
   }
-
+  /**
+   * Generate new wallet from private key
+   *
+   * @param {object} args
+   * @param {string} args.privateKey private key string
+   * @param {Protocol} args.protocol blockchain protocol
+   * @param {boolean} testnet true for testnet and false for mainnet
+   * @param args.testnet
+   * @returns {Promise<Wallet>}
+   */
   async generateWalletFromPrivateKey({ privateKey, protocol, testnet = true }) {
     let walletData = { address: null, publicKey: null, privateKey, protocol, testnet }
     switch (protocol) {
@@ -151,7 +169,14 @@ class Controller extends Interface {
       protocol: Protocol.RIPPLE,
     })
   }
-
+  /**
+   * Get wallet information from blockchain
+   *
+   * @param {object} args
+   * @param {string} args.address wallet address or public key
+   * @param {Protocol} args.protocol blockchain protocol
+   * @returns {Promise<WalletInfoResponse>}
+   */
   async getWalletInfo({ address, protocol }) {
     if (!address || typeof address !== 'string') {
       throw new InvalidTypeException('address', 'string')

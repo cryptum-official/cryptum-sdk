@@ -14,6 +14,7 @@ const CELO_DERIVATION_PATH = "m/44'/52752'/0'/0"
 
 /**
  * Derive path from master seed for HD wallet
+ *
  * @param {Buffer} seed HD wallet seed
  * @param {string} path derivation path
  * @param {object?} versions protocol specific versions
@@ -24,6 +25,7 @@ module.exports.derivePathFromMasterSeed = (seed, path, versions) => {
 }
 /**
  * Build web3 account from private key
+ *
  * @param {string} privateKey private key hex string
  * @returns {object} web3 account object
  */
@@ -33,6 +35,7 @@ module.exports.privateKeyToEthAccount = (privateKey) => {
 }
 /**
  * Get Bitcoin address from private key
+ *
  * @param {string} privateKey private key hex string
  * @param {boolean?} testnet
  * @returns {string} address
@@ -50,6 +53,7 @@ module.exports.getBitcoinAddressFromPrivateKey = (privateKey, testnet = true) =>
 
 /**
  * Derive bitcoin address, private key and public key
+ *
  * @param {string} mnemonic mnemonic seed string
  * @param {boolean} testnet true or false for testnet
  * @returns
@@ -70,6 +74,7 @@ module.exports.deriveBitcoinWallet = async (mnemonic, testnet) => {
 }
 /**
  * Get ethereum address from private key
+ *
  * @param {string} privateKey private key hex string
  * @returns {string} address
  */
@@ -79,6 +84,7 @@ module.exports.getEthereumAddressFromPrivateKey = (privateKey) => {
 }
 /**
  * Derive ethereum address, private key and public key
+ *
  * @param {string} mnemonic mnemonic seed string
  * @param {boolean} testnet true or false for testnet
  * @returns
@@ -103,6 +109,7 @@ module.exports.getCeloAddressFromPrivateKey = (privateKey) => {
 }
 /**
  * Derive celo address, private key and public key
+ *
  * @param {string} mnemonic mnemonic seed string
  * @returns
  */
@@ -117,7 +124,9 @@ module.exports.deriveCeloWallet = async (mnemonic) => {
 }
 /**
  * Get ethereum address from private key
+ *
  * @param {string} privateKey private key hex string
+ * @param testnet
  * @returns {string} address
  */
 module.exports.getBinancechainAddressFromPrivateKey = (privateKey, testnet = true) => {
@@ -125,6 +134,7 @@ module.exports.getBinancechainAddressFromPrivateKey = (privateKey, testnet = tru
 }
 /**
  * Derive binance chain address, private key and public key
+ *
  * @param {string} mnemonic mnemonic seed string
  * @param {boolean} testnet true or false for testnet
  * @returns
@@ -137,6 +147,7 @@ module.exports.deriveBinancechainWallet = (mnemonic, testnet) => {
 }
 /**
  * Derive stellar private key and public key
+ *
  * @param {string} mnemonic mnemonic seed string
  * @returns
  */
@@ -152,6 +163,7 @@ module.exports.getStellarPublicKeyFromPrivateKey = (privateKey) => {
 }
 /**
  * Derive ripple address, private key and public key
+ *
  * @param {string} mnemonic mnemonic seed string
  * @returns
  */

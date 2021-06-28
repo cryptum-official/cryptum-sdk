@@ -2,6 +2,7 @@
 
 - [Create transfer transactions](#create-transfer-transactions)
 - [Create trustline transactions](#create-trustline-transactions)
+- [Create smart contract call transactions](#create-smart-contract-call-transactions)
 - [Send transactions](#send-transactions)
 
 ## Create transfer transactions
@@ -142,6 +143,32 @@ const transaction = await txController.createStellarTrustlineTransaction({
   issuer: 'GDTAUZE6T...3EYISAOAPYIQMVP2JO',
   limit: '100000000',
   memo: 'create-trustline',
+})
+```
+
+## Create smart contract call transactions
+```js
+// for Celo, Ethereum and BSC blockchain
+const transaction = await txController.createSmartContractTransaction({
+  wallet,
+  contractAddress: '0x3f2f3D45196...8f530165eCb93e772',
+  contractAbi: [{
+    constant: false,
+    inputs: [
+      { name: 'param1', type: 'string' },
+      { name: 'param2', type: 'uint256' },
+      { name: 'param3', type: 'uint256' },
+    ],
+    name: 'executeMethodName',
+    outputs: [{ name: '', type: 'bool' }],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  }],
+  method: 'executeMethodName',
+  params: ['param1', 2, 3],
+  protocol: 'CELO', // CELO, ETHEREUM, BSC only
+  testnet: true,
 })
 ```
 
