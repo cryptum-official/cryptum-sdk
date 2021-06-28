@@ -3,7 +3,7 @@ const requests = require('./requests.json')
 const Interface = require('./interface')
 const { Protocol, TRANSFER_METHOD_ABI, TRANSFER_COMMENT_METHOD_ABI } = require('../../../services/blockchain/constants')
 const { getTokenAddress, toWei } = require('../../../services/blockchain/utils')
-const { FeeResponse, TransactionResponse, SignedTransaction, UTXO, TransactionType } = require('../entity')
+const { FeeResponse, TransactionResponse, SignedTransaction, UTXO, TransactionType, SmartContractCallResponse } = require('../entity')
 const {
   buildStellarTransferTransaction,
   buildStellarTrustlineTransaction,
@@ -26,6 +26,7 @@ const {
   validateBitcoinTransferTransactionParams,
   validateSignedTransaction,
   validateSmartContractTransactionParams,
+  validateSmartContractCallParams,
 } = require('../../../services/validations')
 
 class Controller extends Interface {
@@ -521,6 +522,41 @@ class Controller extends Interface {
       throw new GenericException('Invalid protocol', 'InvalidTypeException')
     }
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.CALL_CONTRACT_METHOD })
+  }
+
+  /**
+   * Call a smart contract method
+   * @param {import('../entity').SmartContractCallTransactionInput} input
+   * @returns {Promise<SmartContractCallResponse>}
+   */
+   async callSmartContractMethod(input) {
+    validateSmartContractCallParams(input)
+    const {
+      contractAddress,
+      contractAbi,
+      method,
+      params,
+      protocol,
+    } = input
+    try {
+      const apiRequest = getApiMethod({
+        requests,
+        key: 'callSmartContractMethod',
+        config: this.config,
+      })
+      const headers = mountHeaders(this.config.apiKey)
+      const response = await apiRequest(
+        requests.callSmartContractMethod.url,
+        { contractAddress, contractAbi, method, params },
+        {
+          headers,
+          params: { protocol },
+        }
+      )
+      return new SmartContractCallResponse(response.data)
+    } catch (error) {
+      handleRequestError(error)
+    }
   }
 
   async _getFeeInfo({

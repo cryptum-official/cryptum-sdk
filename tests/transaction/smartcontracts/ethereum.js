@@ -12,7 +12,7 @@ const txController = new TransactionController(config)
 const axiosApi = new AxiosApi(config)
 const baseUrl = axiosApi.getBaseUrl(config.environment)
 const contractAddress = '0xF13BfC94263F915E1Fec3d341015661056DD49FA'
-const contractAbi = [
+const contractAbiUpdate = [
   {
     constant: false,
     inputs: [
@@ -26,6 +26,23 @@ const contractAbi = [
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+]
+const contractAbiMessage = [
+  {
+    constant: true,
+    inputs: [],
+    name: 'message',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
 ]
@@ -46,7 +63,7 @@ describe.only('Ethereum smart contract transactions', () => {
         type: TransactionType.CALL_CONTRACT_METHOD,
         from: wallets.ethereum.address,
         contractAddress,
-        contractAbi,
+        contractAbi: contractAbiUpdate,
         method: 'update',
         params: ['new message'],
       })
@@ -54,6 +71,16 @@ describe.only('Ethereum smart contract transactions', () => {
         gas: 21000,
         gasPrice: '4000000',
         chainId: 4,
+      })
+      .persist()
+      .post(`/transaction/call-method?protocol=${Protocol.ETHEREUM}`, {
+        contractAddress,
+        contractAbi: contractAbiMessage,
+        method: 'message',
+        params: [],
+      })
+      .reply(200, {
+        result: 'hello',
       })
       .persist()
   })
@@ -65,7 +92,7 @@ describe.only('Ethereum smart contract transactions', () => {
     const transaction = await txController.createSmartContractTransaction({
       wallet: wallets.ethereum,
       contractAddress,
-      contractAbi,
+      contractAbi: contractAbiUpdate,
       method: 'update',
       params: ['new message'],
       protocol: Protocol.ETHEREUM,
@@ -79,7 +106,7 @@ describe.only('Ethereum smart contract transactions', () => {
       txController.createSmartContractTransaction({
         wallet: null,
         contractAddress,
-        contractAbi,
+        contractAbi: contractAbiUpdate,
         method: 'update',
         params: ['new message'],
         protocol: Protocol.ETHEREUM,
@@ -92,7 +119,7 @@ describe.only('Ethereum smart contract transactions', () => {
       txController.createSmartContractTransaction({
         wallet: wallets.ethereum,
         contractAddress: undefined,
-        contractAbi,
+        contractAbi: contractAbiUpdate,
         method: 'update',
         params: ['new message'],
         protocol: Protocol.ETHEREUM,
@@ -108,6 +135,39 @@ describe.only('Ethereum smart contract transactions', () => {
         method: 'update',
         params: ['new message'],
         protocol: Protocol.ETHEREUM,
+      })
+    )
+  })
+  it('call smart contract method', async () => {
+    const response = await txController.callSmartContractMethod({
+      contractAddress,
+      contractAbi: contractAbiMessage,
+      method: 'message',
+      params: [],
+      protocol: Protocol.ETHEREUM,
+      testnet: true,
+    })
+    assert.strictEqual(response.result, 'hello')
+  })
+  it('call smart contract method failed when constract address missing', async () => {
+    assert.isRejected(
+      txController.callSmartContractMethod({
+        contractAbi: contractAbiMessage,
+        method: 'message',
+        params: [],
+        protocol: Protocol.ETHEREUM,
+        testnet: true,
+      })
+    )
+  })
+  it('call smart contract method failed when constract abi missing', async () => {
+    assert.isRejected(
+      txController.callSmartContractMethod({
+        contractAddress,
+        method: 'message',
+        params: [],
+        protocol: Protocol.ETHEREUM,
+        testnet: true,
       })
     )
   })

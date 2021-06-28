@@ -11,7 +11,8 @@ const { TransactionType } = require('../../../src/features/transaction/entity')
 const txController = new TransactionController(config)
 const axiosApi = new AxiosApi(config)
 const baseUrl = axiosApi.getBaseUrl(config.environment)
-const contractAbi = [
+const contractAddress = '0x2B751008e680E1921161C5456a763e72788Db9Ca'
+const contractAbiUpdate = [
   {
     constant: false,
     inputs: [
@@ -25,6 +26,23 @@ const contractAbi = [
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+]
+const contractAbiMessage = [
+  {
+    constant: true,
+    inputs: [],
+    name: 'message',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
 ]
@@ -44,8 +62,8 @@ describe.only('Celo smart contract transactions', () => {
       .post(`/fee?protocol=${Protocol.CELO}`, {
         type: TransactionType.CALL_CONTRACT_METHOD,
         from: '0x8C33DB44a78629cF60C88383d436EEc356884625',
-        contractAddress: '0x2B751008e680E1921161C5456a763e72788Db9Ca',
-        contractAbi,
+        contractAddress,
+        contractAbi: contractAbiUpdate,
         method: 'update',
         params: ['new message'],
       })
@@ -53,6 +71,16 @@ describe.only('Celo smart contract transactions', () => {
         gas: 21000,
         gasPrice: '4000000',
         chainId: 44787,
+      })
+      .persist()
+      .post(`/transaction/call-method?protocol=${Protocol.CELO}`, {
+        contractAddress,
+        contractAbi: contractAbiMessage,
+        method: 'message',
+        params: [],
+      })
+      .reply(200, {
+        result: 'hello',
       })
       .persist()
   })
@@ -63,8 +91,8 @@ describe.only('Celo smart contract transactions', () => {
   it('create smart contract call transaction', async () => {
     const transaction = await txController.createSmartContractTransaction({
       wallet: wallets.celo,
-      contractAddress: '0x2B751008e680E1921161C5456a763e72788Db9Ca',
-      contractAbi,
+      contractAddress,
+      contractAbi: contractAbiUpdate,
       method: 'update',
       params: ['new message'],
       protocol: Protocol.CELO,
@@ -77,8 +105,8 @@ describe.only('Celo smart contract transactions', () => {
     assert.isRejected(
       txController.createSmartContractTransaction({
         wallet: null,
-        contractAddress: '0x2B751008e680E1921161C5456a763e72788Db9Ca',
-        contractAbi,
+        contractAddress,
+        contractAbi: contractAbiUpdate,
         method: 'update',
         params: ['new message'],
         protocol: Protocol.CELO,
@@ -91,7 +119,7 @@ describe.only('Celo smart contract transactions', () => {
       txController.createSmartContractTransaction({
         wallet: wallets.celo,
         contractAddress: undefined,
-        contractAbi,
+        contractAbi: contractAbiUpdate,
         method: 'update',
         params: ['new message'],
         protocol: Protocol.CELO,
@@ -102,11 +130,44 @@ describe.only('Celo smart contract transactions', () => {
     assert.isRejected(
       txController.createSmartContractTransaction({
         wallet: wallets.celo,
-        contractAddress: '0x2B751008e680E1921161C5456a763e72788Db9Ca',
+        contractAddress,
         contractAbi: null,
         method: 'update',
         params: ['new message'],
         protocol: Protocol.CELO,
+      })
+    )
+  })
+  it('call smart contract method', async () => {
+    const response = await txController.callSmartContractMethod({
+      contractAddress,
+      contractAbi: contractAbiMessage,
+      method: 'message',
+      params: [],
+      protocol: Protocol.CELO,
+      testnet: true,
+    })
+    assert.strictEqual(response.result, 'hello')
+  })
+  it('call smart contract method failed when constract address missing', async () => {
+    assert.isRejected(
+      txController.callSmartContractMethod({
+        contractAbi: contractAbiMessage,
+        method: 'message',
+        params: [],
+        protocol: Protocol.CELO,
+        testnet: true,
+      })
+    )
+  })
+  it('call smart contract method failed when constract abi missing', async () => {
+    assert.isRejected(
+      txController.callSmartContractMethod({
+        contractAddress,
+        method: 'message',
+        params: [],
+        protocol: Protocol.CELO,
+        testnet: true,
       })
     )
   })

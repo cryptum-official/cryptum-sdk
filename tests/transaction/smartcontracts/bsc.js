@@ -12,7 +12,7 @@ const txController = new TransactionController(config)
 const axiosApi = new AxiosApi(config)
 const baseUrl = axiosApi.getBaseUrl(config.environment)
 const contractAddress = '0xBCD0AcF85B5f859073138eD7Fcb8A8c1c90d38aA'
-const contractAbi = [
+const contractAbiUpdate = [
   {
     constant: false,
     inputs: [
@@ -26,6 +26,23 @@ const contractAbi = [
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+]
+const contractAbiMessage = [
+  {
+    constant: true,
+    inputs: [],
+    name: 'message',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
 ]
@@ -46,7 +63,7 @@ describe.only('BSC smart contract transactions', () => {
         type: TransactionType.CALL_CONTRACT_METHOD,
         from: wallets.bsc.address,
         contractAddress,
-        contractAbi,
+        contractAbi: contractAbiUpdate,
         method: 'update',
         params: ['new message'],
       })
@@ -54,6 +71,16 @@ describe.only('BSC smart contract transactions', () => {
         gas: 21000,
         gasPrice: '4000000',
         chainId: 4,
+      })
+      .persist()
+      .post(`/transaction/call-method?protocol=${Protocol.BSC}`, {
+        contractAddress,
+        contractAbi: contractAbiMessage,
+        method: 'message',
+        params: [],
+      })
+      .reply(200, {
+        result: 'hello',
       })
       .persist()
   })
@@ -65,7 +92,7 @@ describe.only('BSC smart contract transactions', () => {
     const transaction = await txController.createSmartContractTransaction({
       wallet: wallets.bsc,
       contractAddress,
-      contractAbi,
+      contractAbi: contractAbiUpdate,
       method: 'update',
       params: ['new message'],
       protocol: Protocol.BSC,
@@ -79,7 +106,7 @@ describe.only('BSC smart contract transactions', () => {
       txController.createSmartContractTransaction({
         wallet: null,
         contractAddress,
-        contractAbi,
+        contractAbi: contractAbiUpdate,
         method: 'update',
         params: ['new message'],
         protocol: Protocol.BSC,
@@ -92,7 +119,7 @@ describe.only('BSC smart contract transactions', () => {
       txController.createSmartContractTransaction({
         wallet: wallets.bsc,
         contractAddress: undefined,
-        contractAbi,
+        contractAbi: contractAbiUpdate,
         method: 'update',
         params: ['new message'],
         protocol: Protocol.BSC,
@@ -108,6 +135,39 @@ describe.only('BSC smart contract transactions', () => {
         method: 'update',
         params: ['new message'],
         protocol: Protocol.BSC,
+      })
+    )
+  })
+  it('call smart contract method', async () => {
+    const response = await txController.callSmartContractMethod({
+      contractAddress,
+      contractAbi: contractAbiMessage,
+      method: 'message',
+      params: [],
+      protocol: Protocol.BSC,
+      testnet: true,
+    })
+    assert.strictEqual(response.result, 'hello')
+  })
+  it('call smart contract method failed when constract address missing', async () => {
+    assert.isRejected(
+      txController.callSmartContractMethod({
+        contractAbi: contractAbiMessage,
+        method: 'message',
+        params: [],
+        protocol: Protocol.BSC,
+        testnet: true,
+      })
+    )
+  })
+  it('call smart contract method failed when constract abi missing', async () => {
+    assert.isRejected(
+      txController.callSmartContractMethod({
+        contractAddress,
+        method: 'message',
+        params: [],
+        protocol: Protocol.BSC,
+        testnet: true,
       })
     )
   })

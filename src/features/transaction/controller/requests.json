@@ -11,6 +11,10 @@
     "method": "GET",
     "url": "/transaction/utxo"
   },
+  "callSmartContractMethod": {
+    "method": "POST",
+    "url": "/transaction/call-method"
+  },
   "getFee": {
     "method": "POST",
     "url": "/fee"

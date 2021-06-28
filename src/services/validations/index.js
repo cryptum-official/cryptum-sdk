@@ -82,6 +82,23 @@ module.exports.validateSmartContractTransactionParams = ({
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
 }
+module.exports.validateSmartContractCallParams = ({ contractAddress, contractAbi, method, params, protocol }) => {
+  if (!contractAddress || typeof contractAddress !== 'string') {
+    throw new GenericException('Invalid contract address', 'InvalidTypeException')
+  }
+  if (!contractAbi || typeof contractAbi !== 'object') {
+    throw new GenericException('Invalid contract ABI', 'InvalidTypeException')
+  }
+  if (!method || typeof method !== 'string') {
+    throw new GenericException('Invalid contract method', 'InvalidTypeException')
+  }
+  if (params && !Array.isArray(params)) {
+    throw new GenericException('Invalid contract params', 'InvalidTypeException')
+  }
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM].includes(protocol)) {
+    throw new GenericException('Invalid protocol', 'InvalidTypeException')
+  }
+}
 
 module.exports.validateBitcoinTransferTransactionParams = ({ wallet, fromUTXOs, outputs }) => {
   if (wallet && fromUTXOs) {
