@@ -482,6 +482,7 @@ class Controller extends Interface {
       wallet,
       fee,
       testnet,
+      value,
       contractAddress,
       contractAbi,
       method,
@@ -505,6 +506,7 @@ class Controller extends Interface {
     const transactionOptions = {
       fromPrivateKey: wallet.privateKey,
       nonce: info.nonce,
+      value,
       contractAddress,
       contractAbi,
       method,

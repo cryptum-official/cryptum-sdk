@@ -60,14 +60,28 @@ module.exports.TRANSFER_METHOD_ABI = [
 ]
 module.exports.TRANSFER_COMMENT_METHOD_ABI = [
   {
+    constant: false,
     inputs: [
-      { internalType: 'address', name: '_to', type: 'address' },
-      { internalType: 'uint256', name: '_value', type: 'uint256' },
-      { internalType: 'string', name: '_comment', type: 'string' },
+      { internalType: 'address', name: 'to', type: 'address' },
+      { internalType: 'uint256', name: 'value', type: 'uint256' },
+      { internalType: 'string', name: 'comment', type: 'string' },
     ],
     name: 'transferWithComment',
-    outputs: [{ internalType: 'bool', name: 'success', type: 'bool' }],
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
   },
 ]
+module.exports.CELO_ACCOUNTS_ADDRESS = {
+  testnet: '0xed7f51A34B4e71fbE69B3091FcF879cD14bD73A9',
+  mainnet: '0x7d21685C17607338b313a7174bAb6620baD0aaB7',
+}
+module.exports.CELO_ELECTION_ADDRESS = {
+  testnet: '0x1c3eDf937CFc2F6F51784D20DEB1af1F9a8655fA',
+  mainnet: '0x8D6677192144292870907E3Fa8A5527fE55A7ff6',
+}
+module.exports.CELO_LOCKEDGOLD_ADDRESS = {
+  testnet: '0x6a4CC5693DC5BFA3799C699F3B941bA2Cb00c341',
+  mainnet: '0x6cC083Aed9e3ebe302A6336dBC7c921C9f03349E',
+}

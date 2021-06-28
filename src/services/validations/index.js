@@ -1,4 +1,6 @@
-const { GenericException } = require('../../../errors')
+const { default: BigNumber } = require('bignumber.js')
+const { default: Web3 } = require('web3')
+const { GenericException, InvalidTypeException } = require('../../../errors')
 const { TransactionType } = require('../../features/transaction/entity')
 const { Protocol } = require('../blockchain/constants')
 
@@ -136,5 +138,17 @@ module.exports.validateSignedTransaction = ({ signedTx, protocol, type }) => {
   }
   if (!type || !TransactionType[type]) {
     throw new GenericException('Invalid transaction type', 'InvalidTypeException')
+  }
+}
+
+module.exports.validateEthAddress = (address) => {
+  if (!Web3.utils.isAddress(address)) {
+    throw new InvalidTypeException(address, 'string')
+  }
+}
+module.exports.validatePositiveAmount = (amount) => {
+  const value = new BigNumber(amount)
+  if (value.isNaN() || value.lte(0)) {
+    throw new GenericException('Invalid amount', 'InvalidTypeException')
   }
 }
