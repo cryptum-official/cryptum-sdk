@@ -1,18 +1,17 @@
 const { assert } = require('chai')
 const faker = require('faker')
 const nock = require('nock')
-const AxiosApi = require('../../axios')
-const { InvalidTypeException, GenericException } = require('../../errors')
+const { InvalidTypeException } = require('../../errors')
 const ExternalKeysController = require('../../src/features/external-keys/controller')
 const requests = require('../../src/features/external-keys/controller/requests.json')
-const { azureAuthenticationResponse } = require('./mocks')
+const { azureAuthenticationResponse, azureKeyVaultResponse } = require('./mocks')
+const AzureKeyVaultEntity = require('../../src/features/external-keys/entity/azure-key-vault');
 
 describe.only('External Keys Controller Tests', () => {
   const config = {
     environment: 'development',
     apiKey: 'apikeyexamplecryptum',
   }
-  const axiosApi = new AxiosApi(config)
 
   describe('azureAuthenticate()', () => {
     describe('when input is valid', () => {
@@ -174,91 +173,119 @@ describe.only('External Keys Controller Tests', () => {
 
   })
 
-  // describe('getAzureSecret()', () => {
-  //   describe('when input is valid', () => {
-  //     it('returns auth data from the credentials given', async () => {
-  //       const azureConfig = {
-  //         tenantId: faker.datatype.uuid(),
-  //         clientId: faker.datatype.uuid(),
-  //         clientSecret: faker.datatype.uuid(),
-  //       };
-  //       nock(requests.azureAuthenticate.baseUrl)
-  //         .post(`/${azureConfig.tenantId}/oauth2/v2.0/token`)
-  //         .reply(200, azureAuthenticationResponse)
+  describe('getAzureSecret()', () => {
+    describe('when input is valid', () => {
+      it('returns auth data from the credentials given', async () => {
+        const azureConfig = {
+          tenantId: faker.datatype.uuid(),
+          clientId: faker.datatype.uuid(),
+          clientSecret: faker.datatype.uuid(),
+        };
+        const instanceAuth = {
+          access_token: faker.datatype.uuid(),
+          expires_on: azureAuthenticationResponse.expires_on + faker.datatype.number({ min: 1000 }),
+        };
+        const keyVaultConfig = {
+          keyVaultUrl: faker.internet.domainName(),
+          secretName: faker.random.word(),
+          secretVersion: faker.random.word(),
+        };
 
-  //       const controller = new ExternalKeysController({ ...config, azureConfig })
+        nock(`https://${keyVaultConfig.keyVaultUrl}`)
+          .get(`/secrets/${keyVaultConfig.secretName}/${keyVaultConfig.secretVersion}?api-version=7.1`)
+          .reply(200, azureKeyVaultResponse)
 
-  //       const exec = await controller.azureAuthenticate(azureConfig)
+        const controller = new ExternalKeysController({ ...config, azureConfig })
 
-  //       assert.deepStrictEqual(exec, azureAuthenticationResponse)
-  //     })
-  //   })
-  //   describe('when input is invalid', () => {
-  //     it('throws invalid type exception when tenant id given is not a string', async () => {
-  //       try {
-  //         const azureConfig = {
-  //           tenantId: faker.datatype.number(),
-  //           clientId: faker.datatype.uuid(),
-  //           clientSecret: faker.datatype.uuid(),
-  //         };
+        controller.azureToken = instanceAuth.access_token;
+        controller.azureTokenExp = instanceAuth.expires_on;
 
-  //         const controller = new ExternalKeysController({ ...config, azureConfig })
+        const exec = await controller.getAzureSecret(keyVaultConfig)
 
-  //         await controller.azureAuthenticate(azureConfig)
-  //       } catch (error) {
-  //         assert.deepStrictEqual(error instanceof InvalidTypeException, true)
-  //       }
-  //     })
-  //     it('throws invalid type exception when client id given is not a string', async () => {
-  //       try {
-  //         const azureConfig = {
-  //           tenantId: faker.datatype.uuid(),
-  //           clientId: faker.datatype.number(),
-  //           clientSecret: faker.datatype.uuid(),
-  //         };
+        assert.deepStrictEqual(exec, new AzureKeyVaultEntity(azureKeyVaultResponse))
+      })
+    })
+    describe('when input is invalid', () => {
+      it('throws invalid type exception when key vault url given is not a string', async () => {
+        try {
+          const azureConfig = {
+            tenantId: faker.datatype.uuid(),
+            clientId: faker.datatype.uuid(),
+            clientSecret: faker.datatype.uuid(),
+          };
+          const keyVaultConfig = {
+            keyVaultUrl: faker.datatype.number(),
+            secretName: faker.random.word(),
+            secretVersion: faker.random.word(),
+          };
 
-  //         const controller = new ExternalKeysController({ ...config, azureConfig })
+          const controller = new ExternalKeysController({ ...config, azureConfig })
 
-  //         await controller.azureAuthenticate(azureConfig)
-  //       } catch (error) {
-  //         assert.deepStrictEqual(error instanceof InvalidTypeException, true)
-  //       }
-  //     })
-  //     it('throws invalid type exception when client secret given is not a string', async () => {
-  //       try {
-  //         const azureConfig = {
-  //           tenantId: faker.datatype.uuid(),
-  //           clientId: faker.datatype.uuid(),
-  //           clientSecret: faker.datatype.number(),
-  //         };
+          await controller.getAzureSecret(keyVaultConfig)
+        } catch (error) {
+          assert.deepStrictEqual(error instanceof InvalidTypeException, true)
+        }
+      })
+      it('throws invalid type exception when secret name given is not a string', async () => {
+        try {
+          const azureConfig = {
+            tenantId: faker.datatype.uuid(),
+            clientId: faker.datatype.uuid(),
+            clientSecret: faker.datatype.uuid(),
+          };
+          const keyVaultConfig = {
+            keyVaultUrl: faker.random.word(),
+            secretName: faker.datatype.number(),
+            secretVersion: faker.random.word(),
+          };
 
-  //         const controller = new ExternalKeysController({ ...config, azureConfig })
+          const controller = new ExternalKeysController({ ...config, azureConfig })
 
-  //         await controller.azureAuthenticate(azureConfig)
-  //       } catch (error) {
-  //         assert.deepStrictEqual(error instanceof InvalidTypeException, true)
-  //       }
-  //     })
-  //     it('throws generic exception when the request executed returns errors', async () => {
-  //       try {
-  //         const azureConfig = {
-  //           tenantId: faker.datatype.uuid(),
-  //           clientId: faker.datatype.uuid(),
-  //           clientSecret: faker.datatype.uuid(),
-  //         };
-  //         nock(requests.azureAuthenticate.baseUrl)
-  //           .post(`/${azureConfig.tenantId}/oauth2/v2.0/token`)
-  //           .reply(400, { error: faker.datatype.string() })
+          await controller.getAzureSecret(keyVaultConfig)
+        } catch (error) {
+          assert.deepStrictEqual(error instanceof InvalidTypeException, true)
+        }
+      })
+      it('throws invalid type exception when secret version given is not a string', async () => {
+        try {
+          const azureConfig = {
+            tenantId: faker.datatype.uuid(),
+            clientId: faker.datatype.uuid(),
+            clientSecret: faker.datatype.uuid(),
+          };
+          const keyVaultConfig = {
+            keyVaultUrl: faker.random.word(),
+            secretName: faker.random.word(),
+            secretVersion: faker.datatype.number(),
+          };
 
-  //         const controller = new ExternalKeysController({ ...config, azureConfig })
+          const controller = new ExternalKeysController({ ...config, azureConfig })
 
-  //         const exec = await controller.azureAuthenticate(azureConfig)
+          await controller.getAzureSecret(keyVaultConfig)
+        } catch (error) {
+          assert.deepStrictEqual(error instanceof InvalidTypeException, true)
+        }
+      })
+      it('throws generic exception when the request executed returns errors', async () => {
+        try {
+          const azureConfig = {
+            tenantId: faker.datatype.uuid(),
+            clientId: faker.datatype.uuid(),
+            clientSecret: faker.datatype.uuid(),
+          };
+          nock(requests.azureAuthenticate.baseUrl)
+            .post(`/${azureConfig.tenantId}/oauth2/v2.0/token`)
+            .reply(400, { error: faker.datatype.string() })
 
-  //         assert.deepStrictEqual(exec, azureAuthenticationResponse)
-  //       } catch (error) {
-  //         assert.deepStrictEqual(error instanceof Error, true)
-  //       }
-  //     })
-  //   })
-  // })
+          const controller = new ExternalKeysController({ ...config, azureConfig })
+
+          const exec = await controller.azureAuthenticate(azureConfig)
+
+          assert.deepStrictEqual(exec, azureAuthenticationResponse)
+        } catch (error) {
+          assert.deepStrictEqual(error instanceof Error, true)
+        }
+      })
+    })
+  })
 })
