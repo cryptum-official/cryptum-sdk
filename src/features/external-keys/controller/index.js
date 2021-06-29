@@ -24,7 +24,7 @@ class Controller extends Interface {
         requests,
         key: 'azureAuthenticate',
         config: {
-          ...this.config, baseURL: 'https://login.microsoftonline.com',
+          ...this.config, baseURL: requests.azureAuthenticate.baseUrl,
         },
       })
 
@@ -47,7 +47,7 @@ class Controller extends Interface {
    * @param {import('../../../..').AzureConfig} azureConfig
    */
   async getAzureToken() {
-    if (this.azureToken && new Date().getTime() > this.azureTokenExp) {
+    if (this.azureToken && new Date().getTime() < this.azureTokenExp) {
       return this.azureToken
     }
 
@@ -55,6 +55,8 @@ class Controller extends Interface {
 
     this.azureToken = authResponse.access_token
     this.azureTokenExp = authResponse.expires_on
+
+    return this.azureToken
   }
 
   /**
@@ -80,11 +82,11 @@ class Controller extends Interface {
         },
       })
 
-      await this.getAzureToken()
+      const token = await this.getAzureToken()
 
       const response = await apiRequest(
         `/secrets/${secretName}/${secretVersion}?api-version=7.1`,
-        { headers: { Authorization: `Bearer ${this.azureToken}` } },
+        { headers: { Authorization: `Bearer ${token}` } },
       )
 
       return new AzureKeyVaultEntity(response.data)

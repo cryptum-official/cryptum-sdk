@@ -4,6 +4,7 @@
     "method": "GET"
   },
   "azureAuthenticate": {
+    "baseUrl": "https://login.microsoftonline.com",
     "url": "",
     "method": "POST"
   }
