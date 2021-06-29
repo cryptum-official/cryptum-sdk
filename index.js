@@ -2,11 +2,15 @@ const WebhooksController = require('./src/features/webhooks/controller')
 const WalletController = require('./src/features/wallet/controller')
 const PricesController = require('./src/features/prices/controller')
 const TransactionController = require('./src/features/transaction/controller')
+const ExternalKeysController = require('./src/features/external-keys/controller')
 /**
  * @typedef {object} AzureConfig
  * @property {string} keyVaultUrl
  * @property {string} secretName
  * @property {string} secretVersion
+ * @property {string} tenantId
+ * @property {string} clientId
+ * @property {string} clientSecret
  * 
  * @typedef {object} Config
  * @property {string} environment
@@ -57,6 +61,15 @@ class CryptumSDK {
    */
   getPricesController() {
     return new PricesController(this.config)
+  }
+  
+  /**
+   * Method to get a controller to retrieve keys from external HSMs
+   *
+   * @returns ExternalKeysController instance
+   */
+  getExternalKeysController() {
+    return new ExternalKeysController(this.config)
   }
 }
 
