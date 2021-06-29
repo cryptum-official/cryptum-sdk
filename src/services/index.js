@@ -16,7 +16,7 @@ const { GenericException } = require('../../errors')
  */
 const getApiMethod = ({ requests, key, config }) => {
   const axios = new AxiosApi(config)
-  const api = axios.getInstance()
+  const api = axios.getInstance(config.baseURL)
 
   const value = requests[key]
   const method = api[value.method.toLowerCase()]
