@@ -190,12 +190,14 @@ class SmartContractCallTransactionInput {
    * @param {Array<object>} args.contractAbi
    * @param {string} args.method
    * @param {Array} args.params
+   * @param {string} args.protocol
    */
-  constructor({ contractAddress, contractAbi, method, params }) {
+  constructor({ contractAddress, contractAbi, method, params, protocol }) {
     this.contractAddress = contractAddress
     this.contractAbi = contractAbi
     this.method = method
     this.params = params
+    this.protocol = protocol
   }
 }
 class CeloTransferTransactionInput extends EthereumTransferTransactionInput {

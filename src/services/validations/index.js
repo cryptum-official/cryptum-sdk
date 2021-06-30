@@ -1,5 +1,5 @@
 const { default: BigNumber } = require('bignumber.js')
-const { default: Web3 } = require('web3')
+const Web3 = require('web3')
 const { GenericException, InvalidTypeException } = require('../../../errors')
 const { TransactionType } = require('../../features/transaction/entity')
 const { Protocol } = require('../blockchain/constants')
