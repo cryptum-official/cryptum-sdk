@@ -8,6 +8,8 @@ const {
 } = require('../../../services/blockchain/constants')
 const { toWei } = require('../../../services/blockchain/utils')
 const { validateEthAddress, validatePositiveAmount } = require('../../../services/validations')
+const { GenericException } = require('../../../../errors')
+const { default: BigNumber } = require('bignumber.js')
 
 // Steps to stake:
 // 1. Register account
@@ -105,12 +107,44 @@ class CeloStakingController extends Interface {
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'vote'
     const txController = new TransactionController(this.config)
+    /** @type {{ result:{ groups, values }}} */
+    const { result: currentVotes } = await txController.callSmartContractMethod({
+      contractAddress: CELO_ELECTION_ADDRESS[network],
+      contractAbi: this.getMethodAbi('Election', 'getTotalVotesForEligibleValidatorGroups'),
+      method: 'getTotalVotesForEligibleValidatorGroups',
+      params: [],
+      protocol: Protocol.CELO,
+    })
+
+    if (!currentVotes) {
+      throw new GenericException('Service is unavailable, try again later')
+    }
+    const amountWei = toWei(amount)
+    const selectedValidatorIndex = currentVotes.groups.findIndex((group) => group === validator)
+    const voteTotal =
+      selectedValidatorIndex > -1
+        ? new BigNumber(currentVotes.values[selectedValidatorIndex]).plus(amountWei)
+        : amountWei
+    let lesser = '0x0000000000000000000000000000000000000000',
+      greater = '0x0000000000000000000000000000000000000000'
+    for (let i = 0; i < currentVotes.groups.length; i++) {
+      const group = currentVotes.groups[i]
+      const votes = new BigNumber(currentVotes.values[i])
+      if (group !== validator) {
+        if (votes.isLessThanOrEqualTo(voteTotal)) {
+          lesser = group
+          break
+        }
+        greater = group
+      }
+    }
+
     const tx = await txController.createSmartContractTransaction({
       wallet,
       contractAddress: CELO_ELECTION_ADDRESS[network],
       contractAbi: this.getMethodAbi('Election', method),
       method,
-      params: [validator, toWei(amount).toString(), '0x0000000000000000000000000000000000000000', '0x0000000000000000000000000000000000000000'],
+      params: [validator, toWei(amount).toString(), lesser, greater],
       value: '0',
       testnet,
       protocol: Protocol.CELO,
@@ -124,7 +158,7 @@ class CeloStakingController extends Interface {
    * @param {boolean} input.testnet
    * @returns {Promise<import('../../entity').SignedTransaction>}
    */
-  async activate({ wallet, testnet = true }) {
+  async activate({ wallet, validator, testnet = true }) {
     validateEthAddress(wallet.address)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'activate'
@@ -134,7 +168,7 @@ class CeloStakingController extends Interface {
       contractAddress: CELO_ELECTION_ADDRESS[network],
       contractAbi: this.getMethodAbi('Election', method),
       method,
-      params: [wallet.address],
+      params: [validator],
       value: '0',
       testnet,
       protocol: Protocol.CELO,
