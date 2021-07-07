@@ -152,3 +152,9 @@ module.exports.validatePositiveAmount = (amount) => {
     throw new GenericException('Invalid amount', 'InvalidTypeException')
   }
 }
+module.exports.validatePositive = (n) => {
+  const value = new BigNumber(n)
+  if (value.isNaN() || value.isNegative()) {
+    throw new GenericException('Invalid value', 'InvalidTypeException')
+  }
+}
