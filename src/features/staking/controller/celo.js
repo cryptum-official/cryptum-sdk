@@ -6,7 +6,7 @@ const {
   CELO_ELECTION_ADDRESS,
   CELO_LOCKEDGOLD_ADDRESS,
 } = require('../../../services/blockchain/constants')
-const { toWei } = require('../../../services/blockchain/utils')
+const { toWei, fromWei } = require('../../../services/blockchain/utils')
 const { validateEthAddress, validatePositiveAmount } = require('../../../services/validations')
 const { GenericException } = require('../../../../errors')
 const { default: BigNumber } = require('bignumber.js')
@@ -255,15 +255,15 @@ class CeloStakingController extends Interface {
     return await txController.sendTransaction(tx)
   }
   /**
-   * Withdraw amount
+   * Get Total Pending Withdrawals
    * @param {object} input
    * @param {string} input.address wallet address
    * @param {boolean} input.testnet
    * @returns {Promise<import('../../entity').SignedTransaction>}
    */
-  async getPendingWithdrawals({ address, testnet = true }) {
+  async getTotalPendingWithdrawals({ address, testnet = true }) {
     const network = testnet ? 'testnet' : 'mainnet'
-    const method = 'getPendingWithdrawals'
+    const method = 'getTotalPendingWithdrawals'
     const txController = new TransactionController(this.config)
     return await txController.callSmartContractMethod({
       contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
@@ -273,6 +273,109 @@ class CeloStakingController extends Interface {
       testnet,
       protocol: Protocol.CELO,
     })
+  }
+  /**
+   * Get groups voted for by account
+   * @param {object} input
+   * @param {string} input.address wallet address
+   * @param {boolean} input.testnet
+   * @returns {Promise<import('../../transaction/entity').SmartContractCallResponse>}
+   */
+  async getGroupsVotedForByAccount({ address, testnet = true }) {
+    const network = testnet ? 'testnet' : 'mainnet'
+    const method = 'getGroupsVotedForByAccount'
+    const txController = new TransactionController(this.config)
+    return await txController.callSmartContractMethod({
+      contractAddress: CELO_ELECTION_ADDRESS[network],
+      contractAbi: this.getMethodAbi('Election', method),
+      method,
+      params: [address],
+      testnet,
+      protocol: Protocol.CELO,
+    })
+  }
+  /**
+   * Get votes for group by account
+   * @param {object} input
+   * @param {string} input.address wallet address
+   * @param {string} input.group validator group address
+   * @param {boolean} input.testnet
+   * @returns {Promise<{pending, active}>}
+   */
+  async getVotesForGroupByAccount({ address, group, testnet = true }) {
+    const network = testnet ? 'testnet' : 'mainnet'
+    const txController = new TransactionController(this.config)
+    const [pending, active] = await Promise.all([
+      txController.callSmartContractMethod({
+        contractAddress: CELO_ELECTION_ADDRESS[network],
+        contractAbi: this.getMethodAbi('Election', 'getPendingVotesForGroupByAccount'),
+        method: 'getPendingVotesForGroupByAccount',
+        params: [group, address],
+        testnet,
+        protocol: Protocol.CELO,
+      }),
+      txController.callSmartContractMethod({
+        contractAddress: CELO_ELECTION_ADDRESS[network],
+        contractAbi: this.getMethodAbi('Election', 'getActiveVotesForGroupByAccount'),
+        method: 'getActiveVotesForGroupByAccount',
+        params: [group, address],
+        testnet,
+        protocol: Protocol.CELO,
+      }),
+    ])
+    return {
+      pending: fromWei(pending.result).toString(),
+      active: fromWei(active.result).toString(),
+    }
+  }
+  /**
+   * Get account summary
+   * @param {object} input
+   * @param {string} input.address wallet address
+   * @param {boolean} input.testnet
+   * @returns {Promise<{total: string, nonvoting: string, pendingWithdrawals: string, votes: any[]}>}
+   */
+  async getAccountSummary({ address, testnet = true }) {
+    validateEthAddress(address)
+    const network = testnet ? 'testnet' : 'mainnet'
+    const txController = new TransactionController(this.config)
+
+    const [nonvoting, total, pendingWithdrawals, groups] = await Promise.all([
+      txController.callSmartContractMethod({
+        contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
+        contractAbi: this.getMethodAbi('LockedGold', 'getAccountNonvotingLockedGold'),
+        method: 'getAccountNonvotingLockedGold',
+        params: [address],
+        testnet,
+        protocol: Protocol.CELO,
+      }),
+      txController.callSmartContractMethod({
+        contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
+        contractAbi: this.getMethodAbi('LockedGold', 'getAccountTotalLockedGold'),
+        method: 'getAccountTotalLockedGold',
+        params: [address],
+        testnet,
+        protocol: Protocol.CELO,
+      }),
+      this.getTotalPendingWithdrawals({ address, testnet }),
+      this.getGroupsVotedForByAccount({ address, testnet }),
+    ])
+
+    const votes = []
+    for (let group of groups.result) {
+      const { pending, active } = await this.getVotesForGroupByAccount({ address, group, testnet })
+      votes.push({
+        group,
+        pending,
+        active,
+      })
+    }
+    return {
+      total: fromWei(total.result).toString(),
+      nonvoting: fromWei(nonvoting.result).toString(),
+      pendingWithdrawals: fromWei(pendingWithdrawals.result).toString(),
+      votes,
+    }
   }
 
   getMethodAbi(contract, method) {
