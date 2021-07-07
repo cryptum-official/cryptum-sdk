@@ -20,6 +20,7 @@
     - [Webhooks](docs/webhooks)
     - [Transactions](docs/transactions)
     - [Prices](docs/prices)
+    - [Staking](docs/staking/index)
 - [Contributing](#contributing)
   - [What does my PR need to be accepted ? 🤔](#what-does-my-pr-need-to-be-accepted--)
 - [License](#license)
