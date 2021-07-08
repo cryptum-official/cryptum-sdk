@@ -27,6 +27,7 @@ const {
   validateSignedTransaction,
   validateSmartContractTransactionParams,
   validateSmartContractCallParams,
+  validateSmartContractDeployTransactionParams,
 } = require('../../../services/validations')
 
 class Controller extends Interface {
@@ -447,7 +448,7 @@ class Controller extends Interface {
     }
     let networkFee = fee
     if (!networkFee) {
-      ;({ estimateValue: networkFee } = await this.getFee({
+      ; ({ estimateValue: networkFee } = await this.getFee({
         type: TransactionType.TRANSFER,
         protocol,
       }))
@@ -529,7 +530,7 @@ class Controller extends Interface {
    * @param {import('../entity').SmartContractCallTransactionInput} input
    * @returns {Promise<SmartContractCallResponse>}
    */
-   async callSmartContractMethod(input) {
+  async callSmartContractMethod(input) {
     validateSmartContractCallParams(input)
     const {
       contractAddress,
@@ -591,6 +592,61 @@ class Controller extends Interface {
     if (fee && fee.gas) networkFee.gas = fee && fee.gas
     if (fee && fee.gasPrice) networkFee.gasPrice = fee && fee.gasPrice
     return { info, networkFee }
+  }
+
+  /**
+     * Create call transaction to smart contract deploy
+     *
+     * @param {import('../entity').SmartContractCallTransactionInput} input
+     * @returns {Promise<SignedTransaction>}
+     */
+  async createSmartContractDeployTransaction(input) {
+    validateSmartContractDeployTransactionParams(input)
+
+    const {
+      wallet,
+      fee,
+      testnet,
+      params,
+      protocol,
+      feeCurrency,
+      feeCurrencyContractAddress,
+      contractId,
+    } = input
+
+    const { info, networkFee } = await this._getFeeInfo({
+      wallet,
+      type: TransactionType.DEPLOY_CONTRACT,
+      contractId,
+      method: 'deploy',
+      params,
+      testnet,
+      fee,
+      protocol,
+    })
+
+    let signedTx
+
+    const transactionOptions = {
+      fromPrivateKey: wallet.privateKey,
+      method: 'deploy',
+      nonce: info.nonce,
+      params,
+      fee: networkFee,
+      feeCurrency,
+      feeCurrencyContractAddress,
+      testnet: testnet !== undefined ? testnet : wallet.testnet,
+    }
+
+    if (protocol === Protocol.CELO) {
+      signedTx = await buildCeloSmartContractTransaction(transactionOptions)
+    } else if ([Protocol.ETHEREUM, Protocol.BSC].includes(protocol)) {
+      signedTx = await buildEthereumSmartContractTransaction({ ...transactionOptions, protocol })
+    } else {
+      throw new GenericException('Invalid protocol', 'InvalidTypeException')
+    }
+
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT })
   }
 }
 
