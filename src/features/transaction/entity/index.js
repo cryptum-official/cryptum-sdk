@@ -7,6 +7,7 @@ const TransactionType = {
   CALL_CONTRACT_METHOD: 'CALL_CONTRACT_METHOD',
   DEPLOY_CONTRACT: 'DEPLOY_CONTRACT',
   CHANGE_TRUST: 'CHANGE_TRUST',
+  TOKEN_ASSET_ISSUE: 'TOKEN_ASSET_ISSUE',
 }
 /**
  * @typedef {object | string} Fee
@@ -50,7 +51,7 @@ class FeeResponse {
   }
 }
 class SmartContractCallResponse {
-  constructor({ result  }) {
+  constructor({ result }) {
     this.result = result
   }
 }
@@ -205,21 +206,23 @@ class SmartContractCallTransactionInput {
 
 class SmartContractDeployTransactionInput {
   /**
-   * Creates an instance of SmartContractCallTransactionInput.
+   * Creates an instance of SmartContractDeployTransactionInput.
    *
    * @param {object} args
    * @param {import('../../wallet/entity').Wallet} args.wallet
    * @param {string} args.method
+   * @param {string} args.name
    * @param {Array} args.params
+   * @param {string} args.code
    * @param {Fee?} args.fee
    * @param {boolean} args.testnet
-   * @param {string} args.contractId
    */
-  constructor({ wallet, method, params, contractId, fee, testnet }) {
+  constructor({ wallet, method, name, params, code, fee, testnet }) {
     this.wallet = wallet
     this.method = method
+    this.name = name
     this.params = params
-    this.contractId = contractId,
+    this.code = code
     this.fee = fee
     this.testnet = testnet
   }
@@ -265,6 +268,27 @@ class BitcoinTransferTransactionInput extends TransferTransactionInput {
     this.fromUTXOs = fromUTXOs
   }
 }
+class TokenAssetIssueTransactionInput {
+  /**
+   * Creates an instance of TokenAssetIssueTransactionInput.
+   *
+   * @param {object} args
+   * @param {import('../../wallet/entity').Wallet} args.wallet
+   * @param {string} args.protocol
+   * @param {string} args.name
+   * @param {string} args.tokenSymbol
+   * @param {string} args.amount
+   * @param {boolean} args.testnet
+   */
+  constructor({ wallet, protocol, name, tokenSymbol, amount, testnet }) {
+    this.wallet = wallet
+    this.protocol = protocol
+    this.name = name
+    this.tokenSymbol = tokenSymbol
+    this.amount = amount
+    this.testnet = testnet
+  }
+}
 
 module.exports = {
   TransactionType,
@@ -283,4 +307,5 @@ module.exports = {
   SmartContractCallTransactionInput,
   SmartContractCallResponse,
   SmartContractDeployTransactionInput,
+  TokenAssetIssueTransactionInput,
 }

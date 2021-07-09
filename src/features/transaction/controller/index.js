@@ -28,6 +28,7 @@ const {
   validateSmartContractTransactionParams,
   validateSmartContractCallParams,
   validateSmartContractDeployTransactionParams,
+  validateTokenAssetIssueTransactionParams,
 } = require('../../../services/validations')
 
 class Controller extends Interface {
@@ -610,13 +611,12 @@ class Controller extends Interface {
       protocol,
       feeCurrency,
       feeCurrencyContractAddress,
-      contractId,
+      code,
     } = input
 
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
       type: TransactionType.DEPLOY_CONTRACT,
-      contractId,
       method: 'deploy',
       params,
       testnet,
@@ -627,6 +627,7 @@ class Controller extends Interface {
     let signedTx
 
     const transactionOptions = {
+      code,
       fromPrivateKey: wallet.privateKey,
       method: 'deploy',
       nonce: info.nonce,
@@ -646,6 +647,65 @@ class Controller extends Interface {
     }
 
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT })
+  }
+
+  /**
+   * Create call transaction to asset/token issue
+   *
+   * @param {import('../entity').TokenAssetIssueTransactionInput} input
+   * @returns {Promise<SignedTransaction>}
+   */
+  async createTokenAssetIssueTransaction(input) {
+    validateTokenAssetIssueTransactionParams(input)
+
+    const {
+      wallet,
+      protocol,
+      name,
+      tokenSymbol,
+      amount,
+      feeCurrency,
+      feeCurrencyContractAddress,
+      fee,
+    } = input
+
+    const testnet = testnet !== undefined ? testnet : wallet.testnet
+    const contractAddress = getTokenAddress(protocol, tokenSymbol, testnet)
+    const contractAbi = TRANSFER_METHOD_ABI
+
+    const { info, networkFee } = await this._getFeeInfo({
+      wallet,
+      type: TransactionType.TOKEN_ASSET_ISSUE,
+      method: 'issue',
+      testnet,
+      fee,
+      protocol,
+      contractAddress,
+      contractAbi,
+    })
+
+    let signedTx
+
+    const transactionOptions = {
+      fromPrivateKey: wallet.privateKey,
+      nonce: info.nonce,
+      fee: networkFee,
+      feeCurrency,
+      feeCurrencyContractAddress,
+      testnet,
+      tokenSymbol,
+      amount,
+      contractAddress,
+      name,
+    }
+
+    if (protocol === Protocol.CELO) {
+      signedTx = await buildCeloTransferTransaction(transactionOptions)
+    } else {
+      throw new GenericException('Invalid protocol', 'InvalidTypeException')
+    }
+
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TOKEN_ASSET_ISSUE })
   }
 }
 
