@@ -597,12 +597,11 @@ class Controller extends Interface {
   /**
      * Create call transaction to smart contract deploy
      *
-     * @param {import('../entity').SmartContractCallTransactionInput} input
+     * @param {import('../entity').SmartContractDeployTransactionInput} input
      * @returns {Promise<SignedTransaction>}
      */
   async createSmartContractDeployTransaction(input) {
     validateSmartContractDeployTransactionParams(input)
-
     const {
       wallet,
       fee,

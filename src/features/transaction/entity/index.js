@@ -203,7 +203,7 @@ class SmartContractCallTransactionInput {
   }
 }
 
-class SmartContractCallDeployInput {
+class SmartContractDeployTransactionInput {
   /**
    * Creates an instance of SmartContractCallTransactionInput.
    *
@@ -282,5 +282,5 @@ module.exports = {
   BitcoinTransferTransactionInput,
   SmartContractCallTransactionInput,
   SmartContractCallResponse,
-  SmartContractCallDeployInput,
+  SmartContractDeployTransactionInput,
 }
