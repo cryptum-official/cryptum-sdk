@@ -16,11 +16,16 @@ const {
   buildBscTransferTransaction,
   buildEthereumTransferTransaction,
   buildEthereumSmartContractTransaction,
+  buildEthereumSmartContractDeployTransaction,
 } = require('../../../services/blockchain/ethereum')
 const { buildBitcoinTransferTransaction } = require('../../../services/blockchain/bitcoin')
 const WalletController = require('../../wallet/controller')
 const { GenericException } = require('../../../../errors')
-const { buildCeloSmartContractTransaction, buildCeloTransferTransaction } = require('../../../services/blockchain/celo')
+const {
+  buildCeloSmartContractTransaction,
+  buildCeloTransferTransaction,
+  buildCeloSmartContractDeployTransaction,
+} = require('../../../services/blockchain/celo')
 const {
   validateCeloTransferTransactionParams,
   validateBitcoinTransferTransactionParams,
@@ -86,6 +91,8 @@ class Controller extends Interface {
     method = null,
     params = null,
     protocol,
+    contractName = null,
+    source = null,
   }) {
     try {
       const apiRequest = getApiMethod({
@@ -103,6 +110,8 @@ class Controller extends Interface {
       if (contractAbi) data.contractAbi = contractAbi
       if (method) data.method = method
       if (params) data.params = params
+      if (contractName) data.contractName = contractName
+      if (source) data.source = source
       const response = await apiRequest(`${requests.getFee.url}?protocol=${protocol}`, data, {
         headers,
       })
@@ -572,6 +581,8 @@ class Controller extends Interface {
     params,
     fee,
     protocol,
+    contractName,
+    source,
   }) {
     const [info, networkFee] = await Promise.all([
       new WalletController(this.config).getWalletInfo({
@@ -588,6 +599,8 @@ class Controller extends Interface {
         contractAddress,
         contractAbi,
         protocol,
+        contractName,
+        source,
       }),
     ])
     if (fee && fee.gas) networkFee.gas = fee && fee.gas
@@ -611,37 +624,40 @@ class Controller extends Interface {
       protocol,
       feeCurrency,
       feeCurrencyContractAddress,
-      code,
+      source,
+      contractName,
     } = input
 
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
       type: TransactionType.DEPLOY_CONTRACT,
-      method: 'deploy',
       params,
       testnet,
       fee,
       protocol,
+      source,
+      contractName,
     })
 
     let signedTx
 
     const transactionOptions = {
-      code,
+      source,
+      contractName,
       fromPrivateKey: wallet.privateKey,
-      method: 'deploy',
       nonce: info.nonce,
       params,
       fee: networkFee,
       feeCurrency,
       feeCurrencyContractAddress,
       testnet: testnet !== undefined ? testnet : wallet.testnet,
+      config: this.config,
     }
 
     if (protocol === Protocol.CELO) {
-      signedTx = await buildCeloSmartContractTransaction(transactionOptions)
+      signedTx = await buildCeloSmartContractDeployTransaction(transactionOptions)
     } else if ([Protocol.ETHEREUM, Protocol.BSC].includes(protocol)) {
-      signedTx = await buildEthereumSmartContractTransaction({ ...transactionOptions, protocol })
+      signedTx = await buildEthereumSmartContractDeployTransaction({ ...transactionOptions, protocol })
     } else {
       throw new GenericException('Invalid protocol', 'InvalidTypeException')
     }
@@ -676,7 +692,6 @@ class Controller extends Interface {
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
       type: TransactionType.TOKEN_ASSET_ISSUE,
-      method: 'issue',
       testnet,
       fee,
       protocol,

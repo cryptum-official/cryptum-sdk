@@ -4,6 +4,7 @@ const BigNumber = require('bignumber.js')
 const Web3 = require('web3')
 const { TRANSFER_METHOD_ABI, BSC_COMMON_CHAIN, Protocol } = require('./constants')
 const { GenericException } = require('../../../errors')
+const { compileContract } = require('../../services/blockchain/contract')
 
 module.exports.buildEthereumTransferTransaction = async function ({
   fromPrivateKey,
@@ -106,6 +107,45 @@ module.exports.buildEthereumSmartContractTransaction = async ({
   const web3 = new Web3()
   const contract = new web3.eth.Contract(contractAbi, contractAddress)
   rawTransaction.data = contract.methods[method](...params).encodeABI()
+
+  let common = null
+  if (protocol === Protocol.ETHEREUM) {
+    common = new EthereumCommon({ chain: chainId })
+  } else if (protocol === Protocol.BSC) {
+    common = EthereumCommon.forCustomChain(BSC_COMMON_CHAIN[network].base, BSC_COMMON_CHAIN[network].chain)
+  } else {
+    throw new GenericException('Invalid protocol', 'InvalidTypeException')
+  }
+  const tx = new EthereumTransaction(rawTransaction, { common })
+  const signedTx = tx.sign(Buffer.from(fromPrivateKey, 'hex'))
+  return `0x${signedTx.serialize().toString('hex')}`
+}
+
+module.exports.buildEthereumSmartContractDeployTransaction = async ({
+  fromPrivateKey,
+  nonce,
+  contractName,
+  source,
+  fee,
+  testnet,
+  protocol,
+  tokenType,
+  config,
+}) => {
+  const { data } = await compileContract({
+    source, contractName, tokenType, protocol, config,
+  });
+  const network = testnet ? 'testnet' : 'mainnet'
+  const { gas, gasPrice, chainId } = fee
+  const rawTransaction = {
+    chainId,
+    nonce: Web3.utils.toHex(nonce),
+    gasPrice: Web3.utils.toHex(gasPrice),
+    to: null,
+    value: null,
+    data,
+    gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
+  }
 
   let common = null
   if (protocol === Protocol.ETHEREUM) {
