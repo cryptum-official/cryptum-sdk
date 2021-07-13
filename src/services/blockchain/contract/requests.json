@@ -1,0 +1,6 @@
+{
+  "compileContract": {
+    "method": "POST",
+    "url": "/transaction/contract/compile"
+  }
+}
