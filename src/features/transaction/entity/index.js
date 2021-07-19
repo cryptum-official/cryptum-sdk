@@ -7,7 +7,6 @@ const TransactionType = {
   CALL_CONTRACT_METHOD: 'CALL_CONTRACT_METHOD',
   DEPLOY_CONTRACT: 'DEPLOY_CONTRACT',
   CHANGE_TRUST: 'CHANGE_TRUST',
-  TOKEN_ASSET_ISSUE: 'TOKEN_ASSET_ISSUE',
 }
 /**
  * @typedef {object | string} Fee
