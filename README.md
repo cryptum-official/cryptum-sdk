@@ -16,10 +16,11 @@
     - [Commons Steps](#commons-steps)
   - [How To Use](#how-to-use)
     - [Configuration](#configuration)
-    - [Wallets](docs/wallets)
-    - [Webhooks](docs/webhooks)
-    - [Transactions](docs/transactions)
-    - [Prices](docs/prices)
+    - [Wallets](docs/wallets.md)
+    - [Webhooks](docs/webhooks.md)
+    - [Transactions](docs/transactions.md)
+    - [Prices](docs/prices.md)
+    - [Staking](docs/staking/index.md)
 - [Contributing](#contributing)
   - [What does my PR need to be accepted ? 🤔](#what-does-my-pr-need-to-be-accepted--)
 - [License](#license)
@@ -53,7 +54,8 @@ cd my-amazing-project/
 Install using npm manager or yarn
 
 ```bash
-npm install cryptum-sdk
+npm install -S cryptum-sdk
+
 yarn add cryptum-sdk
 ```
 

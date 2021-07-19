@@ -186,20 +186,18 @@ class SmartContractCallTransactionInput {
    * Creates an instance of SmartContractCallTransactionInput.
    *
    * @param {object} args
-   * @param {import('../../wallet/entity').Wallet} args.wallet
    * @param {string} args.contractAddress
+   * @param {Array<object>} args.contractAbi
    * @param {string} args.method
    * @param {Array} args.params
-   * @param {Fee?} args.fee
-   * @param {boolean} args.testnet
+   * @param {string} args.protocol
    */
-  constructor({ wallet, contractAddress, method, params, fee, testnet }) {
-    this.wallet = wallet
+  constructor({ contractAddress, contractAbi, method, params, protocol }) {
     this.contractAddress = contractAddress
+    this.contractAbi = contractAbi
     this.method = method
     this.params = params
-    this.fee = fee
-    this.testnet = testnet
+    this.protocol = protocol
   }
 }
 

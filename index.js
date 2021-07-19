@@ -2,6 +2,9 @@ const WebhooksController = require('./src/features/webhooks/controller')
 const WalletController = require('./src/features/wallet/controller')
 const PricesController = require('./src/features/prices/controller')
 const TransactionController = require('./src/features/transaction/controller')
+const StakingController = require('./src/features/staking/controller')
+const { Protocol } = require('./src/services/blockchain/constants')
+const { GenericException } = require('./errors')
 /**
  * @typedef {object} Config
  * @property {string} environment
@@ -42,6 +45,20 @@ class CryptumSDK {
    */
   getTransactionController() {
     return new TransactionController(this.config)
+  }
+  /**
+   * Method to get a controller to manipulate transactions
+   * @param {Protocol} protocol
+   * @returns TransactionController instance
+   */
+  getStakingController(protocol) {
+    const controller = new StakingController(this.config)
+    switch (protocol) {
+      case Protocol.CELO:
+        return controller.celo()
+      default:
+        throw new GenericException('Invalid protocol')
+    }
   }
 
   /**
