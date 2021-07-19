@@ -268,27 +268,6 @@ class BitcoinTransferTransactionInput extends TransferTransactionInput {
     this.fromUTXOs = fromUTXOs
   }
 }
-class TokenAssetIssueTransactionInput {
-  /**
-   * Creates an instance of TokenAssetIssueTransactionInput.
-   *
-   * @param {object} args
-   * @param {import('../../wallet/entity').Wallet} args.wallet
-   * @param {string} args.protocol
-   * @param {string} args.name
-   * @param {string} args.tokenSymbol
-   * @param {string} args.amount
-   * @param {boolean} args.testnet
-   */
-  constructor({ wallet, protocol, name, tokenSymbol, amount, testnet }) {
-    this.wallet = wallet
-    this.protocol = protocol
-    this.name = name
-    this.tokenSymbol = tokenSymbol
-    this.amount = amount
-    this.testnet = testnet
-  }
-}
 
 module.exports = {
   TransactionType,
@@ -307,5 +286,4 @@ module.exports = {
   SmartContractCallTransactionInput,
   SmartContractCallResponse,
   SmartContractDeployTransactionInput,
-  TokenAssetIssueTransactionInput,
 }
