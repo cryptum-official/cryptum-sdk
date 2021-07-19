@@ -114,9 +114,10 @@ module.exports.buildCeloSmartContractDeployTransaction = async ({
   testnet,
   config,
   tokenType,
+  params,
 }) => {
   const { bytecode } = await compileContract({
-    source, contractName, config, tokenType, protocol: 'CELO',
+    source, contractName, config, tokenType, protocol: 'CELO', params,
   });
   const network = testnet ? 'testnet' : 'mainnet'
   const { gas, gasPrice, chainId } = fee

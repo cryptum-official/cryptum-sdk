@@ -131,9 +131,10 @@ module.exports.buildEthereumSmartContractDeployTransaction = async ({
   protocol,
   tokenType,
   config,
+  params,
 }) => {
-  const { data } = await compileContract({
-    source, contractName, tokenType, protocol, config,
+  const { bytecode } = await compileContract({
+    source, contractName, tokenType, protocol, config, params,
   });
   const network = testnet ? 'testnet' : 'mainnet'
   const { gas, gasPrice, chainId } = fee
@@ -143,7 +144,7 @@ module.exports.buildEthereumSmartContractDeployTransaction = async ({
     gasPrice: Web3.utils.toHex(gasPrice),
     to: null,
     value: null,
-    data,
+    data: bytecode,
     gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
   }
 
