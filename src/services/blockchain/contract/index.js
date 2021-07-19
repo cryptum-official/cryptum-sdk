@@ -3,7 +3,7 @@ const requests = require('./requests.json')
 
 const compileContract = async ({
   protocol, config,
-  source, contractName, tokenType,
+  source, contractName, tokenType, params,
 }) => {
   try {
     const apiRequest = getApiMethod({
@@ -17,6 +17,7 @@ const compileContract = async ({
     if (source) data.source = source
     if (contractName) data.contractName = contractName
     if (tokenType) data.tokenType = tokenType
+    if (params) data.params = params
 
     const response = await apiRequest(`${requests.compileContract.url}?protocol=${protocol}`, data, {
       headers,

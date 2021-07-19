@@ -86,8 +86,9 @@ module.exports.validateSmartContractDeployTransactionParams = ({
   wallet,
   fee,
   testnet,
-  name,
-  code,
+  source,
+  contractName,
+  params,
   feeCurrency,
   feeCurrencyContractAddress,
   protocol,
@@ -104,10 +105,13 @@ module.exports.validateSmartContractDeployTransactionParams = ({
   if (testnet !== undefined && typeof testnet !== 'boolean') {
     throw new GenericException('Invalid testnet', 'InvalidTypeException')
   }
-  if (code && typeof code !== 'string') {
-    throw new GenericException('Invalid contract code', 'InvalidTypeException')
+  if (params && !Array.isArray(params)) {
+    throw new GenericException('Invalid params', 'InvalidTypeException')
   }
-  if (name && typeof name !== 'string') {
+  if (source && typeof source !== 'string') {
+    throw new GenericException('Invalid contract source', 'InvalidTypeException')
+  }
+  if (contractName && typeof contractName !== 'string') {
     throw new GenericException('Invalid contract name', 'InvalidTypeException')
   }
   if (feeCurrency && typeof feeCurrency !== 'string') {
@@ -176,46 +180,4 @@ module.exports.validateSignedTransaction = ({ signedTx, protocol, type }) => {
     throw new GenericException('Invalid transaction type', 'InvalidTypeException')
   }
 }
-
-module.exports.validateTokenAssetIssueTransactionParams = ({
-  wallet,
-  fee,
-  testnet,
-  name,
-  tokenSymbol,
-  amount,
-  feeCurrency,
-  feeCurrencyContractAddress,
-  protocol,
-}) => {
-  if (!wallet) {
-    throw new GenericException('Invalid wallet', 'InvalidTypeException')
-  }
-  if (fee && (!fee.gas || !fee.gasPrice)) {
-    throw new GenericException(
-      'Invalid fee, it should be an object with gas and gasPrice parameters',
-      'InvalidTypeException'
-    )
-  }
-  if (testnet !== undefined && typeof testnet !== 'boolean') {
-    throw new GenericException('Invalid testnet', 'InvalidTypeException')
-  }
-  if (tokenSymbol && typeof tokenSymbol !== 'string') {
-    throw new GenericException('Invalid token token symbol', 'InvalidTypeException')
-  }
-  if (name && typeof name !== 'string') {
-    throw new GenericException('Invalid token name', 'InvalidTypeException')
-  }
-  if (amount && typeof amount !== 'string') {
-    throw new GenericException('Invalid token amount', 'InvalidTypeException')
-  }
-  if (feeCurrency && typeof feeCurrency !== 'string') {
-    throw new GenericException('Invalid fee currency', 'InvalidTypeException')
-  }
-  if (feeCurrencyContractAddress && typeof feeCurrencyContractAddress !== 'string') {
-    throw new GenericException('Invalid fee currency contract address', 'InvalidTypeException')
-  }
-  if (![Protocol.CELO].includes(protocol)) {
-    throw new GenericException('Invalid protocol', 'InvalidTypeException')
-  }
 }
