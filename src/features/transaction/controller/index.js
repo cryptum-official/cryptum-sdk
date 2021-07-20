@@ -33,7 +33,7 @@ const {
   validateSmartContractTransactionParams,
   validateSmartContractCallParams,
   validateSmartContractDeployTransactionParams,
-  validateTokenAssetIssueTransactionParams,
+  validateTokenIssueTransactionParams,
 } = require('../../../services/validations')
 
 class Controller extends Interface {
@@ -93,6 +93,7 @@ class Controller extends Interface {
     protocol,
     contractName = null,
     source = null,
+    tokenType = null,
   }) {
     try {
       const apiRequest = getApiMethod({
@@ -112,6 +113,7 @@ class Controller extends Interface {
       if (params) data.params = params
       if (contractName) data.contractName = contractName
       if (source) data.source = source
+      if (tokenType) data.tokenType = tokenType
       const response = await apiRequest(`${requests.getFee.url}?protocol=${protocol}`, data, {
         headers,
       })
@@ -585,6 +587,7 @@ class Controller extends Interface {
     protocol,
     contractName,
     source,
+    tokenType,
   }) {
     const [info, networkFee] = await Promise.all([
       new WalletController(this.config).getWalletInfo({
@@ -603,6 +606,7 @@ class Controller extends Interface {
         protocol,
         contractName,
         source,
+        tokenType,
       }),
     ])
     if (fee && fee.gas) networkFee.gas = fee && fee.gas
@@ -654,6 +658,58 @@ class Controller extends Interface {
       feeCurrencyContractAddress,
       testnet: testnet !== undefined ? testnet : wallet.testnet,
       config: this.config,
+    }
+
+    if (protocol === Protocol.CELO) {
+      signedTx = await buildCeloSmartContractDeployTransaction(transactionOptions)
+    } else if ([Protocol.ETHEREUM, Protocol.BSC].includes(protocol)) {
+      signedTx = await buildEthereumSmartContractDeployTransaction({ ...transactionOptions, protocol })
+    } else {
+      throw new GenericException('Invalid protocol', 'InvalidTypeException')
+    }
+
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT })
+  }
+  /**
+     * Create call transaction to token/asset issue
+     *
+     * @param {import('../entity').TokenIssueTransactionInput} input
+     * @returns {Promise<SignedTransaction>}
+     */
+  async createTokenIssueTransaction(input) {
+    validateTokenIssueTransactionParams(input)
+    const {
+      wallet,
+      fee,
+      testnet,
+      params,
+      protocol,
+      feeCurrency,
+      feeCurrencyContractAddress,
+      tokenType,
+    } = input
+
+    const { info, networkFee } = await this._getFeeInfo({
+      wallet,
+      type: `DEPLOY_${tokenType}`,
+      params,
+      testnet,
+      fee,
+      protocol,
+    })
+
+    let signedTx
+
+    const transactionOptions = {
+      fromPrivateKey: wallet.privateKey,
+      nonce: info.nonce,
+      params,
+      fee: networkFee,
+      feeCurrency,
+      feeCurrencyContractAddress,
+      testnet: testnet !== undefined ? testnet : wallet.testnet,
+      config: this.config,
+      tokenType,
     }
 
     if (protocol === Protocol.CELO) {
