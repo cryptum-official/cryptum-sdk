@@ -2,7 +2,7 @@ const { default: BigNumber } = require('bignumber.js')
 const Web3 = require('web3')
 const { GenericException, InvalidTypeException } = require('../../../errors')
 const { TransactionType } = require('../../features/transaction/entity')
-const { Protocol } = require('../blockchain/constants')
+const { Protocol, TOKEN_TYPES } = require('../blockchain/constants')
 
 module.exports.validateCeloTransferTransactionParams = ({
   wallet,
@@ -115,6 +115,44 @@ module.exports.validateSmartContractDeployTransactionParams = ({
   }
   if (contractName && typeof contractName !== 'string') {
     throw new GenericException('Invalid contract name', 'InvalidTypeException')
+  }
+  if (feeCurrency && typeof feeCurrency !== 'string') {
+    throw new GenericException('Invalid fee currency', 'InvalidTypeException')
+  }
+  if (feeCurrencyContractAddress && typeof feeCurrencyContractAddress !== 'string') {
+    throw new GenericException('Invalid fee currency contract address', 'InvalidTypeException')
+  }
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM].includes(protocol)) {
+    throw new GenericException('Invalid protocol', 'InvalidTypeException')
+  }
+}
+module.exports.validateTokenIssueTransactionParams = ({
+  wallet,
+  fee,
+  testnet,
+  tokenType,
+  params,
+  feeCurrency,
+  feeCurrencyContractAddress,
+  protocol,
+}) => {
+  if (!wallet) {
+    throw new GenericException('Invalid wallet', 'InvalidTypeException')
+  }
+  if (fee && (!fee.gas || !fee.gasPrice)) {
+    throw new GenericException(
+      'Invalid fee, it should be an object with gas and gasPrice parameters',
+      'InvalidTypeException'
+    )
+  }
+  if (testnet !== undefined && typeof testnet !== 'boolean') {
+    throw new GenericException('Invalid testnet', 'InvalidTypeException')
+  }
+  if (params && !Array.isArray(params)) {
+    throw new GenericException('Invalid params', 'InvalidTypeException')
+  }
+  if (tokenType && !Object.keys(TOKEN_TYPES).includes(tokenType)) {
+    throw new GenericException('Invalid token type', 'InvalidTypeException')
   }
   if (feeCurrency && typeof feeCurrency !== 'string') {
     throw new GenericException('Invalid fee currency', 'InvalidTypeException')
