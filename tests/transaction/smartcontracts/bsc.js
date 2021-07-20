@@ -83,6 +83,29 @@ describe.only('BSC smart contract transactions', () => {
         result: 'hello',
       })
       .persist()
+      .post(`/transaction/contract/compile?protocol=${Protocol.BSC}`, {
+        contractName: 'Test',
+        source: 'contract Test {}',
+        params: ['new message'],
+      })
+      .reply(200, {
+        bytecode: '',
+        abi: [],
+      })
+      .persist()
+      .post(`/fee?protocol=${Protocol.BSC}`, {
+        type: TransactionType.DEPLOY_CONTRACT,
+        from: wallets.bsc.address,
+        contractName: 'Test',
+        source: 'contract Test {}',
+        params: ['new message'],
+      })
+      .reply(200, {
+        gas: 21000,
+        gasPrice: '4000000',
+        chainId: 4,
+      })
+      .persist()
   })
   after(() => {
     nock.isDone()
@@ -168,6 +191,61 @@ describe.only('BSC smart contract transactions', () => {
         params: [],
         protocol: Protocol.BSC,
         testnet: true,
+      })
+    )
+  })
+
+  it('create smart contract deploy transaction', async () => {
+    const transaction = await txController.createSmartContractDeployTransaction({
+      wallet: wallets.bsc,
+      params: ['new message'],
+      protocol: Protocol.BSC,
+      testnet: true,
+      contractName: 'Test',
+      source: 'contract Test {}'
+    })
+    assert.include(transaction.signedTx, '0x')
+    // console.log(await txController.sendTransaction(transaction))
+  })
+  it('throws smart contract deploy transaction failed when wallet is invalid', async () => {
+    assert.isRejected(
+      txController.createSmartContractTransaction({
+        params: ['new message'],
+        protocol: Protocol.BSC,
+        testnet: true,
+        contractName: 'Test',
+        source: 'contract Test {}'
+      })
+    )
+  })
+  it('throws smart contract deploy transaction failed when params is invalid', async () => {
+    assert.isRejected(
+      txController.createSmartContractTransaction({
+        wallet: wallets.bsc,
+        protocol: Protocol.BSC,
+        testnet: true,
+        contractName: 'Test',
+        source: 'contract Test {}'
+      })
+    )
+  })
+  it('throws smart contract deploy transaction failed when contract name is invalid', async () => {
+    assert.isRejected(
+      txController.createSmartContractTransaction({
+        wallet: wallets.bsc,
+        protocol: Protocol.BSC,
+        testnet: true,
+        source: 'contract Test {}'
+      })
+    )
+  })
+  it('throws smart contract deploy transaction failed when source is invalid', async () => {
+    assert.isRejected(
+      txController.createSmartContractTransaction({
+        wallet: wallets.bsc,
+        protocol: Protocol.BSC,
+        testnet: true,
+        contractName: 'Test',
       })
     )
   })

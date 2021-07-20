@@ -33,7 +33,6 @@ const {
   validateSmartContractTransactionParams,
   validateSmartContractCallParams,
   validateSmartContractDeployTransactionParams,
-  validateTokenAssetIssueTransactionParams,
 } = require('../../../services/validations')
 
 class Controller extends Interface {

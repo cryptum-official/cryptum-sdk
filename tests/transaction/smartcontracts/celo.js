@@ -83,6 +83,29 @@ describe.only('Celo smart contract transactions', () => {
         result: 'hello',
       })
       .persist()
+      .post(`/transaction/contract/compile?protocol=${Protocol.CELO}`, {
+        contractName: 'Test',
+        source: 'contract Test {}',
+        params: ['new message'],
+      })
+      .reply(200, {
+        bytecode: '',
+        abi: [],
+      })
+      .persist()
+      .post(`/fee?protocol=${Protocol.CELO}`, {
+        type: TransactionType.DEPLOY_CONTRACT,
+        from: '0x8C33DB44a78629cF60C88383d436EEc356884625',
+        contractName: 'Test',
+        source: 'contract Test {}',
+        params: ['new message'],
+      })
+      .reply(200, {
+        gas: 21000,
+        gasPrice: '4000000',
+        chainId: 4,
+      })
+      .persist()
   })
   after(() => {
     nock.isDone()
@@ -168,6 +191,49 @@ describe.only('Celo smart contract transactions', () => {
         params: [],
         protocol: Protocol.CELO,
         testnet: true,
+      })
+    )
+  })
+
+  it('throws smart contract deploy transaction failed when wallet is invalid', async () => {
+    assert.isRejected(
+      txController.createSmartContractTransaction({
+        params: ['new message'],
+        protocol: Protocol.CELO,
+        testnet: true,
+        contractName: 'Test',
+        source: 'contract Test {}'
+      })
+    )
+  })
+  it('throws smart contract deploy transaction failed when params is invalid', async () => {
+    assert.isRejected(
+      txController.createSmartContractTransaction({
+        wallet: wallets.celo,
+        protocol: Protocol.CELO,
+        testnet: true,
+        contractName: 'Test',
+        source: 'contract Test {}'
+      })
+    )
+  })
+  it('throws smart contract deploy transaction failed when contract name is invalid', async () => {
+    assert.isRejected(
+      txController.createSmartContractTransaction({
+        wallet: wallets.celo,
+        protocol: Protocol.CELO,
+        testnet: true,
+        source: 'contract Test {}'
+      })
+    )
+  })
+  it('throws smart contract deploy transaction failed when source is invalid', async () => {
+    assert.isRejected(
+      txController.createSmartContractTransaction({
+        wallet: wallets.celo,
+        protocol: Protocol.CELO,
+        testnet: true,
+        contractName: 'Test',
       })
     )
   })
