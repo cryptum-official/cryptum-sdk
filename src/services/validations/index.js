@@ -126,7 +126,7 @@ module.exports.validateSmartContractDeployTransactionParams = ({
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
 }
-module.exports.validateTokenIssueTransactionParams = ({
+module.exports.validateTokenDeployTransactionParams = ({
   wallet,
   fee,
   testnet,

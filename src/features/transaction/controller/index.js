@@ -33,7 +33,7 @@ const {
   validateSmartContractTransactionParams,
   validateSmartContractCallParams,
   validateSmartContractDeployTransactionParams,
-  validateTokenIssueTransactionParams,
+  validateTokenDeployTransactionParams,
 } = require('../../../services/validations')
 
 class Controller extends Interface {
@@ -673,11 +673,11 @@ class Controller extends Interface {
   /**
      * Create call transaction to token/asset issue
      *
-     * @param {import('../entity').TokenIssueTransactionInput} input
+     * @param {import('../entity').TokenDeployTransactionInput} input
      * @returns {Promise<SignedTransaction>}
      */
   async createTokenDeployTransaction(input) {
-    validateTokenIssueTransactionParams(input)
+    validateTokenDeployTransactionParams(input)
     const {
       wallet,
       fee,

@@ -227,9 +227,9 @@ class SmartContractDeployTransactionInput {
   }
 }
 
-class TokenIssueTransactionInput {
+class TokenDeployTransactionInput {
   /**
-   * Creates an instance of TokenIssueTransactionInput.
+   * Creates an instance of TokenDeployTransactionInput.
    *
    * @param {object} args
    * @param {import('../../wallet/entity').Wallet} args.wallet
@@ -305,5 +305,5 @@ module.exports = {
   SmartContractCallTransactionInput,
   SmartContractCallResponse,
   SmartContractDeployTransactionInput,
-  TokenIssueTransactionInput,
+  TokenDeployTransactionInput,
 }
