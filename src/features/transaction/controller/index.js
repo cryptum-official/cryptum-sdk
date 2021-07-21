@@ -676,7 +676,7 @@ class Controller extends Interface {
      * @param {import('../entity').TokenIssueTransactionInput} input
      * @returns {Promise<SignedTransaction>}
      */
-  async createTokenIssueTransaction(input) {
+  async createTokenDeployTransaction(input) {
     validateTokenIssueTransactionParams(input)
     const {
       wallet,
@@ -696,6 +696,7 @@ class Controller extends Interface {
       testnet,
       fee,
       protocol,
+      tokenType,
     })
 
     let signedTx

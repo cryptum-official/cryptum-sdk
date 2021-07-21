@@ -83,6 +83,27 @@ describe.only('Celo smart contract transactions', () => {
         result: 'hello',
       })
       .persist()
+      .post(`/transaction/contract/compile?protocol=${Protocol.CELO}`, {
+        tokenType: 'ERC20',
+        params: ['new message'],
+      })
+      .reply(200, {
+        bytecode: '',
+        abi: [],
+      })
+      .persist()
+      .post(`/fee?protocol=${Protocol.CELO}`, {
+        type: TransactionType.DEPLOY_ERC20,
+        from: '0x8C33DB44a78629cF60C88383d436EEc356884625',
+        tokenType: 'ERC20',
+        params: ['new message'],
+      })
+      .reply(200, {
+        gas: 21000,
+        gasPrice: '4000000',
+        chainId: 4,
+      })
+      .persist()
   })
   after(() => {
     nock.isDone()
@@ -168,6 +189,46 @@ describe.only('Celo smart contract transactions', () => {
         params: [],
         protocol: Protocol.CELO,
         testnet: true,
+      })
+    )
+  })
+  it('create smart contract token deploy transaction', async () => {
+    const transaction = await txController.createTokenDeployTransaction({
+      wallet: wallets.celo,
+      params: ['new message'],
+      protocol: Protocol.CELO,
+      testnet: true,
+      tokenType: 'ERC20',
+    })
+    assert.include(transaction.signedTx, '0x')
+  })
+  it('throws smart contract token deploy transaction failed when wallet is invalid', async () => {
+    assert.isRejected(
+      txController.createTokenDeployTransaction({
+        params: ['new message'],
+        protocol: Protocol.CELO,
+        testnet: true,
+        tokenType: 'ERC20',
+      })
+    )
+  })
+  it('throws smart contract token deploy transaction failed when params is invalid', async () => {
+    assert.isRejected(
+      txController.createTokenDeployTransaction({
+        wallet: wallets.celo,
+        protocol: Protocol.CELO,
+        testnet: true,
+        tokenType: 'ERC20',
+      })
+    )
+  })
+  it('throws smart contract token deploy transaction failed when token type is invalid', async () => {
+    assert.isRejected(
+      txController.createTokenDeployTransaction({
+        wallet: wallets.celo,
+        protocol: Protocol.CELO,
+        testnet: true,
+        params: ['new message'],
       })
     )
   })
