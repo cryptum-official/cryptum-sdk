@@ -209,7 +209,7 @@ describe.only('BSC smart contract transactions', () => {
   })
   it('throws smart contract deploy transaction failed when wallet is invalid', async () => {
     assert.isRejected(
-      txController.createSmartContractTransaction({
+      txController.createSmartContractDeployTransaction({
         params: ['new message'],
         protocol: Protocol.BSC,
         testnet: true,
@@ -220,7 +220,7 @@ describe.only('BSC smart contract transactions', () => {
   })
   it('throws smart contract deploy transaction failed when params is invalid', async () => {
     assert.isRejected(
-      txController.createSmartContractTransaction({
+      txController.createSmartContractDeployTransaction({
         wallet: wallets.bsc,
         protocol: Protocol.BSC,
         testnet: true,
@@ -231,7 +231,7 @@ describe.only('BSC smart contract transactions', () => {
   })
   it('throws smart contract deploy transaction failed when contract name is invalid', async () => {
     assert.isRejected(
-      txController.createSmartContractTransaction({
+      txController.createSmartContractDeployTransaction({
         wallet: wallets.bsc,
         protocol: Protocol.BSC,
         testnet: true,
@@ -241,7 +241,7 @@ describe.only('BSC smart contract transactions', () => {
   })
   it('throws smart contract deploy transaction failed when source is invalid', async () => {
     assert.isRejected(
-      txController.createSmartContractTransaction({
+      txController.createSmartContractDeployTransaction({
         wallet: wallets.bsc,
         protocol: Protocol.BSC,
         testnet: true,
