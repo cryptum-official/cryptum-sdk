@@ -6,6 +6,9 @@ const TransactionType = {
   TRANSFER: 'TRANSFER',
   CALL_CONTRACT_METHOD: 'CALL_CONTRACT_METHOD',
   DEPLOY_CONTRACT: 'DEPLOY_CONTRACT',
+  DEPLOY_ERC20: 'DEPLOY_ERC20',
+  DEPLOY_ERC721: 'DEPLOY_ERC721',
+  DEPLOY_ERC1155: 'DEPLOY_ERC1155',
   CHANGE_TRUST: 'CHANGE_TRUST',
 }
 /**
@@ -208,18 +211,37 @@ class SmartContractDeployTransactionInput {
    * @param {object} args
    * @param {import('../../wallet/entity').Wallet} args.wallet
    * @param {string} args.method
-   * @param {string} args.name
+   * @param {string} args.contractName
    * @param {Array} args.params
-   * @param {string} args.code
+   * @param {string} args.source
    * @param {Fee?} args.fee
    * @param {boolean} args.testnet
    */
-  constructor({ wallet, method, name, params, code, fee, testnet }) {
+  constructor({ wallet, contractName, params, source, fee, testnet }) {
     this.wallet = wallet
-    this.method = method
-    this.name = name
+    this.contractName = contractName
     this.params = params
-    this.code = code
+    this.source = source
+    this.fee = fee
+    this.testnet = testnet
+  }
+}
+
+class TokenDeployTransactionInput {
+  /**
+   * Creates an instance of TokenDeployTransactionInput.
+   *
+   * @param {object} args
+   * @param {import('../../wallet/entity').Wallet} args.wallet
+   * @param {Array} args.params
+   * @param {string} args.tokenType
+   * @param {Fee?} args.fee
+   * @param {boolean} args.testnet
+   */
+  constructor({ wallet, tokenType, params, fee, testnet }) {
+    this.wallet = wallet
+    this.tokenType = tokenType
+    this.params = params
     this.fee = fee
     this.testnet = testnet
   }
@@ -283,4 +305,5 @@ module.exports = {
   SmartContractCallTransactionInput,
   SmartContractCallResponse,
   SmartContractDeployTransactionInput,
+  TokenDeployTransactionInput,
 }
