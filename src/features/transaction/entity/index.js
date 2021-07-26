@@ -50,7 +50,7 @@ class FeeResponse {
   }
 }
 class SmartContractCallResponse {
-  constructor({ result  }) {
+  constructor({ result }) {
     this.result = result
   }
 }
@@ -200,6 +200,30 @@ class SmartContractCallTransactionInput {
     this.protocol = protocol
   }
 }
+
+class SmartContractDeployTransactionInput {
+  /**
+   * Creates an instance of SmartContractDeployTransactionInput.
+   *
+   * @param {object} args
+   * @param {import('../../wallet/entity').Wallet} args.wallet
+   * @param {string} args.method
+   * @param {string} args.name
+   * @param {Array} args.params
+   * @param {string} args.code
+   * @param {Fee?} args.fee
+   * @param {boolean} args.testnet
+   */
+  constructor({ wallet, method, name, params, code, fee, testnet }) {
+    this.wallet = wallet
+    this.method = method
+    this.name = name
+    this.params = params
+    this.code = code
+    this.fee = fee
+    this.testnet = testnet
+  }
+}
 class CeloTransferTransactionInput extends EthereumTransferTransactionInput {
   /**
    * Creates an instance of CeloTransferTransactionInput.
@@ -257,5 +281,6 @@ module.exports = {
   RippleTransferTransactionInput,
   BitcoinTransferTransactionInput,
   SmartContractCallTransactionInput,
-  SmartContractCallResponse
+  SmartContractCallResponse,
+  SmartContractDeployTransactionInput,
 }

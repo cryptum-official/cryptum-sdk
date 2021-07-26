@@ -16,17 +16,23 @@ const {
   buildBscTransferTransaction,
   buildEthereumTransferTransaction,
   buildEthereumSmartContractTransaction,
+  buildEthereumSmartContractDeployTransaction,
 } = require('../../../services/blockchain/ethereum')
 const { buildBitcoinTransferTransaction } = require('../../../services/blockchain/bitcoin')
 const WalletController = require('../../wallet/controller')
 const { GenericException } = require('../../../../errors')
-const { buildCeloSmartContractTransaction, buildCeloTransferTransaction } = require('../../../services/blockchain/celo')
+const {
+  buildCeloSmartContractTransaction,
+  buildCeloTransferTransaction,
+  buildCeloSmartContractDeployTransaction,
+} = require('../../../services/blockchain/celo')
 const {
   validateCeloTransferTransactionParams,
   validateBitcoinTransferTransactionParams,
   validateSignedTransaction,
   validateSmartContractTransactionParams,
   validateSmartContractCallParams,
+  validateSmartContractDeployTransactionParams,
 } = require('../../../services/validations')
 
 class Controller extends Interface {
@@ -84,6 +90,8 @@ class Controller extends Interface {
     method = null,
     params = null,
     protocol,
+    contractName = null,
+    source = null,
   }) {
     try {
       const apiRequest = getApiMethod({
@@ -101,6 +109,8 @@ class Controller extends Interface {
       if (contractAbi) data.contractAbi = contractAbi
       if (method) data.method = method
       if (params) data.params = params
+      if (contractName) data.contractName = contractName
+      if (source) data.source = source
       const response = await apiRequest(`${requests.getFee.url}?protocol=${protocol}`, data, {
         headers,
       })
@@ -447,7 +457,7 @@ class Controller extends Interface {
     }
     let networkFee = fee
     if (!networkFee) {
-      ;({ estimateValue: networkFee } = await this.getFee({
+      ; ({ estimateValue: networkFee } = await this.getFee({
         type: TransactionType.TRANSFER,
         protocol,
       }))
@@ -531,7 +541,7 @@ class Controller extends Interface {
    * @param {import('../entity').SmartContractCallTransactionInput} input
    * @returns {Promise<SmartContractCallResponse>}
    */
-   async callSmartContractMethod(input) {
+  async callSmartContractMethod(input) {
     validateSmartContractCallParams(input)
     const {
       contractAddress,
@@ -572,6 +582,8 @@ class Controller extends Interface {
     params,
     fee,
     protocol,
+    contractName,
+    source,
   }) {
     const [info, networkFee] = await Promise.all([
       new WalletController(this.config).getWalletInfo({
@@ -588,11 +600,70 @@ class Controller extends Interface {
         contractAddress,
         contractAbi,
         protocol,
+        contractName,
+        source,
       }),
     ])
     if (fee && fee.gas) networkFee.gas = fee && fee.gas
     if (fee && fee.gasPrice) networkFee.gasPrice = fee && fee.gasPrice
     return { info, networkFee }
+  }
+
+  /**
+     * Create call transaction to smart contract deploy
+     *
+     * @param {import('../entity').SmartContractDeployTransactionInput} input
+     * @returns {Promise<SignedTransaction>}
+     */
+  async createSmartContractDeployTransaction(input) {
+    validateSmartContractDeployTransactionParams(input)
+    const {
+      wallet,
+      fee,
+      testnet,
+      params,
+      protocol,
+      feeCurrency,
+      feeCurrencyContractAddress,
+      source,
+      contractName,
+    } = input
+
+    const { info, networkFee } = await this._getFeeInfo({
+      wallet,
+      type: TransactionType.DEPLOY_CONTRACT,
+      params,
+      testnet,
+      fee,
+      protocol,
+      source,
+      contractName,
+    })
+
+    let signedTx
+
+    const transactionOptions = {
+      source,
+      contractName,
+      fromPrivateKey: wallet.privateKey,
+      nonce: info.nonce,
+      params,
+      fee: networkFee,
+      feeCurrency,
+      feeCurrencyContractAddress,
+      testnet: testnet !== undefined ? testnet : wallet.testnet,
+      config: this.config,
+    }
+
+    if (protocol === Protocol.CELO) {
+      signedTx = await buildCeloSmartContractDeployTransaction(transactionOptions)
+    } else if ([Protocol.ETHEREUM, Protocol.BSC].includes(protocol)) {
+      signedTx = await buildEthereumSmartContractDeployTransaction({ ...transactionOptions, protocol })
+    } else {
+      throw new GenericException('Invalid protocol', 'InvalidTypeException')
+    }
+
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT })
   }
 }
 

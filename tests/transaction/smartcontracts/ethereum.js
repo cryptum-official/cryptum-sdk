@@ -83,6 +83,29 @@ describe.only('Ethereum smart contract transactions', () => {
         result: 'hello',
       })
       .persist()
+      .post(`/transaction/contract/compile?protocol=${Protocol.ETHEREUM}`, {
+        contractName: 'Test',
+        source: 'contract Test {}',
+        params: ['new message'],
+      })
+      .reply(200, {
+        bytecode: '',
+        abi: [],
+      })
+      .persist()
+      .post(`/fee?protocol=${Protocol.ETHEREUM}`, {
+        type: TransactionType.DEPLOY_CONTRACT,
+        from: wallets.ethereum.address,
+        contractName: 'Test',
+        source: 'contract Test {}',
+        params: ['new message'],
+      })
+      .reply(200, {
+        gas: 21000,
+        gasPrice: '4000000',
+        chainId: 4,
+      })
+      .persist()
   })
   after(() => {
     nock.isDone()
@@ -168,6 +191,61 @@ describe.only('Ethereum smart contract transactions', () => {
         params: [],
         protocol: Protocol.ETHEREUM,
         testnet: true,
+      })
+    )
+  })
+
+  it('create smart contract deploy transaction', async () => {
+    const transaction = await txController.createSmartContractDeployTransaction({
+      wallet: wallets.ethereum,
+      params: ['new message'],
+      protocol: Protocol.ETHEREUM,
+      testnet: true,
+      contractName: 'Test',
+      source: 'contract Test {}'
+    })
+    assert.include(transaction.signedTx, '0x')
+    // console.log(await txController.sendTransaction(transaction))
+  })
+  it('throws smart contract deploy transaction failed when wallet is invalid', async () => {
+    assert.isRejected(
+      txController.createSmartContractDeployTransaction({
+        params: ['new message'],
+        protocol: Protocol.ETHEREUM,
+        testnet: true,
+        contractName: 'Test',
+        source: 'contract Test {}'
+      })
+    )
+  })
+  it('throws smart contract deploy transaction failed when params is invalid', async () => {
+    assert.isRejected(
+      txController.createSmartContractDeployTransaction({
+        wallet: wallets.ethereum,
+        protocol: Protocol.ETHEREUM,
+        testnet: true,
+        contractName: 'Test',
+        source: 'contract Test {}'
+      })
+    )
+  })
+  it('throws smart contract deploy transaction failed when contract name is invalid', async () => {
+    assert.isRejected(
+      txController.createSmartContractDeployTransaction({
+        wallet: wallets.ethereum,
+        protocol: Protocol.ETHEREUM,
+        testnet: true,
+        source: 'contract Test {}'
+      })
+    )
+  })
+  it('throws smart contract deploy transaction failed when source is invalid', async () => {
+    assert.isRejected(
+      txController.createSmartContractDeployTransaction({
+        wallet: wallets.ethereum,
+        protocol: Protocol.ETHEREUM,
+        testnet: true,
+        contractName: 'Test',
       })
     )
   })

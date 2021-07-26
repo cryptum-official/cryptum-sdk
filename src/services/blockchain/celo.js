@@ -7,6 +7,7 @@ const {
   TRANSFER_METHOD_ABI,
   TRANSFER_COMMENT_METHOD_ABI,
 } = require('./constants')
+const { compileContract } = require('../../services/blockchain/contract')
 
 module.exports.buildCeloTransferTransaction = async function ({
   fromPrivateKey,
@@ -35,8 +36,8 @@ module.exports.buildCeloTransferTransaction = async function ({
       feeCurrency === 'cUSD'
         ? CUSD_CONTRACT_ADDRESS[network]
         : feeCurrency === 'cEUR'
-        ? CEUR_CONTRACT_ADDRESS[network]
-        : feeCurrencyContractAddress,
+          ? CEUR_CONTRACT_ADDRESS[network]
+          : feeCurrencyContractAddress,
   }
   const value = Web3.utils.toWei(amount, 'ether')
   if (tokenSymbol === 'CELO') {
@@ -90,12 +91,51 @@ module.exports.buildCeloSmartContractTransaction = async ({
       feeCurrency === 'cUSD'
         ? CUSD_CONTRACT_ADDRESS[network]
         : feeCurrency === 'cEUR'
-        ? CEUR_CONTRACT_ADDRESS[network]
-        : feeCurrencyContractAddress,
+          ? CEUR_CONTRACT_ADDRESS[network]
+          : feeCurrencyContractAddress,
   }
   const web3 = new Web3()
   const contract = new web3.eth.Contract(contractAbi, contractAddress)
   rawTransaction.data = contract.methods[method](...params).encodeABI()
+
+  const celoWallet = new CeloWallet(fromPrivateKey)
+  const signature = celoWallet._signingKey().signDigest(Web3.utils.sha3(serializeCeloTransaction(rawTransaction)))
+  return serializeCeloTransaction(rawTransaction, signature)
+}
+
+module.exports.buildCeloSmartContractDeployTransaction = async ({
+  fromPrivateKey,
+  contractName,
+  source,
+  nonce,
+  fee,
+  feeCurrency,
+  feeCurrencyContractAddress,
+  testnet,
+  config,
+  tokenType,
+  params,
+}) => {
+  const { bytecode } = await compileContract({
+    source, contractName, config, tokenType, protocol: 'CELO', params,
+  });
+  const network = testnet ? 'testnet' : 'mainnet'
+  const { gas, gasPrice, chainId } = fee
+  const rawTransaction = {
+    chainId,
+    nonce: Web3.utils.toHex(nonce),
+    gasPrice: Web3.utils.toHex(gasPrice),
+    to: null,
+    value: null,
+    data: bytecode,
+    gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
+    feeCurrency:
+      feeCurrency === 'cUSD'
+        ? CUSD_CONTRACT_ADDRESS[network]
+        : feeCurrency === 'cEUR'
+          ? CEUR_CONTRACT_ADDRESS[network]
+          : feeCurrencyContractAddress,
+  }
 
   const celoWallet = new CeloWallet(fromPrivateKey)
   const signature = celoWallet._signingKey().signDigest(Web3.utils.sha3(serializeCeloTransaction(rawTransaction)))
