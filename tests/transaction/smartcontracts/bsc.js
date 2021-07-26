@@ -93,11 +93,31 @@ describe.only('BSC smart contract transactions', () => {
         abi: [],
       })
       .persist()
+      .post(`/transaction/contract/compile?protocol=${Protocol.BSC}`, {
+        tokenType: 'ERC20',
+        params: ['new message'],
+      })
+      .reply(200, {
+        bytecode: '',
+        abi: [],
+      })
+      .persist()
       .post(`/fee?protocol=${Protocol.BSC}`, {
         type: TransactionType.DEPLOY_CONTRACT,
         from: wallets.bsc.address,
         contractName: 'Test',
         source: 'contract Test {}',
+        params: ['new message'],
+      })
+      .reply(200, {
+        gas: 21000,
+        gasPrice: '4000000',
+        chainId: 4,
+      })
+      .post(`/fee?protocol=${Protocol.BSC}`, {
+        type: TransactionType.DEPLOY_ERC20,
+        from: wallets.bsc.address,
+        tokenType: 'ERC20',
         params: ['new message'],
       })
       .reply(200, {
@@ -207,6 +227,17 @@ describe.only('BSC smart contract transactions', () => {
     assert.include(transaction.signedTx, '0x')
     // console.log(await txController.sendTransaction(transaction))
   })
+  it('create smart contract token deploy transaction', async () => {
+    const transaction = await txController.createTokenDeployTransaction({
+      wallet: wallets.bsc,
+      params: ['new message'],
+      protocol: Protocol.BSC,
+      testnet: true,
+      tokenType: 'ERC20',
+    })
+    assert.include(transaction.signedTx, '0x')
+  })
+
   it('throws smart contract deploy transaction failed when wallet is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractDeployTransaction({
@@ -246,6 +277,37 @@ describe.only('BSC smart contract transactions', () => {
         protocol: Protocol.BSC,
         testnet: true,
         contractName: 'Test',
+      })
+    )
+  })
+
+  it('throws smart contract token deploy transaction failed when wallet is invalid', async () => {
+    assert.isRejected(
+      txController.createTokenDeployTransaction({
+        params: ['new message'],
+        protocol: Protocol.BSC,
+        testnet: true,
+        tokenType: 'ERC20',
+      })
+    )
+  })
+  it('throws smart contract token deploy transaction failed when params is invalid', async () => {
+    assert.isRejected(
+      txController.createTokenDeployTransaction({
+        wallet: wallets.bsc,
+        protocol: Protocol.BSC,
+        testnet: true,
+        tokenType: 'ERC20',
+      })
+    )
+  })
+  it('throws smart contract token deploy transaction failed when token type is invalid', async () => {
+    assert.isRejected(
+      txController.createTokenDeployTransaction({
+        wallet: wallets.bsc,
+        protocol: Protocol.BSC,
+        testnet: true,
+        params: ['new message'],
       })
     )
   })

@@ -93,11 +93,32 @@ describe.only('Ethereum smart contract transactions', () => {
         abi: [],
       })
       .persist()
+      .post(`/transaction/contract/compile?protocol=${Protocol.ETHEREUM}`, {
+        tokenType: 'ERC20',
+        params: ['new message'],
+      })
+      .reply(200, {
+        bytecode: '',
+        abi: [],
+      })
+      .persist()
       .post(`/fee?protocol=${Protocol.ETHEREUM}`, {
         type: TransactionType.DEPLOY_CONTRACT,
         from: wallets.ethereum.address,
         contractName: 'Test',
         source: 'contract Test {}',
+        params: ['new message'],
+      })
+      .reply(200, {
+        gas: 21000,
+        gasPrice: '4000000',
+        chainId: 4,
+      })
+      .persist()
+      .post(`/fee?protocol=${Protocol.ETHEREUM}`, {
+        type: TransactionType.DEPLOY_ERC20,
+        from: wallets.ethereum.address,
+        tokenType: 'ERC20',
         params: ['new message'],
       })
       .reply(200, {
@@ -198,11 +219,22 @@ describe.only('Ethereum smart contract transactions', () => {
   it('create smart contract deploy transaction', async () => {
     const transaction = await txController.createSmartContractDeployTransaction({
       wallet: wallets.ethereum,
+      contractName: 'Test',
+      source: 'contract Test {}',
       params: ['new message'],
       protocol: Protocol.ETHEREUM,
       testnet: true,
-      contractName: 'Test',
-      source: 'contract Test {}'
+    })
+    assert.include(transaction.signedTx, '0x')
+    // console.log(await txController.sendTransaction(transaction))
+  })
+  it('create smart contract token deploy transaction', async () => {
+    const transaction = await txController.createTokenDeployTransaction({
+      wallet: wallets.ethereum,
+      params: ['new message'],
+      protocol: Protocol.ETHEREUM,
+      testnet: true,
+      tokenType: 'ERC20',
     })
     assert.include(transaction.signedTx, '0x')
     // console.log(await txController.sendTransaction(transaction))
@@ -214,7 +246,7 @@ describe.only('Ethereum smart contract transactions', () => {
         protocol: Protocol.ETHEREUM,
         testnet: true,
         contractName: 'Test',
-        source: 'contract Test {}'
+        source: 'contract Test {}',
       })
     )
   })
@@ -225,7 +257,7 @@ describe.only('Ethereum smart contract transactions', () => {
         protocol: Protocol.ETHEREUM,
         testnet: true,
         contractName: 'Test',
-        source: 'contract Test {}'
+        source: 'contract Test {}',
       })
     )
   })
@@ -235,7 +267,7 @@ describe.only('Ethereum smart contract transactions', () => {
         wallet: wallets.ethereum,
         protocol: Protocol.ETHEREUM,
         testnet: true,
-        source: 'contract Test {}'
+        source: 'contract Test {}',
       })
     )
   })
@@ -246,6 +278,36 @@ describe.only('Ethereum smart contract transactions', () => {
         protocol: Protocol.ETHEREUM,
         testnet: true,
         contractName: 'Test',
+      })
+    )
+  })
+  it('throws smart contract token deploy transaction failed when wallet is invalid', async () => {
+    assert.isRejected(
+      txController.createTokenDeployTransaction({
+        params: ['new message'],
+        protocol: Protocol.ETHEREUM,
+        testnet: true,
+        tokenType: 'ERC20',
+      })
+    )
+  })
+  it('throws smart contract token deploy transaction failed when params is invalid', async () => {
+    assert.isRejected(
+      txController.createTokenDeployTransaction({
+        wallet: wallets.ethereum,
+        protocol: Protocol.ETHEREUM,
+        testnet: true,
+        tokenType: 'ERC20',
+      })
+    )
+  })
+  it('throws smart contract token deploy transaction failed when token type is invalid', async () => {
+    assert.isRejected(
+      txController.createTokenDeployTransaction({
+        wallet: wallets.ethereum,
+        protocol: Protocol.ETHEREUM,
+        testnet: true,
+        params: ['new message'],
       })
     )
   })
