@@ -19,7 +19,7 @@ class AxiosApi {
    */
   getBaseUrl(environment) {
     if (environment === 'development') return 'https://api-dev.cryptum.io'
-    if (environment === 'production') return 'https://prouction.url.com'
+    if (environment === 'production') return 'https://api.cryptum.io'
 
     throw new GenericException('Invalid environment', 'ConfigException')
   }
