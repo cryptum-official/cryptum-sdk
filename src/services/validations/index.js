@@ -19,7 +19,7 @@ module.exports.validateCeloTransferTransactionParams = ({
   if (!wallet) {
     throw new GenericException('Invalid wallet', 'InvalidTypeException')
   }
-  if (!tokenSymbol || typeof tokenSymbol !== 'string') {
+  if (tokenSymbol && typeof tokenSymbol !== 'string') {
     throw new GenericException('Invalid token symbol', 'InvalidTypeException')
   }
   if (!destination || typeof destination !== 'string') {

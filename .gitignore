@@ -110,3 +110,6 @@ dist
 *.lock
 
 not_send_test_development.js
+
+.privkey
+.secret

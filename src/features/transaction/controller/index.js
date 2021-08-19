@@ -199,7 +199,7 @@ class Controller extends Interface {
       memo,
       fee: networkFee,
       sequence: info.sequence,
-      testnet: testnet !== undefined ? testnet : wallet.testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.CHANGE_TRUST })
   }
@@ -234,7 +234,7 @@ class Controller extends Interface {
       fee: networkFee,
       sequence: info.sequence,
       maxLedgerVersion: info.ledgerCurrentIndex + 10,
-      testnet: testnet !== undefined ? testnet : wallet.testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.CHANGE_TRUST })
   }
@@ -269,7 +269,7 @@ class Controller extends Interface {
       memo,
       fee: networkFee,
       sequence: info.sequence,
-      testnet: testnet !== undefined ? testnet : wallet.testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       startingBalance,
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
@@ -306,7 +306,7 @@ class Controller extends Interface {
       fee: networkFee,
       sequence: info.sequence,
       maxLedgerVersion: info.ledgerCurrentIndex + 10,
-      testnet: testnet !== undefined ? testnet : wallet.testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
@@ -371,7 +371,7 @@ class Controller extends Interface {
       memo,
       fee: networkFee,
       nonce: info.nonce,
-      testnet: testnet !== undefined ? testnet : wallet.testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       contractAddress,
       feeCurrency,
       feeCurrencyContractAddress,
@@ -395,7 +395,6 @@ class Controller extends Interface {
       contractAddress,
       method: tokenSymbol === 'ETH' ? null : 'transfer',
       params: tokenSymbol === 'ETH' ? null : [destination, toWei(amount).toString()],
-      testnet,
       fee,
       protocol,
     })
@@ -406,7 +405,7 @@ class Controller extends Interface {
       destination,
       fee: networkFee,
       nonce: info.nonce,
-      testnet: testnet !== undefined ? testnet : wallet.testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       contractAddress,
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
@@ -439,7 +438,7 @@ class Controller extends Interface {
       destination,
       fee: networkFee,
       nonce: info.nonce,
-      testnet: testnet !== undefined ? testnet : wallet.testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       contractAddress,
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
@@ -527,7 +526,7 @@ class Controller extends Interface {
       fee: networkFee,
       feeCurrency,
       feeCurrencyContractAddress,
-      testnet: testnet !== undefined ? testnet : wallet.testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
     }
     if (protocol === Protocol.CELO) {
       signedTx = await buildCeloSmartContractTransaction(transactionOptions)
@@ -656,7 +655,7 @@ class Controller extends Interface {
       fee: networkFee,
       feeCurrency,
       feeCurrencyContractAddress,
-      testnet: testnet !== undefined ? testnet : wallet.testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       config: this.config,
     }
 
@@ -708,7 +707,7 @@ class Controller extends Interface {
       fee: networkFee,
       feeCurrency,
       feeCurrencyContractAddress,
-      testnet: testnet !== undefined ? testnet : wallet.testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       config: this.config,
       tokenType,
     }

@@ -29,11 +29,11 @@ class CeloStakingController extends Interface {
    * Check if account is registered
    * @param {object} input
    * @param {string} input.address wallet object
-   * @param {boolean} input.testnet blockchain testnet network
    * @returns {Promise<import('../../transaction/entity').SmartContractCallResponse>}
    */
-  async isRegisteredAccount({ address, testnet = true }) {
+  async isRegisteredAccount({ address }) {
     validateEthAddress(address)
+    const testnet = this.config.environment === 'development'
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'isAccount'
     return await new TransactionController(this.config).callSmartContractMethod({
@@ -48,11 +48,11 @@ class CeloStakingController extends Interface {
    * Register account
    * @param {object} input
    * @param {import('../../wallet/entity').Wallet} input.wallet
-   * @param {boolean} input.testnet
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
-  async registerAccount({ wallet, testnet = true }) {
+  async registerAccount({ wallet }) {
     validateEthAddress(wallet.address)
+    const testnet = this.config.environment === 'development'
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'createAccount'
     const txController = new TransactionController(this.config)
@@ -73,12 +73,13 @@ class CeloStakingController extends Interface {
    * @param {object} input
    * @param {import('../../wallet/entity').Wallet} input.wallet wallet object
    * @param {string} input.amount amount to be locked
-   * @param {boolean} input.testnet
+   *
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
-  async lock({ wallet, amount, testnet = true }) {
+  async lock({ wallet, amount }) {
     validateEthAddress(wallet.address)
     validatePositiveAmount(amount)
+    const testnet = this.config.environment === 'development'
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'lock'
     const txController = new TransactionController(this.config)
@@ -100,13 +101,14 @@ class CeloStakingController extends Interface {
    * @param {import('../../wallet/entity').Wallet} input.wallet wallet object
    * @param {string} input.amount amount to vote with
    * @param {string} input.validator validator group address
-   * @param {boolean} input.testnet
+   *
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
-  async vote({ wallet, amount, validator, testnet = true }) {
+  async vote({ wallet, amount, validator }) {
     validateEthAddress(wallet.address)
     validateEthAddress(validator)
     validatePositiveAmount(amount)
+    const testnet = this.config.environment === 'development'
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'vote'
     const txController = new TransactionController(this.config)
@@ -129,11 +131,12 @@ class CeloStakingController extends Interface {
    * Activate all votes
    * @param {object} input
    * @param {import('../../wallet/entity').Wallet} input.wallet wallet object
-   * @param {boolean} input.testnet
+   *
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
-  async activate({ wallet, validator, testnet = true }) {
+  async activate({ wallet, validator }) {
     validateEthAddress(wallet.address)
+    const testnet = this.config.environment === 'development'
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'activate'
     const txController = new TransactionController(this.config)
@@ -155,13 +158,14 @@ class CeloStakingController extends Interface {
    * @param {import('../../wallet/entity').Wallet} input.wallet wallet object
    * @param {string} input.amount amount of votes to revoke
    * @param {string} input.validator validator group address
-   * @param {boolean} input.testnet
+   *
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
-  async revokeActive({ wallet, amount, validator, testnet = true }) {
+  async revokeActive({ wallet, amount, validator }) {
     validateEthAddress(wallet.address)
     validateEthAddress(validator)
     validatePositiveAmount(amount)
+    const testnet = this.config.environment === 'development'
     const network = testnet ? 'testnet' : 'mainnet'
     const { lesser, greater } = await this._findLesserGreater({ amount, validator, network })
     const { result: groups } = await this.getGroupsVotedForByAccount({ address: wallet.address, testnet })
@@ -186,13 +190,14 @@ class CeloStakingController extends Interface {
    * @param {import('../../wallet/entity').Wallet} input.wallet wallet object
    * @param {string} input.amount amount of votes to revoke
    * @param {string} input.validator validator group address
-   * @param {boolean} input.testnet
+   *
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
-  async revokePending({ wallet, amount, validator, testnet = true }) {
+  async revokePending({ wallet, amount, validator }) {
     validateEthAddress(wallet.address)
     validateEthAddress(validator)
     validatePositiveAmount(amount)
+    const testnet = this.config.environment === 'development'
     const network = testnet ? 'testnet' : 'mainnet'
     const { lesser, greater } = await this._findLesserGreater({ amount, validator, network })
     const txController = new TransactionController(this.config)
@@ -216,12 +221,13 @@ class CeloStakingController extends Interface {
    * @param {object} input
    * @param {import('../../wallet/entity').Wallet} input.wallet wallet object
    * @param {boolean} input.amount amount to unlock
-   * @param {boolean} input.testnet
+   *
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
-  async unlock({ wallet, amount, testnet = true }) {
+  async unlock({ wallet, amount }) {
     validateEthAddress(wallet.address)
     validatePositiveAmount(amount)
+    const testnet = this.config.environment === 'development'
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'unlock'
     const txController = new TransactionController(this.config)
@@ -243,13 +249,14 @@ class CeloStakingController extends Interface {
    * @param {import('../../wallet/entity').Wallet} input.wallet wallet object
    * @param {string} input.amount amount to relock from pending withdrawal
    * @param {number} input.index index of pending withdrawal
-   * @param {boolean} input.testnet
+   *
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
-  async relock({ wallet, amount, index, testnet = true }) {
+  async relock({ wallet, amount, index }) {
     validateEthAddress(wallet.address)
     validatePositiveAmount(amount)
     validatePositive(index)
+    const testnet = this.config.environment === 'development'
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'relock'
     const txController = new TransactionController(this.config)
@@ -270,11 +277,12 @@ class CeloStakingController extends Interface {
    * @param {object} input
    * @param {import('../../wallet/entity').Wallet} input.wallet wallet object
    * @param {number} input.index index of pending withdrawal
-   * @param {boolean} input.testnet
+   *
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
-  async withdraw({ wallet, index, testnet = true }) {
+  async withdraw({ wallet, index }) {
     validateEthAddress(wallet.address)
+    const testnet = this.config.environment === 'development'
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'withdraw'
     const txController = new TransactionController(this.config)
@@ -294,10 +302,11 @@ class CeloStakingController extends Interface {
    * Get Total Pending Withdrawals
    * @param {object} input
    * @param {string} input.address wallet address
-   * @param {boolean} input.testnet
+   *
    * @returns {Promise<import('../../transaction/entity').SmartContractCallResponse>}
    */
-  async getTotalPendingWithdrawals({ address, testnet = true }) {
+  async getTotalPendingWithdrawals({ address }) {
+    const testnet = this.config.environment === 'development'
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'getTotalPendingWithdrawals'
     const txController = new TransactionController(this.config)
@@ -314,10 +323,11 @@ class CeloStakingController extends Interface {
    * Get Pending Withdrawals
    * @param {object} input
    * @param {string} input.address wallet address
-   * @param {boolean} input.testnet
+   *
    * @returns {Promise<{amount, timestamp}[]>}
    */
-  async getPendingWithdrawals({ address, testnet = true }) {
+  async getPendingWithdrawals({ address }) {
+    const testnet = this.config.environment === 'development'
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'getPendingWithdrawals'
     const txController = new TransactionController(this.config)
@@ -342,10 +352,11 @@ class CeloStakingController extends Interface {
    * Get groups voted for by account
    * @param {object} input
    * @param {string} input.address wallet address
-   * @param {boolean} input.testnet
+   *
    * @returns {Promise<import('../../transaction/entity').SmartContractCallResponse>}
    */
-  async getGroupsVotedForByAccount({ address, testnet = true }) {
+  async getGroupsVotedForByAccount({ address }) {
+    const testnet = this.config.environment === 'development'
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'getGroupsVotedForByAccount'
     const txController = new TransactionController(this.config)
@@ -363,10 +374,11 @@ class CeloStakingController extends Interface {
    * @param {object} input
    * @param {string} input.address wallet address
    * @param {string} input.group validator group address
-   * @param {boolean} input.testnet
+   *
    * @returns {Promise<{pending, active}>}
    */
-  async getVotesForGroupByAccount({ address, group, testnet = true }) {
+  async getVotesForGroupByAccount({ address, group }) {
+    const testnet = this.config.environment === 'development'
     const network = testnet ? 'testnet' : 'mainnet'
     const txController = new TransactionController(this.config)
     const [pending, active] = await Promise.all([
@@ -396,11 +408,12 @@ class CeloStakingController extends Interface {
    * Get account summary
    * @param {object} input
    * @param {string} input.address wallet object
-   * @param {boolean} input.testnet
+   *
    * @returns {Promise<{total: string, nonvoting: string, pendingWithdrawals: string, votes: any[]}>}
    */
-  async getAccountSummary({ address, testnet = true }) {
+  async getAccountSummary({ address }) {
     validateEthAddress(address)
+    const testnet = this.config.environment === 'development'
     const network = testnet ? 'testnet' : 'mainnet'
     const txController = new TransactionController(this.config)
 
