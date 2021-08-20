@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 const fs = require('fs')
 const CryptumSdk = require('../index')
-const APIKEY =
-  'QBtX081m3136XMwVIbSGupZmPaL1AEIh1azjgp5DUA2ssGwrhcrCZkPtH3c82E7fA3iJXwgnS221dQaldJP1IHnJef563wuHaI9VreszVznZ0BOpvgMlwbceKEAvoq0zIdA'
+
 const sdk = new CryptumSdk({
   environment: 'development',
-  apiKey: APIKEY,
+  apiKey: process.env.APIKEY,
 })
+
 const PRIVATE_KEY_PATH = `${__dirname}/.privkey`
 function loadPrivateKey() {
   return fs.readFileSync(PRIVATE_KEY_PATH, { encoding: 'utf8' })
@@ -19,9 +19,11 @@ async function generateWallet() {
   return wallet
 }
 
-async function getBalance({ address, tokenAddress, tokenSymbol }) {
+async function getBalance({ address, tokenAddresses }) {
   console.log('---------------- getBalance ---------------')
-  return await sdk.getWalletController().getWalletInfo({ address, protocol: 'CELO' })
+  return await sdk
+    .getWalletController()
+    .getWalletInfo({ address, protocol: 'CELO', tokenAddresses })
 }
 
 async function transfer({ destination, amount, tokenAddress, tokenSymbol }) {
@@ -110,11 +112,9 @@ async function start() {
       return await generateWallet()
     }
     case 'balance': {
-      const isNativeToken = process.argv[3] === 'CELO'
       return await getBalance({
         address: process.argv[3],
-        tokenSymbol: isNativeToken ? process.argv[4] : null,
-        tokenAddress: isNativeToken ? null : process.argv[4],
+        tokenAddresses: process.argv[4].split(','),
       })
     }
     case 'transfer': {

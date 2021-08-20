@@ -238,3 +238,15 @@ module.exports.validatePositive = (n) => {
     throw new GenericException('Invalid value', 'InvalidTypeException')
   }
 }
+
+module.exports.validateWalletInfo = ({ address, protocol, tokenAddresses }) => {
+  if (!address || typeof address !== 'string') {
+    throw new InvalidTypeException('address', 'string')
+  }
+  if (!protocol || typeof protocol !== 'string') {
+    throw new InvalidTypeException('protocol', 'string')
+  }
+  if (tokenAddresses && !Array.isArray(tokenAddresses)) {
+    throw new InvalidTypeException('tokenAddresses', 'array')
+  }
+}

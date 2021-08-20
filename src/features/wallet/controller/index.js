@@ -20,6 +20,7 @@ const {
   getRippleAddressFromPrivateKey,
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
+const { validateWalletInfo } = require('../../../services/validations')
 
 class Controller extends Interface {
   /**
@@ -59,12 +60,12 @@ class Controller extends Interface {
    * @param {object} args
    * @param {string} args.privateKey private key string
    * @param {Protocol} args.protocol blockchain protocol
-   * @param {boolean} testnet true for testnet and false for mainnet
-   * @param args.testnet
+   * @param {boolean?} args.testnet true for testnet and false for mainnet
    * @returns {Promise<Wallet>}
    */
-  async generateWalletFromPrivateKey({ privateKey, protocol, testnet = true }) {
-    let walletData = { address: null, publicKey: null, privateKey, protocol, testnet }
+  async generateWalletFromPrivateKey({ privateKey, protocol, testnet }) {
+    testnet = testnet || this.config.environment === 'development'
+    const walletData = { address: null, publicKey: null, privateKey, protocol, testnet }
     switch (protocol) {
       case Protocol.BINANCECHAIN:
         walletData.address = getBinancechainAddressFromPrivateKey(privateKey, testnet)
@@ -172,18 +173,15 @@ class Controller extends Interface {
   /**
    * Get wallet information from blockchain
    *
-   * @param {object} args
-   * @param {string} args.address wallet address or public key
-   * @param {Protocol} args.protocol blockchain protocol
+   * @param {object} input
+   * @param {string} input.address wallet address or public key
+   * @param {Protocol} input.protocol blockchain protocol
+   * @param {string[]?} input.tokenAddresses array of token addresses to fetch balance from
    * @returns {Promise<WalletInfoResponse>}
    */
-  async getWalletInfo({ address, protocol }) {
-    if (!address || typeof address !== 'string') {
-      throw new InvalidTypeException('address', 'string')
-    }
-    if (!protocol || typeof protocol !== 'string') {
-      throw new InvalidTypeException('protocol', 'string')
-    }
+  async getWalletInfo(input) {
+    validateWalletInfo(input)
+    const { address, protocol, tokenAddresses } = input
     try {
       const apiRequest = getApiMethod({
         requests,
@@ -191,7 +189,13 @@ class Controller extends Interface {
         config: this.config,
       })
       const headers = mountHeaders(this.config.apiKey)
-      const response = await apiRequest(`${requests.getWalletInfo.url}/${address}/info?protocol=${protocol}`, {
+      const qs = [`protocol=${protocol}`]
+      if (tokenAddresses) {
+        for (const token of tokenAddresses) {
+          qs.push(`tokenAddresses[]=${token}`)
+        }
+      }
+      const response = await apiRequest(`${requests.getWalletInfo.url}/${address}/info?${qs.join('&')}`, {
         headers,
       })
       return new WalletInfoResponse(response.data)
