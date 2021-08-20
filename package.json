@@ -1,13 +1,13 @@
 {
   "name": "cryptum-sdk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "SDK to sync your application with Cryptum services",
   "main": "index.js",
   "repository": "https://github.com/blockforce-official/cryptum-sdk",
   "author": "Blockforce",
   "license": "MIT",
   "engines": {
-    "node": ">=14"
+    "node": ">=12"
   },
   "scripts": {
     "test": "mocha 'tests/**/*.js' --recursive --timeout 60000 --exit",
