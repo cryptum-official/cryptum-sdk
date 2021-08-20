@@ -1,7 +1,6 @@
 const hdkey = require('hdkey')
 const Web3 = require('web3')
 const bitcoin = require('bitcoinjs-lib')
-const binance = require('@binance-chain/javascript-sdk')
 const { mnemonicToSeed, mnemonicToEntropy } = require('bip39')
 const stellarHdWallet = require('stellar-hd-wallet')
 const rippleKeyPairs = require('ripple-keypairs')
@@ -121,29 +120,6 @@ module.exports.deriveCeloWallet = async (mnemonic) => {
     publicKey: derivedPath.publicKey.toString('hex'),
     privateKey: derivedPath.privateKey.toString('hex'),
   }
-}
-/**
- * Get ethereum address from private key
- *
- * @param {string} privateKey private key hex string
- * @param testnet
- * @returns {string} address
- */
-module.exports.getBinancechainAddressFromPrivateKey = (privateKey, testnet = true) => {
-  return binance.crypto.getAddressFromPrivateKey(privateKey, testnet ? 'tbnb' : 'bnb')
-}
-/**
- * Derive binance chain address, private key and public key
- *
- * @param {string} mnemonic mnemonic seed string
- * @param {boolean} testnet true or false for testnet
- * @returns
- */
-module.exports.deriveBinancechainWallet = (mnemonic, testnet) => {
-  const privateKey = binance.crypto.getPrivateKeyFromMnemonic(mnemonic, true, 0)
-  const publicKey = binance.crypto.getPublicKeyFromPrivateKey(privateKey)
-  const address = this.getBinancechainAddressFromPrivateKey(privateKey, testnet)
-  return { address, publicKey, privateKey }
 }
 /**
  * Derive stellar private key and public key
