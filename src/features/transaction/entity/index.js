@@ -236,12 +236,14 @@ class TokenDeployTransactionInput {
    * @param {Array} args.params
    * @param {string} args.tokenType
    * @param {Fee?} args.fee
+   * @param {Protocol} args.protocol
    * @param {boolean} args.testnet
    */
-  constructor({ wallet, tokenType, params, fee, testnet }) {
+  constructor({ wallet, tokenType, params, fee, protocol, testnet }) {
     this.wallet = wallet
     this.tokenType = tokenType
     this.params = params
+    this.protocol = protocol
     this.fee = fee
     this.testnet = testnet
   }
