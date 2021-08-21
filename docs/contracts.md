@@ -90,6 +90,17 @@ const transaction = await txController.createTokenDeployTransaction({
 })
 ```
 
+## Deploy a smart contract
+```js
+const transaction = await txController.createSmartContractDeployTransaction({
+  wallet,
+  contractName: 'HelloWorld',
+  params: ['hello'],
+  source: fs.readFileSync(`${__dirname}/contracts/HelloWorld.sol`, { encoding: 'utf8' }),
+  protocol: 'CELO',
+})
+```
+
 ## Send transactions
 
 After creating a transaction, use this method to broadcast the transaction.

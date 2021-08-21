@@ -168,6 +168,20 @@ async function deployToken({ tokenType, params }) {
   return await txController.sendTransaction(tx)
 }
 
+async function deploySmartContract() {
+  console.log(`---------------- deploy smart contract -----------------`)
+  const privateKey = loadPrivateKey()
+  const txController = sdk.getTransactionController()
+  const tx = await txController.createSmartContractDeployTransaction({
+    wallet: await sdk.getWalletController().generateWalletFromPrivateKey({ privateKey, protocol: 'CELO' }),
+    contractName: 'HelloWorld',
+    params: ['hello'],
+    source: fs.readFileSync(`${__dirname}/HelloWorld.sol`, { encoding: 'utf8' }),
+    protocol: 'CELO',
+  })
+  return await txController.sendTransaction(tx)
+}
+
 async function start() {
   switch (process.argv[2]) {
     case 'generate-wallet': {
@@ -208,6 +222,9 @@ async function start() {
     }
     case 'deploy-token': {
       return await deployToken({ tokenType: process.argv[3], params: process.argv[4].split(',') })
+    }
+    case 'deploy-smart-contract': {
+      return await deploySmartContract()
     }
   }
 }
