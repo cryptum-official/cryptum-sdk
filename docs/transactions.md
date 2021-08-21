@@ -146,32 +146,6 @@ const transaction = await txController.createStellarTrustlineTransaction({
 })
 ```
 
-## Create smart contract call transactions
-```js
-// for Celo, Ethereum and BSC blockchain
-const transaction = await txController.createSmartContractTransaction({
-  wallet,
-  contractAddress: '0x3f2f3D45196...8f530165eCb93e772',
-  contractAbi: [{
-    constant: false,
-    inputs: [
-      { name: 'param1', type: 'string' },
-      { name: 'param2', type: 'uint256' },
-      { name: 'param3', type: 'uint256' },
-    ],
-    name: 'executeMethodName',
-    outputs: [{ name: '', type: 'bool' }],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  }],
-  method: 'executeMethodName',
-  params: ['param1', 2, 3],
-  protocol: 'CELO', // CELO, ETHEREUM, BSC only
-  testnet: true,
-})
-```
-
 ## Send transactions
 
 After creating a transaction, use this method to broadcast the transaction.

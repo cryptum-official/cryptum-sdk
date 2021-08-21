@@ -134,7 +134,6 @@ async function callSmartContractMethod() {
         name: 'message',
         outputs: [
           {
-            internalType: 'string',
             name: '',
             type: 'string',
           },
@@ -197,7 +196,6 @@ async function start() {
         contractAddress: process.argv[3],
         to: process.argv[4],
         id: process.argv[5],
-        uri: process.argv[6],
       })
     }
     case 'mint-NFT': {
