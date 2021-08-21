@@ -2,6 +2,10 @@
 const fs = require('fs')
 const CryptumSdk = require('../index')
 
+if (!process.env.APIKEY) {
+  throw new Error('API key is invalid')
+}
+
 const sdk = new CryptumSdk({
   environment: 'development',
   apiKey: process.env.APIKEY,
@@ -21,12 +25,10 @@ async function generateWallet() {
 
 async function getBalance({ address, tokenAddresses }) {
   console.log('---------------- getBalance ---------------')
-  return await sdk
-    .getWalletController()
-    .getWalletInfo({ address, protocol: 'CELO', tokenAddresses })
+  return await sdk.getWalletController().getWalletInfo({ address, protocol: 'CELO', tokenAddresses })
 }
 
-async function transfer({ destination, amount, tokenAddress, tokenSymbol }) {
+async function transferERC20({ destination, amount, tokenAddress, tokenSymbol }) {
   console.log(`---------------- transfer -----------------`)
   const privateKey = loadPrivateKey()
   const txController = sdk.getTransactionController()
@@ -40,8 +42,8 @@ async function transfer({ destination, amount, tokenAddress, tokenSymbol }) {
   return await txController.sendTransaction(tx)
 }
 
-async function createSmartContractsTransaction(message) {
-  console.log('---------------- createSmartContractsTransaction ------------------------')
+async function mintNFT({ contractAddress, to, id, uri }) {
+  console.log('---------------- mintNFT ------------------------')
   const txController = sdk.getTransactionController()
   const options = {
     contractAbi: [
@@ -49,26 +51,74 @@ async function createSmartContractsTransaction(message) {
         constant: false,
         inputs: [
           {
+            internalType: 'address',
+            name: 'to',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: 'id',
+            type: 'uint256',
+          },
+          {
             internalType: 'string',
-            name: 'newMessage',
+            name: 'uri',
             type: 'string',
           },
         ],
-        name: 'update',
+        name: 'mintWithTokenURI',
         outputs: [],
         payable: false,
         stateMutability: 'nonpayable',
         type: 'function',
       },
     ],
-    method: 'update',
-    params: [message],
+    method: 'mintWithTokenURI',
+    params: [to, id, uri],
   }
   const privateKey = loadPrivateKey()
   const tx = await txController.createSmartContractTransaction({
     ...options,
     wallet: await sdk.getWalletController().generateWalletFromPrivateKey({ privateKey, protocol: 'CELO' }),
-    contractAddress: '0x2B751008e680E1921161C5456a763e72788Db9Ca',
+    contractAddress,
+    protocol: 'CELO',
+  })
+  return await txController.sendTransaction(tx)
+}
+async function transferNFT({ contractAddress, to, id }) {
+  console.log('---------------- transferNFT ------------------------')
+  const txController = sdk.getTransactionController()
+  const options = {
+    contractAbi: [
+      {
+        constant: false,
+        inputs: [
+          {
+            internalType: 'address',
+            name: 'to',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: 'id',
+            type: 'uint256',
+          },
+        ],
+        name: 'safeTransfer',
+        outputs: [],
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ],
+    method: 'safeTransfer',
+    params: [to, id],
+  }
+  const privateKey = loadPrivateKey()
+  const tx = await txController.createSmartContractTransaction({
+    ...options,
+    wallet: await sdk.getWalletController().generateWalletFromPrivateKey({ privateKey, protocol: 'CELO' }),
+    contractAddress,
     protocol: 'CELO',
   })
   return await txController.sendTransaction(tx)
@@ -106,6 +156,19 @@ async function callSmartContractMethod() {
   })
 }
 
+async function deployToken({ tokenType, params }) {
+  console.log(`---------------- deploy ${tokenType} -----------------`)
+  const privateKey = loadPrivateKey()
+  const txController = sdk.getTransactionController()
+  const tx = await txController.createTokenDeployTransaction({
+    wallet: await sdk.getWalletController().generateWalletFromPrivateKey({ privateKey, protocol: 'CELO' }),
+    tokenType,
+    params,
+    protocol: 'CELO',
+  })
+  return await txController.sendTransaction(tx)
+}
+
 async function start() {
   switch (process.argv[2]) {
     case 'generate-wallet': {
@@ -117,9 +180,9 @@ async function start() {
         tokenAddresses: process.argv[4].split(','),
       })
     }
-    case 'transfer': {
+    case 'transfer-erc20': {
       const isNativeToken = ['CELO', 'cUSD'].includes(process.argv[3])
-      return await transfer({
+      return await transferERC20({
         tokenSymbol: isNativeToken ? process.argv[3] : null,
         tokenAddress: isNativeToken ? null : process.argv[3],
         amount: process.argv[4],
@@ -129,8 +192,24 @@ async function start() {
     case 'call-contract-method': {
       return await callSmartContractMethod()
     }
-    case 'call-contract-method-transaction': {
-      return await createSmartContractsTransaction(process.argv[3])
+    case 'transfer-NFT': {
+      return await transferNFT({
+        contractAddress: process.argv[3],
+        to: process.argv[4],
+        id: process.argv[5],
+        uri: process.argv[6],
+      })
+    }
+    case 'mint-NFT': {
+      return await mintNFT({
+        contractAddress: process.argv[3],
+        to: process.argv[4],
+        id: process.argv[5],
+        uri: process.argv[6],
+      })
+    }
+    case 'deploy-token': {
+      return await deployToken({ tokenType: process.argv[3], params: process.argv[4].split(',') })
     }
   }
 }
