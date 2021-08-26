@@ -172,11 +172,11 @@ class Controller extends Interface {
   /**
    * Create stellar trustline transaction
    *
-   * @param {StellarTrustlineTransactionInput} input
+   * @param {import('../entity').StellarTrustlineTransactionInput} input
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createStellarTrustlineTransaction(input) {
-    const { wallet, assetSymbol, issuer, fee, limit, memo, testnet } = input
+    const { wallet, assetSymbol, issuer, fee, limit, memo, timeout, testnet } = input
     const protocol = Protocol.STELLAR
     const info = await new WalletController(this.config).getWalletInfo({
       address: wallet.publicKey,
@@ -200,13 +200,14 @@ class Controller extends Interface {
       fee: networkFee,
       sequence: info.sequence,
       testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
+      timeout
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.CHANGE_TRUST })
   }
   /**
    * Create ripple trustline transaction
    *
-   * @param {RippleTransferTransactionInput} input
+   * @param {import('../entity').RippleTransferTransactionInput} input
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createRippleTrustlineTransaction(input) {
@@ -241,11 +242,11 @@ class Controller extends Interface {
   /**
    * Create stellar transfer transaction
    *
-   * @param {StellarTransferTransactionInput} input
+   * @param {import('../entity').StellarTransferTransactionInput} input
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createStellarTransferTransaction(input) {
-    const { wallet, assetSymbol, issuer, amount, destination, memo, fee, testnet, startingBalance } = input
+    const { wallet, assetSymbol, issuer, amount, destination, memo, fee, testnet, createAccount, timeout } = input
     const protocol = Protocol.STELLAR
     const info = await new WalletController(this.config).getWalletInfo({
       address: wallet.publicKey,
@@ -270,14 +271,15 @@ class Controller extends Interface {
       fee: networkFee,
       sequence: info.sequence,
       testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
-      startingBalance,
+      createAccount,
+      timeout
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
   /**
    * Create ripple transfer transaction
    *
-   * @param {RippleTransferTransactionInput} input
+   * @param {import('../entity').RippleTransferTransactionInput} input
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createRippleTransferTransaction(input) {

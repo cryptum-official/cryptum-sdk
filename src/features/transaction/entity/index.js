@@ -78,10 +78,10 @@ class TrustlineTransactionInput {
    * @param {object} args
    * @param {import('../../wallet/entity').Wallet} args.wallet
    * @param {string} args.assetSymbol
-   * @param {string} args.issuer
-   * @param {string?} args.limit
+   * @param {string} args.issuer issuer account for the trustline
+   * @param {string?} args.limit max number that the trustline can allow
    * @param {string?} args.memo
-   * @param {Fee?} args.fee
+   * @param {Fee?} args.fee fee in stroops (stellar) or drops (xrp)
    * @param {boolean} args.testnet
    */
   constructor({ wallet, assetSymbol, issuer, limit, memo, fee, testnet }) {
@@ -132,18 +132,22 @@ class StellarTransferTransactionInput extends TransferTransactionInput {
    *
    * @param {object} args
    * @param {import('../../wallet/entity').Wallet} args.wallet
-   * @param {string} args.assetSymbol
-   * @param {string} args.amount
-   * @param {string} args.destination
+   * @param {string} args.assetSymbol asset symbol to be transferred
+   * @param {string} args.issuer issuer account to identify the asset to be transferred
+   * @param {string} args.amount amount to be transferred
+   * @param {string} args.destination account to be transferred to
    * @param {string?} args.memo
-   * @param {Fee?} args.fee
-   * @param {boolean} args.testnet
-   * @param {string?} args.startingBalance
+   * @param {Fee?} args.fee fee in stroops
+   * @param {boolean?} args.createAccount true if the destination account does not exist yet
+   * @param {number?} args.timeout timeout in seconds
+   * @param {boolean?} args.testnet 
    */
-  constructor({ assetSymbol, startingBalance, ...args }) {
+  constructor({ assetSymbol, createAccount, timeout, issuer, ...args }) {
     super(args)
     this.assetSymbol = assetSymbol
-    this.startingBalance = startingBalance
+    this.createAccount = createAccount
+    this.timeout = timeout
+    this.issuer = issuer
   }
 }
 class RippleTransferTransactionInput extends TransferTransactionInput {
@@ -152,16 +156,18 @@ class RippleTransferTransactionInput extends TransferTransactionInput {
    *
    * @param {object} args
    * @param {import('../../wallet/entity').Wallet} args.wallet
-   * @param {string} args.assetSymbol
-   * @param {string} args.amount
-   * @param {string} args.destination
+   * @param {string} args.assetSymbol asset symbol to be transferred
+   * @param {string} args.issuer issuer account to identify the asset to be transferred
+   * @param {string} args.amount amount to be transferred
+   * @param {string} args.destination account to be transferred to
+   * @param {Fee?} args.fee fee in drops
    * @param {string?} args.memo
-   * @param {Fee?} args.fee
-   * @param {boolean} args.testnet
+   * @param {boolean?} args.testnet
    */
-  constructor({ assetSymbol, ...args }) {
+  constructor({ assetSymbol, issuer, ...args }) {
     super(args)
     this.assetSymbol = assetSymbol
+    this.issuer = issuer
   }
 }
 class EthereumTransferTransactionInput extends TransferTransactionInput {

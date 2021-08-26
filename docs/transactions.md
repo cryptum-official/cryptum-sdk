@@ -90,6 +90,15 @@ const transaction = await txController.createStellarTransferTransaction({
   destination: 'GDLCRMXZ66NFDIALVOJC...YWT7MK26NO2GJXIBHTVGUIO',
   memo: 'create-transfer',
 })
+// transfer XLM to create destination account
+const transaction = await txController.createStellarTransferTransaction({
+  wallet,
+  assetSymbol: 'XLM',
+  amount: '2',
+  createAccount: true,
+  destination: 'GDLCRMXZ66NFDIALVOJC...YWT7MK26NO2GJXIBHTVGUIO',
+  memo: 'create-account',
+})
 // transfer custom asset
 const transaction = await txController.createStellarTransferTransaction({
   wallet,

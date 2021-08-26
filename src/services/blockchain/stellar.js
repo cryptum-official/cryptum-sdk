@@ -55,7 +55,7 @@ module.exports.buildStellarTrustlineTransaction = async function ({
  * @param {string} args.issuer issuer account
  * @param {string} args.amount amount number for the transfer
  * @param {string} args.destination destination account
- * @param {string?} args.startingBalance amount number for starting a new account in blockchain
+ * @param {boolean?} args.createAccount true if the destination account does not exist
  * @param {string?} args.fee fee in stroops
  * @param {string?} args.memo memo string
  * @param {boolean?} args.testnet
@@ -69,23 +69,24 @@ module.exports.buildStellarTransferTransaction = async function ({
   issuer,
   amount,
   destination,
-  startingBalance = null,
+  createAccount = false,
   fee = null,
   memo = null,
   testnet = true,
+  timeout = null
 }) {
   const account = new StellarSdk.Account(fromPublicKey, sequence)
   const builder = new StellarSdk.TransactionBuilder(account, {
     fee: fee ? fee : '100',
     memo: memo ? (memo.length > 28 ? StellarSdk.Memo.hash(memo) : StellarSdk.Memo.text(memo)) : null,
     networkPassphrase: testnet ? StellarSdk.Networks.TESTNET : StellarSdk.Networks.PUBLIC,
-  }).setTimeout(180)
+  }).setTimeout(timeout || 180)
 
-  const transaction = startingBalance
+  const transaction = createAccount
     ? builder
         .addOperation(
           StellarSdk.Operation.createAccount({
-            startingBalance,
+            startingBalance: amount,
             destination: destination.trim(),
           })
         )
