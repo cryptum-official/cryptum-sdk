@@ -31,7 +31,7 @@ module.exports.buildRippleTrustlineTransaction = async function ({
     currency: assetSymbol,
     counterparty: issuer,
     limit,
-    memos: memo ? [{ type: 'test', format: 'text/plain', data: memo }] : null,
+    memos: memo ? [{ type: 'test', format: 'text/plain', data: memo }] : undefined,
   }
   const prepared = await rippleAPI.prepareTrustline(fromAddress, trustline, {
     fee: fee ? fromDrop(fee).toString() : '0.0001',
@@ -88,7 +88,7 @@ module.exports.buildRippleTransferTransaction = async function ({
         value: amount,
       },
     },
-    memos: memo ? [{ type: '', format: 'text/plain', data: memo }] : null,
+    memos: memo ? [{ type: '', format: 'text/plain', data: memo }] : undefined,
   }
   const prepared = await rippleAPI.preparePayment(fromAddress, transfer, {
     fee: fee ? fromDrop(fee).toString() : '0.0001',

@@ -11,7 +11,6 @@ const wallets = {
   bsc: null,
   celo: null,
   bitcoin: null,
-  binancechain: null,
 }
 exports.mnemonic = mnemonic
 exports.config = {
@@ -48,11 +47,6 @@ exports.getWallets = async () => {
   wallets.stellar = await controller.generateWallet({
     protocol: Protocol.STELLAR,
     mnemonic,
-  })
-  wallets.binancechain = await controller.generateWallet({
-    protocol: Protocol.BINANCECHAIN,
-    mnemonic,
-    tesnet: true,
   })
   return wallets
 }

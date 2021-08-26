@@ -5,7 +5,6 @@
  */
 const Protocol = {
   BITCOIN: 'BITCOIN',
-  BINANCECHAIN: 'BINANCECHAIN',
   BSC: 'BSC',
   CELO: 'CELO',
   ETHEREUM: 'ETHEREUM',

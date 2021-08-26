@@ -3,15 +3,12 @@ const { Wallet, WalletInfoResponse } = require('../entity')
 const { getApiMethod, mountHeaders, handleRequestError } = require('../../../services')
 const Interface = require('./interface')
 const requests = require('./requests.json')
-const { InvalidTypeException } = require('../../../../errors')
 const {
   deriveBitcoinWallet,
   deriveEthereumWallet,
-  deriveBinancechainWallet,
   deriveCeloWallet,
   deriveRippleWallet,
   deriveStellarWallet,
-  getBinancechainAddressFromPrivateKey,
   getBitcoinAddressFromPrivateKey,
   getBscAddressFromPrivateKey,
   getEthereumAddressFromPrivateKey,
@@ -36,8 +33,6 @@ class Controller extends Interface {
     mnemonic = mnemonic ? mnemonic : generateMnemonic(256)
 
     switch (protocol) {
-      case Protocol.BINANCECHAIN:
-        return await this.generateBinancechainWallet(mnemonic, testnet)
       case Protocol.BITCOIN:
         return await this.generateBitcoinWallet(mnemonic, testnet)
       case Protocol.BSC:
@@ -67,9 +62,6 @@ class Controller extends Interface {
     testnet = testnet || this.config.environment === 'development'
     const walletData = { address: null, publicKey: null, privateKey, protocol, testnet }
     switch (protocol) {
-      case Protocol.BINANCECHAIN:
-        walletData.address = getBinancechainAddressFromPrivateKey(privateKey, testnet)
-        break
       case Protocol.BITCOIN:
         walletData.address = getBitcoinAddressFromPrivateKey(privateKey, testnet)
         break
@@ -122,18 +114,6 @@ class Controller extends Interface {
     const wallet = await this.generateEthereumWallet(mnemonic, testnet)
     wallet.protocol = Protocol.BSC
     return wallet
-  }
-
-  async generateBinancechainWallet(mnemonic, testnet) {
-    const { address, privateKey, publicKey } = deriveBinancechainWallet(mnemonic, testnet)
-    return new Wallet({
-      mnemonic,
-      privateKey,
-      publicKey,
-      address,
-      testnet,
-      protocol: Protocol.BINANCECHAIN,
-    })
   }
 
   async generateCeloWallet(mnemonic, testnet) {

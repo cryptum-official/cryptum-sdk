@@ -1,4 +1,6 @@
 const { default: BigNumber } = require('bignumber.js')
+const { isValidAddress } = require('ripple-lib/dist/npm/common/schema-validator')
+const { StrKey } = require('stellar-sdk')
 const Web3 = require('web3')
 const { GenericException, InvalidTypeException } = require('../../../errors')
 const { TransactionType } = require('../../features/transaction/entity')
@@ -209,6 +211,159 @@ module.exports.validateBitcoinTransferTransactionParams = ({ wallet, fromUTXOs, 
   }
 }
 
+module.exports.validateStellarTransferTransactionParams = ({
+  wallet,
+  assetSymbol,
+  issuer,
+  amount,
+  destination,
+  memo,
+  fee,
+  testnet,
+  createAccount,
+  timeout,
+}) => {
+  if (!wallet) {
+    throw new GenericException('Invalid wallet', 'InvalidTypeException')
+  }
+  if (fee && typeof fee !== 'string') {
+    throw new GenericException('Invalid fee, it should be a string in drops', 'InvalidTypeException')
+  }
+  if (testnet !== undefined && typeof testnet !== 'boolean') {
+    throw new GenericException('Invalid testnet', 'InvalidTypeException')
+  }
+  if (!assetSymbol || typeof assetSymbol !== 'string') {
+    throw new InvalidTypeException('assetSymbol', 'string')
+  }
+  if (issuer && typeof issuer !== 'string' && !StrKey.isValidEd25519PublicKey(issuer)) {
+    throw new GenericException('Invalid issuer account', 'InvalidTypeException')
+  }
+  if (!destination || typeof destination !== 'string' || !StrKey.isValidEd25519PublicKey(destination)) {
+    throw new GenericException('Invalid issuer account', 'InvalidTypeException')
+  }
+  const _amount = new BigNumber(amount)
+  if (!amount || typeof amount !== 'string' || _amount.isNaN() || _amount.lte(0)) {
+    throw new GenericException('Invalid amount', 'InvalidTypeException')
+  }
+  if (memo && typeof memo !== 'string') {
+    throw new GenericException('Invalid memo', 'InvalidTypeException')
+  }
+  if (createAccount && typeof createAccount !== 'boolean') {
+    throw new InvalidTypeException('createAccount', 'boolean')
+  }
+  const _timeout = new BigNumber(timeout)
+  if (timeout && (typeof timeout !== 'number' || _timeout.isNaN() || _timeout.lte(0))) {
+    throw new InvalidTypeException('timeout', 'number')
+  }
+}
+module.exports.validateRippleTransferTransactionParams = ({
+  wallet,
+  assetSymbol,
+  issuer,
+  amount,
+  destination,
+  memo,
+  fee,
+  testnet,
+}) => {
+  if (!wallet) {
+    throw new GenericException('Invalid wallet', 'InvalidTypeException')
+  }
+  if (fee && typeof fee !== 'string') {
+    throw new GenericException('Invalid fee, it should be a string in drops', 'InvalidTypeException')
+  }
+  if (testnet !== undefined && typeof testnet !== 'boolean') {
+    throw new GenericException('Invalid testnet', 'InvalidTypeException')
+  }
+  if (!assetSymbol || typeof assetSymbol !== 'string') {
+    throw new InvalidTypeException('assetSymbol', 'string')
+  }
+  if (issuer && typeof issuer !== 'string' && !isValidAddress(issuer)) {
+    throw new GenericException('Invalid issuer account', 'InvalidTypeException')
+  }
+  if (!destination || typeof destination !== 'string' || !isValidAddress(destination)) {
+    throw new GenericException('Invalid issuer account', 'InvalidTypeException')
+  }
+  const _amount = new BigNumber(amount)
+  if (!amount || typeof amount !== 'string' || _amount.isNaN() || _amount.lte(0)) {
+    throw new GenericException('Invalid amount', 'InvalidTypeException')
+  }
+  if (memo && typeof memo !== 'string') {
+    throw new GenericException('Invalid memo', 'InvalidTypeException')
+  }
+}
+
+module.exports.validateStellarTrustlineTransactionParams = ({
+  wallet,
+  assetSymbol,
+  issuer,
+  fee,
+  limit,
+  memo,
+  timeout,
+  testnet,
+}) => {
+  if (!wallet) {
+    throw new GenericException('Invalid wallet', 'InvalidTypeException')
+  }
+  if (fee && typeof fee !== 'string') {
+    throw new GenericException('Invalid fee, it should be a string in drops', 'InvalidTypeException')
+  }
+  if (testnet !== undefined && typeof testnet !== 'boolean') {
+    throw new GenericException('Invalid testnet', 'InvalidTypeException')
+  }
+  if (!assetSymbol || typeof assetSymbol !== 'string') {
+    throw new InvalidTypeException('assetSymbol', 'string')
+  }
+  if (!issuer || typeof issuer !== 'string' || !StrKey.isValidEd25519PublicKey(issuer)) {
+    throw new GenericException('Invalid issuer account', 'InvalidTypeException')
+  }
+  const _limit = new BigNumber(limit)
+  if (!limit || typeof limit !== 'string' || _limit.isNaN() || _limit.lt(0)) {
+    throw new GenericException('Invalid limit', 'InvalidTypeException')
+  }
+  const _timeout = new BigNumber(timeout)
+  if (timeout && (typeof timeout !== 'number' || _timeout.isNaN() || _timeout.lte(0))) {
+    throw new InvalidTypeException('timeout', 'number')
+  }
+  if (memo && typeof memo !== 'string') {
+    throw new GenericException('Invalid memo', 'InvalidTypeException')
+  }
+}
+
+module.exports.validateRippleTrustlineTransactionParams = ({
+  wallet,
+  assetSymbol,
+  issuer,
+  fee,
+  limit,
+  memo,
+  testnet,
+}) => {
+  if (!wallet) {
+    throw new GenericException('Invalid wallet', 'InvalidTypeException')
+  }
+  if (fee && typeof fee !== 'string') {
+    throw new GenericException('Invalid fee, it should be a string in drops', 'InvalidTypeException')
+  }
+  if (testnet !== undefined && typeof testnet !== 'boolean') {
+    throw new GenericException('Invalid testnet', 'InvalidTypeException')
+  }
+  if (!assetSymbol || typeof assetSymbol !== 'string') {
+    throw new InvalidTypeException('assetSymbol', 'string')
+  }
+  if (!issuer || typeof issuer !== 'string' || !isValidAddress(issuer)) {
+    throw new GenericException('Invalid issuer account', 'InvalidTypeException')
+  }
+  const _limit = new BigNumber(limit)
+  if (!limit || typeof limit !== 'string' || _limit.isNaN() || _limit.lt(0)) {
+    throw new GenericException('Invalid limit', 'InvalidTypeException')
+  }
+  if (memo && typeof memo !== 'string') {
+    throw new GenericException('Invalid memo', 'InvalidTypeException')
+  }
+}
+
 module.exports.validateSignedTransaction = ({ signedTx, protocol, type }) => {
   if (!protocol || typeof protocol !== 'string') {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
@@ -223,6 +378,16 @@ module.exports.validateSignedTransaction = ({ signedTx, protocol, type }) => {
 
 module.exports.validateEthAddress = (address) => {
   if (!Web3.utils.isAddress(address)) {
+    throw new InvalidTypeException(address, 'string')
+  }
+}
+module.exports.validateRippleAddress = (address) => {
+  if (!isValidAddress(address)) {
+    throw new InvalidTypeException(address, 'string')
+  }
+}
+module.exports.validateStellarAddress = (address) => {
+  if (!StrKey.isValidEd25519PublicKey(address)) {
     throw new InvalidTypeException(address, 'string')
   }
 }

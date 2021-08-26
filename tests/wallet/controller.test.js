@@ -65,14 +65,6 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       })
       assert.strictEqual(wallet.address, '0x8C33DB44a78629cF60C88383d436EEc356884625')
     })
-    it('binancechain', async () => {
-      const controller = new WalletController(config)
-      const wallet = await controller.generateWalletFromPrivateKey({
-        protocol: Protocol.BINANCECHAIN,
-        privateKey: '6e615aa358a7b7ab0e226e6ce436709bf00d7a6050f1337639c4fc1e35167393'
-      })
-      assert.strictEqual(wallet.address, 'tbnb1ggckn09nkn2kvl28aaksrj7ze5esfx58fsvfep')
-    })
   })
 
   describe('From same mnemonic', () => {
@@ -150,19 +142,6 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       assert.strictEqual(
         wallet.publicKey,
         'GAC2V7MGMTG57FZKJSXRSZ4EIDL2RBFIYVXZJMTJZ232XPZQUCTYUCWL'
-      )
-    })
-    it('generate binancechain wallet', async () => {
-      const controller = new WalletController(config)
-      const wallet = await controller.generateWallet({
-        protocol: Protocol.BINANCECHAIN,
-        mnemonic,
-        tesnet: true,
-      })
-      assert.strictEqual(wallet.protocol, Protocol.BINANCECHAIN)
-      assert.strictEqual(
-        wallet.address,
-        'tbnb1ggckn09nkn2kvl28aaksrj7ze5esfx58fsvfep'
       )
     })
   })

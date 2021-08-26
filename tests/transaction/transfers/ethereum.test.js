@@ -5,7 +5,7 @@ chai.use(chaiAsPromised)
 const assert = chai.assert
 const AxiosApi = require('../../../axios')
 const TransactionController = require('../../../src/features/transaction/controller')
-const { Protocol } = require('../../../src/services/blockchain/constants')
+const { Protocol, TRANSFER_METHOD_ABI } = require('../../../src/services/blockchain/constants')
 const { getWallets, config } = require('../../wallet/constants')
 const { TransactionType } = require('../../../src/features/transaction/entity')
 const txController = new TransactionController(config)
@@ -43,6 +43,7 @@ describe.only('Ethereum transfer transactions', () => {
         from: '0x481B542b7419D8Ba305B5cc5029C12d5a68B4f69',
         destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
         contractAddress: '0xcf1caf3f6aa5e5206b2d50dd1206a7cc3c76dc10',
+        contractAbi: TRANSFER_METHOD_ABI,
         method: 'transfer',
         params: ['0x3f2f3D45196D7B99D0a615e8f530165eCb93e772', '10000000000000000'],
       })

@@ -3,7 +3,14 @@ const requests = require('./requests.json')
 const Interface = require('./interface')
 const { Protocol, TRANSFER_METHOD_ABI, TRANSFER_COMMENT_METHOD_ABI } = require('../../../services/blockchain/constants')
 const { getTokenAddress, toWei } = require('../../../services/blockchain/utils')
-const { FeeResponse, TransactionResponse, SignedTransaction, UTXO, TransactionType, SmartContractCallResponse } = require('../entity')
+const {
+  FeeResponse,
+  TransactionResponse,
+  SignedTransaction,
+  UTXO,
+  TransactionType,
+  SmartContractCallResponse,
+} = require('../entity')
 const {
   buildStellarTransferTransaction,
   buildStellarTrustlineTransaction,
@@ -34,6 +41,10 @@ const {
   validateSmartContractCallParams,
   validateSmartContractDeployTransactionParams,
   validateTokenDeployTransactionParams,
+  validateRippleTransferTransactionParams,
+  validateStellarTransferTransactionParams,
+  validateStellarTrustlineTransactionParams,
+  validateRippleTrustlineTransactionParams,
 } = require('../../../services/validations')
 
 class Controller extends Interface {
@@ -176,6 +187,7 @@ class Controller extends Interface {
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createStellarTrustlineTransaction(input) {
+    validateStellarTrustlineTransactionParams(input)
     const { wallet, assetSymbol, issuer, fee, limit, memo, timeout, testnet } = input
     const protocol = Protocol.STELLAR
     const info = await new WalletController(this.config).getWalletInfo({
@@ -200,7 +212,7 @@ class Controller extends Interface {
       fee: networkFee,
       sequence: info.sequence,
       testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
-      timeout
+      timeout,
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.CHANGE_TRUST })
   }
@@ -211,6 +223,7 @@ class Controller extends Interface {
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createRippleTrustlineTransaction(input) {
+    validateRippleTrustlineTransactionParams(input)
     const { wallet, assetSymbol, issuer, fee, limit, memo, testnet } = input
     const protocol = Protocol.RIPPLE
     const info = await new WalletController(this.config).getWalletInfo({
@@ -246,6 +259,7 @@ class Controller extends Interface {
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createStellarTransferTransaction(input) {
+    validateStellarTransferTransactionParams(input)
     const { wallet, assetSymbol, issuer, amount, destination, memo, fee, testnet, createAccount, timeout } = input
     const protocol = Protocol.STELLAR
     const info = await new WalletController(this.config).getWalletInfo({
@@ -272,7 +286,7 @@ class Controller extends Interface {
       sequence: info.sequence,
       testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       createAccount,
-      timeout
+      timeout,
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
@@ -283,6 +297,7 @@ class Controller extends Interface {
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createRippleTransferTransaction(input) {
+    validateRippleTransferTransactionParams(input)
     const { wallet, assetSymbol, issuer, amount, destination, memo, fee, testnet } = input
     const protocol = Protocol.RIPPLE
     const info = await new WalletController(this.config).getWalletInfo({
@@ -463,7 +478,7 @@ class Controller extends Interface {
     }
     let networkFee = fee
     if (!networkFee) {
-      ; ({ estimateValue: networkFee } = await this.getFee({
+      ;({ estimateValue: networkFee } = await this.getFee({
         type: TransactionType.TRANSFER,
         protocol,
       }))
@@ -549,13 +564,7 @@ class Controller extends Interface {
    */
   async callSmartContractMethod(input) {
     validateSmartContractCallParams(input)
-    const {
-      contractAddress,
-      contractAbi,
-      method,
-      params,
-      protocol,
-    } = input
+    const { contractAddress, contractAbi, method, params, protocol } = input
     try {
       const apiRequest = getApiMethod({
         requests,
@@ -618,24 +627,15 @@ class Controller extends Interface {
   }
 
   /**
-     * Create call transaction to smart contract deploy
-     *
-     * @param {import('../entity').SmartContractDeployTransactionInput} input
-     * @returns {Promise<SignedTransaction>}
-     */
+   * Create call transaction to smart contract deploy
+   *
+   * @param {import('../entity').SmartContractDeployTransactionInput} input
+   * @returns {Promise<SignedTransaction>}
+   */
   async createSmartContractDeployTransaction(input) {
     validateSmartContractDeployTransactionParams(input)
-    const {
-      wallet,
-      fee,
-      testnet,
-      params,
-      protocol,
-      feeCurrency,
-      feeCurrencyContractAddress,
-      source,
-      contractName,
-    } = input
+    const { wallet, fee, testnet, params, protocol, feeCurrency, feeCurrencyContractAddress, source, contractName } =
+      input
 
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
@@ -674,23 +674,14 @@ class Controller extends Interface {
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT })
   }
   /**
-     * Create call transaction to token/asset issue
-     *
-     * @param {import('../entity').TokenDeployTransactionInput} input
-     * @returns {Promise<SignedTransaction>}
-     */
+   * Create call transaction to token/asset issue
+   *
+   * @param {import('../entity').TokenDeployTransactionInput} input
+   * @returns {Promise<SignedTransaction>}
+   */
   async createTokenDeployTransaction(input) {
     validateTokenDeployTransactionParams(input)
-    const {
-      wallet,
-      fee,
-      testnet,
-      params,
-      protocol,
-      feeCurrency,
-      feeCurrencyContractAddress,
-      tokenType,
-    } = input
+    const { wallet, fee, testnet, params, protocol, feeCurrency, feeCurrencyContractAddress, tokenType } = input
 
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
