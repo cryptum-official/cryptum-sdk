@@ -20,7 +20,6 @@ const txController = sdk.getStakingController('CELO')
 
 const summary = await txController.getAccountSummary({
 	address: '0xaaaaaaaaaaaaa',
-	testnet: true 
 }))
 // summary {
 //   total: '2.781313429852',
@@ -45,23 +44,22 @@ const { result } = await txController.isRegisteredAccount({
 	testnet: true
 }))
 // Register account
-const transaction = await txController.registerAccount({ wallet, testnet: true }))
+const transaction = await txController.registerAccount({ wallet }))
 ```
 
 ## Lock tokens
 
 ```js
-const transaction = await txController.lock({ wallet, amount: '0.22', testnet: true }))
+const transaction = await txController.lock({ wallet, amount: '0.22', }))
 ```
 
 ## Vote for validator group
 
 ```js
-const transaction = await txController.vote({ 
-	wallet, 
-	amount: '1.77', 
-	validator: '0xbbbbbbbb', 
-	testnet: true 
+const transaction = await txController.vote({
+	wallet,
+	amount: '1.77',
+	validator: '0xbbbbbbbb',
 }))
 ```
 
@@ -70,10 +68,9 @@ const transaction = await txController.vote({
 Before activating, you'll need to wait for the next epoch to begin. One epoch takes around one day to begin.
 
 ```js
-const transaction = await txController.activate({ 
-	wallet, 
-	validator: '0xbbbbbbbb', 
-	testnet: true 
+const transaction = await txController.activate({
+	wallet,
+	validator: '0xbbbbbbbb',
 }))
 ```
 
@@ -81,29 +78,26 @@ const transaction = await txController.activate({
 
 ```js
 // revoke pending votes
-const transaction = await txController.revokePending({ 
-	wallet, 
-	amount: '1', 
-	validator: '0x5555555555', 
-	testnet: true 
+const transaction = await txController.revokePending({
+	wallet,
+	amount: '1',
+	validator: '0x5555555555',
 }))
 
 // revoke active votes
-const transaction = await txController.revokeActive({ 
-	wallet, 
-	amount: '0.2218', 
-	validator: '0xcccccccccccccc', 
-	testnet: true 
+const transaction = await txController.revokeActive({
+	wallet,
+	amount: '0.2218',
+	validator: '0xcccccccccccccc',
 }))
 ```
 
 ## Unlock tokens
 
 ```js
-const transaction = await txController.unlock({ 
-	wallet, 
-	amount: '0.01218', 
-	testnet: true 
+const transaction = await txController.unlock({
+	wallet,
+	amount: '0.01218',
 }))
 ```
 
@@ -115,11 +109,10 @@ Use this method to withdraw pending amounts. After unlocking the tokens you have
 // check pending withdrawals
 const pendingWithdrawals = await txController.getPendingWithdrawals({
 	address: '0xaaaaaaaaaa',
-	testnet: true
 }))
 
 // withdraw using index of pending withdrawals
-const transaction = await txController.withdraw({ wallet, index: 1, testnet: true }))
+const transaction = await txController.withdraw({ wallet, index: 1, }))
 ```
 
 ## Relock tokens
@@ -127,10 +120,9 @@ const transaction = await txController.withdraw({ wallet, index: 1, testnet: tru
 Relock tokens that are pending withdrawals
 
 ```js
-const transaction = await txController.relock({ 
-	wallet, 
+const transaction = await txController.relock({
+	wallet,
 	amount: '0.01218',
 	index: 0,
-	testnet: true 
 }))
 ```

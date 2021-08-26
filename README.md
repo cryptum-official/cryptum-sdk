@@ -19,6 +19,7 @@
     - [Wallets](docs/wallets.md)
     - [Webhooks](docs/webhooks.md)
     - [Transactions](docs/transactions.md)
+    - [Tokens and Smart contracts](docs/contracts.md)
     - [Prices](docs/prices.md)
     - [Staking](docs/staking/index.md)
 - [Contributing](#contributing)

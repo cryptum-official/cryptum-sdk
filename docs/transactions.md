@@ -16,7 +16,6 @@ const transaction = await txController.createEthereumTransferTransaction({
   tokenSymbol: 'ETH',
   amount: '0.01',
   destination: '0x3f2f3D45196...5e8f530165eCb93e772',
-  testnet: true,
 })
 // transfer ethereum token MTK
 const transaction = await txController.createEthereumTransferTransaction({
@@ -25,7 +24,6 @@ const transaction = await txController.createEthereumTransferTransaction({
   contractAddress: '0xcf1caf3f6aa5...50dd1206a7cc3c76dc10',
   amount: '0.01',
   destination: '0x3f2f3D45196D7...15e8f530165eCb93e772',
-  testnet: true,
 })
 ```
 
@@ -38,7 +36,6 @@ const transaction = await txController.createBscTransferTransaction({
   tokenSymbol: 'BNB',
   amount: '0.01',
   destination: '0x3f2f3D451...15e8f530165eCb93e772',
-  testnet: true,
 })
 // transfer bsc token
 const transaction = await txController.createBscTransferTransaction({
@@ -47,7 +44,6 @@ const transaction = await txController.createBscTransferTransaction({
   contractAddress: '0xcf1caf3f6aa...0dd1206a7cc3c76dc10',
   amount: '0.01',
   destination: '0x3f2f3D45196D...e8f530165eCb93e772',
-  testnet: true,
 })
 ```
 
@@ -61,7 +57,6 @@ const transaction = await txController.createCeloTransferTransaction({
   amount: '0.01',
   destination: '0x3f2f3D45196...8f530165eCb93e772',
   feeCurrency: 'cUSD',
-  testnet: true,
 })
 ```
 
@@ -75,7 +70,6 @@ const transaction = await txController.createBitcoinTransferTransaction({
     { address: 'btc-address1', amount: '0.05' },
     { address: 'btc-address2', amount: '0.449996' },
   ],
-  testnet: true,
 })
 ```
 
@@ -118,7 +112,6 @@ const transaction = await txController.createRippleTransferTransaction({
   assetSymbol: 'XRP',
   amount: '0.59',
   destination: 'rPT1Sjq2Y...HjKu9dyfzbpAYe',
-  testnet: true,
 })
 // transfer custom asset
 const transaction = await txController.createRippleTransferTransaction({
@@ -128,7 +121,6 @@ const transaction = await txController.createRippleTransferTransaction({
   amount: '1',
   destination: 'rPT1Sjq2Y...HjKu9dyfzbpAYe',
   memo: 'create-transfer',
-  testnet: true,
 })
 ```
 

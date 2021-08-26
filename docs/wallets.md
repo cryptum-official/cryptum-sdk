@@ -11,7 +11,6 @@ const wallet = await walletController.generateWallet({ protocol: Protocol.STELLA
 const wallet = await walletController.generateWallet({
   protocol: Protocol.ETHEREUM,
   mnemonic: '<words>...',
-  testnet: true,
 })
 console.log(wallet)
 // Wallet {
@@ -19,12 +18,11 @@ console.log(wallet)
 //   privateKey: '...',
 //   publicKey: '...',
 //   protocol: 'ETHEREUM',
-//   testnet: true }
+// }
 
 // or using an existing private key
 const wallet = await walletController.generateWalletFromPrivateKey({
   privateKey: '0x...',
   protocol: Protocol.ETHEREUM,
-  testnet: true,
 })
 ```

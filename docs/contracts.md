@@ -1,5 +1,7 @@
 # Smart contracts
 
+Protocols supported are `CELO`, `ETHEREUM` and `BSC`.
+
 ## Call smart contract method
 
 Call a method of a smart contract and receive its value without creating a transaction in the blockchain.
@@ -27,7 +29,7 @@ const { result } = await txController.callSmartContractMethod({
   ],
   method: 'message',
   params: [],
-  protocol: 'CELO',
+  protocol: 'CELO', // CELO, ETHEREUM, BSC only
 })
 console.log(result)
 // Result value from smart contract method
@@ -73,7 +75,7 @@ const transaction = await txController.createTokenDeployTransaction({
   wallet,
   tokenType: 'ERC20',
   params: ['Token name', 'TOK', '1000000'],
-  protocol: 'CELO',
+  protocol: 'CELO', // CELO, ETHEREUM, BSC only
 })
 ```
 
@@ -86,7 +88,7 @@ const transaction = await txController.createTokenDeployTransaction({
   wallet,
   tokenType: 'ERC721',
   params: ['NFT name', 'NFT'],
-  protocol: 'CELO',
+  protocol: 'CELO', // CELO, ETHEREUM, BSC only
 })
 ```
 
@@ -97,7 +99,7 @@ const transaction = await txController.createSmartContractDeployTransaction({
   contractName: 'HelloWorld',
   params: ['hello'],
   source: fs.readFileSync(`${__dirname}/contracts/HelloWorld.sol`, { encoding: 'utf8' }),
-  protocol: 'CELO',
+  protocol: 'CELO', // CELO, ETHEREUM, BSC only
 })
 ```
 
