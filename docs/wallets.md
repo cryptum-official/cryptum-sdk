@@ -1,6 +1,9 @@
 # Wallets
 
 You need only to instantiate Wallet controller to manage wallets.
+```js
+const walletController = sdk.getWalletController()
+```
 
 #### `walletController.generateWallet(opts)`
 
@@ -10,7 +13,6 @@ Generate a wallet for a blockchain protocol:
 
 Example:
 ```js
-const walletController = sdk.getWalletController()
 // generate random wallet for blockchain protocol
 const wallet = await walletController.generateWallet({ protocol: 'STELLAR' })
 
