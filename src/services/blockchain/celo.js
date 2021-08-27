@@ -18,7 +18,6 @@ module.exports.buildCeloTransferTransaction = async function ({
   destination,
   fee,
   feeCurrency = null,
-  feeCurrencyContractAddress = null,
   memo = null,
   testnet = true,
 }) {
@@ -37,7 +36,7 @@ module.exports.buildCeloTransferTransaction = async function ({
         ? CUSD_CONTRACT_ADDRESS[network]
         : feeCurrency === 'cEUR'
           ? CEUR_CONTRACT_ADDRESS[network]
-          : feeCurrencyContractAddress,
+          : feeCurrency,
   }
   const value = Web3.utils.toWei(amount, 'ether')
   if (tokenSymbol === 'CELO') {
@@ -74,7 +73,6 @@ module.exports.buildCeloSmartContractTransaction = async ({
   value,
   fee,
   feeCurrency,
-  feeCurrencyContractAddress,
   testnet,
 }) => {
   const network = testnet ? 'testnet' : 'mainnet'
@@ -92,7 +90,7 @@ module.exports.buildCeloSmartContractTransaction = async ({
         ? CUSD_CONTRACT_ADDRESS[network]
         : feeCurrency === 'cEUR'
           ? CEUR_CONTRACT_ADDRESS[network]
-          : feeCurrencyContractAddress,
+          : feeCurrency,
   }
   const web3 = new Web3()
   const contract = new web3.eth.Contract(contractAbi, contractAddress)
@@ -110,7 +108,6 @@ module.exports.buildCeloSmartContractDeployTransaction = async ({
   nonce,
   fee,
   feeCurrency,
-  feeCurrencyContractAddress,
   testnet,
   config,
   tokenType,
@@ -134,7 +131,7 @@ module.exports.buildCeloSmartContractDeployTransaction = async ({
         ? CUSD_CONTRACT_ADDRESS[network]
         : feeCurrency === 'cEUR'
           ? CEUR_CONTRACT_ADDRESS[network]
-          : feeCurrencyContractAddress,
+          : feeCurrency,
   }
 
   const celoWallet = new CeloWallet(fromPrivateKey)

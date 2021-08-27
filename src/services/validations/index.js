@@ -16,7 +16,6 @@ module.exports.validateCeloTransferTransactionParams = ({
   testnet,
   contractAddress,
   feeCurrency,
-  feeCurrencyContractAddress,
 }) => {
   if (!wallet) {
     throw new GenericException('Invalid wallet', 'InvalidTypeException')
@@ -48,9 +47,6 @@ module.exports.validateCeloTransferTransactionParams = ({
   if (feeCurrency && typeof feeCurrency !== 'string') {
     throw new GenericException('Invalid fee currency', 'InvalidTypeException')
   }
-  if (feeCurrencyContractAddress && typeof feeCurrencyContractAddress !== 'string') {
-    throw new GenericException('Invalid fee currency contract address', 'InvalidTypeException')
-  }
 }
 module.exports.validateSmartContractTransactionParams = ({
   wallet,
@@ -58,7 +54,7 @@ module.exports.validateSmartContractTransactionParams = ({
   testnet,
   contractAddress,
   feeCurrency,
-  feeCurrencyContractAddress,
+
   protocol,
 }) => {
   if (!wallet) {
@@ -79,9 +75,6 @@ module.exports.validateSmartContractTransactionParams = ({
   if (feeCurrency && typeof feeCurrency !== 'string') {
     throw new GenericException('Invalid fee currency', 'InvalidTypeException')
   }
-  if (feeCurrencyContractAddress && typeof feeCurrencyContractAddress !== 'string') {
-    throw new GenericException('Invalid fee currency contract address', 'InvalidTypeException')
-  }
   if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM].includes(protocol)) {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
@@ -94,7 +87,7 @@ module.exports.validateSmartContractDeployTransactionParams = ({
   contractName,
   params,
   feeCurrency,
-  feeCurrencyContractAddress,
+
   protocol,
 }) => {
   if (!wallet) {
@@ -121,9 +114,6 @@ module.exports.validateSmartContractDeployTransactionParams = ({
   if (feeCurrency && typeof feeCurrency !== 'string') {
     throw new GenericException('Invalid fee currency', 'InvalidTypeException')
   }
-  if (feeCurrencyContractAddress && typeof feeCurrencyContractAddress !== 'string') {
-    throw new GenericException('Invalid fee currency contract address', 'InvalidTypeException')
-  }
   if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM].includes(protocol)) {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
@@ -135,7 +125,7 @@ module.exports.validateTokenDeployTransactionParams = ({
   tokenType,
   params,
   feeCurrency,
-  feeCurrencyContractAddress,
+
   protocol,
 }) => {
   if (!wallet) {
@@ -158,9 +148,6 @@ module.exports.validateTokenDeployTransactionParams = ({
   }
   if (feeCurrency && typeof feeCurrency !== 'string') {
     throw new GenericException('Invalid fee currency', 'InvalidTypeException')
-  }
-  if (feeCurrencyContractAddress && typeof feeCurrencyContractAddress !== 'string') {
-    throw new GenericException('Invalid fee currency contract address', 'InvalidTypeException')
   }
   if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM].includes(protocol)) {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')

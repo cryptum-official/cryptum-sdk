@@ -1,4 +1,4 @@
-# Transactions
+# Transfers
 
 - [Ethereum](#ethereum)
 - [Binance Smart Chain](#binance-smart-chain-bsc)
@@ -22,6 +22,9 @@ Create a transfer transaction in Ethereum blockchain, you can transfer ETH or an
 * `opts.contractAddress` (string) - required if you are transferring a ERC20 token, otherwise leave undefined.
 * `opts.amount` (string)(__required__) - amount to be transferred.
 * `opts.destination` (string)(__required__) - destination address to be transfer to.
+* `opts.fee` - optional fee object.
+  * `opts.fee.gas` (number) - gas value.
+  * `opts.fee.gasPrice` (string) - gas price.
 
 Examples:
 ```js
@@ -41,7 +44,7 @@ const transaction = await txController.createEthereumTransferTransaction({
 })
 ```
 
-### Binance Smart Chain (BSC)
+## Binance Smart Chain (BSC)
 
 #### `txController.createBscTransferTransaction(opts)`
 
@@ -51,6 +54,9 @@ Create a transfer transaction in BSC blockchain, you can transfer BNB or any oth
 * `opts.contractAddress` (string) - required if you are transferring a BEP20 token, otherwise leave undefined.
 * `opts.amount` (string)(__required__) - amount to be transferred.
 * `opts.destination` (string)(__required__) - destination address to be transfer to.
+* `opts.fee` - optional fee object.
+  * `opts.fee.gas` (number) - gas value.
+  * `opts.fee.gasPrice` (string) - gas price.
 
 Examples:
 
@@ -71,7 +77,7 @@ const transaction = await txController.createBscTransferTransaction({
 })
 ```
 
-### Celo
+## Celo
 
 #### `txController.createCeloTransferTransaction(opts)`
 
@@ -81,7 +87,10 @@ Create a transfer transaction in Celo blockchain, you can transfer CELO, cUSD or
 * `opts.contractAddress` (string) - required if you are transferring a ERC20 token, otherwise leave undefined.
 * `opts.amount` (string)(__required__) - amount to be transferred.
 * `opts.destination` (string)(__required__) - destination address to be transfer to.
-* `opts.feeCurrency` (string) - required if you are trying to pay the transaction with a custom token like `cUSD`, otherwise leave it undefined to pay with the native token `CELO`.
+* `opts.feeCurrency` (string) - required if you are trying to pay the transaction with a custom token, otherwise leave it undefined to pay with the native token `CELO`. You can input `cUSD` to pay with Celo dollar or any other approved token address here.
+* `opts.fee` - optional fee object.
+  * `opts.fee.gas` (number) - gas value.
+  * `opts.fee.gasPrice` (string) - gas price.
 
 Examples:
 
@@ -96,12 +105,14 @@ const transaction = await txController.createCeloTransferTransaction({
 })
 ```
 
-### Bitcoin
+## Bitcoin
 
 #### `txController.createBitcoinTransferTransaction(opts)`
 
 Create a transfer transaction in Bitcoin blockchain.
 
+* `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
+* `opts.outputs` (string)(__required__) - asset to transfer.
 
 ```js
 // transfer BTC
@@ -114,7 +125,7 @@ const transaction = await txController.createBitcoinTransferTransaction({
 })
 ```
 
-### Stellar
+## Stellar
 
 #### `txController.createStellarTransferTransaction(opts)`
 
@@ -126,6 +137,8 @@ Create a transfer transaction in Stellar blockchain, you can transfer XLM or any
 * `opts.amount` (string)(__required__) - amount to be transferred.
 * `opts.destination` (string)(__required__) - destination address to be transfer to.
 * `opts.memo` (string) - message to be attached with this transaction, otherwise leave it undefined. This memo must be a string up to 28-bytes long or a 32-byte hash.
+* `opts.fee` (string) - optional fee in stroops (XLM).
+* `opts.timeout` (number) - optional timeout in seconds.
 
 Examples:
 
@@ -156,28 +169,8 @@ const transaction = await txController.createStellarTransferTransaction({
   destination: 'GDLCRMXZ66NFDIA...WT7MK26NO2GJXIBHTVGUIO',
 })
 ```
-#### `txController.createStellarTrustlineTransaction(opts)`
 
-Create a trustline transaction in Stellar blockchain. It is used to create or delete assets (trustline).
-
-* `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
-* `opts.assetSymbol` (string)(__required__) - asset symbol.
-* `opts.issuer` (string)(__required__) - issuer account to be used in the trustline.
-* `opts.limit` (string)(__required__) - limit for the trustline. To create the trustline this limit should be bigger than 0 and to delete the trustline it should be 0.
-* `opts.memo` (string) - message to be attached with this transaction, otherwise leave it undefined. This memo must be a string up to 28-bytes long or a 32-byte hash.
-
-Example:
-```js
-const transaction = await txController.createStellarTrustlineTransaction({
-  wallet,
-  assetSymbol: 'FOO',
-  issuer: 'GDTAUZE6T...3EYISAOAPYIQMVP2JO',
-  limit: '100000000',
-  memo: 'create-trustline',
-})
-```
-
-### Ripple (XRPL)
+## Ripple (XRPL)
 
 #### `txController.createRippleTransferTransaction(opts)`
 
@@ -188,7 +181,8 @@ Create a transfer transaction in XRP blockchain, you can transfer XRP or any oth
 * `opts.issuer` (string) - required if you are transferring a custom asset so this is the issuer account, otherwise leave undefined.
 * `opts.amount` (string)(__required__) - amount to be transferred.
 * `opts.destination` (string)(__required__) - destination address to be transfer to.
-* `opts.memo` (string) - message to be attached with this transaction, otherwise leave it undefined.
+* `opts.memo` (string) - optional message to be attached with this transaction, otherwise leave it undefined.
+* `opts.fee` (string) - optional fee in drops (XRP).
 
 Examples:
 ```js
@@ -207,28 +201,6 @@ const transaction = await txController.createRippleTransferTransaction({
   amount: '1',
   destination: 'rPT1Sjq2Y...HjKu9dyfzbpAYe',
   memo: 'create-transfer',
-})
-```
-
-#### `txController.createRippleTrustlineTransaction(opts)`
-
-Create a trustline transaction in XRP blockchain. It is used to create or delete assets (trustline).
-
-* `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
-* `opts.assetSymbol` (string)(__required__) - asset to transfer.
-* `opts.issuer` (string) - required if you are transferring a custom asset so this is the issuer account, otherwise leave undefined.
-* `opts.limit` (string)(__required__) - limit for the trustline. To create the trustline this limit should be bigger than 0 and to delete the trustline it should be 0.
-* `opts.memo` (string) - message to be attached with this transaction, otherwise leave it undefined.
-
-Example:
-```js
-// Ripple
-const transaction = await txController.createRippleTrustlineTransaction({
-  wallet,
-  assetSymbol: 'FOO',
-  issuer: 'rPT1Sjq2YGr...jKu9dyfzbpAYe',
-  limit: '100000000',
-  memo: 'create-trustline',
 })
 ```
 

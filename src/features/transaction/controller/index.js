@@ -335,18 +335,7 @@ class Controller extends Interface {
    */
   async createCeloTransferTransaction(input) {
     validateCeloTransferTransactionParams(input)
-    let {
-      wallet,
-      tokenSymbol,
-      amount,
-      destination,
-      memo,
-      fee,
-      testnet,
-      contractAddress,
-      feeCurrency,
-      feeCurrencyContractAddress,
-    } = input
+    let { wallet, tokenSymbol, amount, destination, memo, fee, testnet, contractAddress, feeCurrency } = input
     const protocol = Protocol.CELO
     let type, method, params, value, contractAbi
     const amountWei = toWei(amount).toString()
@@ -391,7 +380,6 @@ class Controller extends Interface {
       testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       contractAddress,
       feeCurrency,
-      feeCurrencyContractAddress,
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
@@ -509,19 +497,7 @@ class Controller extends Interface {
    */
   async createSmartContractTransaction(input) {
     validateSmartContractTransactionParams(input)
-    const {
-      wallet,
-      fee,
-      testnet,
-      value,
-      contractAddress,
-      contractAbi,
-      method,
-      params,
-      protocol,
-      feeCurrency,
-      feeCurrencyContractAddress,
-    } = input
+    const { wallet, fee, testnet, value, contractAddress, contractAbi, method, params, protocol, feeCurrency } = input
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
       type: TransactionType.CALL_CONTRACT_METHOD,
@@ -544,7 +520,7 @@ class Controller extends Interface {
       params,
       fee: networkFee,
       feeCurrency,
-      feeCurrencyContractAddress,
+
       testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
     }
     if (protocol === Protocol.CELO) {
@@ -634,8 +610,7 @@ class Controller extends Interface {
    */
   async createSmartContractDeployTransaction(input) {
     validateSmartContractDeployTransactionParams(input)
-    const { wallet, fee, testnet, params, protocol, feeCurrency, feeCurrencyContractAddress, source, contractName } =
-      input
+    const { wallet, fee, testnet, params, protocol, feeCurrency, source, contractName } = input
 
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
@@ -658,7 +633,7 @@ class Controller extends Interface {
       params,
       fee: networkFee,
       feeCurrency,
-      feeCurrencyContractAddress,
+
       testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       config: this.config,
     }
@@ -681,7 +656,7 @@ class Controller extends Interface {
    */
   async createTokenDeployTransaction(input) {
     validateTokenDeployTransactionParams(input)
-    const { wallet, fee, testnet, params, protocol, feeCurrency, feeCurrencyContractAddress, tokenType } = input
+    const { wallet, fee, testnet, params, protocol, feeCurrency, tokenType } = input
 
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
@@ -701,7 +676,7 @@ class Controller extends Interface {
       params,
       fee: networkFee,
       feeCurrency,
-      feeCurrencyContractAddress,
+
       testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       config: this.config,
       tokenType,
