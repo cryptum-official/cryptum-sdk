@@ -48,10 +48,11 @@ class CryptumSDK {
   }
   /**
    * Method to get a controller to manipulate transactions
-   * @param {Protocol} protocol
+   * @param {Object} args
+   * @param {Protocol} args.protocol
    * @returns TransactionController instance
    */
-  getStakingController(protocol) {
+  getStakingController({ protocol }) {
     const controller = new StakingController(this.config)
     switch (protocol) {
       case Protocol.CELO:

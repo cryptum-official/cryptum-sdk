@@ -13,11 +13,19 @@ To unstake you have the following steps to do:
 - Unlock tokens
 - Withdraw tokens
 
+Use the transaction controller to make the calls below:
+```js
+const txController = sdk.getStakingController({ protocol: 'CELO' })
+```
+
+
 ## Query information about account
 
-```js
-const txController = sdk.getStakingController('CELO')
+### `txController.getAccountSummary(opts)`
 
+* `opts.address` (string) (__required__) - wallet address.
+
+```js
 const summary = await txController.getAccountSummary({
 	address: '0xaaaaaaaaaaaaa',
 }))
@@ -37,23 +45,44 @@ const summary = await txController.getAccountSummary({
 
 ## Register account
 
+### `txController.isRegisteredAccount(opts)`
+
+Check if account is registered already for staking.
+
+* `opts.address` (string) (__required__) - wallet address.
 ```js
-// Check if account is registered
 const { result } = await txController.isRegisteredAccount({
-	address: '0xaaaaaa',
-	testnet: true
+	address: '0xaaaaaa'
 }))
-// Register account
+```
+
+### `txController.registerAccount(opts)`
+
+Register account.
+
+* `opts.wallet` (Wallet) (__required__) - wallet to be registered.
+
+```js
 const transaction = await txController.registerAccount({ wallet }))
 ```
 
 ## Lock tokens
 
+### `txController.lock(opts)`
+
+* `opts.wallet` (Wallet) (__required__) - wallet used to lock the amount with.
+* `opts.amount` (string) (__required__) - amount to be locked.
+
 ```js
-const transaction = await txController.lock({ wallet, amount: '0.22', }))
+const transaction = await txController.lock({ wallet, amount: '0.22' }))
 ```
 
 ## Vote for validator group
+### `txController.vote(opts)`
+
+* `opts.wallet` (Wallet) (__required__) - wallet used to vote.
+* `opts.amount` (string) (__required__) - Celo amount used to vote.
+* `opts.validator` (string) (__required__) - validator group address.
 
 ```js
 const transaction = await txController.vote({
@@ -67,6 +96,10 @@ const transaction = await txController.vote({
 
 Before activating, you'll need to wait for the next epoch to begin. One epoch takes around one day to begin.
 
+### `txController.activate(opts)`
+* `opts.wallet` (Wallet) (__required__) - wallet used to activate.
+* `opts.validator` (string) (__required__) - validator group address.
+
 ```js
 const transaction = await txController.activate({
 	wallet,
@@ -75,16 +108,24 @@ const transaction = await txController.activate({
 ```
 
 ## Revoke votes
+### `txController.revokePending(opts)`
 
+* `opts.wallet` (Wallet) (__required__) - wallet used to revoke pending votes.
+* `opts.amount` (string) (__required__) - Celo amount used to revoke.
+* `opts.validator` (string) (__required__) - validator group address to revoke from.
 ```js
-// revoke pending votes
 const transaction = await txController.revokePending({
 	wallet,
 	amount: '1',
 	validator: '0x5555555555',
 }))
+```
+### `txController.revokeActive(opts)`
 
-// revoke active votes
+* `opts.wallet` (Wallet) (__required__) - wallet used to revoke active votes.
+* `opts.amount` (string) (__required__) - Celo amount used to revoke.
+* `opts.validator` (string) (__required__) - validator group address to revoke from.
+```js
 const transaction = await txController.revokeActive({
 	wallet,
 	amount: '0.2218',
@@ -93,7 +134,10 @@ const transaction = await txController.revokeActive({
 ```
 
 ## Unlock tokens
+### `txController.unlock(opts)`
 
+* `opts.wallet` (Wallet) (__required__) - wallet used to unlock amount.
+* `opts.amount` (string) (__required__) - Celo amount used to unlock.
 ```js
 const transaction = await txController.unlock({
 	wallet,
@@ -105,19 +149,32 @@ const transaction = await txController.unlock({
 
 Use this method to withdraw pending amounts. After unlocking the tokens you have to wait for 3 days to withdraw.
 
+### `txController.getPendingWithdrawals(opts)`
+
+* `opts.address` (string) (__required__) - wallet address to get the pending withdrawals from.
+
 ```js
-// check pending withdrawals
 const pendingWithdrawals = await txController.getPendingWithdrawals({
 	address: '0xaaaaaaaaaa',
 }))
+```
 
-// withdraw using index of pending withdrawals
-const transaction = await txController.withdraw({ wallet, index: 1, }))
+### `txController.withdraw(opts)`
+
+* `opts.wallet` (Wallet) (__required__) - wallet used to withdraw.
+* `opts.index` (number) (__required__) - index of pending withdrawals.
+```js
+const transaction = await txController.withdraw({ wallet, index: 1 }))
 ```
 
 ## Relock tokens
 
-Relock tokens that are pending withdrawals
+Relock tokens that are pending withdrawals.
+### `txController.relock(opts)`
+
+* `opts.wallet` (Wallet) (__required__) - wallet used to withdraw.
+* `opts.amount` (string) (__required__) - amount to relock.
+* `opts.index` (number) (__required__) - index of pending withdrawals.
 
 ```js
 const transaction = await txController.relock({
