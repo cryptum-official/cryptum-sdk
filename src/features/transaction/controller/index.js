@@ -10,6 +10,7 @@ const {
   UTXO,
   TransactionType,
   SmartContractCallResponse,
+  Input,
 } = require('../entity')
 const {
   buildStellarTransferTransaction,
@@ -139,7 +140,7 @@ class Controller extends Interface {
    * @param {object} input
    * @param {string} input.address
    * @param {Protocol} input.protocol
-   * @returns {Array<UTXOResponse>}
+   * @returns {Promise<Array<import('../entity').UTXOResponse>>}
    */
   async getUTXOs({ address, protocol }) {
     try {
@@ -453,16 +454,29 @@ class Controller extends Interface {
   /**
    * Create bitcoin transfer transaction
    *
-   * @param {BitcoinTransferTransactionInput} input
+   * @param {import('../entity').BitcoinTransferTransactionInput} input
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createBitcoinTransferTransaction(input) {
-    let { wallet, fromUTXOs, fromPrivateKeys, outputs, fee, testnet } = input
     validateBitcoinTransferTransactionParams(input)
+    let { wallet, inputs, outputs, fee, testnet } = input
     const protocol = Protocol.BITCOIN
     if (wallet) {
-      fromUTXOs = await this.getUTXOs({ address: wallet.address, protocol })
-      fromPrivateKeys = fromUTXOs.map(() => wallet.privateKey)
+      const utxos = await this.getUTXOs({ address: wallet.address, protocol })
+      inputs = []
+      for (let i = 0; i < utxos.length; ++i) {
+        const tx = await this.getTransactionByHash({ hash: utxos[i].txHash, protocol })
+        inputs[i] = new Input({ ...utxos[i], privateKey: wallet.privateKey, hex: tx.hex, blockhash: tx.blockhash })
+      }
+    } else if (inputs) {
+      for (let i = 0; i < inputs.length; ++i) {
+        const tx = await this.getTransactionByHash({ hash: inputs[i].txHash, protocol })
+        if (!tx.vout[inputs[i].index]) {
+          throw new GenericException(`Invalid UTXO hash ${inputs[i].txHash}`, 'InvalidParams')
+        }
+        inputs[i].hex = tx.hex
+        inputs[i].blockhash = tx.blockhash
+      }
     }
     let networkFee = fee
     if (!networkFee) {
@@ -471,21 +485,13 @@ class Controller extends Interface {
         protocol,
       }))
     }
-    const utxos = []
-    for (const utxo of fromUTXOs) {
-      const tx = await this.getTransactionByHash({ hash: utxo.txHash, protocol })
-      utxos.push({
-        ...utxo,
-        hex: tx.hex,
-      })
-    }
+
     const signedTx = await buildBitcoinTransferTransaction({
       wallet,
-      fromUTXOs: utxos,
-      fromPrivateKeys,
+      inputs,
       outputs,
       fee: networkFee,
-      testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }

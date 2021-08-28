@@ -11,14 +11,7 @@ function calculateTransactionSize(numInputs, numOutputs) {
   return numInputs * 148 + numOutputs * 34 + 10
 }
 
-module.exports.buildBitcoinTransferTransaction = async function ({
-  wallet,
-  fromUTXOs,
-  fromPrivateKeys,
-  outputs,
-  fee,
-  testnet,
-}) {
+module.exports.buildBitcoinTransferTransaction = async function ({ wallet, inputs, outputs, fee, testnet }) {
   const feePerByte = fee
   const outputDatas = outputs.map(({ address, amount }) => ({ address, value: toSatoshi(amount).toNumber() }))
   const amountSatoshi = outputDatas
@@ -30,9 +23,9 @@ module.exports.buildBitcoinTransferTransaction = async function ({
   tx.setMaximumFeeRate(new BigNumber(feePerByte).toNumber())
   let availableSatoshi = new BigNumber(0)
   let calcFee = new BigNumber(0)
-  for (let i = 0; i < fromUTXOs.length; ++i) {
-    const utxo = fromUTXOs[i]
-    if (utxo.height === 0) {
+  for (let i = 0; i < inputs.length; ++i) {
+    const utxo = inputs[i]
+    if (!utxo.blockhash) {
       throw new GenericException(`UTXO transaction ${utxo.txHash} is still pending`, 'InvalidTypeException')
     }
     tx.addInput({
@@ -50,8 +43,8 @@ module.exports.buildBitcoinTransferTransaction = async function ({
     }
   }
   tx.addOutputs(outputDatas)
-  for (let i = 0; i < fromUTXOs.length; ++i) {
-    tx.signInput(i, bitcoin.ECPair.fromPrivateKey(Buffer.from(fromPrivateKeys[i], 'hex'), { network }))
+  for (let i = 0; i < inputs.length; ++i) {
+    tx.signInput(i, bitcoin.ECPair.fromPrivateKey(Buffer.from(inputs[i].privateKey, 'hex'), { network }))
     if (!tx.validateSignaturesOfInput(i)) {
       throw new GenericException('Signature validation failed of input', 'InvalidTypeException')
     }

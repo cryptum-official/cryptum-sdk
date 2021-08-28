@@ -54,7 +54,6 @@ module.exports.validateSmartContractTransactionParams = ({
   testnet,
   contractAddress,
   feeCurrency,
-
   protocol,
 }) => {
   if (!wallet) {
@@ -87,7 +86,6 @@ module.exports.validateSmartContractDeployTransactionParams = ({
   contractName,
   params,
   feeCurrency,
-
   protocol,
 }) => {
   if (!wallet) {
@@ -125,7 +123,6 @@ module.exports.validateTokenDeployTransactionParams = ({
   tokenType,
   params,
   feeCurrency,
-
   protocol,
 }) => {
   if (!wallet) {
@@ -171,22 +168,22 @@ module.exports.validateSmartContractCallParams = ({ contractAddress, contractAbi
   }
 }
 
-module.exports.validateBitcoinTransferTransactionParams = ({ wallet, fromUTXOs, outputs }) => {
-  if (wallet && fromUTXOs) {
+module.exports.validateBitcoinTransferTransactionParams = ({ wallet, inputs, outputs }) => {
+  if (wallet && inputs) {
     throw new GenericException(
-      'Parameters wallet and fromUTXOs can not be sent at the same time',
+      'Parameters wallet and inputs can not be sent at the same time',
       'InvalidTypeException'
     )
   }
-  if (!wallet && !fromUTXOs) {
+  if (!wallet && !inputs) {
     throw new GenericException(
-      'Parameters wallet and fromUTXOs are null, it should send one only',
+      'Parameters wallet and inputs are null, it should send one only',
       'InvalidTypeException'
     )
   }
-  if (fromUTXOs && (!Array.isArray(fromUTXOs) || !fromUTXOs.length)) {
+  if (inputs && (!Array.isArray(inputs) || !inputs.length)) {
     throw new GenericException(
-      'Invalid parameter fromUTXOs, it should be an array with length larger than 0',
+      'Invalid parameter inputs, it should be an array with length larger than 0',
       'InvalidTypeException'
     )
   }

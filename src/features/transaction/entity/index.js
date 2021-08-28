@@ -65,6 +65,16 @@ class UTXO {
     this.height = height
   }
 }
+class Input {
+  constructor({ txHash, index, privateKey, value, blockhash, hex }) {
+    this.txHash = txHash
+    this.index = index
+    this.privateKey = privateKey
+    this.hex = hex
+    this.value = value
+    this.blockhash = blockhash
+  }
+}
 class Output {
   constructor(output) {
     this.address = output.address
@@ -282,17 +292,15 @@ class BitcoinTransferTransactionInput extends TransferTransactionInput {
    *
    * @param {object} args
    * @param {import('../../wallet/entity').Wallet?} args.wallet wallet to transfer from
-   * @param {Array<UTXO>} args.fromUTXOs inputs from UTXOs to transfer from
-   * @param {Array<string>} args.fromPrivateKeys input private keys to sign from
+   * @param {Array<Input>?} args.inputs inputs to transfer from
    * @param {Array<Output>} args.outputs outputs to transfer to
    * @param {Fee?} args.fee fee per byte in satoshi
    * @param {boolean} args.testnet
    */
-  constructor({ outputs, fromUTXOs, fromPrivateKeys, ...args }) {
+  constructor({ outputs, inputs, ...args }) {
     super(args)
     this.outputs = outputs
-    this.fromPrivateKeys = fromPrivateKeys
-    this.fromUTXOs = fromUTXOs
+    this.inputs = inputs
   }
 }
 
@@ -302,6 +310,7 @@ module.exports = {
   TransactionResponse,
   FeeResponse,
   UTXO,
+  Input,
   Output,
   StellarTrustlineTransactionInput,
   RippleTrustlineTransactionInput,

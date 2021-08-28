@@ -111,13 +111,36 @@ const transaction = await txController.createCeloTransferTransaction({
 
 Create a transfer transaction in Bitcoin blockchain.
 
-* `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
-* `opts.outputs` (string)(__required__) - asset to transfer.
+* `opts.wallet` (Wallet) - wallet to sign the transaction with. Required if `inputs` is not used.
+* `opts.inputs` (array of Input) - optional array of inputs to include in the transaction. Required if `wallet` is not used.
+  * `opts.inputs[].txHash` (string) - transaction hash of the UTXO.
+  * `opts.inputs[].index` (number) - index of the UTXO output.
+  * `opts.inputs[].privateKey` (string) - input private key to sign the transaction with.
+* `opts.outputs` (array of Output)(__required__) - outputs to transfer to.
+  * `opts.outputs[].address` (string) - address to transfer to.
+  * `opts.outputs[].amount` (string) - amount in BTC to transfer.
+
+ __Obs:__ It is important to note that the sum of the amount of the inputs must be equal to the sum of the amount of the outputs plus the fee. To set the fee amount, you need to subtract the total amount of the outputs. It's up to the user to decide the fee amount.
 
 ```js
-// transfer BTC
+// transfer BTC from wallet to 2 output addresses
 const transaction = await txController.createBitcoinTransferTransaction({
   wallet,
+  outputs: [
+    { address: 'btc-address1', amount: '0.05' },
+    { address: 'btc-address2', amount: '0.449996' },
+  ],
+})
+
+// transfer BTC from 1 input to 2 output addresses
+const transaction = await txController.createBitcoinTransferTransaction({
+  inputs: [
+    {
+      txHash: 'cf4c5da8b45...3785df8687f55c337299cc38c',
+      index: 0,
+      privateKey: '696007545...ed03b2af3b900a678318160'
+    }
+  ],
   outputs: [
     { address: 'btc-address1', amount: '0.05' },
     { address: 'btc-address2', amount: '0.449996' },
