@@ -6,6 +6,40 @@ const { GenericException, InvalidTypeException } = require('../../../errors')
 const { TransactionType } = require('../../features/transaction/entity')
 const { Protocol, TOKEN_TYPES } = require('../blockchain/constants')
 
+module.exports.validateEthereumTransferTransactionParams = ({
+  wallet,
+  tokenSymbol,
+  amount,
+  destination,
+  fee,
+  testnet,
+  contractAddress,
+}) => {
+  if (!wallet) {
+    throw new GenericException('Invalid wallet', 'InvalidTypeException')
+  }
+  if (tokenSymbol && typeof tokenSymbol !== 'string') {
+    throw new GenericException('Invalid token symbol', 'InvalidTypeException')
+  }
+  if (!destination || typeof destination !== 'string') {
+    throw new GenericException('Invalid destination', 'InvalidTypeException')
+  }
+  if (!amount || typeof amount !== 'string') {
+    throw new GenericException('Invalid amount', 'InvalidTypeException')
+  }
+  if (fee && (!fee.gas || !fee.gasPrice)) {
+    throw new GenericException(
+      'Invalid fee, it should be an object with gas and gasPrice parameters',
+      'InvalidTypeException'
+    )
+  }
+  if (testnet !== undefined && typeof testnet !== 'boolean') {
+    throw new GenericException('Invalid testnet', 'InvalidTypeException')
+  }
+  if (contractAddress && typeof contractAddress !== 'string') {
+    throw new GenericException('Invalid contract address', 'InvalidTypeException')
+  }
+}
 module.exports.validateCeloTransferTransactionParams = ({
   wallet,
   tokenSymbol,

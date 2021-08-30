@@ -46,6 +46,7 @@ const {
   validateStellarTransferTransactionParams,
   validateStellarTrustlineTransactionParams,
   validateRippleTrustlineTransactionParams,
+  validateEthereumTransferTransactionParams,
 } = require('../../../services/validations')
 
 class Controller extends Interface {
@@ -391,6 +392,7 @@ class Controller extends Interface {
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createEthereumTransferTransaction(input) {
+    validateEthereumTransferTransactionParams(input)
     const { wallet, tokenSymbol, amount, destination, fee, testnet, contractAddress } = input
     const protocol = Protocol.ETHEREUM
     const { info, networkFee } = await this._getFeeInfo({
@@ -424,6 +426,7 @@ class Controller extends Interface {
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createBscTransferTransaction(input) {
+    validateEthereumTransferTransactionParams(input)
     const { wallet, tokenSymbol, amount, destination, fee, testnet, contractAddress } = input
     const protocol = Protocol.BSC
     const { info, networkFee } = await this._getFeeInfo({
