@@ -1,6 +1,6 @@
 # Webhooks
 
-## Create an Webhook
+## Create a Webhook
 
 You need only instantiate Webhook controller and send your webhook to cryptum 🚀
 
@@ -33,7 +33,7 @@ console.log(webhooks)
 
 ps.: If you not provide an asset or protocol valid, the Cryptum sdk return an exception.
 
-## Delete an Webhook
+## Delete a Webhook
 
 You need only instantiate Webhook controller and send your asset, protocol and webhookId to cryptum 🚀
 
@@ -46,4 +46,4 @@ const webhooks = await webhookController.destroyWebhook({
 })
 ```
 
-ps.: If you not provide an asset, protocol and webhookId valid, the Cryptum sdk return an exception.
+ps.: If you don't provide an asset, protocol and webhookId valid, the Cryptum sdk return an exception.
