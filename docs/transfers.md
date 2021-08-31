@@ -193,7 +193,7 @@ const transaction = await txController.createStellarTransferTransaction({
 })
 ```
 
-## Ripple (XRPL)
+## Ripple
 
 #### `txController.createRippleTransferTransaction(opts)`
 

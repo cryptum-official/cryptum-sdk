@@ -34,7 +34,7 @@ const transaction = await txController.createStellarTrustlineTransaction({
 })
 ```
 
-### Ripple (XRPL)
+### Ripple
 
 #### `txController.createRippleTrustlineTransaction(opts)`
 
