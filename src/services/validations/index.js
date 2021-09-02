@@ -1,10 +1,26 @@
 const { default: BigNumber } = require('bignumber.js')
+const bip39 = require('bip39')
 const { isValidAddress } = require('ripple-lib/dist/npm/common/schema-validator')
 const { StrKey } = require('stellar-sdk')
 const Web3 = require('web3')
 const { GenericException, InvalidTypeException } = require('../../../errors')
 const { TransactionType } = require('../../features/transaction/entity')
 const { Protocol, TOKEN_TYPES } = require('../blockchain/constants')
+
+module.exports.validatePrivateKey = (privateKey) => {
+  if (!privateKey || typeof privateKey !== 'string') {
+    throw new GenericException('Invalid private key', 'InvalidTypeException');
+  }
+}
+
+module.exports.validateMnemonic = (mnemonic) => {
+  if (mnemonic && typeof mnemonic !== 'string') {
+    throw new InvalidTypeException('mnemonic', 'string')
+  }
+  if (mnemonic && !bip39.validateMnemonic(mnemonic)) {
+    throw new GenericException('Invalid mnemonic', 'InvalidTypeException')
+  }
+}
 
 module.exports.validateEthereumTransferTransactionParams = ({
   wallet,

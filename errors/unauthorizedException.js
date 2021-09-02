@@ -4,7 +4,7 @@
 class UnauthorizedException extends Error {
   constructor() {
     super(
-      'You dont have permission or not provided correct credentials or token'
+      'You don\'t have permission or didn\'t provide the correct credentials'
     )
   }
 }

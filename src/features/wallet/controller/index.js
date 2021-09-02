@@ -19,7 +19,7 @@ const {
   getHathorAddressFromPrivateKey,
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
-const { validateWalletInfo } = require('../../../services/validations')
+const { validateWalletInfo, validateMnemonic, validatePrivateKey } = require('../../../services/validations')
 
 class Controller extends Interface {
   /**
@@ -32,6 +32,7 @@ class Controller extends Interface {
    * @returns {Promise<Wallet>}
    */
   async generateWallet({ protocol, testnet, mnemonic = '' }) {
+    validateMnemonic(mnemonic)
     mnemonic = mnemonic ? mnemonic : generateMnemonic(256)
     testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
 
@@ -64,6 +65,7 @@ class Controller extends Interface {
    * @returns {Promise<Wallet>}
    */
   async generateWalletFromPrivateKey({ privateKey, protocol, testnet }) {
+    validatePrivateKey(privateKey)
     testnet = testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
     const walletData = { address: null, publicKey: null, privateKey, protocol, testnet }
     switch (protocol) {
