@@ -5,6 +5,8 @@ const { mnemonicToSeed, mnemonicToEntropy } = require('bip39')
 const stellarHdWallet = require('stellar-hd-wallet')
 const rippleKeyPairs = require('ripple-keypairs')
 const { Keypair } = require('stellar-sdk')
+const hathorSdk = require('@hathor/wallet-lib')
+const bitcore = require('bitcore-lib')
 
 const TESTNET_DERIVATION_PATH = "m/44'/1'/0'/0"
 const BITCOIN_DERIVATION_PATH = "m/44'/0'/0'/0"
@@ -156,4 +158,25 @@ module.exports.getRippleAddressFromPrivateKey = (privateKey) => {
   const keypair = rippleKeyPairs.deriveKeypair(privateKey)
   const address = rippleKeyPairs.deriveAddress(keypair.publicKey)
   return address
+}
+/**
+ * Derive hathor address, private key and public key
+ *
+ * @param {string} mnemonic mnemonic seed string
+ * @param {boolean} testnet true or false if testnet
+ * @param {number} index derivation index
+ */
+module.exports.deriveHathorWallet = (mnemonic, testnet, index = 0) => {
+  const networkName = testnet === true ? 'testnet' : 'mainnet'
+  const xprivkey = hathorSdk.walletUtils.getXPrivKeyFromSeed(mnemonic, { networkName })
+  const { privateKey } = hathorSdk.walletUtils.deriveXpriv(xprivkey, index)
+  const publicKey = privateKey.toPublicKey()
+  const address = publicKey.toAddress()
+  return { address: address.toString(), publicKey: publicKey.toString(), privateKey: privateKey.toString() }
+}
+
+module.exports.getHathorAddressFromPrivateKey = (privateKey, testnet = true) => {
+  const network = new hathorSdk.Network(testnet === true ? 'testnet' : 'mainnet')
+  const privkey = new bitcore.PrivateKey(privateKey, network.bitcoreNetwork)
+  return privkey.toAddress().toString()
 }

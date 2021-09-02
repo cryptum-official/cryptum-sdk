@@ -10,6 +10,7 @@ const Protocol = {
   ETHEREUM: 'ETHEREUM',
   STELLAR: 'STELLAR',
   RIPPLE: 'RIPPLE',
+  HATHOR: 'HATHOR',
 }
 module.exports.Protocol = Protocol
 
@@ -89,4 +90,4 @@ module.exports.TOKEN_TYPES = {
   ERC20: 'ERC20',
   ERC721: 'ERC721',
   ERC1155: 'ERC1155',
-};
+}

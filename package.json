@@ -17,6 +17,7 @@
   "dependencies": {
     "@celo-tools/celo-ethers-wrapper": "^0.0.5",
     "@ethereumjs/tx": "^3.2.1",
+    "@hathor/wallet-lib": "^0.22.0",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
     "bip39": "^3.0.4",

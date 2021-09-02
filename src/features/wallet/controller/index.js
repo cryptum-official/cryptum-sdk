@@ -15,6 +15,8 @@ const {
   getCeloAddressFromPrivateKey,
   getStellarPublicKeyFromPrivateKey,
   getRippleAddressFromPrivateKey,
+  deriveHathorWallet,
+  getHathorAddressFromPrivateKey,
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
 const { validateWalletInfo } = require('../../../services/validations')
@@ -29,8 +31,9 @@ class Controller extends Interface {
    * @param {string?} args.mnemonic mnemonic seed
    * @returns {Promise<Wallet>}
    */
-  async generateWallet({ protocol, testnet = true, mnemonic = '' }) {
+  async generateWallet({ protocol, testnet, mnemonic = '' }) {
     mnemonic = mnemonic ? mnemonic : generateMnemonic(256)
+    testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
 
     switch (protocol) {
       case Protocol.BITCOIN:
@@ -45,6 +48,8 @@ class Controller extends Interface {
         return await this.generateStellarWallet(mnemonic, testnet)
       case Protocol.RIPPLE:
         return await this.generateRippleWallet(mnemonic, testnet)
+      case Protocol.HATHOR:
+        return await this.generateHathorWallet(mnemonic, testnet)
       default:
         throw new Error('Unsupported blockchain protocol')
     }
@@ -59,7 +64,7 @@ class Controller extends Interface {
    * @returns {Promise<Wallet>}
    */
   async generateWalletFromPrivateKey({ privateKey, protocol, testnet }) {
-    testnet = testnet || this.config.environment === 'development'
+    testnet = testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
     const walletData = { address: null, publicKey: null, privateKey, protocol, testnet }
     switch (protocol) {
       case Protocol.BITCOIN:
@@ -79,6 +84,9 @@ class Controller extends Interface {
         break
       case Protocol.RIPPLE:
         walletData.address = getRippleAddressFromPrivateKey(privateKey)
+        break
+      case Protocol.HATHOR:
+        walletData.address = getHathorAddressFromPrivateKey(privateKey, testnet)
         break
       default:
         throw new Error('Unsupported blockchain protocol')
@@ -148,6 +156,17 @@ class Controller extends Interface {
       address,
       testnet,
       protocol: Protocol.RIPPLE,
+    })
+  }
+  async generateHathorWallet(mnemonic, testnet) {
+    const { address, privateKey, publicKey } = deriveHathorWallet(mnemonic, testnet)
+    return new Wallet({
+      mnemonic,
+      privateKey,
+      publicKey,
+      address,
+      testnet,
+      protocol: Protocol.HATHOR,
     })
   }
   /**

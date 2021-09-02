@@ -65,6 +65,14 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       })
       assert.strictEqual(wallet.address, '0x8C33DB44a78629cF60C88383d436EEc356884625')
     })
+    it('hathor', async () => {
+      const controller = new WalletController(config)
+      const wallet = await controller.generateWalletFromPrivateKey({
+        protocol: Protocol.HATHOR,
+        privateKey: 'cbc23f4dc6d485807ff86e51b7b0c39de0028e3d5db0ef0feb264e6625832829'
+      })
+      assert.strictEqual(wallet.address, 'WXK74dFXd6Ctj6EUBH3ctpWwoVR2TnHCjV')
+    })
   })
 
   describe('From same mnemonic', () => {
@@ -73,7 +81,6 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.ETHEREUM,
         mnemonic,
-        testnet: true,
       })
       assert.strictEqual(wallet.protocol, Protocol.ETHEREUM)
       assert.strictEqual(
@@ -86,7 +93,6 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.BITCOIN,
         mnemonic,
-        testnet: true,
       })
       assert.strictEqual(wallet.protocol, Protocol.BITCOIN)
       assert.strictEqual(
@@ -99,7 +105,6 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.BSC,
         mnemonic,
-        testnet: true,
       })
       assert.strictEqual(wallet.protocol, Protocol.BSC)
       assert.strictEqual(
@@ -112,7 +117,6 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.CELO,
         mnemonic,
-        testnet: true,
       })
       assert.strictEqual(wallet.protocol, Protocol.CELO)
       assert.strictEqual(
@@ -142,6 +146,18 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       assert.strictEqual(
         wallet.publicKey,
         'GAC2V7MGMTG57FZKJSXRSZ4EIDL2RBFIYVXZJMTJZ232XPZQUCTYUCWL'
+      )
+    })
+    it('generate hathor wallet', async () => {
+      const controller = new WalletController(config)
+      const wallet = await controller.generateWallet({
+        protocol: Protocol.HATHOR,
+        mnemonic,
+      })
+      assert.strictEqual(wallet.protocol, Protocol.HATHOR)
+      assert.strictEqual(
+        wallet.address,
+        'WgzYfVxZiL7bCN37Wj8myVY9HKZ5GCACsh'
       )
     })
   })
