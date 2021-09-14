@@ -8,19 +8,18 @@ const { Keypair } = require('stellar-sdk')
 
 const TESTNET_DERIVATION_PATH = "m/44'/1'/0'/0"
 const BITCOIN_DERIVATION_PATH = "m/44'/0'/0'/0"
-const ETHEREUM_DERIVATION_PATH = "m/44'/60'/0'/0"
-const CELO_DERIVATION_PATH = "m/44'/52752'/0'/0"
+const ETHEREUM_DERIVATION_PATH = "m/44'/60'/0'/0/0"
+const CELO_DERIVATION_PATH = "m/44'/52752'/0'/0/0"
 
 /**
  * Derive path from master seed for HD wallet
  *
  * @param {Buffer} seed HD wallet seed
  * @param {string} path derivation path
- * @param {object?} versions protocol specific versions
  * @returns {hdkey}
  */
-module.exports.derivePathFromMasterSeed = (seed, path, versions) => {
-  return hdkey.fromMasterSeed(seed, versions).derive(path)
+module.exports.derivePathFromMasterSeed = (seed, path) => {
+  return hdkey.fromMasterSeed(seed).derive(path)
 }
 /**
  * Build web3 account from private key
@@ -58,11 +57,9 @@ module.exports.getBitcoinAddressFromPrivateKey = (privateKey, testnet = true) =>
  * @returns
  */
 module.exports.deriveBitcoinWallet = async (mnemonic, testnet) => {
-  const network = testnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin
   const derivedPath = this.derivePathFromMasterSeed(
     await mnemonicToSeed(mnemonic),
-    testnet ? TESTNET_DERIVATION_PATH : BITCOIN_DERIVATION_PATH,
-    network.bip32
+    testnet ? TESTNET_DERIVATION_PATH : BITCOIN_DERIVATION_PATH
   )
   const address = this.getBitcoinAddressFromPrivateKey(derivedPath.privateKey.toString('hex'), testnet)
   return {
@@ -85,14 +82,10 @@ module.exports.getEthereumAddressFromPrivateKey = (privateKey) => {
  * Derive ethereum address, private key and public key
  *
  * @param {string} mnemonic mnemonic seed string
- * @param {boolean} testnet true or false for testnet
  * @returns
  */
-module.exports.deriveEthereumWallet = async (mnemonic, testnet) => {
-  const derivedPath = this.derivePathFromMasterSeed(
-    await mnemonicToSeed(mnemonic),
-    testnet ? TESTNET_DERIVATION_PATH : ETHEREUM_DERIVATION_PATH
-  )
+module.exports.deriveEthereumWallet = async (mnemonic) => {
+  const derivedPath = this.derivePathFromMasterSeed(await mnemonicToSeed(mnemonic), ETHEREUM_DERIVATION_PATH)
   const address = this.getEthereumAddressFromPrivateKey(derivedPath.privateKey.toString('hex'))
   return {
     address,

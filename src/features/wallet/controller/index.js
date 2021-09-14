@@ -29,7 +29,8 @@ class Controller extends Interface {
    * @param {string?} args.mnemonic mnemonic seed
    * @returns {Promise<Wallet>}
    */
-  async generateWallet({ protocol, testnet = true, mnemonic = '' }) {
+  async generateWallet({ protocol, mnemonic = '', testnet }) {
+    testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
     mnemonic = mnemonic ? mnemonic : generateMnemonic(256)
 
     switch (protocol) {
@@ -59,7 +60,7 @@ class Controller extends Interface {
    * @returns {Promise<Wallet>}
    */
   async generateWalletFromPrivateKey({ privateKey, protocol, testnet }) {
-    testnet = testnet || this.config.environment === 'development'
+    testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
     const walletData = { address: null, publicKey: null, privateKey, protocol, testnet }
     switch (protocol) {
       case Protocol.BITCOIN:

@@ -27,7 +27,7 @@ describe.only('Bsc transfer transactions', () => {
     nock(baseUrl)
       .post(`/fee?protocol=${Protocol.BSC}`, {
         type: TransactionType.TRANSFER,
-        from: '0x481B542b7419D8Ba305B5cc5029C12d5a68B4f69',
+        from: '0xCf61eaf64D895C3c71A8812e9EedC4c179b4ed60',
         destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
         amount: '0.01'
       })
@@ -39,7 +39,7 @@ describe.only('Bsc transfer transactions', () => {
       .persist()
       .post(`/fee?protocol=${Protocol.BSC}`, {
         type: TransactionType.CALL_CONTRACT_METHOD,
-        from: '0x481B542b7419D8Ba305B5cc5029C12d5a68B4f69',
+        from: '0xCf61eaf64D895C3c71A8812e9EedC4c179b4ed60',
         destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
         contractAddress: '0xfd78c660ee04357526c62e427cc2c3ff22fe5bdc',
         contractAbi: TRANSFER_METHOD_ABI,

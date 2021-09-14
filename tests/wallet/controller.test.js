@@ -78,7 +78,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       assert.strictEqual(wallet.protocol, Protocol.ETHEREUM)
       assert.strictEqual(
         wallet.address,
-        '0x481B542b7419D8Ba305B5cc5029C12d5a68B4f69'
+        '0xCf61eaf64D895C3c71A8812e9EedC4c179b4ed60'
       )
     })
     it('generate bitcoin wallet', async () => {
@@ -104,7 +104,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       assert.strictEqual(wallet.protocol, Protocol.BSC)
       assert.strictEqual(
         wallet.address,
-        '0x481B542b7419D8Ba305B5cc5029C12d5a68B4f69'
+        '0xCf61eaf64D895C3c71A8812e9EedC4c179b4ed60'
       )
     })
     it('generate celo wallet', async () => {
@@ -117,7 +117,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       assert.strictEqual(wallet.protocol, Protocol.CELO)
       assert.strictEqual(
         wallet.address,
-        '0x8C33DB44a78629cF60C88383d436EEc356884625'
+        '0xb8a29fA1876EB806e411f15D2D94c8e80FB72e23'
       )
     })
     it('generate ripple wallet', async () => {
