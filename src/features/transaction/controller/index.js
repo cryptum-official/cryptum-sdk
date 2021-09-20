@@ -49,6 +49,11 @@ const {
   validateEthereumTransferTransactionParams,
 } = require('../../../services/validations')
 
+const {
+  buildHathorTransferTransaction
+} = require('../../../services/blockchain/hathor');
+
+
 class Controller extends Interface {
   /**
    * Method to send an transaction to Cryptum
@@ -483,7 +488,7 @@ class Controller extends Interface {
     }
     let networkFee = fee
     if (!networkFee) {
-      ;({ estimateValue: networkFee } = await this.getFee({
+      ; ({ estimateValue: networkFee } = await this.getFee({
         type: TransactionType.TRANSFER,
         protocol,
       }))
@@ -700,6 +705,41 @@ class Controller extends Interface {
     }
 
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT })
+  }
+
+
+  async createHathorTransferTransaction(input) {
+    validateBitcoinTransferTransactionParams(input)
+    let { wallet, inputs, outputs, network } = input
+
+    const protocol = Protocol.HATHOR
+    if (wallet) {
+      const utxos = await this.getUTXOs({ address: wallet.address, protocol })
+
+      inputs = []
+      for (let i = 0; i < utxos.length; ++i) {
+        const tx = await this.getTransactionByHash({ hash: utxos[i].txHash, protocol })
+        inputs[i] = {
+          ...utxos[i],
+        }
+      }
+
+    } else if(inputs) {
+      for (let i = 0; i < inputs.length; ++i) {
+        const tx = await this.getTransactionByHash({ hash: inputs[i].txHash, protocol })
+        inputs[i].hex = tx.hex
+        inputs[i].tx.hash = tx.tx.hash,
+        inputs[i].data = ''
+      }
+    }
+    const signedTx = await buildHathorTransferTransaction({
+      wallet,
+      inputs,
+      outputs,
+      network
+    })
+
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
 }
 
