@@ -12,6 +12,7 @@ const TESTNET_DERIVATION_PATH = "m/44'/1'/0'/0"
 const BITCOIN_DERIVATION_PATH = "m/44'/0'/0'/0"
 const ETHEREUM_DERIVATION_PATH = "m/44'/60'/0'/0"
 const CELO_DERIVATION_PATH = "m/44'/52752'/0'/0"
+const HATHOR_DERIVATION_PATH = "m/44'/280'/0'/0"
 
 /**
  * Derive path from master seed for HD wallet
@@ -164,12 +165,14 @@ module.exports.getRippleAddressFromPrivateKey = (privateKey) => {
  *
  * @param {string} mnemonic mnemonic seed string
  * @param {boolean} testnet true or false if testnet
- * @param {number} index derivation index
  */
-module.exports.deriveHathorWallet = (mnemonic, testnet, index = 0) => {
+module.exports.deriveHathorWallet = async (mnemonic, testnet) => {
   const networkName = testnet === true ? 'testnet' : 'mainnet'
-  const xprivkey = hathorSdk.walletUtils.getXPrivKeyFromSeed(mnemonic, { networkName })
-  const { privateKey } = hathorSdk.walletUtils.deriveXpriv(xprivkey, index)
+  const xprivkey = bitcore.HDPrivateKey.fromSeed(
+    await mnemonicToSeed(mnemonic),
+    hathorSdk.network.getNetwork(networkName)
+  )
+  const { privateKey } = xprivkey.deriveNonCompliantChild(HATHOR_DERIVATION_PATH)
   const publicKey = privateKey.toPublicKey()
   const address = publicKey.toAddress()
   return { address: address.toString(), publicKey: publicKey.toString(), privateKey: privateKey.toString() }
