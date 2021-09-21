@@ -15,11 +15,11 @@ walletController.generateHathorWallet(mnemonic, true).then((wallet) => {
   
   txController.createHathorTransferTransaction({
     wallet,
-    outputs: [{ address: 'WXngE15Yynt1nEut4EG2C2C5evoxp4gAGm', amount: 1 }],
+    outputs: [{ address: 'WXngE15Yynt1nEut4EG2C2C5evoxp4gAGm', amount: 1, token: '00' }],
     testnet: true
   }).then((transaction) => {
-    const { hash } =  txController.sendTransaction(transaction)
-    console.log(hash)
+    // const { hash } =  txController.sendTransaction(transaction)
+    console.log("HEX:", transaction)
   }).catch((e) => {
     console.log(e)
   })

@@ -1,4 +1,5 @@
 const hathorLib = require("@hathor/wallet-lib");
+const walletApi = require("@hathor/wallet-lib/lib/wallet/api/walletApi");
 const { storageFactory } = require('storage-factory');
 
 hathorLib.storage.setStore(storageFactory(() => 'localStorage'));
@@ -22,13 +23,13 @@ module.exports.buildHathorTransferTransaction = async function ({ wallet, output
             'address': outputs[j].address,
             'script': script,
             'tokenData':  0,
-            'token': '00',
+            'token': outputs[j].token,
         }
     }
 
     const allAddress = await walletService.getAllAddresses()
     const changeAddress = await allAddress.next();
-
+    console.log(allAddress)
     const options = {
         outputs: txData.outputs,
         // inputs: txData.inputs,
@@ -36,15 +37,16 @@ module.exports.buildHathorTransferTransaction = async function ({ wallet, output
     };
 
     const TransactionService = new hathorLib.SendTransactionWalletService(walletService, options)
-    // const prepare = await TransactionService.prepareTx()
 
-    TransactionService.run();
+    const sign = await TransactionService.run()
+    const toHex = sign.toHex()
+    
+    console.log("2HEX: ", toHex)
 
+    // const proposal = await walletApi.default.createTxProposal(walletService, toHex);
+    // const updateTxProposal = await walletApi.default.updateTxProposal(walletService, "b057c928-fab4-477a-af15-3710b4ded43b", toHex);
+    // console.log(updateTxProposal)
 
-    // const Transaction = new hathorLib.Transaction(TransactionService.inputs, TransactionService.outputs, TransactionService)
-
-    // Transaction.
-
-    console.log("sign", TransactionService)
+    return toHex
 
 }
