@@ -50,7 +50,10 @@ const {
 } = require('../../../services/validations')
 
 const {
-  buildHathorTransferTransaction
+  
+    buildHathorTransferTransaction,
+    buildHathorTokenTransferTransaction
+  
 } = require('../../../services/blockchain/hathor');
 
 
@@ -741,7 +744,7 @@ class Controller extends Interface {
       }
     }
 
-    const signedTx = await buildHathorTransferTransaction({
+    const signedTx = await buildHathorTokenTransferTransaction({
       wallet,
       inputs,
       outputs,
