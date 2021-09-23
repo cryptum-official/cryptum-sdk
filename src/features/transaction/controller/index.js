@@ -710,33 +710,46 @@ class Controller extends Interface {
 
   async createHathorTransferTransaction(input) {
     validateBitcoinTransferTransactionParams(input)
-    let { wallet, inputs, outputs, network } = input
+    
+    let { wallet, inputs, outputs, inputPrivateKeys, tokens, testnet } = input
 
+    let inputsSum = 0;
+    let changeAddress;
     const protocol = Protocol.HATHOR
     if (wallet) {
       const utxos = await this.getUTXOs({ address: wallet.address, protocol })
-
-      inputs = []
+      inputs = [];
       for (let i = 0; i < utxos.length; ++i) {
         const tx = await this.getTransactionByHash({ hash: utxos[i].txHash, protocol })
+        inputsSum += tx.tx.outputs[inputs[i].index].decoded.address
+        changeAddress =  tx.tx.outputs[inputs[i].index].value
         inputs[i] = {
-          ...utxos[i],
+          'txHash': tx.tx.hash,
+          'index': utxos[i].index,
+          'data': ""
         }
       }
 
     } else if(inputs) {
       for (let i = 0; i < inputs.length; ++i) {
         const tx = await this.getTransactionByHash({ hash: inputs[i].txHash, protocol })
-        inputs[i].hex = tx.hex
-        inputs[i].tx.hash = tx.tx.hash,
+        changeAddress =  tx.tx.outputs[inputs[i].index].decoded.address
+        inputsSum += tx.tx.outputs[inputs[i].index].value
+        inputs[i].index  = inputs[i].index,
+        inputs[i].txHash = tx.tx.hash,
         inputs[i].data = ''
       }
     }
+
     const signedTx = await buildHathorTransferTransaction({
       wallet,
       inputs,
       outputs,
-      network
+      inputPrivateKeys,
+      tokens,
+      inputsSum,
+      changeAddress,
+      testnet
     })
 
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
