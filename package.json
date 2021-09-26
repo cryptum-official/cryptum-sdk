@@ -21,6 +21,7 @@
     "bignumber.js": "^9.0.1",
     "bip39": "^3.0.4",
     "bitcoinjs-lib": "^5.2.0",
+    "ethereumjs-wallet": "^1.0.1",
     "hdkey": "^2.0.1",
     "ripple-keypairs": "^1.0.3",
     "ripple-lib": "^1.9.5",

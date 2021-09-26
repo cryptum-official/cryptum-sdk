@@ -4,17 +4,17 @@ const { getApiMethod, mountHeaders, handleRequestError } = require('../../../ser
 const Interface = require('./interface')
 const requests = require('./requests.json')
 const {
-  deriveBitcoinWallet,
-  deriveEthereumWallet,
-  deriveCeloWallet,
-  deriveRippleWallet,
-  deriveStellarWallet,
   getBitcoinAddressFromPrivateKey,
   getBscAddressFromPrivateKey,
   getEthereumAddressFromPrivateKey,
   getCeloAddressFromPrivateKey,
   getStellarPublicKeyFromPrivateKey,
   getRippleAddressFromPrivateKey,
+  deriveBitcoinWalletFromDerivationPath,
+  deriveCeloWalletFromDerivationPath,
+  deriveStellarWalletFromDerivationPath,
+  deriveRippleWalletFromDerivationPath,
+  deriveEthereumWalletFromDerivationPath,
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
 const { validateWalletInfo } = require('../../../services/validations')
@@ -27,25 +27,29 @@ class Controller extends Interface {
    * @param {Protocol} args.protocol blockchain protocol to generate the wallet for
    * @param {boolean?} args.testnet true for testnet and false for mainnet
    * @param {string?} args.mnemonic mnemonic seed
+   * @param {object?} args.derivation object with information to derive one wallet (BIP44 derivation path)
+   * @param {number?} args.derivation.account account index to derive wallet
+   * @param {number?} args.derivation.change change index to derive wallet
+   * @param {number?} args.derivation.address address index to derive wallet
    * @returns {Promise<Wallet>}
    */
-  async generateWallet({ protocol, mnemonic = '', testnet }) {
+  async generateWallet({ protocol, mnemonic = '', testnet, derivation = { account: 0, change: 0, address: 0 } }) {
     testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
     mnemonic = mnemonic ? mnemonic : generateMnemonic(256)
 
     switch (protocol) {
       case Protocol.BITCOIN:
-        return await this.generateBitcoinWallet(mnemonic, testnet)
+        return await this.generateBitcoinWallet({ mnemonic, derivation, testnet })
       case Protocol.BSC:
-        return await this.generateBscWallet(mnemonic, testnet)
+        return await this.generateBscWallet({ mnemonic, derivation, testnet })
       case Protocol.ETHEREUM:
-        return await this.generateEthereumWallet(mnemonic, testnet)
+        return await this.generateEthereumWallet({ mnemonic, derivation, testnet })
       case Protocol.CELO:
-        return await this.generateCeloWallet(mnemonic, testnet)
+        return await this.generateCeloWallet({ mnemonic, derivation, testnet })
       case Protocol.STELLAR:
-        return await this.generateStellarWallet(mnemonic, testnet)
+        return await this.generateStellarWallet({ mnemonic, derivation, testnet })
       case Protocol.RIPPLE:
-        return await this.generateRippleWallet(mnemonic, testnet)
+        return await this.generateRippleWallet({ mnemonic, derivation, testnet })
       default:
         throw new Error('Unsupported blockchain protocol')
     }
@@ -87,10 +91,13 @@ class Controller extends Interface {
     return new Wallet(walletData)
   }
 
-  async generateBitcoinWallet(mnemonic, testnet) {
-    const { address, privateKey, publicKey } = await deriveBitcoinWallet(mnemonic, testnet)
-    return new Wallet({
+  async generateBitcoinWallet({ mnemonic, derivation, testnet }) {
+    const { address, privateKey, publicKey } = await deriveBitcoinWalletFromDerivationPath(
       mnemonic,
+      testnet,
+      derivation
+    )
+    return new Wallet({
       privateKey,
       publicKey,
       address,
@@ -99,10 +106,9 @@ class Controller extends Interface {
     })
   }
 
-  async generateEthereumWallet(mnemonic, testnet) {
-    const { address, privateKey, publicKey } = await deriveEthereumWallet(mnemonic, testnet)
+  async generateEthereumWallet({ mnemonic, derivation, testnet }) {
+    const { address, privateKey, publicKey } = await deriveEthereumWalletFromDerivationPath(mnemonic, derivation)
     return new Wallet({
-      mnemonic,
       privateKey,
       publicKey,
       address,
@@ -111,16 +117,15 @@ class Controller extends Interface {
     })
   }
 
-  async generateBscWallet(mnemonic, testnet) {
-    const wallet = await this.generateEthereumWallet(mnemonic, testnet)
+  async generateBscWallet({ mnemonic, derivation, testnet }) {
+    const wallet = await this.generateEthereumWallet({ mnemonic, derivation, testnet })
     wallet.protocol = Protocol.BSC
     return wallet
   }
 
-  async generateCeloWallet(mnemonic, testnet) {
-    const { address, privateKey, publicKey } = await deriveCeloWallet(mnemonic)
+  async generateCeloWallet({ mnemonic, derivation, testnet }) {
+    const { address, privateKey, publicKey } = await deriveCeloWalletFromDerivationPath(mnemonic, derivation)
     return new Wallet({
-      mnemonic,
       privateKey,
       publicKey,
       address,
@@ -129,10 +134,9 @@ class Controller extends Interface {
     })
   }
 
-  async generateStellarWallet(mnemonic, testnet) {
-    const { privateKey, publicKey } = deriveStellarWallet(mnemonic)
+  async generateStellarWallet({ mnemonic, derivation, testnet }) {
+    const { privateKey, publicKey } = deriveStellarWalletFromDerivationPath(mnemonic, derivation)
     return new Wallet({
-      mnemonic,
       privateKey,
       publicKey,
       testnet,
@@ -140,10 +144,9 @@ class Controller extends Interface {
     })
   }
 
-  async generateRippleWallet(mnemonic, testnet) {
-    const { address, privateKey, publicKey } = deriveRippleWallet(mnemonic)
+  async generateRippleWallet({ mnemonic, derivation, testnet }) {
+    const { address, privateKey, publicKey } = deriveRippleWalletFromDerivationPath(mnemonic, derivation)
     return new Wallet({
-      mnemonic,
       privateKey,
       publicKey,
       address,
