@@ -24,7 +24,7 @@ const wallet = await walletController.generateWallet({ protocol: 'STELLAR' })
 const wallet = await walletController.generateWallet({
   protocol: 'ETHEREUM',
   mnemonic: '<words>...',
-  derivation: { address: 19 }
+  derivation: { account: 10, address: 2 }
 })
 console.log(wallet)
 // Wallet {

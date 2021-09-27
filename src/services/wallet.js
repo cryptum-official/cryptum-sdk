@@ -18,9 +18,6 @@ const getDerivationPath = ({ coin, account = 0, change, address }) => {
     path = path.replace('/{change}', '')
   }
   if (address !== undefined && typeof address === 'number') {
-    if (change === undefined || change === null) {
-      throw new Error('Derivation path change index must be set too')
-    }
     path = path.replace('{address}', address)
   } else {
     path = path.replace('/{address}', '')
@@ -36,6 +33,7 @@ const getEthereumDerivationPath = ({ account = 0, change, address }) =>
   getDerivationPath({ coin: 60, account, change, address })
 const getCeloDerivationPath = ({ account = 0, change, address }) =>
   getDerivationPath({ coin: 52752, account, change, address })
+const getHathorDerivationPath = ({ account = 0, address }) => getDerivationPath({ coin: 280, account, address })
 
 /**
  * Get Bitcoin address from private key
@@ -63,7 +61,7 @@ module.exports.getBitcoinAddressFromPrivateKey = (privateKey, testnet = true) =>
  * @param {number} derivationPath.address derivation path address index
  * @returns
  */
-module.exports.deriveBitcoinAddressFromXpub = async (xpub, testnet, { address = 0 } = {}) => {
+module.exports.deriveBitcoinAddressFromXpub = (xpub, testnet, { address = 0 } = {}) => {
   const network = testnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin
   const derivedPath = bitcoin.bip32.fromBase58(xpub, network).derive(address)
   const { address: btcAddress } = bitcoin.payments.p2pkh({
@@ -89,19 +87,25 @@ module.exports.deriveBitcoinWalletFromDerivationPath = async (
   { account = 0, change = 0, address } = {}
 ) => {
   const network = testnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin
+  const accountIndex = account !== undefined ? account : 0
+  const changeIndex = change !== undefined ? change : 0
+  const addressIndex = address !== undefined ? address : 0
   const derivedPath = bitcoin.bip32
     .fromSeed(await mnemonicToSeed(mnemonic), network)
     .derivePath(
       testnet
-        ? getTestnetDerivationPath({ account, change, address })
-        : getBitcoinDerivationPath({ account, change, address })
+        ? getTestnetDerivationPath({ account: accountIndex, change: changeIndex })
+        : getBitcoinDerivationPath({ account: accountIndex, change: changeIndex })
     )
-  const btcAddress = this.getBitcoinAddressFromPrivateKey(derivedPath.privateKey.toString('hex'), testnet)
+  const xpub = derivedPath.neutered().toBase58()
+  const btcAddress = this.deriveBitcoinAddressFromXpub(xpub, testnet, { address: addressIndex })
+  const privkeyDerived = derivedPath.derive(addressIndex)
+
   return {
     address: btcAddress,
-    privateKey: derivedPath.privateKey.toString('hex'),
-    publicKey: derivedPath.publicKey.toString('hex'),
-    xpub: derivedPath.neutered().toBase58()
+    privateKey: privkeyDerived.privateKey.toString('hex'),
+    publicKey: privkeyDerived.publicKey.toString('hex'),
+    xpub,
   }
 }
 /**
@@ -135,16 +139,20 @@ module.exports.getEthereumAddressFromPrivateKey = (privateKey) => {
  * @returns
  */
 module.exports.deriveEthereumWalletFromDerivationPath = async (mnemonic, { account = 0, change = 0, address } = {}) => {
+  const accountIndex = account !== undefined ? account : 0
+  const changeIndex = change !== undefined ? change : 0
+  const addressIndex = address !== undefined ? address : 0
   const derivedPath = hdkey
     .fromMasterSeed(await mnemonicToSeed(mnemonic))
-    .derivePath(getEthereumDerivationPath({ account, change, address }))
-  const wallet = derivedPath.getWallet()
+    .derivePath(getEthereumDerivationPath({ account: accountIndex, change: changeIndex }))
+  const xpub = derivedPath.publicExtendedKey().toString('hex')
+  const wallet = derivedPath.deriveChild(addressIndex).getWallet()
 
   return {
     address: wallet.getAddressString().toLocaleLowerCase(),
     privateKey: wallet.getPrivateKeyString(),
     publicKey: wallet.getPublicKeyString(),
-    xpub: derivedPath.publicExtendedKey().toString('hex')
+    xpub,
   }
 }
 /**
@@ -175,16 +183,20 @@ module.exports.getCeloAddressFromPrivateKey = (privateKey) => {
  * @returns
  */
 module.exports.deriveCeloWalletFromDerivationPath = async (mnemonic, { account = 0, change = 0, address } = {}) => {
+  const accountIndex = account !== undefined ? account : 0
+  const changeIndex = change !== undefined ? change : 0
+  const addressIndex = address !== undefined ? address : 0
   const derivedPath = hdkey
     .fromMasterSeed(await mnemonicToSeed(mnemonic))
-    .derivePath(getCeloDerivationPath({ account, change, address }))
-  const wallet = derivedPath.getWallet()
+    .derivePath(getCeloDerivationPath({ account: accountIndex, change: changeIndex, address }))
+  const xpub = derivedPath.publicExtendedKey().toString('hex')
+  const wallet = derivedPath.deriveChild(addressIndex).getWallet()
 
   return {
     address: wallet.getAddressString().toLocaleLowerCase(),
     privateKey: wallet.getPrivateKeyString(),
     publicKey: wallet.getPublicKeyString(),
-    xpub: derivedPath.publicExtendedKey().toString('hex')
+    xpub,
   }
 }
 module.exports.deriveCeloAddressFromXpub = async (xpub, { address = 0 } = {}) =>
@@ -236,19 +248,40 @@ module.exports.getRippleAddressFromPrivateKey = (privateKey) => {
  *
  * @param {string} mnemonic mnemonic seed string
  * @param {boolean} testnet true or false if testnet
- * @param {number} index derivation index
+ * @param {object} derivation derivation object
  */
-module.exports.deriveHathorWallet = (mnemonic, testnet, index = 0) => {
+module.exports.deriveHathorWalletFromDerivationPath = async (mnemonic, testnet, { account = 0, address } = {}) => {
+  const accountIndex = account !== undefined ? account : 0
+  const addressIndex = address !== undefined ? address : 0
   const networkName = testnet === true ? 'testnet' : 'mainnet'
-  const xprivkey = hathorSdk.walletUtils.getXPrivKeyFromSeed(mnemonic, { networkName })
-  const { privateKey } = hathorSdk.walletUtils.deriveXpriv(xprivkey, index)
-  const publicKey = privateKey.toPublicKey()
-  const address = publicKey.toAddress()
-  return { address: address.toString(), publicKey: publicKey.toString(), privateKey: privateKey.toString() }
+  const partialDerivationPath = getHathorDerivationPath({ account: accountIndex }).substring(11)
+  const xprivkey = hathorSdk.walletUtils.getXPrivKeyFromSeed(mnemonic, {
+    networkName,
+    accountDerivationIndex: partialDerivationPath,
+  })
+  const privkey = hathorSdk.walletUtils.deriveXpriv(xprivkey, partialDerivationPath)
+  const xpub = hathorSdk.walletUtils.getXPubKeyFromXPrivKey(privkey)
+  const privkeyDerived = privkey.deriveChild(addressIndex)
+
+  return {
+    address: this.deriveHathorAddressFromXpub(xpub, testnet, { address: addressIndex }),
+    publicKey: privkeyDerived.publicKey.toString(),
+    privateKey: privkeyDerived.privateKey.toString(),
+    xpub,
+  }
 }
 
 module.exports.getHathorAddressFromPrivateKey = (privateKey, testnet = true) => {
   const network = new hathorSdk.Network(testnet === true ? 'testnet' : 'mainnet')
   const privkey = new bitcore.PrivateKey(privateKey, network.bitcoreNetwork)
   return privkey.toAddress().toString()
+}
+
+module.exports.deriveHathorAddressFromXpub = (xpub, testnet, { address = 0 } = {}) => {
+  const networkName = testnet === true ? 'testnet' : 'mainnet'
+  const hdPublicKey = new bitcore.HDPublicKey(xpub)
+  return new bitcore.Address(
+    hdPublicKey.derive(address).publicKey,
+    hathorSdk.network.getNetwork(networkName)
+  ).toString()
 }

@@ -81,7 +81,6 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.ETHEREUM,
         mnemonic,
-        derivation: { address: 0 }
       })
       assert.strictEqual(wallet.protocol, Protocol.ETHEREUM)
       assert.strictEqual(
@@ -94,7 +93,6 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.BITCOIN,
         mnemonic,
-        derivation: { address: 0 }
       })
       assert.strictEqual(wallet.protocol, Protocol.BITCOIN)
       assert.strictEqual(
@@ -107,7 +105,6 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.BSC,
         mnemonic,
-        derivation: { address: 0 }
       })
       assert.strictEqual(wallet.protocol, Protocol.BSC)
       assert.strictEqual(
@@ -120,7 +117,6 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.CELO,
         mnemonic,
-        derivation: { address: 0 }
       })
       assert.strictEqual(wallet.protocol, Protocol.CELO)
       assert.strictEqual(
@@ -157,12 +153,11 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.HATHOR,
         mnemonic,
-        derivation:{address:0}
       })
       assert.strictEqual(wallet.protocol, Protocol.HATHOR)
       assert.strictEqual(
         wallet.address,
-        'WgzYfVxZiL7bCN37Wj8myVY9HKZ5GCACsh'
+        'WXpJQ1Y815pGQVC1MgD7DwJepokVnSmGD3'
       )
     })
   })

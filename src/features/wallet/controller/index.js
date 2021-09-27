@@ -1,4 +1,4 @@
-const { generateMnemonic } = require('bip39')
+const { generateMnemonic, validateMnemonic } = require('bip39')
 const { Wallet, WalletInfoResponse } = require('../entity')
 const { getApiMethod, mountHeaders, handleRequestError } = require('../../../services')
 const Interface = require('./interface')
@@ -19,9 +19,12 @@ const {
   deriveBscAddressFromXpub,
   deriveEthereumAddressFromXpub,
   deriveCeloAddressFromXpub,
+  deriveHathorWalletFromDerivationPath,
+  getHathorAddressFromPrivateKey,
+  deriveHathorAddressFromXpub,
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
-const { validateWalletInfo, validateMnemonic, validatePrivateKey } = require('../../../services/validations')
+const { validateWalletInfo, validatePrivateKey } = require('../../../services/validations')
 
 class Controller extends Interface {
   /**
@@ -37,8 +40,8 @@ class Controller extends Interface {
    * @param {number?} args.derivation.address address index to derive wallet
    * @returns {Promise<Wallet>}
    */
-  async generateWallet({ protocol, mnemonic = '', testnet, derivation = { account: 0, change: 0 } }) {
-    testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
+  async generateWallet({ protocol, mnemonic, testnet, derivation = { account: 0, change: 0 } }) {
+    validateMnemonic(mnemonic)
     mnemonic = mnemonic ? mnemonic : generateMnemonic(256)
     testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
 
@@ -56,7 +59,7 @@ class Controller extends Interface {
       case Protocol.RIPPLE:
         return await this.generateRippleWallet({ mnemonic, derivation, testnet })
       case Protocol.HATHOR:
-        return await this.generateHathorWallet(mnemonic, testnet)
+        return await this.generateHathorWallet({ mnemonic, derivation, testnet })
       default:
         throw new Error('Unsupported blockchain protocol')
     }
@@ -124,6 +127,9 @@ class Controller extends Interface {
         break
       case Protocol.CELO:
         walletAddress = deriveCeloAddressFromXpub(xpub, { address })
+        break
+      case Protocol.HATHOR:
+        walletAddress = deriveHathorAddressFromXpub(xpub, testnet, { address })
         break
       default:
         throw new Error('Unsupported blockchain protocol')
@@ -197,14 +203,15 @@ class Controller extends Interface {
       protocol: Protocol.RIPPLE,
     })
   }
-  async generateHathorWallet(mnemonic, testnet) {
-    const { address, privateKey, publicKey } = await deriveHathorWallet(mnemonic, testnet)
+  async generateHathorWallet({ mnemonic, derivation, testnet }) {
+    const { address, privateKey, publicKey, xpub } = await deriveHathorWalletFromDerivationPath(mnemonic, testnet, derivation)
     return new Wallet({
       mnemonic,
       privateKey,
       publicKey,
       address,
       testnet,
+      xpub,
       protocol: Protocol.HATHOR,
     })
   }

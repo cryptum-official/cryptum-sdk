@@ -2,7 +2,7 @@
 
 List currency price quotations in realtime.
 
-Possible tokens are: XLM, XRP, BTC, ETH, CELO, BNB, MDA, HTR.
+Possible tokens are: XLM, XRP, BTC, ETH, CELO, BNB, MDA, HTR, BRL, USD.
 
 ```js
 const controller = sdk.getPricesController()
