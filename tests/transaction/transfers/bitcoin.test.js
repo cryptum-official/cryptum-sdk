@@ -33,39 +33,22 @@ describe.only('Bitcoin transfer transactions', () => {
       })
       .reply(200, [
         {
-          value: 44999600,
-          txHash: 'd28c5a7ea19f1187d8d1144d0ea1976e821fb0337e03d817a53b7f93b6599081',
-          index: 2,
+          value: 2022623,
+          txHash: '03fceba0863bbf2070fa2f03b20ece7ded5bf0992da2cd99948d950ff7971f94',
+          index: 0,
           height: 2005940,
-        },
-        {
-          value: 1396115,
-          txHash: 'addecbe2b0f58993678cbfec881b9aab62d6a5c7dee3bcc6acf6ef840f3f8e8a',
-          index: 1,
-          height: 2005980,
         },
       ])
       .persist()
     nock(baseUrl)
-      .get(`/transaction/addecbe2b0f58993678cbfec881b9aab62d6a5c7dee3bcc6acf6ef840f3f8e8a`)
+      .get(`/transaction/03fceba0863bbf2070fa2f03b20ece7ded5bf0992da2cd99948d950ff7971f94`)
       .query({
         protocol: Protocol.BITCOIN,
       })
       .reply(200, {
-        blockhash: '000000000000000417decfc22cd6f3e680c148d84bf6214407f9d4862c57ff34',
+        blockhash: '0000000000242d0443cc5b1847547260dc9278a5ba6a83e73c892e6c70c459d3',
         vout: [{},{}],
-        hex: '02000000000101fc83dfaddaca076257d529fb4b5ebd06a78cddb1350ff809d6465d9768156b47000000001716001465a4323e641c60b1f53d0a7923949bcb30d292d0feffffff020ac6d10f0200000017a9140da4ba2552f8bc81ac99e2bf1669738dcca0c97f87934d1500000000001976a914dfe789a916cf07bfe348bfd4e418c39aecc2bfae88ac02473044022050fbdd68e4087d9409d77175d697edc9ebd910e0c5f6b0ce2db5660984baaba302201453bede2d6328a84b1a6fb46ba088f3f54878cccd475fe7121b50ee5b4b5a80012102f6c5c880bf768b459d72f15b662f1bc51c58d15a2af810686ad2d4f0046efd0cdb9b1e00',
-      })
-      .persist()
-    nock(baseUrl)
-      .get(`/transaction/d28c5a7ea19f1187d8d1144d0ea1976e821fb0337e03d817a53b7f93b6599081`)
-      .query({
-        protocol: Protocol.BITCOIN,
-      })
-      .reply(200, {
-        blockhash: '0000000000d38e259f973daffe7d90c6635b699e4f6a3e8fb502530f7be8aee9',
-        vout: [{},{},{}],
-        hex: '020000000147f622ba9b8814d466511af85ef97e6d7d52e1a4d65ce52fd4507b299b5b5bfe010000006a47304402207b903fbb2c965ee03c0736d82be37e83549cbe0041f78ec83e23dd2d6c5ad736022033031c089a671e78ee4480be9fe2a36f521aba5829ef72bbba7d9bcac7c21b0f01210292f8705e8f86de81b4f3291c1ee05ee6549146bed01d76576ece5c36545a4cfbffffffff0300093d00000000001976a9144b57e83b4b50c8665be6beca8ca90762eb5f850f88ac40420f00000000001600140704deafedca2c760520e2ee50521e60a57b211cb0a3ae02000000001976a914dfe789a916cf07bfe348bfd4e418c39aecc2bfae88ac00000000',
+        hex: '02000000000101f27eb920690ce3b0c3673c36873725b677447f09817045492faa4858d6a3d08d0100000000feffffff02dfdc1e00000000001976a9141c2187a8c42875b6256fc672d84924fbcc1b7a8d88ac5718370f0000000017a91426513f88c7013b174f970161736fa562ac77f7058702473044022008f35c495c5cd0c8953666afcf8968ba4787d0b2c985b8612bb079dc7a4286b402201b0a3009465c4b3dd598aaa9fa2a63e383cf50b44a3ea52a58ea72236a4eee3e01210224c8275f744ee80f25f230c865f242f413819e305e5c0e7cee04b5d6ceacdccd97fd1f00',
       })
       .persist()
   })
@@ -77,13 +60,13 @@ describe.only('Bitcoin transfer transactions', () => {
     const transaction = await txController.createBitcoinTransferTransaction({
       wallet: wallets.bitcoin,
       outputs: [
-        { address: 'mnPLHLXaj9rs6hr1WmPJJSvFwtvVyp4BGo', amount: '0.01395' },
-        { address: wallets.bitcoin.address, amount: '0.45' },
+        { address: 'mnPLHLXaj9rs6hr1WmPJJSvFwtvVyp4BGo', amount: '0.01' },
+        { address: wallets.bitcoin.address, amount: '0.01022223' },
       ],
     })
     assert.strictEqual(
       transaction.signedTx,
-      '0200000002819059b6937f3ba517d8037e33b01f826e97a10e4d14d1d887119fa17e5a8cd2020000006b483045022100fbfa2f0ef42772544a93f263f7a9da4dbbeceef9c402a3f900694c1ff25076a502203a3733a7b2b287a2169ca1c56b991c93b0f6ba77d5a07f6a7d228fada13515c201210292f8705e8f86de81b4f3291c1ee05ee6549146bed01d76576ece5c36545a4cfbffffffff8a8e3f0f84eff6acc6bce3dec7a5d662ab9a1b88ecbf8c679389f5b0e2cbdead010000006b483045022100a79af2dbc9175b7b69a071be763e0951481416371af42f8759ed94930d8eabad02206d4fcaad0054b2c8cfdb34538448b3151cfe6c67d9d99161f6f0bd3c8924c4f801210292f8705e8f86de81b4f3291c1ee05ee6549146bed01d76576ece5c36545a4cfbffffffff0238491500000000001976a9144b57e83b4b50c8665be6beca8ca90762eb5f850f88ac40a5ae02000000001976a914dfe789a916cf07bfe348bfd4e418c39aecc2bfae88ac00000000'
+      '0200000001941f97f70f958d9499cda22d99f05bed7dce0eb2032ffa7020bf3b86a0ebfc03000000006b483045022100d095187170f6430ae7e831f9d8183d904c25944c74c136aed2e458ff6cbb1e1902203182de11b9bb37ba318a6087963f3567a783f203a4144617509cb774c5fe8a530121038706e8890e71cef61e2fa913a12791d315a51f1635a4746469f5cb74d9f327dcffffffff0240420f00000000001976a9144b57e83b4b50c8665be6beca8ca90762eb5f850f88ac0f990f00000000001976a9141c2187a8c42875b6256fc672d84924fbcc1b7a8d88ac00000000'
     )
 
     // console.log(await txController.sendTransaction(transaction))
@@ -92,20 +75,20 @@ describe.only('Bitcoin transfer transactions', () => {
     const transaction = await txController.createBitcoinTransferTransaction({
       inputs: [
         {
-          txHash: 'd28c5a7ea19f1187d8d1144d0ea1976e821fb0337e03d817a53b7f93b6599081',
-          index: 2,
+          txHash: '03fceba0863bbf2070fa2f03b20ece7ded5bf0992da2cd99948d950ff7971f94',
+          index: 0,
           privateKey: wallets.bitcoin.privateKey,
         },
       ],
       outputs: [
-        { address: 'mnPLHLXaj9rs6hr1WmPJJSvFwtvVyp4BGo', amount: '0.0219' },
-        { address: 'tb1qquzdatldegk8vpfquth9q5s7vzjhkggudtf0qj', amount: '0.02809' },
-        { address: wallets.bitcoin.address, amount: '0.4' },
+        { address: 'mnPLHLXaj9rs6hr1WmPJJSvFwtvVyp4BGo', amount: '0.008' },
+        { address: 'tb1qquzdatldegk8vpfquth9q5s7vzjhkggudtf0qj', amount: '0.002' },
+        { address: wallets.bitcoin.address, amount: '0.01022223' },
       ],
     })
     assert.strictEqual(
       transaction.signedTx,
-      '0200000001819059b6937f3ba517d8037e33b01f826e97a10e4d14d1d887119fa17e5a8cd2020000006a473044022078f76f2aea0398780b43a7d3441496564f2b452e9c798dcd482246797b85c76e02205ce03390ad158d382f1061af3120e4546f59d208a0860c0ff5a9abec4194e5e301210292f8705e8f86de81b4f3291c1ee05ee6549146bed01d76576ece5c36545a4cfbffffffff03b06a2100000000001976a9144b57e83b4b50c8665be6beca8ca90762eb5f850f88aca8dc2a00000000001600140704deafedca2c760520e2ee50521e60a57b211c005a6202000000001976a914dfe789a916cf07bfe348bfd4e418c39aecc2bfae88ac00000000'
+      '0200000001941f97f70f958d9499cda22d99f05bed7dce0eb2032ffa7020bf3b86a0ebfc03000000006b48304502210089b11f2c201aeb502ff65bc622eb125eb36c1b0c5fe06decd9cfe825102bb14c0220189ed612058484ecf7fde6fa948e6618dc2b241480429c772ea098af2383bc9c0121038706e8890e71cef61e2fa913a12791d315a51f1635a4746469f5cb74d9f327dcffffffff0300350c00000000001976a9144b57e83b4b50c8665be6beca8ca90762eb5f850f88ac400d0300000000001600140704deafedca2c760520e2ee50521e60a57b211c0f990f00000000001976a9141c2187a8c42875b6256fc672d84924fbcc1b7a8d88ac00000000'
     )
 
     // console.log(await txController.sendTransaction(transaction))
@@ -116,14 +99,14 @@ describe.only('Bitcoin transfer transactions', () => {
         wallet: wallets.bitcoin,
         inputs: [
           {
-            txHash: 'd28c5a7ea19f1187d8d1144d0ea1976e821fb0337e03d817a53b7f93b6599081',
-            index: 2,
+            txHash: '03fceba0863bbf2070fa2f03b20ece7ded5bf0992da2cd99948d950ff7971f94',
+            index: 0,
             privateKey: wallets.bitcoin.privateKey,
           },
         ],
         outputs: [
-          { address: 'mnPLHLXaj9rs6hr1WmPJJSvFwtvVyp4BGo', amount: '0.03' },
-          { address: wallets.bitcoin.address, amount: '0.4' },
+          { address: 'mnPLHLXaj9rs6hr1WmPJJSvFwtvVyp4BGo', amount: '0.01' },
+          { address: wallets.bitcoin.address, amount: '0.01' },
         ],
       }),
       'Parameters wallet and fromUTXOs can not be sent at the same time'

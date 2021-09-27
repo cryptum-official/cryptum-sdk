@@ -183,6 +183,29 @@ class Controller extends Interface {
     }
   }
   /**
+   * Get block info
+   *
+   * @param {object} input
+   * @param {string} input.block block number or hash
+   * @param {Protocol} input.protocol blockchain protocol
+   */
+  async getBlock({ block, protocol }) {
+    try {
+      const apiRequest = getApiMethod({
+        requests,
+        key: 'getBlock',
+        config: this.config,
+      })
+      const headers = mountHeaders(this.config.apiKey)
+      const response = await apiRequest(`${requests.getBlock.url}/${block}?protocol=${protocol}`, {
+        headers,
+      })
+      return response.data
+    } catch (error) {
+      handleRequestError(error)
+    }
+  }
+  /**
    * Create stellar trustline transaction
    *
    * @param {import('../entity').StellarTrustlineTransactionInput} input
@@ -388,7 +411,7 @@ class Controller extends Interface {
   /**
    * Create ethereum transfer transaction
    *
-   * @param {EthereumTransferTransactionInput} input
+   * @param {import('../entity').EthereumTransferTransactionInput} input
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createEthereumTransferTransaction(input) {
