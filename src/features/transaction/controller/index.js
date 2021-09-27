@@ -714,7 +714,7 @@ class Controller extends Interface {
   async createHathorTransferTransaction(input) {
     validateBitcoinTransferTransactionParams(input)
     
-    let { wallet, inputs, outputs, inputPrivateKeys, tokens, testnet } = input
+    let { wallet, inputs, outputs, tokens, testnet } = input
 
     let inputsSum = 0;
     let changeAddress;
@@ -744,11 +744,10 @@ class Controller extends Interface {
       }
     }
 
-    const signedTx = await buildHathorTokenTransferTransaction({
+    const signedTx = await buildHathorTransferTransaction({
       wallet,
       inputs,
       outputs,
-      inputPrivateKeys,
       tokens,
       inputsSum,
       changeAddress,
