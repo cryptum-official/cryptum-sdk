@@ -411,7 +411,7 @@ class Controller extends Interface {
   /**
    * Create ethereum transfer transaction
    *
-   * @param {EthereumTransferTransactionInput} input
+   * @param {import('../entity').EthereumTransferTransactionInput} input
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createEthereumTransferTransaction(input) {

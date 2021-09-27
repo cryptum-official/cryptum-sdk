@@ -53,17 +53,17 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const controller = new WalletController(config)
       const wallet = await controller.generateWalletFromPrivateKey({
         protocol: Protocol.ETHEREUM,
-        privateKey: '351dafbabc1e7211e44c744cab1ea0ef6ee621be6f0be363c275ed1d8f3a7772'
+        privateKey: '62a0747f04d08305e00618e1f5f750a06d5c0c336d3cf6971ef82a6f25605df2'
       })
-      assert.strictEqual(wallet.address, '0x481B542b7419D8Ba305B5cc5029C12d5a68B4f69')
+      assert.strictEqual(wallet.address, '0x250f7fc273c792d76327ef37b709a82484fe0168')
     })
     it('celo', async () => {
       const controller = new WalletController(config)
       const wallet = await controller.generateWalletFromPrivateKey({
         protocol: Protocol.CELO,
-        privateKey: '121498c189793c9f7f2beae35d681a797eb22484760701e0de5d5c9904499618'
+        privateKey: '0x121498c189793c9f7f2beae35d681a797eb22484760701e0de5d5c9904499618'
       })
-      assert.strictEqual(wallet.address, '0x8C33DB44a78629cF60C88383d436EEc356884625')
+      assert.strictEqual(wallet.address, '0x8c33db44a78629cf60c88383d436eec356884625')
     })
   })
 
@@ -73,12 +73,11 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.ETHEREUM,
         mnemonic,
-        testnet: true,
       })
       assert.strictEqual(wallet.protocol, Protocol.ETHEREUM)
       assert.strictEqual(
         wallet.address,
-        '0xCf61eaf64D895C3c71A8812e9EedC4c179b4ed60'
+        '0xcf61eaf64d895c3c71a8812e9eedc4c179b4ed60'
       )
     })
     it('generate bitcoin wallet', async () => {
@@ -86,12 +85,11 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.BITCOIN,
         mnemonic,
-        testnet: true,
       })
       assert.strictEqual(wallet.protocol, Protocol.BITCOIN)
       assert.strictEqual(
         wallet.address,
-        'n1vrMMcNaAig5fgdfdtC5DUu2G4NRodHpi'
+        'mi5hP8CMZYanXLecyPmKeFo4xZFji7fiKF'
       )
     })
     it('generate bsc wallet', async () => {
@@ -99,12 +97,11 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.BSC,
         mnemonic,
-        testnet: true,
       })
       assert.strictEqual(wallet.protocol, Protocol.BSC)
       assert.strictEqual(
         wallet.address,
-        '0xCf61eaf64D895C3c71A8812e9EedC4c179b4ed60'
+        '0xcf61eaf64d895c3c71a8812e9eedc4c179b4ed60'
       )
     })
     it('generate celo wallet', async () => {
@@ -112,12 +109,11 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.CELO,
         mnemonic,
-        testnet: true,
       })
       assert.strictEqual(wallet.protocol, Protocol.CELO)
       assert.strictEqual(
         wallet.address,
-        '0xb8a29fA1876EB806e411f15D2D94c8e80FB72e23'
+        '0xb8a29fa1876eb806e411f15d2d94c8e80fb72e23'
       )
     })
     it('generate ripple wallet', async () => {

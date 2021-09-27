@@ -119,7 +119,7 @@ module.exports.privateKeyToEthAccount = (privateKey) => {
  */
 module.exports.getEthereumAddressFromPrivateKey = (privateKey) => {
   const { address } = this.privateKeyToEthAccount(privateKey)
-  return address
+  return address.toLowerCase()
 }
 /**
  * Derive ethereum address, private key and public key
