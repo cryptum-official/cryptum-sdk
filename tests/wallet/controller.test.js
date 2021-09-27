@@ -73,6 +73,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.ETHEREUM,
         mnemonic,
+        derivation: { address: 0 }
       })
       assert.strictEqual(wallet.protocol, Protocol.ETHEREUM)
       assert.strictEqual(
@@ -85,6 +86,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.BITCOIN,
         mnemonic,
+        derivation: { address: 0 }
       })
       assert.strictEqual(wallet.protocol, Protocol.BITCOIN)
       assert.strictEqual(
@@ -97,6 +99,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.BSC,
         mnemonic,
+        derivation: { address: 0 }
       })
       assert.strictEqual(wallet.protocol, Protocol.BSC)
       assert.strictEqual(
@@ -109,6 +112,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const wallet = await controller.generateWallet({
         protocol: Protocol.CELO,
         mnemonic,
+        derivation: { address: 0 }
       })
       assert.strictEqual(wallet.protocol, Protocol.CELO)
       assert.strictEqual(
@@ -139,6 +143,36 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         wallet.publicKey,
         'GAC2V7MGMTG57FZKJSXRSZ4EIDL2RBFIYVXZJMTJZ232XPZQUCTYUCWL'
       )
+    })
+  })
+
+  describe('Generate wallet address from xpub', () => {
+    it('bitcoin', async () => {
+      const controller = new WalletController(config)
+      const walletAddress = await controller.generateWalletAddressFromXpub({
+        protocol: Protocol.BITCOIN,
+        xpub: 'tpubDEFyQA3yezcuwZS9S8yTYP1kTV9d1RegHQPyAcdyFyURFpotMwM7VpHqwhBNweYuuSMLWG2733fjDwrx7vPk2CpS22zmG8g3U5JJmix3RKs',
+        address: 0
+      })
+      assert.strictEqual(walletAddress, 'mi5hP8CMZYanXLecyPmKeFo4xZFji7fiKF')
+    })
+    it('ethereum', async () => {
+      const controller = new WalletController(config)
+      const walletAddress = await controller.generateWalletAddressFromXpub({
+        protocol: Protocol.ETHEREUM,
+        xpub: 'xpub6EWLCGwtcyjG8r8qBmF82Le6sA4FhQBfWtxUHvo7GDTZr1ch3FBbYbbCntYjvsRMK22NpvjtC9X87bahssEUpPEdU453fibMFhi3QS5sqjL',
+        address: 0
+      })
+      assert.strictEqual(walletAddress, '0xcf61eaf64d895c3c71a8812e9eedc4c179b4ed60')
+    })
+    it('celo', async () => {
+      const controller = new WalletController(config)
+      const walletAddress = await controller.generateWalletAddressFromXpub({
+        protocol: Protocol.CELO,
+        xpub: 'xpub6EWLCGwtcyjG8r8qBmF82Le6sA4FhQBfWtxUHvo7GDTZr1ch3FBbYbbCntYjvsRMK22NpvjtC9X87bahssEUpPEdU453fibMFhi3QS5sqjL',
+        address: 0
+      })
+      assert.strictEqual(walletAddress, '0xcf61eaf64d895c3c71a8812e9eedc4c179b4ed60')
     })
   })
 })

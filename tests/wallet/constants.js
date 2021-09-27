@@ -23,26 +23,32 @@ exports.getWallets = async () => {
   wallets.ethereum = await controller.generateWallet({
     protocol: Protocol.ETHEREUM,
     mnemonic,
+    derivation: { address: 0 },
   })
   wallets.bitcoin = await controller.generateWallet({
     protocol: Protocol.BITCOIN,
     mnemonic,
+    derivation: { address: 0 },
   })
   wallets.bsc = await controller.generateWallet({
     protocol: Protocol.BSC,
     mnemonic,
+    derivation: { address: 0 },
   })
   wallets.celo = await controller.generateWallet({
     protocol: Protocol.CELO,
     mnemonic,
+    derivation: { address: 0 },
   })
   wallets.ripple = await controller.generateWallet({
     protocol: Protocol.RIPPLE,
     mnemonic,
+    derivation: { address: 0 },
   })
   wallets.stellar = await controller.generateWallet({
     protocol: Protocol.STELLAR,
     mnemonic,
+    derivation: { address: 0 },
   })
   return wallets
 }

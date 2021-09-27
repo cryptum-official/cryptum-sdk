@@ -15,6 +15,10 @@ const {
   deriveStellarWalletFromDerivationPath,
   deriveRippleWalletFromDerivationPath,
   deriveEthereumWalletFromDerivationPath,
+  deriveBitcoinAddressFromXpub,
+  deriveBscAddressFromXpub,
+  deriveEthereumAddressFromXpub,
+  deriveCeloAddressFromXpub,
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
 const { validateWalletInfo } = require('../../../services/validations')
@@ -33,7 +37,7 @@ class Controller extends Interface {
    * @param {number?} args.derivation.address address index to derive wallet
    * @returns {Promise<Wallet>}
    */
-  async generateWallet({ protocol, mnemonic = '', testnet, derivation = { account: 0, change: 0, address: 0 } }) {
+  async generateWallet({ protocol, mnemonic = '', testnet, derivation = { account: 0, change: 0 } }) {
     testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
     mnemonic = mnemonic ? mnemonic : generateMnemonic(256)
 
@@ -90,9 +94,38 @@ class Controller extends Interface {
     }
     return new Wallet(walletData)
   }
+  /**
+   * Generate wallet address deriving from the xpub
+   * @param {object} input
+   * @param {string} input.xpub extended public key string
+   * @param {Protocol} input.protocol blockchain protocol
+   * @param {boolean?} input.testnet testnet
+   * @param {number?} input.address address index number to derive the wallet address from
+   */
+  async generateWalletAddressFromXpub({ xpub, protocol, testnet, address }) {
+    testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
+    let walletAddress
+    switch (protocol) {
+      case Protocol.BITCOIN:
+        walletAddress = deriveBitcoinAddressFromXpub(xpub, testnet, { address })
+        break
+      case Protocol.BSC:
+        walletAddress = deriveBscAddressFromXpub(xpub, { address })
+        break
+      case Protocol.ETHEREUM:
+        walletAddress = deriveEthereumAddressFromXpub(xpub, { address })
+        break
+      case Protocol.CELO:
+        walletAddress = deriveCeloAddressFromXpub(xpub, { address })
+        break
+      default:
+        throw new Error('Unsupported blockchain protocol')
+    }
+    return walletAddress
+  }
 
   async generateBitcoinWallet({ mnemonic, derivation, testnet }) {
-    const { address, privateKey, publicKey } = await deriveBitcoinWalletFromDerivationPath(
+    const { address, privateKey, publicKey, xpub } = await deriveBitcoinWalletFromDerivationPath(
       mnemonic,
       testnet,
       derivation
@@ -103,17 +136,19 @@ class Controller extends Interface {
       address,
       testnet,
       protocol: Protocol.BITCOIN,
+      xpub,
     })
   }
 
   async generateEthereumWallet({ mnemonic, derivation, testnet }) {
-    const { address, privateKey, publicKey } = await deriveEthereumWalletFromDerivationPath(mnemonic, derivation)
+    const { address, privateKey, publicKey, xpub } = await deriveEthereumWalletFromDerivationPath(mnemonic, derivation)
     return new Wallet({
       privateKey,
       publicKey,
       address,
       testnet,
       protocol: Protocol.ETHEREUM,
+      xpub,
     })
   }
 
@@ -124,13 +159,14 @@ class Controller extends Interface {
   }
 
   async generateCeloWallet({ mnemonic, derivation, testnet }) {
-    const { address, privateKey, publicKey } = await deriveCeloWalletFromDerivationPath(mnemonic, derivation)
+    const { address, privateKey, publicKey, xpub } = await deriveCeloWalletFromDerivationPath(mnemonic, derivation)
     return new Wallet({
       privateKey,
       publicKey,
       address,
       testnet,
       protocol: Protocol.CELO,
+      xpub,
     })
   }
 

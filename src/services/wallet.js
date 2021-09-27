@@ -99,6 +99,7 @@ module.exports.deriveBitcoinWalletFromDerivationPath = async (
     address: btcAddress,
     privateKey: derivedPath.privateKey.toString('hex'),
     publicKey: derivedPath.publicKey.toString('hex'),
+    xpub: derivedPath.neutered().toBase58()
   }
 }
 /**
@@ -141,6 +142,7 @@ module.exports.deriveEthereumWalletFromDerivationPath = async (mnemonic, { accou
     address: wallet.getAddressString().toLocaleLowerCase(),
     privateKey: wallet.getPrivateKeyString(),
     publicKey: wallet.getPublicKeyString(),
+    xpub: derivedPath.publicExtendedKey().toString('hex')
   }
 }
 /**
@@ -153,7 +155,7 @@ module.exports.deriveEthereumWalletFromDerivationPath = async (mnemonic, { accou
  */
 module.exports.deriveEthereumAddressFromXpub = async (xpub, { address = 0 } = {}) => {
   const derivedPath = hdkey.fromExtendedKey(xpub).deriveChild(address)
-  return `0x${derivedPath.getWallet().getAddressString().toLowerCase()}`
+  return derivedPath.getWallet().getAddressString().toLowerCase()
 }
 module.exports.getBscAddressFromPrivateKey = (privateKey) => {
   return this.getEthereumAddressFromPrivateKey(privateKey)
@@ -180,6 +182,7 @@ module.exports.deriveCeloWalletFromDerivationPath = async (mnemonic, { account =
     address: wallet.getAddressString().toLocaleLowerCase(),
     privateKey: wallet.getPrivateKeyString(),
     publicKey: wallet.getPublicKeyString(),
+    xpub: derivedPath.publicExtendedKey().toString('hex')
   }
 }
 module.exports.deriveCeloAddressFromXpub = async (xpub, { address = 0 } = {}) =>
