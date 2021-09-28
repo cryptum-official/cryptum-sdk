@@ -26,11 +26,11 @@ swapController.getSupportedCurrencies().then((curencies) => {
 ```
 
 ## Get minimum amount
-Get the minimum amount to swap from currency.
+Get the minimum amount to swap.
 
 Params:
-* `opts.currencyFrom` (string) (__required__)
-* `opts.currencyTo` (string) (__required__)
+* `opts.currencyFrom` (string) (__required__) criptocurrency to swap from.
+* `opts.currencyTo` (string) (__required__) criptocurrency to swap to.
 
 Examples:
 
@@ -47,9 +47,9 @@ swapController.getMinimumAmount({
 Get estimate amount to receive from the swap.
 
 Params:
-* `opts.currencyFrom` (string) (__required__)
-* `opts.currencyTo` (string) (__required__)
-* `opts.amount` (string) (__required__)
+* `opts.currencyFrom` (string) (__required__) criptocurrency to swap from.
+* `opts.currencyTo` (string) (__required__) criptocurrency to swap to.
+* `opts.amount` (string) (__required__) criptocurrency amount to estimate.
 
 Examples:
 
@@ -66,7 +66,7 @@ swapController.getEstimateAmount({
 Get the swap order by its id.
 
 Params:
-* `id` (string) (__required__)
+* `id` (string) (__required__) swap order id.
 
 Example:
 ```js
