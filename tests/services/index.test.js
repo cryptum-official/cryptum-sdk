@@ -36,7 +36,7 @@ describe.only('Test Suite of the Services (All project)', function () {
   })
 
   it('Check if an services throw respective error (With InvalidTypeException error param) - method: handleRequestError', async () => {
-    const expectedResult = 'The "webhook" parameter must be of the "WebhookCryptum" type, or not is an valid object'
+    const expectedResult = 'The "webhook" parameter must be of the "WebhookCryptum" type'
 
     try {
       handleRequestError(new InvalidTypeException('webhook', 'WebhookCryptum'))

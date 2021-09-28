@@ -1,6 +1,6 @@
 {
   "name": "cryptum-sdk",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "description": "SDK to sync your application with Cryptum services",
   "main": "index.js",
   "repository": "https://github.com/blockforce-official/cryptum-sdk",
@@ -23,7 +23,7 @@
     "bip39": "^3.0.4",
     "bitcoinjs-lib": "^5.2.0",
     "bitcore-lib": "^8.25.10",
-    "ethers": "^5.4.6",
+    "ethereumjs-wallet": "^1.0.1",
     "hdkey": "^2.0.1",
     "ripple-keypairs": "^1.0.3",
     "ripple-lib": "^1.9.5",
