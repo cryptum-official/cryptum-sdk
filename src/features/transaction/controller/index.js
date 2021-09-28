@@ -3,6 +3,9 @@ const requests = require('./requests.json')
 const Interface = require('./interface')
 const { Protocol, TRANSFER_METHOD_ABI, TRANSFER_COMMENT_METHOD_ABI } = require('../../../services/blockchain/constants')
 const { getTokenAddress, toWei } = require('../../../services/blockchain/utils')
+const lodash_1 = require("lodash");
+const { toHTRUnit, fromHTRUnit } = require('../../../services/blockchain/utils')
+
 const {
   FeeResponse,
   TransactionResponse,
@@ -50,10 +53,10 @@ const {
 } = require('../../../services/validations')
 
 const {
-  
-    buildHathorTransferTransaction,
-    buildHathorTokenTransferTransaction
-  
+
+  buildHathorTransferTransaction,
+  buildHathorTokenTransaction
+
 } = require('../../../services/blockchain/hathor');
 
 
@@ -713,35 +716,47 @@ class Controller extends Interface {
 
   async createHathorTransferTransaction(input) {
     validateBitcoinTransferTransactionParams(input)
-    
+
     let { wallet, inputs, outputs, tokens, testnet } = input
 
-    let inputsSum = 0;
-    let changeAddress;
     const protocol = Protocol.HATHOR
+    const outputAmountMap = this.getAmountMap(outputs)
+
     if (wallet) {
       const utxos = await this.getUTXOs({ address: wallet.address, protocol })
       inputs = [];
       for (let i = 0; i < utxos.length; ++i) {
         const tx = await this.getTransactionByHash({ hash: utxos[i].txHash, protocol })
-        inputsSum += tx.tx.outputs[inputs[i].index].decoded.address
-        changeAddress =  tx.tx.outputs[inputs[i].index].value
         inputs[i] = {
           'txHash': tx.tx.hash,
           'index': utxos[i].index,
-          'data': ""
+          'data': "",
+          'amount': tx.tx.outputs[inputs[i].index].value,
+          'tokenData': tx.tx.outputs[inputs[i].index].token_data,
+          "changeAddress": tx.tx.outputs[inputs[i].index].decoded.address,
+          'privateKey': wallet.privateKey
         }
       }
-
-    } else if(inputs) {
+    } else if (inputs) {
       for (let i = 0; i < inputs.length; ++i) {
         const tx = await this.getTransactionByHash({ hash: inputs[i].txHash, protocol })
-        changeAddress =  tx.tx.outputs[inputs[i].index].decoded.address
-        inputsSum += tx.tx.outputs[inputs[i].index].value
-        inputs[i].index  = inputs[i].index,
-        inputs[i].txHash = tx.tx.hash,
-        inputs[i].data = ''
+        inputs[i] = {
+          "index": inputs[i].index,
+          "txHash": tx.tx.hash,
+          "data": '',
+          "amount": tx.tx.outputs[inputs[i].index].value,
+          "tokenData": tx.tx.outputs[inputs[i].index].token_data,
+          "changeAddress": (typeof inputs[i].changeAddress !== 'undefined') ? inputs[i].changeAddress : tx.tx.outputs[inputs[i].index].decoded.address,
+          'privateKey': inputs[i].privateKey
+        }
       }
+    }
+
+    const amountMap = this.validateInputs(inputs, outputAmountMap)
+
+    for (let i = 0; i < amountMap.length; i++) {
+      amountMap[i].amount = fromHTRUnit(amountMap[i].amount).toNumber()
+      outputs.push(amountMap[i])
     }
 
     const signedTx = await buildHathorTransferTransaction({
@@ -749,13 +764,83 @@ class Controller extends Interface {
       inputs,
       outputs,
       tokens,
-      inputsSum,
-      changeAddress,
       testnet
     })
 
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
+
+  async createHathorTokenTransaction(input) {
+
+    let { wallet, params, inputs, testnet } = input
+    let inputsSum = 0;
+    const protocol = Protocol.HATHOR
+    if (wallet) {
+      const utxos = await this.getUTXOs({ address: wallet.address, protocol })
+      inputs = [];
+      for (let i = 0; i < utxos.length; ++i) {
+        const tx = await this.getTransactionByHash({ hash: utxos[i].txHash, protocol })
+        inputsSum += tx.tx.outputs[inputs[i].index].decoded.address
+        inputs[i] = {
+          'txHash': tx.tx.hash,
+          'index': utxos[i].index,
+          'data': ""
+        }
+      }
+    } else if (inputs) {
+      for (let i = 0; i < inputs.length; ++i) {
+        const tx = await this.getTransactionByHash({ hash: inputs[i].txHash, protocol })
+        inputsSum += tx.tx.outputs[inputs[i].index].value
+        inputs[i].index = inputs[i].index,
+          inputs[i].txHash = tx.tx.hash,
+          inputs[i].data = ''
+
+      }
+    }
+
+    const tokenTx = await buildHathorTokenTransaction({
+      inputs,
+      params,
+      testnet,
+      inputsSum
+    });
+
+    return tokenTx;
+  }
+
+  getAmountMap(amountMap) {
+    const tokenAmountMap = {};
+    for (const output of amountMap) {
+      if (output.tokenData in tokenAmountMap) {
+        tokenAmountMap[output.tokenData] += output.amount;
+      }
+      else {
+        tokenAmountMap[output.tokenData] = output.amount;
+      }
+    }
+    return tokenAmountMap;
+  }
+
+  validateInputs(amountInputMap, tokenAmountMap) {
+    
+    let outputs = []
+    for (const t in tokenAmountMap) {
+
+      for (const j in amountInputMap) {        
+        if (typeof amountInputMap[j] !== 'undefined') {
+          if (amountInputMap[j].tokenData == t) {
+            const changeAmount = (amountInputMap[j].amount - toHTRUnit(tokenAmountMap[t]).toNumber());
+            const changeAddress = amountInputMap[j].changeAddress
+            outputs.push({ address: changeAddress, amount: changeAmount, tokenData: t });
+          }
+        }
+      }
+    }
+    return outputs;
+  }
+
 }
+
+
 
 module.exports = Controller
