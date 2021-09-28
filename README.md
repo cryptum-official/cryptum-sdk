@@ -21,6 +21,7 @@
     - [Trustlines](docs/trustlines.md)
     - [Tokens and Smart contracts](docs/contracts.md)
     - [Prices](docs/prices.md)
+    - [Swap tokens](docs/swap.md)
     - [Blockchain info](docs/data.md)
     - [Webhooks](docs/webhooks.md)
     - [Staking](docs/staking/index.md)
