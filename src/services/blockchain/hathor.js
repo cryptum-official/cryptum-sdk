@@ -54,7 +54,7 @@ module.exports.buildHathorTransferTransaction = async function ({ inputs, output
 }
 
 
-module.exports.buildHathorTokenTransaction = async function ({ inputs, params, inputsSum, mint_address, melt_address, testnet }) {
+module.exports.buildHathorTokenTransaction = async function ({ inputs, params, inputsSum, testnet }) {
 
   let txData = {
     inputs: inputs.map((input) => ({ tx_id: input.txHash, index: input.index })),
@@ -82,17 +82,17 @@ module.exports.buildHathorTokenTransaction = async function ({ inputs, params, i
     throw new GenericException("Insufficient funds")
   }
 
-  if (mint_address) {
+  if (params.mint_address) {
     _dataToken.outputs.push({
-      'address': mint_address,
+      'address': params.mint_address,
       'value': hathorLib.constants.TOKEN_MINT_MASK,
       'tokenData': hathorLib.constants.AUTHORITY_TOKEN_DATA
     });
   }
 
-  if (melt_address) {
+  if (params.melt_address) {
     _dataToken.outputs.push({
-      'address': melt_address,
+      'address': params.melt_address,
       'value': hathorLib.constants.TOKEN_MELT_MASK,
       'tokenData': hathorLib.constants.AUTHORITY_TOKEN_DATA
     });
@@ -111,7 +111,7 @@ module.exports.buildHathorTokenTransaction = async function ({ inputs, params, i
     })
     _dataToken.inputs[i]['data'] = hathorLib.transaction.createInputData(sig.toDER(), privateKey.toPublicKey().toBuffer());
   }
-  console.log(_dataToken);
+
   hathorLib.transaction.verifyTxData(_dataToken);
   hathorLib.transaction.setWeightIfNeeded(_dataToken);
 

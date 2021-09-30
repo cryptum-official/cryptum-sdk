@@ -772,7 +772,9 @@ class Controller extends Interface {
 
   async createHathorTokenTransaction(input) {
 
-    let { wallet, params, inputs,melt_address, mint_address, testnet } = input
+    let { wallet, params, inputs, testnet } = input
+    // console.log(input);
+    // return 
     let inputsSum = 0;
     const protocol = Protocol.HATHOR
     if (wallet) {
@@ -800,8 +802,6 @@ class Controller extends Interface {
     const tokenTx = await buildHathorTokenTransaction({
       inputs,
       params,
-      melt_address, 
-      mint_address,
       testnet,
       inputsSum
     });
