@@ -229,24 +229,43 @@ const transaction = await txController.createRippleTransferTransaction({
 
 ## Hathor
 
-#### `txController.createHathorTransferTransaction(opts)`
+#### `txController.createHathorTransferTransactionFromWallet(opts)`
 
 Create a transfer transaction for Hathor blockchain, you can transfer HTR or any other tokens.
+If the sum of inputs from the wallet is greater than the sum of outputs then the change will be
+transferred back to the wallet.
 
-* `opts.wallet` (Wallet) - wallet to sign the transaction with. Required if `inputs` is not used.
-* `opts.inputs` (array of Input) - optional array of inputs to include in the transaction. Required if `wallet` is not used.
+* `opts.wallet` (Wallet) - wallet to sign the transaction with.
+* `opts.outputs` (array of Output)(__required__) - outputs to transfer to.
+  * `opts.outputs[].address` (string) - address to transfer to.
+  * `opts.outputs[].amount` (string) - amount to transfer.
+  * `opts.outputs[].token` (string) - token uid or HTR.
+
+```js
+// transfer BTC from 1 input to 2 output addresses
+const transaction = await txController.createHathorTransferTransactionFromWallet({
+  wallet,
+  outputs: [
+    { address: 'address1', amount: '0.05', token: 'HTR' },
+    { address: 'address2', amount: '0.449996', token: '0739933...484949' },
+    { address: 'address3', amount: '1.5', token: 'HTR' },
+  ],
+})
+```
+#### `txController.createHathorTransferTransactionFromUTXO(opts)`
+
+* `opts.inputs` (array of Input) - optional array of inputs to include in the transaction.
   * `opts.inputs[].txHash` (string) - transaction hash of the UTXO.
   * `opts.inputs[].index` (number) - index of the UTXO output.
   * `opts.inputs[].privateKey` (string) - input private key to sign the transaction with.
 * `opts.outputs` (array of Output)(__required__) - outputs to transfer to.
   * `opts.outputs[].address` (string) - address to transfer to.
   * `opts.outputs[].amount` (string) - amount to transfer.
-  * `opts.token` (string) - token uid or HTR.
-* `opts.tokens` (array of string) - array of token uid.
+  * `opts.outputs[].token` (string) - token uid or HTR.
 
 ```js
 // transfer BTC from 1 input to 2 output addresses
-const transaction = await txController.createHathorTransferTransaction({
+const transaction = await txController.createHathorTransferTransactionFromUTXO({
   inputs: [
     {
       txHash: 'cf4c5da8b45...3785df8687f55c337299cc38c',
