@@ -3,8 +3,6 @@ const requests = require('./requests.json')
 const Interface = require('./interface')
 const { Protocol, TRANSFER_METHOD_ABI, TRANSFER_COMMENT_METHOD_ABI } = require('../../../services/blockchain/constants')
 const { getTokenAddress, toWei } = require('../../../services/blockchain/utils')
-const lodash_1 = require("lodash");
-const { toHTRUnit, fromHTRUnit } = require('../../../services/blockchain/utils')
 
 const {
   FeeResponse,
@@ -50,15 +48,10 @@ const {
   validateStellarTrustlineTransactionParams,
   validateRippleTrustlineTransactionParams,
   validateEthereumTransferTransactionParams,
+  validateHathorTokenTransaction,
 } = require('../../../services/validations')
 
-const {
-
-  buildHathorTransferTransaction,
-  buildHathorTokenTransaction
-
-} = require('../../../services/blockchain/hathor');
-
+const { buildHathorTransferTransaction, buildHathorTokenTransaction } = require('../../../services/blockchain/hathor')
 
 class Controller extends Interface {
   /**
@@ -494,7 +487,7 @@ class Controller extends Interface {
     }
     let networkFee = fee
     if (!networkFee) {
-      ; ({ estimateValue: networkFee } = await this.getFee({
+      ;({ estimateValue: networkFee } = await this.getFee({
         type: TransactionType.TRANSFER,
         protocol,
       }))
@@ -713,135 +706,155 @@ class Controller extends Interface {
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT })
   }
 
-
-  async createHathorTransferTransaction(input) {
+  /**
+   * Create transfer tokens transaction in Hathor blockchain
+   * @param {import('../entity').HathorTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>}
+   */
+  async createHathorTransferTransactionFromWallet(input) {
     validateBitcoinTransferTransactionParams(input)
-
-    let { wallet, inputs, outputs, tokens, testnet } = input
-
+    let { wallet, outputs, testnet } = input
     const protocol = Protocol.HATHOR
-    const outputAmountMap = this.getAmountMap(outputs)
-
-    if (wallet) {
-      const utxos = await this.getUTXOs({ address: wallet.address, protocol })
-      inputs = [];
-      for (let i = 0; i < utxos.length; ++i) {
+    const utxos = await this.getUTXOs({ address: wallet.address, protocol })
+    if (utxos.length === 0) {
+      throw new GenericException('No available UTXOs')
+    }
+    const tokenSet = new Set()
+    for (let i = 0; i < outputs.length; ++i) {
+      if (outputs[i].token === 'HTR' || outputs[i].token == null) {
+        outputs[i].token = '00'
+      }
+      tokenSet.add(outputs[i].token)
+    }
+    const tokens = Array.from(tokenSet).filter((i) => i)
+    const inputs = []
+    for (let i = 0; i < utxos.length; ++i) {
+      if (tokens.includes(utxos[i].token)) {
         const tx = await this.getTransactionByHash({ hash: utxos[i].txHash, protocol })
-        inputs[i] = {
-          'txHash': tx.tx.hash,
-          'index': utxos[i].index,
-          'data': "",
-          'amount': tx.tx.outputs[inputs[i].index].value,
-          'tokenData': tx.tx.outputs[inputs[i].index].token_data,
-          "changeAddress": tx.tx.outputs[inputs[i].index].decoded.address,
-          'privateKey': wallet.privateKey
-        }
-      }
-    } else if (inputs) {
-      for (let i = 0; i < inputs.length; ++i) {
-        const tx = await this.getTransactionByHash({ hash: inputs[i].txHash, protocol })
-        inputs[i] = {
-          "index": inputs[i].index,
-          "txHash": tx.tx.hash,
-          "data": '',
-          "amount": tx.tx.outputs[inputs[i].index].value,
-          "tokenData": tx.tx.outputs[inputs[i].index].token_data,
-          "changeAddress": (typeof inputs[i].changeAddress !== 'undefined') ? inputs[i].changeAddress : tx.tx.outputs[inputs[i].index].decoded.address,
-          'privateKey': inputs[i].privateKey
+        if (
+          utxos[i].token === '00' ||
+          (utxos[i].token !== '00' && ![0, 129].includes(tx.tx.outputs[utxos[i].index].token_data))
+        ) {
+          inputs.push({
+            ...utxos[i],
+            privateKey: wallet.privateKey,
+          })
         }
       }
     }
-
-    const amountMap = this.validateInputs(inputs, outputAmountMap)
-
-    for (let i = 0; i < amountMap.length; i++) {
-      amountMap[i].amount = fromHTRUnit(amountMap[i].amount).toNumber()
-      outputs.push(amountMap[i])
-    }
-
     const signedTx = await buildHathorTransferTransaction({
-      wallet,
       inputs,
       outputs,
       tokens,
-      testnet
+      changeAddress: wallet.address,
+      testnet,
     })
-
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
+  /**
+   * Create transfer tokens transaction in Hathor blockchain
+   * @param {import('../entity').HathorTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>}
+   */
+  async createHathorTransferTransactionFromUTXO(input) {
+    validateBitcoinTransferTransactionParams(input)
+    let { inputs, outputs, testnet } = input
 
-  async createHathorTokenTransaction(input) {
-
-    let { wallet, params, inputs, testnet } = input
-    // console.log(input);
-    // return 
-    let inputsSum = 0;
     const protocol = Protocol.HATHOR
-    if (wallet) {
-      const utxos = await this.getUTXOs({ address: wallet.address, protocol })
-      inputs = [];
-      for (let i = 0; i < utxos.length; ++i) {
-        const tx = await this.getTransactionByHash({ hash: utxos[i].txHash, protocol })
-        inputsSum += tx.tx.outputs[inputs[i].index].decoded.address
-        inputs[i] = {
-          'txHash': tx.tx.hash,
-          'index': utxos[i].index,
-          'data': ""
-        }
+    const tokenSet = new Set()
+    for (let i = 0; i < outputs.length; ++i) {
+      if (outputs[i].token === 'HTR' || outputs[i].token == null) {
+        outputs[i].token = '00'
       }
-    } else if (inputs) {
-      for (let i = 0; i < inputs.length; ++i) {
-        const tx = await this.getTransactionByHash({ hash: inputs[i].txHash, protocol })
-        inputsSum += tx.tx.outputs[inputs[i].index].value
-        inputs[i].index = inputs[i].index,
-          inputs[i].txHash = tx.tx.hash,
-          inputs[i].data = ''
-      }
+      tokenSet.add(outputs[i].token)
+    }
+    const tokens = Array.from(tokenSet).filter((i) => i)
+    for (let i = 0; i < inputs.length; ++i) {
+      const tx = await this.getTransactionByHash({ hash: inputs[i].txHash, protocol })
+      const utxo = tx.tx.outputs[inputs[i].index]
+      inputs[i].value = utxo.value
+      inputs[i].token = utxo.token_data === 0 ? '00' : tx.tx.tokens[utxo.token_data - 1].uid
     }
 
-    const tokenTx = await buildHathorTokenTransaction({
+    const signedTx = await buildHathorTransferTransaction({
       inputs,
-      params,
+      outputs,
+      tokens,
       testnet,
-      inputsSum
-    });
-
-    return tokenTx;
+    })
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
-
-  getAmountMap(amountMap) {
-    const tokenAmountMap = {};
-    for (const output of amountMap) {
-      if (output.tokenData in tokenAmountMap) {
-        tokenAmountMap[output.tokenData] += output.amount;
-      }
-      else {
-        tokenAmountMap[output.tokenData] = output.amount;
+  /**
+   * Create Hathor token transaction using wallet
+   * @param {import('../entity').HathorTokenTransactionFromWalletInput} input
+   * @returns {Promise<SignedTransaction>}
+   */
+  async createHathorTokenTransactionFromWallet(input) {
+    validateHathorTokenTransaction(input)
+    let { wallet, tokenName, tokenSymbol, mintAddress, meltAddress, amount, testnet } = input
+    let inputsSum = 0
+    const protocol = Protocol.HATHOR
+    const utxos = (await this.getUTXOs({ address: wallet.address, protocol })).filter(
+      (utxo) => utxo.token === '00' || utxo.token == null
+    )
+    if (utxos.length === 0) {
+      throw new GenericException('No available UTXOs')
+    }
+    const inputs = []
+    for (let i = 0; i < utxos.length; ++i) {
+      inputsSum += utxos[i].value
+      inputs[i] = {
+        txHash: utxos[i].txHash,
+        index: utxos[i].index,
+        privateKey: wallet.privateKey,
       }
     }
-    return tokenAmountMap;
+    const signedTx = await buildHathorTokenTransaction({
+      inputs,
+      tokenName,
+      tokenSymbol,
+      address: wallet.address,
+      changeAddress: wallet.address,
+      mintAddress,
+      meltAddress,
+      amount,
+      testnet,
+      inputsSum,
+    })
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.HATHOR_TOKEN_CREATION })
   }
-
-  validateInputs(amountInputMap, tokenAmountMap) {
-    
-    let outputs = []
-    for (const t in tokenAmountMap) {
-
-      for (const j in amountInputMap) {        
-        if (typeof amountInputMap[j] !== 'undefined') {
-          if (amountInputMap[j].tokenData == t) {
-            const changeAmount = (amountInputMap[j].amount - toHTRUnit(tokenAmountMap[t]).toNumber());
-            const changeAddress = amountInputMap[j].changeAddress
-            outputs.push({ address: changeAddress, amount: changeAmount, tokenData: t });
-          }
-        }
+  /**
+   * Create Hathor token transaction using UTXO
+   * @param {import('../entity').HathorTokenTransactionFromUTXOInput} input
+   * @returns {Promise<SignedTransaction>}
+   */
+  async createHathorTokenTransactionFromUTXO(input) {
+    validateHathorTokenTransaction(input)
+    let { inputs, tokenName, tokenSymbol, address, changeAddress, mintAddress, meltAddress, amount, testnet } = input
+    let inputsSum = 0
+    const protocol = Protocol.HATHOR
+    for (let i = 0; i < inputs.length; ++i) {
+      const tx = await this.getTransactionByHash({ hash: inputs[i].txHash, protocol })
+      if (tx.tx.outputs[inputs[i].index].token_data !== 0) {
+        throw new GenericException('Invalid UTXO with invalid token, it should be HTR', 'InvalidTokenType')
       }
+      inputsSum += tx.tx.outputs[inputs[i].index].value
+      inputs[i].txHash = tx.tx.hash
     }
-    return outputs;
+    const signedTx = await buildHathorTokenTransaction({
+      inputs,
+      tokenName,
+      tokenSymbol,
+      address,
+      changeAddress,
+      mintAddress,
+      meltAddress,
+      amount,
+      testnet,
+      inputsSum,
+    })
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.HATHOR_TOKEN_CREATION })
   }
-
 }
-
-
 
 module.exports = Controller

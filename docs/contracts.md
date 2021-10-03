@@ -146,6 +146,90 @@ const transaction = await txController.createSmartContractDeployTransaction({
 })
 ```
 
+## Create Hathor tokens
+
+Create a signed transaction to create a new token.
+
+In Hathor, you will always spend 1% of the amount of tokens you are minting in HTR,
+that is, to mint 1000 tokens you need to spend 10 HTR.
+
+#### `txController.createHathorTokenTransactionFromWallet(opts)`
+
+- `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
+- `opts.tokenName` (string)(**required**) - token name.
+- `opts.tokenSymbol` (string)(**required**) - token symbol.
+- `opts.amount` (string)(**required**) - token amount to be first minted.
+- `opts.mintAddress` (string)(**optional**) - wallet address to be the mint authority. Required if you want to mint more tokens later.
+- `opts.meltAddress` (string)(**optional**) - wallet address to be the melt authority. Required if you want to burn tokens later.
+
+```js
+// Create token transaction, mint 100 tokens and do not want to mint or burn tokens later
+const transaction = await txController.createHathorTokenTransactionFromWallet({
+  wallet,
+  symbol: 'TOK',
+  name: 'TOKEN',
+  amount: '100',
+})
+// Create token transaction, mint 3000 tokens and want to mint or burn tokens later
+const transaction = await txController.createHathorTokenTransactionFromWallet({
+  wallet,
+  symbol: 'TOK',
+  name: 'TOKEN',
+  amount: '3000',
+  mintAddress: 'address-1',
+  meltAddress: 'address-2',
+})
+```
+
+#### `txController.createHathorTokenTransactionFromUTXO(opts)`
+
+- `opts.inputs` (array of Input)(**required**) - array of inputs to include in the transaction.
+  - `opts.inputs[].txHash` (string) - transaction hash of the UTXO.
+  - `opts.inputs[].index` (number) - index of the UTXO output.
+  - `opts.inputs[].privateKey` (string) - input private key to sign the transaction with.
+- `opts.tokenName` (string)(**required**) - token name.
+- `opts.tokenSymbol` (string)(**required**) - token symbol.
+- `opts.amount` (string)(**required**) - token amount to be first minted.
+- `opts.address` (string)(**required**) - destination wallet address to receive the minted tokens.
+- `opts.changeAddress` (string)(**required**) - wallet address to receive the change in HTR if there's any.
+- `opts.mintAddress` (string)(**optional**) - wallet address to be the mint authority. Required if you want to mint more tokens later.
+- `opts.meltAddress` (string)(**optional**) - wallet address to be the melt authority. Required if you want to burn tokens later.
+
+```js
+// Create token transaction, mint 100 tokens and do not want to mint or burn tokens later
+const transaction = await txController.createHathorTokenTransactionFromUTXO({
+  inputs: [
+    {
+      txHash: 'cf4c5da8b45...3785df8687f55c337299cc38c',
+      index: 0,
+      privateKey: '696007545...ed03b2af3b900a678318160',
+    },
+  ],
+  symbol: 'TOK',
+  name: 'TOKEN',
+  amount: '100',
+  address: 'address-1',
+  changeAddress: 'address-1',
+})
+// Create token transaction, mint 3000 tokens and want to mint or burn tokens later
+const transaction = await txController.createHathorTokenTransactionFromUTXO({
+  inputs: [
+    {
+      txHash: 'cf4c5da8b45...3785df8687f55c337299cc38c',
+      index: 0,
+      privateKey: '696007545...ed03b2af3b900a678318160',
+    },
+  ],
+  symbol: 'TOK',
+  name: 'TOKEN',
+  amount: '3000',
+  address: 'address-1',
+  changeAddress: 'address-1',
+  mintAddress: 'address-1',
+  meltAddress: 'address-2',
+})
+```
+
 ## Send transactions to the blockchain
 
 After creating a transaction, use this method to broadcast the transaction.

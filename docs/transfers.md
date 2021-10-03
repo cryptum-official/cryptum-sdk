@@ -227,6 +227,41 @@ const transaction = await txController.createRippleTransferTransaction({
 })
 ```
 
+## Hathor
+
+#### `txController.createHathorTransferTransaction(opts)`
+
+Create a transfer transaction for Hathor blockchain, you can transfer HTR or any other tokens.
+
+* `opts.wallet` (Wallet) - wallet to sign the transaction with. Required if `inputs` is not used.
+* `opts.inputs` (array of Input) - optional array of inputs to include in the transaction. Required if `wallet` is not used.
+  * `opts.inputs[].txHash` (string) - transaction hash of the UTXO.
+  * `opts.inputs[].index` (number) - index of the UTXO output.
+  * `opts.inputs[].privateKey` (string) - input private key to sign the transaction with.
+* `opts.outputs` (array of Output)(__required__) - outputs to transfer to.
+  * `opts.outputs[].address` (string) - address to transfer to.
+  * `opts.outputs[].amount` (string) - amount to transfer.
+  * `opts.token` (string) - token uid or HTR.
+* `opts.tokens` (array of string) - array of token uid.
+
+```js
+// transfer BTC from 1 input to 2 output addresses
+const transaction = await txController.createHathorTransferTransaction({
+  inputs: [
+    {
+      txHash: 'cf4c5da8b45...3785df8687f55c337299cc38c',
+      index: 0,
+      privateKey: '696007545...ed03b2af3b900a678318160'
+    }
+  ],
+  outputs: [
+    { address: 'address1', amount: '0.05', token: 'HTR' },
+    { address: 'address2', amount: '0.449996', token: '0739933...484949' },
+    { address: 'address3', amount: '1.5', token: 'HTR' },
+  ],
+})
+```
+
 ## Send transactions to blockchain
 
 After creating a transaction, use this method to broadcast the transaction.

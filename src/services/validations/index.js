@@ -9,7 +9,7 @@ const { Protocol, TOKEN_TYPES } = require('../blockchain/constants')
 
 module.exports.validatePrivateKey = (privateKey) => {
   if (!privateKey || typeof privateKey !== 'string') {
-    throw new GenericException('Invalid private key', 'InvalidTypeException');
+    throw new GenericException('Invalid private key', 'InvalidTypeException')
   }
 }
 
@@ -220,16 +220,10 @@ module.exports.validateSmartContractCallParams = ({ contractAddress, contractAbi
 
 module.exports.validateBitcoinTransferTransactionParams = ({ wallet, inputs, outputs }) => {
   if (wallet && inputs) {
-    throw new GenericException(
-      'Parameters wallet and inputs can not be sent at the same time',
-      'InvalidTypeException'
-    )
+    throw new GenericException('Parameters wallet and inputs can not be sent at the same time', 'InvalidTypeException')
   }
   if (!wallet && !inputs) {
-    throw new GenericException(
-      'Parameters wallet and inputs are null, it should send one only',
-      'InvalidTypeException'
-    )
+    throw new GenericException('Parameters wallet and inputs are null, it should send one only', 'InvalidTypeException')
   }
   if (inputs && (!Array.isArray(inputs) || !inputs.length)) {
     throw new GenericException(
@@ -242,6 +236,50 @@ module.exports.validateBitcoinTransferTransactionParams = ({ wallet, inputs, out
       'Invalid parameter outputs, it should be an array with length larger than 0',
       'InvalidTypeException'
     )
+  }
+}
+
+module.exports.validateHathorTokenTransaction = ({
+  wallet,
+  inputs,
+  tokenName,
+  tokenSymbol,
+  address,
+  changeAddress,
+  mintAddress,
+  meltAddress,
+  amount
+}) => {
+  if (wallet && inputs) {
+    throw new GenericException('Parameters wallet and inputs can not be sent at the same time', 'InvalidTypeException')
+  }
+  if (!wallet && !inputs) {
+    throw new GenericException('Parameters wallet and inputs are null, it should send one only', 'InvalidTypeException')
+  }
+  if (inputs && (!Array.isArray(inputs) || !inputs.length)) {
+    throw new GenericException(
+      'Invalid parameter inputs, it should be an array with length larger than 0',
+      'InvalidTypeException'
+    )
+  }
+  if (!tokenName || typeof tokenName !== 'string') {
+    throw new InvalidTypeException('tokenName', 'string')
+  }
+  if (!tokenSymbol || typeof tokenSymbol !== 'string') {
+    throw new InvalidTypeException('tokenSymbol', 'string')
+  }
+  this.validatePositiveAmount(amount)
+  if (address && typeof tokenSymbol !== 'string') {
+    throw new InvalidTypeException('address', 'string')
+  }
+  if (changeAddress && typeof changeAddress !== 'string') {
+    throw new InvalidTypeException('changeAddress', 'string')
+  }
+  if (mintAddress && typeof mintAddress !== 'string') {
+    throw new InvalidTypeException('mintAddress', 'string')
+  }
+  if (meltAddress && typeof meltAddress !== 'string') {
+    throw new InvalidTypeException('meltAddress', 'string')
   }
 }
 

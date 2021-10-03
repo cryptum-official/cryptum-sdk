@@ -161,7 +161,7 @@ class Controller extends Interface {
     })
   }
   async generateHathorWallet(mnemonic, testnet) {
-    const { address, privateKey, publicKey } = deriveHathorWallet(mnemonic, testnet)
+    const { address, privateKey, publicKey } = await deriveHathorWallet(mnemonic, testnet)
     return new Wallet({
       mnemonic,
       privateKey,
