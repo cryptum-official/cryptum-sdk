@@ -81,12 +81,8 @@ module.exports.buildHathorTransferTransaction = async function ({ inputs, output
 
   hathorLib.transaction.verifyTxData(txData)
   hathorLib.transaction.setWeightIfNeeded(txData)
-
   const tx = hathorLib.helpersUtils.createTxFromData(txData)
   const mineTx = new mineTransaction.default(tx)
-
-  console.log(tx)
-
   return new Promise((resolve, reject) => {
     mineTx.on('error', (message) => {
       reject(new Error(message))
@@ -111,8 +107,8 @@ module.exports.buildHathorTokenTransaction = async function ({
   tokenSymbol,
   address,
   changeAddress,
-  mintAddress,
-  meltAddress,
+  mintAuthorityAddress,
+  meltAuthorityAddress,
   amount,
   inputsSum,
   testnet,
@@ -132,7 +128,6 @@ module.exports.buildHathorTokenTransaction = async function ({
   _dataToken.symbol = tokenSymbol
 
   const depositAmount = hathorLib.tokensUtils.getDepositAmount(mintAmount)
-
   if (depositAmount < inputsSum) {
     _dataToken.outputs.push({
       address: changeAddress,
@@ -142,25 +137,22 @@ module.exports.buildHathorTokenTransaction = async function ({
   } else if (depositAmount > inputsSum) {
     throw new GenericException('Insufficient funds')
   }
-
-  if (mintAddress) {
+  if (mintAuthorityAddress) {
     _dataToken.outputs.push({
-      address: mintAddress,
+      address: mintAuthorityAddress,
       value: hathorLib.constants.TOKEN_MINT_MASK,
       tokenData: hathorLib.constants.AUTHORITY_TOKEN_DATA,
     })
   }
-
-  if (meltAddress) {
+  if (meltAuthorityAddress) {
     _dataToken.outputs.push({
-      address: meltAddress,
+      address: meltAuthorityAddress,
       value: hathorLib.constants.TOKEN_MELT_MASK,
       tokenData: hathorLib.constants.AUTHORITY_TOKEN_DATA,
     })
   }
 
   hathorLib.transaction.completeTx(_dataToken)
-
   const dataToSign = hathorLib.transaction.dataToSign(_dataToken)
   const hashbuf = hathorLib.transaction.getDataToSignHash(dataToSign)
   const network = hathorLib.network.getNetwork(testnet ? 'testnet' : 'mainnet')
@@ -175,7 +167,6 @@ module.exports.buildHathorTokenTransaction = async function ({
       privateKey.toPublicKey().toBuffer()
     )
   }
-
   hathorLib.transaction.verifyTxData(_dataToken)
   hathorLib.transaction.setWeightIfNeeded(_dataToken)
   const tx = hathorLib.helpersUtils.createTxFromData(_dataToken)

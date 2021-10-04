@@ -159,8 +159,8 @@ that is, to mint 1000 tokens you need to spend 10 HTR.
 - `opts.tokenName` (string)(**required**) - token name.
 - `opts.tokenSymbol` (string)(**required**) - token symbol.
 - `opts.amount` (string)(**required**) - token amount to be first minted.
-- `opts.mintAddress` (string)(**optional**) - wallet address to be the mint authority. Required if you want to mint more tokens later.
-- `opts.meltAddress` (string)(**optional**) - wallet address to be the melt authority. Required if you want to burn tokens later.
+- `opts.mintAuthorityAddress` (string)(**optional**) - wallet address to be the mint authority. Required if you want to mint more tokens later.
+- `opts.meltAuthorityAddress` (string)(**optional**) - wallet address to be the melt authority. Required if you want to burn tokens later.
 
 ```js
 // Create token transaction, mint 100 tokens and do not want to mint or burn tokens later
@@ -176,8 +176,8 @@ const transaction = await txController.createHathorTokenTransactionFromWallet({
   symbol: 'TOK',
   name: 'TOKEN',
   amount: '3000',
-  mintAddress: 'address-1',
-  meltAddress: 'address-2',
+  mintAuthorityAddress: 'address-1',
+  meltAuthorityAddress: 'address-2',
 })
 ```
 
@@ -192,9 +192,8 @@ const transaction = await txController.createHathorTokenTransactionFromWallet({
 - `opts.amount` (string)(**required**) - token amount to be first minted.
 - `opts.address` (string)(**required**) - destination wallet address to receive the minted tokens.
 - `opts.changeAddress` (string)(**required**) - wallet address to receive the change in HTR if there's any.
-- `opts.mintAddress` (string)(**optional**) - wallet address to be the mint authority. Required if you want to mint more tokens later.
-- `opts.meltAddress` (string)(**optional**) - wallet address to be the melt authority. Required if you want to burn tokens later.
-
+- `opts.mintAuthorityAddress` (string)(**optional**) - wallet address to be the mint authority. Required if you want to mint more tokens later.
+- `opts.meltAuthorityAddress` (string)(**optional**) - wallet address to be the melt authority. Required if you want to burn tokens later.
 ```js
 // Create token transaction, mint 100 tokens and do not want to mint or burn tokens later
 const transaction = await txController.createHathorTokenTransactionFromUTXO({
@@ -225,8 +224,8 @@ const transaction = await txController.createHathorTokenTransactionFromUTXO({
   amount: '3000',
   address: 'address-1',
   changeAddress: 'address-1',
-  mintAddress: 'address-1',
-  meltAddress: 'address-2',
+  mintAuthorityAddress: 'address-1',
+  meltAuthorityAddress: 'address-2',
 })
 ```
 

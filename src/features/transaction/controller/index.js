@@ -791,7 +791,7 @@ class Controller extends Interface {
    */
   async createHathorTokenTransactionFromWallet(input) {
     validateHathorTokenTransaction(input)
-    let { wallet, tokenName, tokenSymbol, mintAddress, meltAddress, amount, testnet } = input
+    let {  wallet, tokenName, tokenSymbol, mintAuthorityAddress, meltAuthorityAddress, amount, testnet } = input
     let inputsSum = 0
     const protocol = Protocol.HATHOR
     const utxos = (await this.getUTXOs({ address: wallet.address, protocol })).filter(
@@ -815,8 +815,8 @@ class Controller extends Interface {
       tokenSymbol,
       address: wallet.address,
       changeAddress: wallet.address,
-      mintAddress,
-      meltAddress,
+      mintAuthorityAddress,
+      meltAuthorityAddress,
       amount,
       testnet,
       inputsSum,
@@ -830,16 +830,24 @@ class Controller extends Interface {
    */
   async createHathorTokenTransactionFromUTXO(input) {
     validateHathorTokenTransaction(input)
-    let { inputs, tokenName, tokenSymbol, address, changeAddress, mintAddress, meltAddress, amount, testnet } = input
+    let {
+      inputs,
+      tokenName,
+      tokenSymbol,
+      address,
+      changeAddress,
+      mintAuthorityAddress,
+      meltAuthorityAddress,
+      amount,
+      testnet,
+    } = input
     let inputsSum = 0
     const protocol = Protocol.HATHOR
     for (let i = 0; i < inputs.length; ++i) {
       const tx = await this.getTransactionByHash({ hash: inputs[i].txHash, protocol })
-      if (tx.tx.outputs[inputs[i].index].token_data !== 0) {
-        throw new GenericException('Invalid UTXO with invalid token, it should be HTR', 'InvalidTokenType')
+      if (tx.tx.outputs[inputs[i].index].token_data === 0) {
+        inputsSum += tx.tx.outputs[inputs[i].index].value
       }
-      inputsSum += tx.tx.outputs[inputs[i].index].value
-      inputs[i].txHash = tx.tx.hash
     }
     const signedTx = await buildHathorTokenTransaction({
       inputs,
@@ -847,8 +855,8 @@ class Controller extends Interface {
       tokenSymbol,
       address,
       changeAddress,
-      mintAddress,
-      meltAddress,
+      mintAuthorityAddress,
+      meltAuthorityAddress,
       amount,
       testnet,
       inputsSum,

@@ -11,6 +11,8 @@ const TransactionType = {
   DEPLOY_ERC1155: 'DEPLOY_ERC1155',
   CHANGE_TRUST: 'CHANGE_TRUST',
   HATHOR_TOKEN_CREATION: 'HATHOR_TOKEN_CREATION',
+  HATHOR_TOKEN_MINT: 'HATHOR_TOKEN_MINT',
+  HATHOR_TOKEN_MELT: 'HATHOR_TOKEN_MELT',
 }
 /**
  * @typedef {object | string} Fee
@@ -332,6 +334,7 @@ class HathorTransferTransactionInput extends TransferTransactionInput {
 }
 /**
  * @typedef {Object} HathorTokenTransactionFromWalletInput
+ * @property {TransactionType} type token transaction type
  * @property {import('../../wallet/entity').Wallet} wallet wallet to create the token with
  * @property {string} tokenName token name
  * @property {string} tokenSymbol token symbol
@@ -342,6 +345,7 @@ class HathorTransferTransactionInput extends TransferTransactionInput {
  */
 /**
  * @typedef {Object} HathorTokenTransactionFromUTXOInput
+ * @property {TransactionType} type token transaction type
  * @property {Input[]} inputs UTXOs to create the token with
  * @property {string} tokenName token name
  * @property {string} tokenSymbol token symbol
