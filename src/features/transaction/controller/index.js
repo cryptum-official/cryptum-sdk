@@ -862,18 +862,23 @@ class Controller extends Interface {
       mintAuthorityAddress,
       meltAuthorityAddress,
       amount,
+      tokenUid,
+      type,
       testnet,
     } = input
     let inputsSum = 0
+    const depositInputs = []
     const protocol = Protocol.HATHOR
     for (let i = 0; i < inputs.length; ++i) {
       const tx = await this.getTransactionByHash({ hash: inputs[i].txHash, protocol })
       if (tx.tx.outputs[inputs[i].index].token_data === 0) {
+        depositInputs.push({ tx_id: inputs[i].txHash, index: inputs[i].index })
         inputsSum += tx.tx.outputs[inputs[i].index].value
       }
     }
     const signedTx = await buildHathorTokenTransaction({
       inputs,
+      depositInputs,
       tokenName,
       tokenSymbol,
       address,
@@ -881,7 +886,9 @@ class Controller extends Interface {
       mintAuthorityAddress,
       meltAuthorityAddress,
       amount,
+      tokenUid,
       testnet,
+      type,
       inputsSum,
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.HATHOR_TOKEN_CREATION })

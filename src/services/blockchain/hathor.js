@@ -4,6 +4,7 @@ const mineTransaction = require('@hathor/wallet-lib/lib/wallet/mineTransaction')
 const { toHTRUnit } = require('./utils')
 const { GenericException, HathorException } = require('../../../errors')
 const { default: BigNumber } = require('bignumber.js')
+const { TransactionType } = require('../../features/transaction/entity')
 
 hathorLib.transaction.updateMaxInputsConstant(hathorLib.constants.MAX_INPUTS)
 hathorLib.transaction.updateMaxOutputsConstant(hathorLib.constants.MAX_OUTPUTS)
@@ -111,6 +112,8 @@ module.exports.buildHathorTokenTransaction = async function ({
   meltAuthorityAddress,
   amount,
   inputsSum,
+  tokenUid,
+  type,
   testnet,
 }) {
   let txData = {
@@ -123,9 +126,13 @@ module.exports.buildHathorTokenTransaction = async function ({
     createMelt: false,
   })
 
-  _dataToken.version = hathorLib.constants.CREATE_TOKEN_TX_VERSION
-  _dataToken.name = tokenName
-  _dataToken.symbol = tokenSymbol
+  _dataToken.version =
+    type === TransactionType.HATHOR_TOKEN_CREATION
+      ? hathorLib.constants.CREATE_TOKEN_TX_VERSION
+      : hathorLib.constants.DEFAULT_TX_VERSION
+  if (tokenName) _dataToken.name = tokenName
+  if (tokenSymbol) _dataToken.symbol = tokenSymbol
+  if (tokenUid) _dataToken.tokens = [tokenUid]
 
   const depositAmount = hathorLib.tokensUtils.getDepositAmount(mintAmount)
   if (depositAmount < inputsSum) {
@@ -135,7 +142,7 @@ module.exports.buildHathorTokenTransaction = async function ({
       tokenData: hathorLib.constants.HATHOR_TOKEN_INDEX,
     })
   } else if (depositAmount > inputsSum) {
-    throw new GenericException('Insufficient funds')
+    throw new GenericException('Insufficient HTR funds')
   }
   if (mintAuthorityAddress) {
     _dataToken.outputs.push({

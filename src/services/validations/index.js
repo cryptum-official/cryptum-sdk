@@ -3,7 +3,7 @@ const bip39 = require('bip39')
 const { isValidAddress } = require('ripple-lib/dist/npm/common/schema-validator')
 const { StrKey } = require('stellar-sdk')
 const Web3 = require('web3')
-const { GenericException, InvalidTypeException } = require('../../../errors')
+const { GenericException, InvalidTypeException, HathorException } = require('../../../errors')
 const { TransactionType } = require('../../features/transaction/entity')
 const { Protocol, TOKEN_TYPES } = require('../blockchain/constants')
 
@@ -242,13 +242,15 @@ module.exports.validateBitcoinTransferTransactionParams = ({ wallet, inputs, out
 module.exports.validateHathorTokenTransaction = ({
   wallet,
   inputs,
+  tokenUid,
   tokenName,
   tokenSymbol,
   address,
   changeAddress,
-  mintAddress,
-  meltAddress,
-  amount
+  mintAuthorityAddress,
+  meltAuthorityAddress,
+  amount,
+  type,
 }) => {
   if (wallet && inputs) {
     throw new GenericException('Parameters wallet and inputs can not be sent at the same time', 'InvalidTypeException')
@@ -262,24 +264,39 @@ module.exports.validateHathorTokenTransaction = ({
       'InvalidTypeException'
     )
   }
-  if (!tokenName || typeof tokenName !== 'string') {
-    throw new InvalidTypeException('tokenName', 'string')
+  if (
+    ![
+      TransactionType.HATHOR_TOKEN_CREATION,
+      TransactionType.HATHOR_TOKEN_MELT,
+      TransactionType.HATHOR_TOKEN_MINT,
+    ].includes(type)
+  ) {
+    throw new HathorException('Invalid type')
   }
-  if (!tokenSymbol || typeof tokenSymbol !== 'string') {
-    throw new InvalidTypeException('tokenSymbol', 'string')
+  if (type === TransactionType.HATHOR_TOKEN_CREATION) {
+    if (!tokenName || typeof tokenName !== 'string') {
+      throw new InvalidTypeException('tokenName', 'string')
+    }
+    if (!tokenSymbol || typeof tokenSymbol !== 'string') {
+      throw new InvalidTypeException('tokenSymbol', 'string')
+    }
+  } else {
+    if (!tokenUid || typeof tokenUid !== 'string') {
+      throw new InvalidTypeException('tokenUid', 'string')
+    }
   }
   this.validatePositiveAmount(amount)
-  if (address && typeof tokenSymbol !== 'string') {
+  if (address && typeof address !== 'string') {
     throw new InvalidTypeException('address', 'string')
   }
   if (changeAddress && typeof changeAddress !== 'string') {
     throw new InvalidTypeException('changeAddress', 'string')
   }
-  if (mintAddress && typeof mintAddress !== 'string') {
-    throw new InvalidTypeException('mintAddress', 'string')
+  if (mintAuthorityAddress && typeof mintAuthorityAddress !== 'string') {
+    throw new InvalidTypeException('mintAuthorityAddress', 'string')
   }
-  if (meltAddress && typeof meltAddress !== 'string') {
-    throw new InvalidTypeException('meltAddress', 'string')
+  if (meltAuthorityAddress && typeof meltAuthorityAddress !== 'string') {
+    throw new InvalidTypeException('meltAuthorityAddress', 'string')
   }
 }
 
