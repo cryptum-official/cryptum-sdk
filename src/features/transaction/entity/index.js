@@ -10,10 +10,13 @@ const TransactionType = {
   DEPLOY_ERC721: 'DEPLOY_ERC721',
   DEPLOY_ERC1155: 'DEPLOY_ERC1155',
   CHANGE_TRUST: 'CHANGE_TRUST',
+  HATHOR_TOKEN_CREATION: 'HATHOR_TOKEN_CREATION',
+  HATHOR_TOKEN_MINT: 'HATHOR_TOKEN_MINT',
+  HATHOR_TOKEN_MELT: 'HATHOR_TOKEN_MELT',
 }
 /**
  * @typedef {object | string} Fee
- * @property {number} gas 
+ * @property {number} gas
  * @property {string} gasPrice
  */
 
@@ -58,11 +61,12 @@ class SmartContractCallResponse {
   }
 }
 class UTXO {
-  constructor({ value, txHash, index, height }) {
+  constructor({ value, txHash, index, height, token }) {
     this.value = value
     this.txHash = txHash
     this.index = index
     this.height = height
+    this.token = token
   }
 }
 class Input {
@@ -76,9 +80,17 @@ class Input {
   }
 }
 class Output {
+  /**
+   * 
+   * @param {object} output 
+   * @param {string} output.address
+   * @param {string} output.amount
+   * @param {string?} output.token
+   */
   constructor(output) {
     this.address = output.address
     this.amount = output.amount
+    this.token = output.token
   }
 }
 class TrustlineTransactionInput {
@@ -150,7 +162,7 @@ class StellarTransferTransactionInput extends TransferTransactionInput {
    * @param {Fee?} args.fee fee in stroops
    * @param {boolean?} args.createAccount true if the destination account does not exist yet
    * @param {number?} args.timeout timeout in seconds
-   * @param {boolean?} args.testnet 
+   * @param {boolean?} args.testnet
    */
   constructor({ assetSymbol, createAccount, timeout, issuer, ...args }) {
     super(args)
@@ -303,6 +315,47 @@ class BitcoinTransferTransactionInput extends TransferTransactionInput {
     this.inputs = inputs
   }
 }
+class HathorTransferTransactionInput extends TransferTransactionInput {
+  /**
+   * Creates an instance of HathorTransferTransactionInput.
+   *
+   * @param {object} args
+   * @param {import('../../wallet/entity').Wallet?} args.wallet wallet to transfer from
+   * @param {Array<Input>?} args.inputs inputs to transfer from
+   * @param {Array<Output>} args.outputs outputs to transfer to
+   * @param {Array<Output>} args.tokens outputs to transfer to
+   * @param {boolean} args.testnet
+   */
+  constructor({ outputs, inputs, ...args }) {
+    super(args)
+    this.outputs = outputs
+    this.inputs = inputs
+  }
+}
+/**
+ * @typedef {Object} HathorTokenTransactionFromWalletInput
+ * @property {TransactionType} type token transaction type
+ * @property {import('../../wallet/entity').Wallet} wallet wallet to create the token with
+ * @property {string} tokenName token name
+ * @property {string} tokenSymbol token symbol
+ * @property {string} amount token amount to mint
+ * @property {string?} mintAddress mint address
+ * @property {string?} meltAddress melt address
+ * @property {boolean?} testnet
+ */
+/**
+ * @typedef {Object} HathorTokenTransactionFromUTXOInput
+ * @property {TransactionType} type token transaction type
+ * @property {Input[]} inputs UTXOs to create the token with
+ * @property {string} tokenName token name
+ * @property {string} tokenSymbol token symbol
+ * @property {string} amount token amount to mint
+ * @property {string} address destination address to receive the tokens
+ * @property {string?} changeAddress change address
+ * @property {string?} mintAddress mint address
+ * @property {string?} meltAddress melt address
+ * @property {boolean?} testnet
+ */
 
 module.exports = {
   TransactionType,
@@ -323,4 +376,5 @@ module.exports = {
   SmartContractCallResponse,
   SmartContractDeployTransactionInput,
   TokenDeployTransactionInput,
+  HathorTransferTransactionInput,
 }

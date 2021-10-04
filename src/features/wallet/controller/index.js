@@ -203,6 +203,7 @@ class Controller extends Interface {
       protocol: Protocol.RIPPLE,
     })
   }
+
   async generateHathorWallet({ mnemonic, derivation, testnet }) {
     const { address, privateKey, publicKey, xpub } = await deriveHathorWalletFromDerivationPath(mnemonic, testnet, derivation)
     return new Wallet({
