@@ -14,7 +14,8 @@ function calculateTransactionSize(numInputs, numOutputs) {
 module.exports.buildBitcoinTransferTransaction = async function ({ wallet, inputs, outputs, fee, testnet }) {
   const feePerByte = fee
   const outputDatas = outputs.map(({ address, amount }) => ({ address, value: toSatoshi(amount).toNumber() }))
-  const amountSatoshi = outputDatas
+
+  const outputSum = outputDatas
     .map((output) => output.value)
     .reduce((prev, cur) => new BigNumber(prev).plus(cur), new BigNumber(0))
 
@@ -37,7 +38,7 @@ module.exports.buildBitcoinTransferTransaction = async function ({ wallet, input
     calcFee = new BigNumber(feePerByte).times(transactionSize)
     if (wallet) {
       availableSatoshi = availableSatoshi.plus(utxo.value)
-      if (availableSatoshi.gte(amountSatoshi.plus(calcFee))) {
+      if (availableSatoshi.gte(outputSum.plus(calcFee))) {
         break
       }
     }

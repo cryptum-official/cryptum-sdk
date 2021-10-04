@@ -1,7 +1,7 @@
-const UseCases = require('../use-cases')
 const { handleRequestError } = require('../../../services')
+const { getApiMethod, mountHeaders } = require('../../../services')
 
-const Adapter = require('../adapter')
+const requests = require('./requests.json')
 const Interface = require('./interface')
 
 class Controller extends Interface {
@@ -18,26 +18,43 @@ class Controller extends Interface {
    */
   async createWebhook(webhook) {
     try {
-      const webhookCryptum = UseCases.mountWebhookToCreate(webhook)
+      const method = getApiMethod({ requests, key: 'createWebhook', config: this.config })
+      const headers = mountHeaders(this.config.apiKey)
 
-      const { data } = await Adapter.createWebhook(webhookCryptum, this.config)
-      return UseCases.mountWebhook({ ...webhookCryptum, ...data })
+      const response = await method(requests.createWebhook.url, webhook, {
+        headers,
+      })
+      return response.data
     } catch (error) {
       handleRequestError(error)
     }
   }
   /**
    * Method to get webhooks of the Cryptum
-   *
-   * @param {string} asset asset to get respective webhooks
-   * @param {string} protocol protocol to get yours webhooks
+   * @param {object} input 
+   * @param {string} input.protocol protocol to get yours webhooks
+   * @param {string?} input.asset asset to get respective webhooks
+   * @param {string?} input.limit pagination limit
+   * @param {string?} input.offset pagination offset
+   * @param {string?} input.startDate pagination start date
+   * @param {string?} input.endDate pagination end date
    */
-  async getWebhooks(asset, protocol) {
+  async getWebhooks({ asset, protocol, startDate, endDate, limit, offset }) {
     try {
-      const { data } = await Adapter.getWebhooks(asset, protocol, this.config)
+      const method = getApiMethod({ requests, key: 'getWebhooks', config: this.config })
+      const headers = mountHeaders(this.config.apiKey)
 
-      const webhooks = data.map((webhook) => UseCases.mountWebhook(webhook))
-      return webhooks
+      const qs = [`protocol=${protocol}`]
+      if (asset) qs.push(`asset=${asset}`)
+      if (startDate) qs.push(`startDate=${startDate}`)
+      if (endDate) qs.push(`endDate=${endDate}`)
+      if (limit) qs.push(`limit=${asset}`)
+      if (offset) qs.push(`offset=${asset}`)
+
+      const response = await method(`${requests.getWebhooks.url}?${qs.join('&')}`, {
+        headers,
+      })
+      return response.data
     } catch (error) {
       handleRequestError(error)
     }
@@ -45,15 +62,19 @@ class Controller extends Interface {
   /**
    * Method to destroy an webhook of the Cryptum
    *
-   * @param {object} webhookDestroy object with all data required to destroy: { asset, webhookId, protocol }
-   * @param {string} webhookDestroy.asset
+   * @param {object} webhookDestroy object with all data required to destroy: { webhookId, protocol }
    * @param {string} webhookDestroy.webhookId
    * @param {string} webhookDestroy.protocol
    */
-  async destroyWebhook({ asset, webhookId, protocol }) {
+  async destroyWebhook({ webhookId, protocol }) {
     try {
-      const { data } = await Adapter.destroyWebhook({ asset, webhookId, protocol }, this.config)
-      return data
+      const method = getApiMethod({ requests, key: 'destroyWebhook', config: this.config })
+      const headers = mountHeaders(this.config.apiKey)
+
+      const response = await method(`${requests.destroyWebhook.url}/${webhookId}?protocol=${protocol}`, {
+        headers,
+      })
+      return response.data
     } catch (error) {
       handleRequestError(error)
     }

@@ -18,5 +18,9 @@
   "getFee": {
     "method": "POST",
     "url": "/fee"
+  },
+  "getBlock": {
+    "method": "GET",
+    "url": "/block"
   }
 }

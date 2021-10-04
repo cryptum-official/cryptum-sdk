@@ -1,7 +1,6 @@
 const assert = require('assert')
 const nock = require('nock')
 
-const WebhookCryptum = require('../../src/features/webhooks/entity')
 const WebhookCryptumController = require('../../src/features/webhooks/controller')
 
 describe.only('Test Suite of the Webhook (Controller)', function () {
@@ -17,18 +16,19 @@ describe.only('Test Suite of the Webhook (Controller)', function () {
         url: 'https://site.com',
         address: '0x0c99adab65a55df5faf53ab923f43d9eb9368772',
         confirmations: 6,
+        asset: 'BTC',
       },
     ]
 
     nock('https://api-dev.cryptum.io', {
       reqheaders: { 'x-api-key': 'apikeyexamplecryptum' },
     })
-      .post('/webhook/BTC', {
+      .post('/webhook', {
         asset: 'BTC',
         url: 'https://site.com',
         event: 'tx-confirmation',
         address: '0x0c99adab65a55df5faf53ab923f43d9eb9368772',
-        confirmations: '6',
+        confirmations: 6,
         protocol: 'BITCOIN',
       })
       .reply(200, postResponse)
@@ -37,14 +37,14 @@ describe.only('Test Suite of the Webhook (Controller)', function () {
     nock('https://api-dev.cryptum.io', {
       reqheaders: { 'x-api-key': 'apikeyexamplecryptum' },
     })
-      .get('/webhook/BTC')
+      .get('/webhook')
       .query(params)
       .reply(200, getResponse)
 
     nock('https://api-dev.cryptum.io', {
       reqheaders: { 'x-api-key': 'apikeyexamplecryptum' },
     })
-      .delete('/webhook/BTC/143c07af-cc73-4d46-9e0a-8d96624a082e')
+      .delete('/webhook/143c07af-cc73-4d46-9e0a-8d96624a082e')
       .query(params)
       .reply(200)
   })
@@ -55,21 +55,19 @@ describe.only('Test Suite of the Webhook (Controller)', function () {
       url: 'https://site.com',
       event: 'tx-confirmation',
       address: '0x0c99adab65a55df5faf53ab923f43d9eb9368772',
-      confirmations: '6',
+      confirmations: 6,
       protocol: 'BITCOIN',
     }
 
-    const webhook = new WebhookCryptum(data)
-    const expectedResult = new WebhookCryptum({
-      ...webhook,
+    const expectedResult = {
       id: '143c07af-cc73-4d46-9e0a-8d96624a082e',
-    })
+    }
 
     const controller = new WebhookCryptumController({
       environment: 'development',
       apiKey: 'apikeyexamplecryptum',
     })
-    const result = await controller.createWebhook(webhook)
+    const result = await controller.createWebhook(data)
     assert.deepStrictEqual(result, expectedResult)
   })
 
@@ -77,7 +75,6 @@ describe.only('Test Suite of the Webhook (Controller)', function () {
     const expectedResult = ''
     const data = {
       webhookId: '143c07af-cc73-4d46-9e0a-8d96624a082e',
-      asset: 'BTC',
       protocol: 'BITCOIN',
     }
 
@@ -91,20 +88,21 @@ describe.only('Test Suite of the Webhook (Controller)', function () {
 
   it('Check get webhooks : getWebhooks', async () => {
     const expectedResult = [
-      new WebhookCryptum({
+      {
         id: '68c2e098-12e0-435e-aabe-f2ed5a581672',
         event: 'tx-confirmation',
         url: 'https://site.com',
         address: '0x0c99adab65a55df5faf53ab923f43d9eb9368772',
         confirmations: 6,
-      }),
+        asset: 'BTC',
+      },
     ]
 
     const controller = new WebhookCryptumController({
       environment: 'development',
       apiKey: 'apikeyexamplecryptum',
     })
-    const result = await controller.getWebhooks('BTC', 'BITCOIN')
+    const result = await controller.getWebhooks({ protocol: 'BITCOIN' })
     assert.deepStrictEqual(result, expectedResult)
   })
 })

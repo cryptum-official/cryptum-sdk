@@ -61,7 +61,7 @@ describe.only('Celo smart contract transactions', () => {
       .persist()
       .post(`/fee?protocol=${Protocol.CELO}`, {
         type: TransactionType.CALL_CONTRACT_METHOD,
-        from: '0x8C33DB44a78629cF60C88383d436EEc356884625',
+        from: '0xb8a29fa1876eb806e411f15d2d94c8e80fb72e23',
         contractAddress,
         contractAbi: contractAbiUpdate,
         method: 'update',
@@ -104,7 +104,7 @@ describe.only('Celo smart contract transactions', () => {
       .persist()
       .post(`/fee?protocol=${Protocol.CELO}`, {
         type: TransactionType.DEPLOY_CONTRACT,
-        from: '0x8C33DB44a78629cF60C88383d436EEc356884625',
+        from: '0xb8a29fa1876eb806e411f15d2d94c8e80fb72e23',
         contractName: 'Test',
         source: 'contract Test {}',
         params: ['new message'],
@@ -117,7 +117,7 @@ describe.only('Celo smart contract transactions', () => {
       .persist()
       .post(`/fee?protocol=${Protocol.CELO}`, {
         type: TransactionType.DEPLOY_ERC20,
-        from: '0x8C33DB44a78629cF60C88383d436EEc356884625',
+        from: '0xb8a29fa1876eb806e411f15d2d94c8e80fb72e23',
         tokenType: 'ERC20',
         params: ['new message'],
       })

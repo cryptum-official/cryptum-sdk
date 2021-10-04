@@ -1,0 +1,26 @@
+{
+    "getSupportedCurrencies": {
+        "method": "GET",
+        "url": "/swap/currencies"
+    },
+    "getMinimumAmount": {
+        "method": "GET",
+        "url": "/swap/currencies/min-amount"
+    },
+    "getEstimateAmount": {
+        "method": "GET",
+        "url": "/swap/currencies/estimate-amount"
+    },
+    "getOrder": {
+        "method": "GET",
+        "url": "/swap/orders/{id}"
+    },
+    "createOrder": {
+        "method": "POST",
+        "url": "/swap/orders"
+    },
+    "getOrders": {
+        "method": "GET",
+        "url": "/swap/orders"
+    }
+}
