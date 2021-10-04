@@ -5,6 +5,7 @@
 - [Celo](#celo)
 - [Stellar](#stellar)
 - [Ripple](#ripple)
+- [Hathor](#hathor)
 - [Send transactions to blockchain](#send-transactions-to-blockchain)
 
 First create an instance of transaction controller to call all methods below.
@@ -109,7 +110,7 @@ const transaction = await txController.createCeloTransferTransaction({
 
 #### `txController.createBitcoinTransferTransaction(opts)`
 
-Create a transfer transaction in Bitcoin blockchain.
+Create a transfer transaction for Bitcoin blockchain.
 
 * `opts.wallet` (Wallet) - wallet to sign the transaction with. Required if `inputs` is not used.
 * `opts.inputs` (array of Input) - optional array of inputs to include in the transaction. Required if `wallet` is not used.

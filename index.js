@@ -3,6 +3,7 @@ const WalletController = require('./src/features/wallet/controller')
 const PricesController = require('./src/features/prices/controller')
 const TransactionController = require('./src/features/transaction/controller')
 const StakingController = require('./src/features/staking/controller')
+const SwapController = require('./src/features/swap/controller')
 const { Protocol } = require('./src/services/blockchain/constants')
 const { GenericException } = require('./errors')
 /**
@@ -70,6 +71,16 @@ class CryptumSDK {
   getPricesController() {
     return new PricesController(this.config)
   }
+
+
+  /**
+   * Method to get a controller to manipulate swap
+   *
+   * @returns PricesController instance
+   */
+   getSwapController() {
+    return new SwapController(this.config)
+  }  
 }
 
 module.exports = CryptumSDK

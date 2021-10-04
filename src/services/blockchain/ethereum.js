@@ -38,7 +38,7 @@ module.exports.buildEthereumTransferTransaction = async function ({
   const tx = new EthereumTransaction(rawTransaction, {
     common: new EthereumCommon({ chain: chainId }),
   })
-  const signedTx = tx.sign(Buffer.from(fromPrivateKey, 'hex'))
+  const signedTx = tx.sign(Buffer.from(fromPrivateKey.substring(2), 'hex'))
   return `0x${signedTx.serialize().toString('hex')}`
 }
 
@@ -77,7 +77,7 @@ module.exports.buildBscTransferTransaction = async function ({
     common: EthereumCommon.forCustomChain(BSC_COMMON_CHAIN[network].base, BSC_COMMON_CHAIN[network].chain),
   })
 
-  const signedTx = tx.sign(Buffer.from(fromPrivateKey, 'hex'))
+  const signedTx = tx.sign(Buffer.from(fromPrivateKey.substring(2), 'hex'))
   return `0x${signedTx.serialize().toString('hex')}`
 }
 
@@ -117,7 +117,7 @@ module.exports.buildEthereumSmartContractTransaction = async ({
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
   const tx = new EthereumTransaction(rawTransaction, { common })
-  const signedTx = tx.sign(Buffer.from(fromPrivateKey, 'hex'))
+  const signedTx = tx.sign(Buffer.from(fromPrivateKey.substring(2), 'hex'))
   return `0x${signedTx.serialize().toString('hex')}`
 }
 
@@ -157,6 +157,6 @@ module.exports.buildEthereumSmartContractDeployTransaction = async ({
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
   const tx = new EthereumTransaction(rawTransaction, { common })
-  const signedTx = tx.sign(Buffer.from(fromPrivateKey, 'hex'))
+  const signedTx = tx.sign(Buffer.from(fromPrivateKey.substring(2), 'hex'))
   return `0x${signedTx.serialize().toString('hex')}`
 }

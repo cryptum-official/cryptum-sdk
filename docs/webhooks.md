@@ -22,11 +22,11 @@ ps.: If you not provide an WebhookCryptum valid, the Cryptum sdk return an excep
 
 ## List you Webhooks
 
-You need only instantiate Webhook controller and send your asset and your protocol to cryptum 🚀
+You need only instantiate Webhook controller and your protocol to cryptum 🚀
 
 ```js
 const webhookController = sdk.getWebhooksController()
-const webhooks = await webhookController.getWebhooks('BTC', 'BITCOIN')
+const webhooks = await webhookController.getWebhooks({ protocol: 'BITCOIN' })
 console.log(webhooks)
 // Log your WebhookCryptum list
 ```
@@ -40,7 +40,6 @@ You need only instantiate Webhook controller and send your asset, protocol and w
 ```js
 const webhookController = sdk.getWebhooksController()
 const webhooks = await webhookController.destroyWebhook({
-  asset: 'BTC',
   protocol: 'BITCOIN',
   webhookId: 'ba291cc3-1e29-4c70-b716-b4185891c569',
 })

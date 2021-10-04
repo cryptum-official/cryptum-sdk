@@ -27,7 +27,7 @@ describe.only('Ethereum transfer transactions', () => {
     nock(baseUrl)
       .post(`/fee?protocol=${Protocol.ETHEREUM}`, {
         type: TransactionType.TRANSFER,
-        from: '0x481B542b7419D8Ba305B5cc5029C12d5a68B4f69',
+        from: '0xcf61eaf64d895c3c71a8812e9eedc4c179b4ed60',
         destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
         amount: '0.01'
       })
@@ -40,7 +40,7 @@ describe.only('Ethereum transfer transactions', () => {
     nock(baseUrl)
       .post(`/fee?protocol=${Protocol.ETHEREUM}`, {
         type: TransactionType.CALL_CONTRACT_METHOD,
-        from: '0x481B542b7419D8Ba305B5cc5029C12d5a68B4f69',
+        from: '0xcf61eaf64d895c3c71a8812e9eedc4c179b4ed60',
         destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
         contractAddress: '0xcf1caf3f6aa5e5206b2d50dd1206a7cc3c76dc10',
         contractAbi: TRANSFER_METHOD_ABI,
