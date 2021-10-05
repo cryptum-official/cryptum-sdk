@@ -19,7 +19,7 @@
     - [Wallets](docs/wallets.md)
     - [Transfers](docs/transfers.md)
     - [Trustlines](docs/trustlines.md)
-    - [Tokens and Smart contracts](docs/contracts.md)
+    - [Tokens and Smart contracts](docs/tokens-contracts.md)
     - [Prices](docs/prices.md)
     - [Swap tokens](docs/swap.md)
     - [Blockchain info](docs/data.md)

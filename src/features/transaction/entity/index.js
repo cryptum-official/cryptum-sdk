@@ -336,11 +336,14 @@ class HathorTransferTransactionInput extends TransferTransactionInput {
  * @typedef {Object} HathorTokenTransactionFromWalletInput
  * @property {TransactionType} type token transaction type
  * @property {import('../../wallet/entity').Wallet} wallet wallet to create the token with
- * @property {string} tokenName token name
- * @property {string} tokenSymbol token symbol
+ * @property {string?} tokenName token name
+ * @property {string?} tokenSymbol token symbol
+ * @property {string?} tokenUid token uid
  * @property {string} amount token amount to mint
- * @property {string?} mintAddress mint address
- * @property {string?} meltAddress melt address
+ * @property {string} address destination address to receive the tokens
+ * @property {string?} changeAddress change address
+ * @property {string?} mintAuthorityAddress mint authority address
+ * @property {string?} meltAuthorityAddress melt authority address
  * @property {boolean?} testnet
  */
 /**
@@ -352,8 +355,8 @@ class HathorTransferTransactionInput extends TransferTransactionInput {
  * @property {string} amount token amount to mint
  * @property {string} address destination address to receive the tokens
  * @property {string?} changeAddress change address
- * @property {string?} mintAddress mint address
- * @property {string?} meltAddress melt address
+ * @property {string?} mintAuthorityAddress mint authority address
+ * @property {string?} meltAuthorityAddress melt authority address
  * @property {boolean?} testnet
  */
 
