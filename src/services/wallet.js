@@ -341,10 +341,10 @@ module.exports.deriveCardanoWalletFromDerivationPath = async (mnemonic, testnet,
 }
 
 /**
- * Derive cardano address, private key and public key
+ * Derive bitcoin addresses from extended public key (xpub)
  *
- * @param {string} mnemonic mnemonic seed string
- * @param {boolean?} testnet
+ * @param {string} xpub extended public key string
+ * @param {boolean} testnet true or false for testnet
  * * @param {object} derivation derivation object
  * @returns
  */
