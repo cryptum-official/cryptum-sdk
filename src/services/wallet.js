@@ -7,11 +7,19 @@ const rippleKeyPairs = require('ripple-keypairs')
 const { Keypair } = require('stellar-sdk')
 const hathorSdk = require('@hathor/wallet-lib')
 const bitcore = require('bitcore-lib')
+const {
+  bech32,
+  derivePrivate,
+  derivePublic,
+  getPubKeyBlake2b224Hash,
+  mnemonicToRootKeypair,
+  packBaseAddress,
+} = require('cardano-crypto.js')
 
-const DERIVATION_PATH_TEMPLATE = "m/44'/{coin}'/{account}'/{change}/{address}"
+const DERIVATION_PATH_TEMPLATE = "m/{purpose}'/{coin}'/{account}'/{change}/{address}"
 
-const getDerivationPath = ({ coin, account = 0, change, address }) => {
-  let path = DERIVATION_PATH_TEMPLATE.replace('{coin}', coin).replace('{account}', account)
+const getDerivationPath = ({ purpose, coin, account = 0, change, address }) => {
+  let path = DERIVATION_PATH_TEMPLATE.replace('{purpose}', purpose).replace('{coin}', coin).replace('{account}', account)
   if (change !== undefined && typeof change === 'number') {
     path = path.replace('{change}', change)
   } else {
@@ -26,14 +34,18 @@ const getDerivationPath = ({ coin, account = 0, change, address }) => {
 }
 
 const getBitcoinDerivationPath = ({ account = 0, change, address }) =>
-  getDerivationPath({ coin: 0, account, change, address })
+  getDerivationPath({ purpose: 44, coin: 0, account, change, address })
 const getTestnetDerivationPath = ({ account = 0, change, address }) =>
-  getDerivationPath({ coin: 1, account, change, address })
+  getDerivationPath({ purpose: 44, coin: 1, account, change, address })
 const getEthereumDerivationPath = ({ account = 0, change, address }) =>
-  getDerivationPath({ coin: 60, account, change, address })
+  getDerivationPath({ purpose: 44, coin: 60, account, change, address })
 const getCeloDerivationPath = ({ account = 0, change, address }) =>
-  getDerivationPath({ coin: 52752, account, change, address })
-const getHathorDerivationPath = ({ account = 0, address }) => getDerivationPath({ coin: 280, account, address })
+  getDerivationPath({ purpose: 44, coin: 52752, account, change, address })
+const getHathorDerivationPath = ({ account = 0, address }) =>
+  getDerivationPath({ purpose: 44, coin: 280, account, address })
+const getCardanoDerivationPath = ({ account = 0, address }) =>
+  getDerivationPath({ purpose: 1852, coin: 1815, account, address })
+
 
 /**
  * Get Bitcoin address from private key
@@ -284,4 +296,75 @@ module.exports.deriveHathorAddressFromXpub = (xpub, testnet, { address = 0 } = {
     hdPublicKey.derive(address).publicKey,
     hathorSdk.network.getNetwork(networkName)
   ).toString()
+}
+
+/**
+ * Derive cardano address, private key and public key
+ *
+ * @param {string} mnemonic mnemonic seed string
+ * @param {boolean?} testnet
+ * * @param {object} derivation derivation object
+ * @returns
+ */
+module.exports.deriveCardanoWalletFromDerivationPath = async (mnemonic, testnet, { account = 0, address } = {}) => {
+  const accountIndex = account !== undefined ? account : 0
+  const addressIndex = address !== undefined ? address : 0
+  const CARDANO_DERIVATION_MODE = 2
+  const HARDENED_INDEX = 0x80000000
+  const walletSecret = await mnemonicToRootKeypair(mnemonic, CARDANO_DERIVATION_MODE)
+  const keyPair = getCardanoDerivationPath({ account: accountIndex })
+    .split('/')
+    .slice(1)
+    .map(index => index.slice(-1) === '\'' ? HARDENED_INDEX + parseInt(index.slice(0, -1)) : parseInt(index))
+    .reduce((secret, index) => derivePrivate(secret, index, CARDANO_DERIVATION_MODE), walletSecret)
+
+  const privateKey = derivePrivate(derivePrivate(keyPair, 0, CARDANO_DERIVATION_MODE), addressIndex, CARDANO_DERIVATION_MODE).toString('hex')
+  const spendXPubKey = derivePrivate(keyPair, addressIndex, CARDANO_DERIVATION_MODE).slice(64, 128).toString('hex')
+  const stakeXPubKey = derivePrivate(
+    derivePrivate(keyPair, 2, CARDANO_DERIVATION_MODE), 0, CARDANO_DERIVATION_MODE
+  ).slice(64, 128).toString('hex')
+  const xpub = spendXPubKey + stakeXPubKey
+  const newAddress = bech32.encode(
+    testnet ? 'addr_test' : 'addr',
+    packBaseAddress(
+      getPubKeyBlake2b224Hash(Buffer.from(
+        derivePublic(Buffer.from(xpub.substr(0, 128),
+          'hex'), addressIndex, CARDANO_DERIVATION_MODE), 'hex').slice(0, 32)),
+      getPubKeyBlake2b224Hash(Buffer.from(
+        stakeXPubKey,
+        'hex').slice(0, 32)),
+      testnet ? 0 : 1
+    )
+  )
+
+  return { address: newAddress, publicKey: spendXPubKey, xpub, privateKey: privateKey }
+}
+
+/**
+ * Derive cardano address, private key and public key
+ *
+ * @param {string} mnemonic mnemonic seed string
+ * @param {boolean?} testnet
+ * * @param {object} derivation derivation object
+ * @returns
+ */
+module.exports.deriveCardanoAddressFromXpub = async (xpub, testnet, { account = 0, address } = {}) => {
+  const addressIndex = address !== undefined ? address : 0
+  const CARDANO_DERIVATION_MODE = 2
+
+  const newAddress = bech32.encode(
+    testnet ? 'addr_test' : 'addr',
+    packBaseAddress(
+      getPubKeyBlake2b224Hash(Buffer.from(
+        derivePublic(Buffer.from(
+          xpub.substr(0, 128),
+          'hex'), addressIndex, CARDANO_DERIVATION_MODE), 'hex').slice(0, 32)),
+      getPubKeyBlake2b224Hash(Buffer.from(
+        xpub.substr(128, 128),
+        'hex').slice(0, 32)),
+      testnet ? 0 : 1
+    )
+  )
+
+  return newAddress
 }

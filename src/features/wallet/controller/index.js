@@ -22,6 +22,8 @@ const {
   deriveHathorWalletFromDerivationPath,
   getHathorAddressFromPrivateKey,
   deriveHathorAddressFromXpub,
+  deriveCardanoWalletFromDerivationPath,
+  deriveCardanoAddressFromXpub,
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
 const { validateWalletInfo, validatePrivateKey } = require('../../../services/validations')
@@ -60,6 +62,8 @@ class Controller extends Interface {
         return await this.generateRippleWallet({ mnemonic, derivation, testnet })
       case Protocol.HATHOR:
         return await this.generateHathorWallet({ mnemonic, derivation, testnet })
+      case Protocol.CARDANO:
+        return await this.generateCardanoWallet({ mnemonic, derivation, testnet })
       default:
         throw new Error('Unsupported blockchain protocol')
     }
@@ -130,6 +134,9 @@ class Controller extends Interface {
         break
       case Protocol.HATHOR:
         walletAddress = deriveHathorAddressFromXpub(xpub, testnet, { address })
+        break
+      case Protocol.CARDANO:
+        walletAddress = deriveCardanoAddressFromXpub(xpub, testnet, { address })
         break
       default:
         throw new Error('Unsupported blockchain protocol')
@@ -216,6 +223,20 @@ class Controller extends Interface {
       protocol: Protocol.HATHOR,
     })
   }
+
+  async generateCardanoWallet({ mnemonic, derivation, testnet }) {
+    const { address, privateKey, publicKey, xpub } = await deriveCardanoWalletFromDerivationPath(mnemonic, testnet, derivation)
+    return new Wallet({
+      mnemonic,
+      privateKey,
+      publicKey,
+      xpub,
+      address,
+      testnet,
+      protocol: Protocol.CARDANO,
+    })
+  }
+
   /**
    * Get wallet information from blockchain
    *
