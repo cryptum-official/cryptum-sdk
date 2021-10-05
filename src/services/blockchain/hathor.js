@@ -111,38 +111,62 @@ module.exports.buildHathorTokenTransaction = async function ({
   mintAuthorityAddress,
   meltAuthorityAddress,
   amount,
-  inputsSum,
+  inputSum,
   tokenUid,
   type,
   testnet,
 }) {
   let txData = {
     inputs: inputs.map((input) => ({ tx_id: input.txHash, index: input.index })),
+    outputs: []
   }
-  const mintAmount = toHTRUnit(amount).toNumber()
-  const _dataToken = hathorLib.tokens.createMintData(null, null, address, mintAmount, txData, {
-    changeAddress: changeAddress,
-    createAnotherMint: false,
-    createMelt: false,
-  })
+  const tokenAmount = toHTRUnit(amount).toNumber()
+  const _dataToken =
+    type === TransactionType.HATHOR_TOKEN_MELT
+      ? txData
+      : hathorLib.tokens.createMintData(null, null, address, tokenAmount, txData, {
+          changeAddress: changeAddress,
+          createAnotherMint: false,
+          createMelt: false,
+        })
 
-  _dataToken.version =
-    type === TransactionType.HATHOR_TOKEN_CREATION
-      ? hathorLib.constants.CREATE_TOKEN_TX_VERSION
-      : hathorLib.constants.DEFAULT_TX_VERSION
-  if (tokenName) _dataToken.name = tokenName
-  if (tokenSymbol) _dataToken.symbol = tokenSymbol
-  if (tokenUid) _dataToken.tokens = [tokenUid]
-
-  const depositAmount = hathorLib.tokensUtils.getDepositAmount(mintAmount)
-  if (depositAmount < inputsSum) {
-    _dataToken.outputs.push({
-      address: changeAddress,
-      value: inputsSum - depositAmount,
-      tokenData: hathorLib.constants.HATHOR_TOKEN_INDEX,
-    })
-  } else if (depositAmount > inputsSum) {
-    throw new GenericException('Insufficient HTR funds')
+  if (type === TransactionType.HATHOR_TOKEN_CREATION) {
+    _dataToken.version = hathorLib.constants.CREATE_TOKEN_TX_VERSION
+    _dataToken.name = tokenName
+    _dataToken.symbol = tokenSymbol
+  } else if (type === TransactionType.HATHOR_TOKEN_MINT || type === TransactionType.HATHOR_TOKEN_MELT) {
+    _dataToken.version = hathorLib.constants.DEFAULT_TX_VERSION
+    _dataToken.tokens = [tokenUid]
+  } else {
+    throw new HathorException('Invalid transaction type')
+  }
+  if (type === TransactionType.HATHOR_TOKEN_MELT) {
+    if (inputSum > tokenAmount) {
+      _dataToken.outputs.push({
+        address: changeAddress,
+        value: inputSum - tokenAmount,
+        tokenData: 1
+      })
+    }
+    const withdrawAmount = hathorLib.tokens.getWithdrawAmount(tokenAmount)
+    if (withdrawAmount > 0) {
+      _dataToken.outputs.push({
+        address,
+        value: withdrawAmount,
+        tokenData: hathorLib.constants.HATHOR_TOKEN_INDEX,
+      })
+    }
+  } else {
+    const depositAmount = hathorLib.tokensUtils.getDepositAmount(tokenAmount)
+    if (depositAmount < inputSum) {
+      _dataToken.outputs.push({
+        address: changeAddress,
+        value: inputSum - depositAmount,
+        tokenData: hathorLib.constants.HATHOR_TOKEN_INDEX,
+      })
+    } else if (depositAmount > inputSum) {
+      throw new HathorException('Insufficient funds')
+    }
   }
   if (mintAuthorityAddress) {
     _dataToken.outputs.push({
@@ -177,7 +201,6 @@ module.exports.buildHathorTokenTransaction = async function ({
   hathorLib.transaction.verifyTxData(_dataToken)
   hathorLib.transaction.setWeightIfNeeded(_dataToken)
   const tx = hathorLib.helpersUtils.createTxFromData(_dataToken)
-  console.log(_dataToken)
   const mineTx = new mineTransaction.default(tx)
 
   return new Promise((resolve, reject) => {
