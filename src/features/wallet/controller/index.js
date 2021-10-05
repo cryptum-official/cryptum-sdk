@@ -28,6 +28,14 @@ const { validateWalletInfo, validatePrivateKey } = require('../../../services/va
 
 class Controller extends Interface {
   /**
+   * Generate random words
+   * @param {number} strength 
+   * @returns {string} list of random words
+   */
+  generateRandomMnemonic(strength = 256) {
+    return generateMnemonic(strength)
+  }
+  /**
    * Generate new wallet
    *
    * @param {object} args
@@ -42,7 +50,7 @@ class Controller extends Interface {
    */
   async generateWallet({ protocol, mnemonic, testnet, derivation = { account: 0, change: 0 } }) {
     validateMnemonic(mnemonic)
-    mnemonic = mnemonic ? mnemonic : generateMnemonic(256)
+    mnemonic = mnemonic ? mnemonic : this.generateRandomMnemonic()
     testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
 
     switch (protocol) {
