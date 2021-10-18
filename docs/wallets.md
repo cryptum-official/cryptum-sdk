@@ -8,7 +8,7 @@ const walletController = sdk.getWalletController()
 #### `walletController.generateRandomMnemonic(strength)`
 
 Generate random mnemonic (words) to generate wallets.
-`strength` (number)(__optional__) - strength number.
+* `strength` (number)(__optional__) - strength number.
 
 ```js
 const mnemonic = walletController.generateRandomMnemonic()
