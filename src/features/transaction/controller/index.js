@@ -773,7 +773,7 @@ class Controller extends Interface {
       outputs,
       tokens,
       changeAddress: wallet.address,
-      testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
@@ -806,7 +806,7 @@ class Controller extends Interface {
       inputs,
       outputs,
       tokens,
-      testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
@@ -877,7 +877,7 @@ class Controller extends Interface {
       mintAuthorityAddress,
       meltAuthorityAddress,
       amount,
-      testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       inputSum,
     })
     return new SignedTransaction({ signedTx, protocol, type })
@@ -924,7 +924,7 @@ class Controller extends Interface {
       meltAuthorityAddress,
       amount,
       tokenUid,
-      testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       type,
       inputSum,
     })
