@@ -55,6 +55,8 @@ const {
 } = require('../../../services/validations')
 
 const { buildHathorTransferTransaction, buildHathorTokenTransaction } = require('../../../services/blockchain/hathor')
+const { buildOperation, buildOperationFromInputs } = require('../../../services/blockchain/cardano')
+const CardanoWasm = require("@emurgo/cardano-serialization-lib-nodejs");
 
 class Controller extends Interface {
   /**
@@ -513,7 +515,7 @@ class Controller extends Interface {
     }
     let networkFee = fee
     if (!networkFee) {
-      ;({ estimateValue: networkFee } = await this.getFee({
+      ; ({ estimateValue: networkFee } = await this.getFee({
         type: TransactionType.TRANSFER,
         protocol,
       }))
@@ -930,6 +932,199 @@ class Controller extends Interface {
     })
     return new SignedTransaction({ signedTx, protocol, type })
   }
-}
 
+  /**
+     * Create transfer tokens transaction in Cardano blockchain
+     * @param {import('../entity').CardanoTransferTransactionInput} input
+     * @returns {Promise<SignedTransaction>}
+     */
+  async createCardanoTransferTransactionFromWallet(input) {
+    try {
+      let { wallet, outputs } = input
+      const protocol = Protocol.CARDANO
+      const keyAddressMapper = {}
+      keyAddressMapper[wallet.address] = { secretKey: wallet.privateKey.slice(0, 128), publicKey: wallet.privateKey.slice(128, 192) }
+
+      const privateKey = CardanoWasm.Bip32PrivateKey.from_128_xprv(new Uint8Array(wallet.privateKey.match(/.{1,2}/g).map(byte => parseInt(byte, 16))))
+      const headers = mountHeaders(this.config.apiKey)
+      const utxoApiRequest = getApiMethod({
+        requests,
+        key: 'getUTXOs',
+        config: this.config,
+      })
+      const utxo = await utxoApiRequest(`${requests.getUTXOs.url}/${wallet.address}?protocol=${protocol}`,
+        {
+          headers,
+        })
+      let feelessUtxo = JSON.parse(JSON.stringify(utxo.data))
+      const feelessTx = buildOperation(feelessUtxo, wallet.address, outputs)
+      const apiRequest = getApiMethod({
+        requests,
+        key: 'preprocess',
+        config: this.config,
+      })
+      const options = await apiRequest(`${requests.preprocess.url}?protocol=${protocol}`,
+        {
+          operations: feelessTx.operations,
+          metadata: { relative_ttl: 1000 }
+        },
+        {
+          headers,
+        })
+
+      const metadata = await apiRequest(`${requests.getMetadata.url}?protocol=${protocol}`,
+        {
+          ...options.data
+        }
+      )
+
+      const builtTx = buildOperation(utxo.data, wallet.address, outputs, metadata.data.suggested_fee[0].value)
+      const payload = await apiRequest(`${requests.getPayload.url}?protocol=${protocol}`,
+        {
+          operations: builtTx.operations,
+          metadata: metadata.data.metadata,
+        }
+      )
+
+      const signatures = payload.data.payloads.map((signing_payload) => {
+        const {
+          account_identifier: { address },
+        } = signing_payload;
+        return {
+          signing_payload,
+          public_key: {
+            hex_bytes: keyAddressMapper[address].publicKey,
+            curve_type: "edwards25519",
+          },
+          signature_type: "ed25519",
+          hex_bytes: Buffer.from(
+            CardanoWasm.make_vkey_witness(
+              CardanoWasm.TransactionHash.from_bytes(
+                Buffer.from(signing_payload.hex_bytes, "hex")
+              ),
+              privateKey.to_raw_key()
+            )
+              .signature()
+              .to_bytes()
+          ).toString("hex"),
+        };
+      });
+
+      const combine = await apiRequest(`${requests.combineSignatures.url}?protocol=${protocol}`,
+        {
+          unsigned_transaction: payload.data.unsigned_transaction,
+          signatures,
+        }
+      )
+      const signedTx = combine.data.signed_transaction
+
+      return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
+    }
+    catch (error) {
+      handleRequestError(error)
+    }
+  }
+
+  /**
+     * Create transfer tokens transaction in Cardano blockchain
+     * @param {import('../entity').CardanoTransferTransactionInput} input
+     * @returns {Promise<SignedTransaction>}
+     */
+  async createCardanoTransferTransactionFromUTXO(input) {
+    try {
+      let { outputs, inputs } = input
+      const headers = mountHeaders(this.config.apiKey)
+      const utxoApiRequest = getApiMethod({
+        requests,
+        key: 'getUTXOs',
+        config: this.config,
+      })
+      const protocol = Protocol.CARDANO
+      const keyAddressMapper = {}
+      const inputList = []
+
+      await Promise.all(inputs.map(async (i) => {
+        keyAddressMapper[i.address] = {
+          secretKey: CardanoWasm.Bip32PrivateKey.from_128_xprv(new Uint8Array(i.privateKey.match(/.{1,2}/g).map(byte => parseInt(byte, 16)))),
+          publicKey: i.privateKey.slice(128, 192),
+        }
+
+        let utxo = await utxoApiRequest(`${requests.getUTXOs.url}/${i.address}?protocol=${protocol}`, { headers })
+        utxo.data.map((u) => {
+          if (u.txHash === i.txHash && u.index.toString() === i.index) {
+            inputList.push({ ...u, address: i.address })
+          }
+        })
+      }))
+
+      if (inputList.length !== inputs.length)
+        throw new Error('One or more inputs are invalid')
+
+      const apiRequest = getApiMethod({
+        requests,
+        key: 'preprocess',
+        config: this.config,
+      })
+
+      const builtTx = buildOperationFromInputs(inputList, outputs)
+      const options = await apiRequest(`${requests.preprocess.url}?protocol=${protocol}`,
+        {
+          operations: builtTx.operations,
+          metadata: { relative_ttl: 1000 }
+        },
+        {
+          headers,
+        })
+
+      const metadata = await apiRequest(`${requests.getMetadata.url}?protocol=${protocol}`,
+        {
+          ...options.data
+        }
+      )
+      const payload = await apiRequest(`${requests.getPayload.url}?protocol=${protocol}`,
+        {
+          operations: builtTx.operations,
+          metadata: metadata.data.metadata,
+        }
+      )
+
+      const signatures = payload.data.payloads.map((signing_payload) => {
+        const {
+          account_identifier: { address },
+        } = signing_payload;
+        return {
+          signing_payload,
+          public_key: {
+            hex_bytes: keyAddressMapper[address].publicKey,
+            curve_type: "edwards25519",
+          },
+          signature_type: "ed25519",
+          hex_bytes: Buffer.from(
+            CardanoWasm.make_vkey_witness(
+              CardanoWasm.TransactionHash.from_bytes(
+                Buffer.from(signing_payload.hex_bytes, "hex")
+              ),
+              keyAddressMapper[address].secretKey.to_raw_key()
+            )
+              .signature()
+              .to_bytes()
+          ).toString("hex"),
+        };
+      });
+
+      const combine = await apiRequest(`${requests.combineSignatures.url}?protocol=${protocol}`,
+        {
+          unsigned_transaction: payload.data.unsigned_transaction,
+          signatures,
+        }
+      )
+      const signedTx = combine.data.signed_transaction
+
+      return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
+    } catch (error) {
+      handleRequestError(error)
+    }
+  }
+
+}
 module.exports = Controller
