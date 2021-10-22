@@ -87,7 +87,7 @@ class Controller extends Interface {
    */
   async generateWalletFromPrivateKey({ privateKey, protocol, testnet }) {
     validatePrivateKey(privateKey)
-    testnet = testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
+    testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
     const walletData = { address: null, publicKey: null, privateKey, protocol, testnet }
     switch (protocol) {
       case Protocol.BITCOIN:
@@ -222,7 +222,6 @@ class Controller extends Interface {
   async generateHathorWallet({ mnemonic, derivation, testnet }) {
     const { address, privateKey, publicKey, xpub } = await deriveHathorWalletFromDerivationPath(mnemonic, testnet, derivation)
     return new Wallet({
-      mnemonic,
       privateKey,
       publicKey,
       address,
@@ -235,7 +234,6 @@ class Controller extends Interface {
   async generateCardanoWallet({ mnemonic, derivation, testnet }) {
     const { address, privateKey, publicKey, xpub } = await deriveCardanoWalletFromDerivationPath(mnemonic, testnet, derivation)
     return new Wallet({
-      mnemonic,
       privateKey,
       publicKey,
       xpub,
