@@ -38,7 +38,7 @@ module.exports.buildStellarTrustlineTransaction = async function ({
         limit,
       })
     )
-    .setTimeout(300)
+    .setTimeout(100)
     .build()
 
   transaction.sign(StellarSdk.Keypair.fromSecret(fromPrivateKey))
@@ -72,15 +72,14 @@ module.exports.buildStellarTransferTransaction = async function ({
   createAccount = false,
   fee = null,
   memo = null,
-  testnet = true,
-  timeout = null
+  testnet = true
 }) {
   const account = new StellarSdk.Account(fromPublicKey, sequence)
   const builder = new StellarSdk.TransactionBuilder(account, {
     fee: fee ? fee : '100',
     memo: memo ? (memo.length > 28 ? StellarSdk.Memo.hash(memo) : StellarSdk.Memo.text(memo)) : null,
     networkPassphrase: testnet ? StellarSdk.Networks.TESTNET : StellarSdk.Networks.PUBLIC,
-  }).setTimeout(timeout || 180)
+  }).setTimeout(100)
 
   const transaction = createAccount
     ? builder

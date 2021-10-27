@@ -161,8 +161,7 @@ Create a transfer transaction in Stellar blockchain, you can transfer XLM or any
 * `opts.amount` (string)(__required__) - amount to be transferred.
 * `opts.destination` (string)(__required__) - destination address to be transfer to.
 * `opts.memo` (string) - message to be attached with this transaction, otherwise leave it undefined. This memo must be a string up to 28-bytes long or a 32-byte hash.
-* `opts.fee` (string) - optional fee in stroops (XLM).
-* `opts.timeout` (number) - optional timeout in seconds.
+* `opts.fee` (string) - optional fee in stroops.
 
 Examples:
 
@@ -206,7 +205,7 @@ Create a transfer transaction in XRP blockchain, you can transfer XRP or any oth
 * `opts.amount` (string)(__required__) - amount to be transferred.
 * `opts.destination` (string)(__required__) - destination address to be transfer to.
 * `opts.memo` (string) - optional message to be attached with this transaction, otherwise leave it undefined.
-* `opts.fee` (string) - optional fee in drops (XRP).
+* `opts.fee` (string) - optional fee in drops.
 
 Examples:
 ```js

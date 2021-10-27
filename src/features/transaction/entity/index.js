@@ -161,14 +161,12 @@ class StellarTransferTransactionInput extends TransferTransactionInput {
    * @param {string?} args.memo
    * @param {Fee?} args.fee fee in stroops
    * @param {boolean?} args.createAccount true if the destination account does not exist yet
-   * @param {number?} args.timeout timeout in seconds
    * @param {boolean?} args.testnet
    */
-  constructor({ assetSymbol, createAccount, timeout, issuer, ...args }) {
+  constructor({ assetSymbol, createAccount, issuer, ...args }) {
     super(args)
     this.assetSymbol = assetSymbol
     this.createAccount = createAccount
-    this.timeout = timeout
     this.issuer = issuer
   }
 }
