@@ -582,7 +582,7 @@ class Controller extends Interface {
    */
   async callSmartContractMethod(input) {
     validateSmartContractCallParams(input)
-    const { contractAddress, contractAbi, method, params, protocol } = input
+    const { from, contractAddress, contractAbi, method, params, protocol } = input
     try {
       const apiRequest = getApiMethod({
         requests,
@@ -592,7 +592,7 @@ class Controller extends Interface {
       const headers = mountHeaders(this.config.apiKey)
       const response = await apiRequest(
         requests.callSmartContractMethod.url,
-        { contractAddress, contractAbi, method, params },
+        { from, contractAddress, contractAbi, method, params },
         {
           headers,
           params: { protocol },

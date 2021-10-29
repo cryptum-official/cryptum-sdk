@@ -215,13 +215,15 @@ class SmartContractCallTransactionInput {
    * Creates an instance of SmartContractCallTransactionInput.
    *
    * @param {object} args
+   * @param {string?} args.from
    * @param {string} args.contractAddress
    * @param {Array<object>} args.contractAbi
    * @param {string} args.method
    * @param {Array} args.params
    * @param {string} args.protocol
    */
-  constructor({ contractAddress, contractAbi, method, params, protocol }) {
+  constructor({ from, contractAddress, contractAbi, method, params, protocol }) {
+    this.from = from
     this.contractAddress = contractAddress
     this.contractAbi = contractAbi
     this.method = method
