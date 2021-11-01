@@ -190,5 +190,14 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       })
       assert.strictEqual(walletAddress, '0xcf61eaf64d895c3c71a8812e9eedc4c179b4ed60')
     })
+    it('hathor', async () => {
+      const controller = new WalletController(config)
+      const walletAddress = await controller.generateWalletAddressFromXpub({
+        protocol: Protocol.HATHOR,
+        xpub: 'xpub6BvfktJnGiZJhbj8pwzKpsdKLmroLwJ3Fix1ZMm1rjMoGQgiP9dZekHP1qzZ4WLPGpsuJwEXSTCGdY3wqjuwCeSiF1DgLmQTtRmNVKscfcj',
+        address: 0
+      })
+      assert.strictEqual(walletAddress, 'WXpJQ1Y815pGQVC1MgD7DwJepokVnSmGD3')
+    })
   })
 })
