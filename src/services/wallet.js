@@ -47,6 +47,8 @@ const getHathorDerivationPath = ({ account = 0, address }) =>
   getDerivationPath({ purpose: 44, coin: 280, account, address })
 const getCardanoDerivationPath = ({ account = 0, address }) =>
   getDerivationPath({ purpose: 1852, coin: 1815, account, address })
+const getAvalancheDerivationPath = ({ account = 0, address }) =>
+  getDerivationPath({ purpose: 44, coin: 9000, account, address })
 
 /**
  * Get Bitcoin address from private key
@@ -313,29 +315,24 @@ module.exports.deriveCardanoWalletFromDerivationPath = async (mnemonic, testnet,
   const keyPair = getCardanoDerivationPath({ account: accountIndex })
     .split('/')
     .slice(1)
-    .map((index) => (index.slice(-1) === "'" ? HARDENED_INDEX + parseInt(index.slice(0, -1)) : parseInt(index)))
+    .map(index => index.slice(-1) === '\'' ? HARDENED_INDEX + parseInt(index.slice(0, -1)) : parseInt(index))
     .reduce((secret, index) => derivePrivate(secret, index, CARDANO_DERIVATION_MODE), walletSecret)
 
-  const privateKey = derivePrivate(
-    derivePrivate(keyPair, 0, CARDANO_DERIVATION_MODE),
-    addressIndex,
-    CARDANO_DERIVATION_MODE
-  ).toString('hex')
+  const privateKey = derivePrivate(derivePrivate(keyPair, 0, CARDANO_DERIVATION_MODE), addressIndex, CARDANO_DERIVATION_MODE).toString('hex')
   const spendXPubKey = derivePrivate(keyPair, addressIndex, CARDANO_DERIVATION_MODE).slice(64, 128).toString('hex')
-  const stakeXPubKey = derivePrivate(derivePrivate(keyPair, 2, CARDANO_DERIVATION_MODE), 0, CARDANO_DERIVATION_MODE)
-    .slice(64, 128)
-    .toString('hex')
+  const stakeXPubKey = derivePrivate(
+    derivePrivate(keyPair, 2, CARDANO_DERIVATION_MODE), 0, CARDANO_DERIVATION_MODE
+  ).slice(64, 128).toString('hex')
   const xpub = spendXPubKey + stakeXPubKey
   const newAddress = bech32.encode(
     testnet ? 'addr_test' : 'addr',
     packBaseAddress(
-      getPubKeyBlake2b224Hash(
-        Buffer.from(
-          derivePublic(Buffer.from(xpub.substr(0, 128), 'hex'), addressIndex, CARDANO_DERIVATION_MODE),
-          'hex'
-        ).slice(0, 32)
-      ),
-      getPubKeyBlake2b224Hash(Buffer.from(stakeXPubKey, 'hex').slice(0, 32)),
+      getPubKeyBlake2b224Hash(Buffer.from(
+        derivePublic(Buffer.from(xpub.substr(0, 128),
+          'hex'), addressIndex, CARDANO_DERIVATION_MODE), 'hex').slice(0, 32)),
+      getPubKeyBlake2b224Hash(Buffer.from(
+        stakeXPubKey,
+        'hex').slice(0, 32)),
       testnet ? 0 : 1
     )
   )
@@ -368,6 +365,48 @@ module.exports.deriveCardanoAddressFromXpub = async (xpub, testnet, { account = 
       testnet ? 0 : 1
     )
   )
-
   return newAddress
 }
+
+/**
+ * Get Avalanche address from private key
+ *
+ * @param {string} privateKey private key code58/hex string
+ * @returns {object} address
+ */
+
+module.exports.getAvalancheAddressFromPrivateKey = (privateKey) => {
+  const { address } = this.privateKeyToEthAccount(privateKey)
+  return address.toLowerCase()
+}
+
+/**
+ * Derive avalanche address, private key and public key
+ *
+ * @param {string} mnemonic mnemonic seed string
+ * @param {object?} derivationPath derivation path object
+ * @param {number} derivationPath.account derivation path account index
+ * @param {number} derivationPath.change derivation path change index
+ * @param {number} derivationPath.address derivation path address index
+ * @returns
+ */
+
+module.exports.deriveAvalancheWalletFromDerivationPath = async (mnemonic, { account = 0, change = 0, address } = {}) => {
+  const accountIndex = account !== undefined ? account : 0
+  const changeIndex = change !== undefined ? change : 0
+  const addressIndex = address !== undefined ? address : 0
+  const derivedPath = hdkey
+    .fromMasterSeed(await mnemonicToSeed(mnemonic))
+    .derivePath(getAvalancheDerivationPath({ account: accountIndex, change: changeIndex }))
+  const xpub = derivedPath.publicExtendedKey().toString('hex')
+  const wallet = derivedPath.deriveChild(addressIndex).getWallet()
+  return {
+    address: wallet.getAddressString().toLocaleLowerCase(),
+    privateKey: wallet.getPrivateKeyString(),
+    publicKey: wallet.getPublicKeyString(),
+    xpub
+  }
+}
+module.exports.deriveAvalancheAddressFromXpub = async (xpub, { address = 0 } = {}) =>
+  this.deriveEthereumAddressFromXpub(xpub, { address })
+
