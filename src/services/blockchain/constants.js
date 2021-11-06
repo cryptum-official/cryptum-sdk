@@ -12,7 +12,7 @@ const Protocol = {
   RIPPLE: 'RIPPLE',
   HATHOR: 'HATHOR',
   CARDANO: 'CARDANO',
-  AVALANCHE: 'AVALANCHE'
+  AVAXCCHAIN: 'AVAXCCHAIN'
 }
 module.exports.Protocol = Protocol
 

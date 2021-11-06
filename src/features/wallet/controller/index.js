@@ -75,7 +75,7 @@ class Controller extends Interface {
         return await this.generateHathorWallet({ mnemonic, derivation, testnet })
       case Protocol.CARDANO:
         return await this.generateCardanoWallet({ mnemonic, derivation, testnet })
-      case Protocol.AVALANCHE:
+      case Protocol.AVAXCCHAIN:
         return await this.generateAvalancheWallet({ mnemonic, derivation, testnet })
       default:
         throw new Error('Unsupported blockchain protocol')
@@ -116,7 +116,7 @@ class Controller extends Interface {
       case Protocol.HATHOR:
         walletData.address = getHathorAddressFromPrivateKey(privateKey, testnet)
         break
-      case Protocol.AVALANCHE:
+      case Protocol.AVAXCCHAIN:
         walletData.address = getAvalancheAddressFromPrivateKey(privateKey)
         break
       default:
@@ -154,7 +154,7 @@ class Controller extends Interface {
       case Protocol.CARDANO:
         walletAddress = deriveCardanoAddressFromXpub(xpub, testnet, { address })
         break
-      case Protocol.AVALANCHE:
+      case Protocol.AVAXCCHAIN:
         walletAddress = deriveAvalancheAddressFromXpub(xpub, { address })
         break
       default:
@@ -262,7 +262,7 @@ class Controller extends Interface {
       xpub,
       address,
       testnet,
-      protocol: Protocol.AVALANCHE,
+      protocol: Protocol.AVAXCCHAIN,
     })
   }
 
