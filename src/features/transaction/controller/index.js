@@ -943,9 +943,9 @@ class Controller extends Interface {
       let { wallet, outputs } = input
       const protocol = Protocol.CARDANO
       const keyAddressMapper = {}
-      keyAddressMapper[wallet.address] = { secretKey: wallet.privateKey.slice(0, 128), publicKey: wallet.privateKey.slice(128, 192) }
+      keyAddressMapper[wallet.address] = { secretKey: wallet.privateKey.spendingPrivateKey.slice(0, 128), publicKey: wallet.privateKey.spendingPrivateKey.slice(128, 192) }
 
-      const privateKey = CardanoWasm.Bip32PrivateKey.from_128_xprv(new Uint8Array(wallet.privateKey.match(/.{1,2}/g).map(byte => parseInt(byte, 16))))
+      const privateKey = CardanoWasm.Bip32PrivateKey.from_128_xprv(new Uint8Array(wallet.privateKey.spendingPrivateKey.match(/.{1,2}/g).map(byte => parseInt(byte, 16))))
       const headers = mountHeaders(this.config.apiKey)
       const utxoApiRequest = getApiMethod({
         requests,

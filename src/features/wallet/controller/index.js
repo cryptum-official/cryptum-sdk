@@ -24,9 +24,10 @@ const {
   deriveHathorAddressFromXpub,
   deriveCardanoWalletFromDerivationPath,
   deriveCardanoAddressFromXpub,
+  getCardanoAddressFromPrivateKey,
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
-const { validateWalletInfo, validatePrivateKey } = require('../../../services/validations')
+const { validateWalletInfo, validatePrivateKey, validateCardanoPrivateKey } = require('../../../services/validations')
 
 class Controller extends Interface {
   /**
@@ -86,7 +87,11 @@ class Controller extends Interface {
    * @returns {Promise<Wallet>}
    */
   async generateWalletFromPrivateKey({ privateKey, protocol, testnet }) {
-    validatePrivateKey(privateKey)
+    if (protocol === Protocol.CARDANO) {
+      validateCardanoPrivateKey(privateKey)
+    } else {
+      validatePrivateKey(privateKey)
+    }
     testnet = testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
     const walletData = { address: null, publicKey: null, privateKey, protocol, testnet }
     switch (protocol) {
@@ -110,6 +115,9 @@ class Controller extends Interface {
         break
       case Protocol.HATHOR:
         walletData.address = getHathorAddressFromPrivateKey(privateKey, testnet)
+        break
+      case Protocol.CARDANO:
+        walletData.address = getCardanoAddressFromPrivateKey(privateKey, testnet)
         break
       default:
         throw new Error('Unsupported blockchain protocol')

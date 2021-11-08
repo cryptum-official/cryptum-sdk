@@ -13,6 +13,16 @@ module.exports.validatePrivateKey = (privateKey) => {
   }
 }
 
+module.exports.validateCardanoPrivateKey = (privateKey) => {
+  if (!privateKey
+    || !privateKey.spendingPrivateKey
+    || !privateKey.stakingPrivateKey
+    || typeof privateKey.spendingPrivateKey !== 'string'
+    || typeof privateKey.stakingPrivateKey !== 'string') {
+    throw new GenericException('Invalid private key object', 'InvalidTypeException')
+  }
+}
+
 module.exports.validateMnemonic = (mnemonic) => {
   if (mnemonic && typeof mnemonic !== 'string') {
     throw new InvalidTypeException('mnemonic', 'string')

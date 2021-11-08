@@ -73,6 +73,17 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       })
       assert.strictEqual(wallet.address, 'WXK74dFXd6Ctj6EUBH3ctpWwoVR2TnHCjV')
     })
+    it('cardano', async () => {
+      const controller = new WalletController(config)
+      const wallet = await controller.generateWalletFromPrivateKey({
+        protocol: Protocol.CARDANO,
+        privateKey: {
+          spendingPrivateKey: 'b0d7795a5eee850fec4d5fee4d38416f6754b83f3a63072ea4e4989bfcef4d40ae984afa5cc9b2d565110ebfa28a046ea93f817813c114c6b0cfdbcd7c2377327249dc8f22284234187be43b57e07a49329ebf9f812d7705cbc48ac9118a8822e3208ddf3830771b0944376d320c5c534d5bae7dbb04000802ae6d72e8f040ec',
+          stakingPrivateKey: 'a8e753c5ea97a138f8b11441b6c862793bafb243ffd4a9ba755919e800f04d4056bb70e6784a3c092b5b4c8f7151231f3afe96444b489b16ef1d22c8f0cd0c5e942ed15b06ff59b34dca14aa5eaf37d39d226e4b3d6d38c5997f100d427180d6fb7c81b78a547c0a94b0398f3490c6befc35c818e487eddf9dd9c9b940b64b1d'
+        }
+      })
+      assert.strictEqual(wallet.address, 'addr_test1qq7xrd2acryragknqwnsgqaam9hxq2scfcuhjuu3p6kmepgxr2xgy4urjt8p0gf0x6ykqag4km2dzrz870n7j4ydjszqj93ujx')
+    })
   })
 
   describe('From same mnemonic', () => {
@@ -160,6 +171,18 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         'WXpJQ1Y815pGQVC1MgD7DwJepokVnSmGD3'
       )
     })
+    it('generate cardano wallet', async () => {
+      const controller = new WalletController(config)
+      const wallet = await controller.generateWallet({
+        protocol: Protocol.CARDANO,
+        mnemonic,
+      })
+      assert.strictEqual(wallet.protocol, Protocol.CARDANO)
+      assert.strictEqual(
+        wallet.address,
+        'addr_test1qq7xrd2acryragknqwnsgqaam9hxq2scfcuhjuu3p6kmepgxr2xgy4urjt8p0gf0x6ykqag4km2dzrz870n7j4ydjszqj93ujx'
+      )
+    })
   })
 
   describe('Generate wallet address from xpub', () => {
@@ -189,6 +212,15 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         address: 0
       })
       assert.strictEqual(walletAddress, '0xcf61eaf64d895c3c71a8812e9eedc4c179b4ed60')
+    })
+    it('cardano', async () => {
+      const controller = new WalletController(config)
+      const walletAddress = await controller.generateWalletAddressFromXpub({
+        protocol: Protocol.CARDANO,
+        xpub: '7249dc8f22284234187be43b57e07a49329ebf9f812d7705cbc48ac9118a8822942ed15b06ff59b34dca14aa5eaf37d39d226e4b3d6d38c5997f100d427180d6',
+        address: 0
+      })
+      assert.strictEqual(walletAddress, 'addr_test1qq7xrd2acryragknqwnsgqaam9hxq2scfcuhjuu3p6kmepgxr2xgy4urjt8p0gf0x6ykqag4km2dzrz870n7j4ydjszqj93ujx')
     })
   })
 })

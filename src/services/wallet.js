@@ -7,14 +7,8 @@ const rippleKeyPairs = require('ripple-keypairs')
 const { Keypair } = require('stellar-sdk')
 const hathorSdk = require('@hathor/wallet-lib')
 const bitcore = require('bitcore-lib')
-const {
-  bech32,
-  derivePrivate,
-  derivePublic,
-  getPubKeyBlake2b224Hash,
-  mnemonicToRootKeypair,
-  packBaseAddress,
-} = require('cardano-crypto.js')
+const CardanoWasm = require("@emurgo/cardano-serialization-lib-nodejs");
+const Bip39 = require("bip39");
 
 const DERIVATION_PATH_TEMPLATE = "m/{purpose}'/{coin}'/{account}'/{change}/{address}"
 
@@ -306,65 +300,95 @@ module.exports.deriveHathorAddressFromXpub = (xpub, testnet, { address = 0 } = {
  * * @param {object} derivation derivation object
  * @returns
  */
-module.exports.deriveCardanoWalletFromDerivationPath = async (mnemonic, testnet, { account = 0, address } = {}) => {
-  const accountIndex = account !== undefined ? account : 0
-  const addressIndex = address !== undefined ? address : 0
-  const CARDANO_DERIVATION_MODE = 2
-  const HARDENED_INDEX = 0x80000000
-  const walletSecret = await mnemonicToRootKeypair(mnemonic, CARDANO_DERIVATION_MODE)
-  const keyPair = getCardanoDerivationPath({ account: accountIndex })
-    .split('/')
-    .slice(1)
-    .map(index => index.slice(-1) === '\'' ? HARDENED_INDEX + parseInt(index.slice(0, -1)) : parseInt(index))
-    .reduce((secret, index) => derivePrivate(secret, index, CARDANO_DERIVATION_MODE), walletSecret)
+module.exports.deriveCardanoWalletFromDerivationPath = async (mnemonic, testnet, { account = 0, address = 0 } = {}) => {
+  function harden(num) {
+    return 0x80000000 + num;
+  }
 
-  const privateKey = derivePrivate(derivePrivate(keyPair, 0, CARDANO_DERIVATION_MODE), addressIndex, CARDANO_DERIVATION_MODE).toString('hex')
-  const spendXPubKey = derivePrivate(keyPair, addressIndex, CARDANO_DERIVATION_MODE).slice(64, 128).toString('hex')
-  const stakeXPubKey = derivePrivate(
-    derivePrivate(keyPair, 2, CARDANO_DERIVATION_MODE), 0, CARDANO_DERIVATION_MODE
-  ).slice(64, 128).toString('hex')
-  const xpub = spendXPubKey + stakeXPubKey
-  const newAddress = bech32.encode(
-    testnet ? 'addr_test' : 'addr',
-    packBaseAddress(
-      getPubKeyBlake2b224Hash(Buffer.from(
-        derivePublic(Buffer.from(xpub.substr(0, 128),
-          'hex'), addressIndex, CARDANO_DERIVATION_MODE), 'hex').slice(0, 32)),
-      getPubKeyBlake2b224Hash(Buffer.from(
-        stakeXPubKey,
-        'hex').slice(0, 32)),
-      testnet ? 0 : 1
-    )
+  const entropy = Bip39.mnemonicToEntropy(mnemonic);
+  const accountKey = CardanoWasm.Bip32PrivateKey.from_bip39_entropy(
+    Buffer.from(entropy, "hex"),
+    Buffer.from("")
   )
+    .derive(harden(1852))
+    .derive(harden(1815))
+    .derive(harden(account));
 
-  return { address: newAddress, publicKey: spendXPubKey, xpub, privateKey: privateKey }
+  const privateKey = accountKey
+    .derive(0)
+    .derive(address);
+
+  const stakingKey = accountKey
+    .derive(2)
+    .derive(address)
+
+  const utxoPubKey = privateKey
+    .to_public();
+
+  const stakingPubKey = stakingKey
+    .to_public();
+
+  const pubKeyAsHex = Buffer.from(utxoPubKey.to_raw_key().as_bytes()).toString("hex");
+  const stakePubKeyAsHex = Buffer.from(stakingPubKey.to_raw_key().as_bytes()).toString("hex");
+
+  const baseAddr = CardanoWasm.BaseAddress.new(
+    testnet ? 0 : 1,
+    CardanoWasm.StakeCredential.from_keyhash(utxoPubKey.to_raw_key().hash()),
+    CardanoWasm.StakeCredential.from_keyhash(stakingPubKey.to_raw_key().hash()),
+  ).to_address().to_bech32()
+
+  return {
+    address: baseAddr, xpub: pubKeyAsHex + stakePubKeyAsHex,
+    publicKey: {
+      spendingPublicKey: pubKeyAsHex,
+      stakingPublicKey: stakePubKeyAsHex,
+    },
+    privateKey: {
+      spendingPrivateKey: Buffer.from(privateKey.to_128_xprv()).toString('hex'),
+      stakingPrivateKey: Buffer.from(stakingKey.to_128_xprv()).toString('hex')
+    }
+  }
 }
 
 /**
- * Derive bitcoin addresses from extended public key (xpub)
+ * Derive cardano addresses from extended public key (xpub)
  *
  * @param {string} xpub extended public key string
  * @param {boolean} testnet true or false for testnet
  * * @param {object} derivation derivation object
  * @returns
  */
-module.exports.deriveCardanoAddressFromXpub = async (xpub, testnet, { account = 0, address } = {}) => {
-  const addressIndex = address !== undefined ? address : 0
-  const CARDANO_DERIVATION_MODE = 2
+module.exports.deriveCardanoAddressFromXpub = async (xpub, testnet) => {
+  let utxo = new Uint8Array(xpub.substr(0, 64).match(/.{1,2}/g).map(byte => parseInt(byte, 16)))
+  let stake = new Uint8Array(xpub.substr(64, 64).match(/.{1,2}/g).map(byte => parseInt(byte, 16)))
+  utxo = CardanoWasm.PublicKey.from_bytes(utxo)
+  stake = CardanoWasm.PublicKey.from_bytes(stake)
 
-  const newAddress = bech32.encode(
-    testnet ? 'addr_test' : 'addr',
-    packBaseAddress(
-      getPubKeyBlake2b224Hash(Buffer.from(
-        derivePublic(Buffer.from(
-          xpub.substr(0, 128),
-          'hex'), addressIndex, CARDANO_DERIVATION_MODE), 'hex').slice(0, 32)),
-      getPubKeyBlake2b224Hash(Buffer.from(
-        xpub.substr(128, 128),
-        'hex').slice(0, 32)),
-      testnet ? 0 : 1
-    )
-  )
+  const baseAddr = CardanoWasm.BaseAddress.new(
+    testnet ? 0 : 1,
+    CardanoWasm.StakeCredential.from_keyhash(utxo.hash()),
+    CardanoWasm.StakeCredential.from_keyhash(stake.hash()),
+  ).to_address().to_bech32()
 
-  return newAddress
+  return baseAddr
+}
+
+module.exports.getCardanoAddressFromPrivateKey = (privateKey, testnet = true) => {
+
+  let spendingPrivateKey = new Uint8Array(privateKey.spendingPrivateKey.match(/.{1,2}/g).map(byte => parseInt(byte, 16)))
+  let stakingPrivateKey = new Uint8Array(privateKey.stakingPrivateKey.match(/.{1,2}/g).map(byte => parseInt(byte, 16)))
+
+  const spendingPublicKey = CardanoWasm.Bip32PrivateKey.from_128_xprv(spendingPrivateKey)
+    .to_public();
+
+  const stakingPubKey = CardanoWasm.Bip32PrivateKey.from_128_xprv(stakingPrivateKey)
+    .to_public();
+
+  const baseAddr = CardanoWasm.BaseAddress.new(
+    testnet ? 0 : 1,
+    CardanoWasm.StakeCredential.from_keyhash(spendingPublicKey.to_raw_key().hash()),
+    CardanoWasm.StakeCredential.from_keyhash(stakingPubKey.to_raw_key().hash()),
+  ).to_address().to_bech32()
+
+  return baseAddr
 }
