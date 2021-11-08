@@ -10,6 +10,7 @@ const {
   getCeloAddressFromPrivateKey,
   getStellarPublicKeyFromPrivateKey,
   getRippleAddressFromPrivateKey,
+  getAvalancheAddressFromPrivateKey,
   deriveBitcoinWalletFromDerivationPath,
   deriveCeloWalletFromDerivationPath,
   deriveStellarWalletFromDerivationPath,
@@ -24,6 +25,8 @@ const {
   deriveHathorAddressFromXpub,
   deriveCardanoWalletFromDerivationPath,
   deriveCardanoAddressFromXpub,
+  deriveAvalancheWalletFromDerivationPath,
+  deriveAvalancheAddressFromXpub
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
 const { validateWalletInfo, validatePrivateKey } = require('../../../services/validations')
@@ -72,6 +75,8 @@ class Controller extends Interface {
         return await this.generateHathorWallet({ mnemonic, derivation, testnet })
       case Protocol.CARDANO:
         return await this.generateCardanoWallet({ mnemonic, derivation, testnet })
+      case Protocol.AVAXCCHAIN:
+        return await this.generateAvalancheWallet({ mnemonic, derivation, testnet })
       default:
         throw new Error('Unsupported blockchain protocol')
     }
@@ -111,6 +116,9 @@ class Controller extends Interface {
       case Protocol.HATHOR:
         walletData.address = getHathorAddressFromPrivateKey(privateKey, testnet)
         break
+      case Protocol.AVAXCCHAIN:
+        walletData.address = getAvalancheAddressFromPrivateKey(privateKey)
+        break
       default:
         throw new Error('Unsupported blockchain protocol')
     }
@@ -145,6 +153,9 @@ class Controller extends Interface {
         break
       case Protocol.CARDANO:
         walletAddress = deriveCardanoAddressFromXpub(xpub, testnet, { address })
+        break
+      case Protocol.AVAXCCHAIN:
+        walletAddress = deriveAvalancheAddressFromXpub(xpub, { address })
         break
       default:
         throw new Error('Unsupported blockchain protocol')
@@ -240,6 +251,18 @@ class Controller extends Interface {
       address,
       testnet,
       protocol: Protocol.CARDANO,
+    })
+  }
+
+  async generateAvalancheWallet({ mnemonic, derivation, testnet }) {
+    const { address, privateKey, publicKey, xpub } = await deriveAvalancheWalletFromDerivationPath(mnemonic, derivation)
+    return new Wallet({
+      privateKey,
+      publicKey,
+      xpub,
+      address,
+      testnet,
+      protocol: Protocol.AVAXCCHAIN,
     })
   }
 
