@@ -10,7 +10,9 @@ class Prices {
     XRP,
     CELO,
     BTC,
-    HTR
+    HTR,
+    ADA,
+    AVAX,
   }) {
     this.BRL = BRL;
     this.USD = USD;
@@ -24,6 +26,8 @@ class Prices {
     this.BTC = BTC;
     this.MDA = MDA;
     this.HTR = HTR;
+    this.ADA = ADA;
+    this.AVAX = AVAX;
   }
 }
 

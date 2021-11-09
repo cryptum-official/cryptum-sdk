@@ -19,7 +19,7 @@ console.log(mnemonic)
 #### `walletController.generateWallet(opts)`
 
 Generate a wallet for a blockchain protocol:
-* `opts.protocol` (string) (__required__) - blockchain protocol supported: `BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `STELLAR`, `RIPPLE`, `HATHOR`.
+* `opts.protocol` (string) (__required__) - blockchain protocol supported: `BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `STELLAR`, `RIPPLE`, `HATHOR`, `CARDANO`, `AVAXCCHAIN`.
 * `opts.mnemonic` (string) (__optional__) - mnemonic string to generate private and public keys.
 * `opts.derivation` (object) (__optional__) - derivation object (BIP44 derivation path).
 * `opts.derivation.account` (number) (__optional__) - derivation account index.
@@ -49,7 +49,7 @@ console.log(wallet)
 #### `walletController.generateWalletFromPrivateKey(opts)`
 
 Generate a wallet for a blockchain protocol:
-* `opts.protocol` (string) (__required__) - blockchain protocol supported: `BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `STELLAR`, `RIPPLE`, `HATHOR`.
+* `opts.protocol` (string) (__required__) - blockchain protocol supported: `BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `STELLAR`, `RIPPLE`, `HATHOR`, `CARDANO`, `AVAXCCHAIN`.
 * `opts.privateKey` (string) (__required__) - private key string.
 
 Example:
@@ -64,7 +64,7 @@ const wallet = await walletController.generateWalletFromPrivateKey({
 #### `walletController.generateWalletAddressFromXpub(opts)`
 
 Generate a wallet address from xpub for a blockchain protocol:
-* `opts.protocol` (string) (__required__) - blockchain protocol supported: `BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `HATHOR`.
+* `opts.protocol` (string) (__required__) - blockchain protocol supported: `BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `HATHOR`, `CARDANO`,`AVAXCCHAIN`.
 * `opts.xpub` (string) (__required__) - xpub string.
 * `opts.address` (number) (__required__) - address index.
 

@@ -13,5 +13,7 @@ module.exports = {
     CELO: faker.datatype.number(),
     BTC: faker.datatype.number(),
     HTR: faker.datatype.number(),
+    ADA: faker.datatype.number(),
+    AVAX: faker.datatype.number(),
   }
 };

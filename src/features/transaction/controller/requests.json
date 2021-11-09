@@ -22,5 +22,21 @@
   "getBlock": {
     "method": "GET",
     "url": "/block"
+  },
+  "preprocess": {
+    "method": "POST",
+    "url": "/transaction/preprocess"
+  },
+  "getMetadata": {
+    "method": "POST",
+    "url": "/transaction/metadata"
+  },
+  "getPayload": {
+    "method": "POST",
+    "url": "/transaction/payload"
+  },
+  "combineSignatures": {
+    "method": "POST",
+    "url": "/transaction/combine"
   }
 }

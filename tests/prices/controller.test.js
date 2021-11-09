@@ -16,7 +16,7 @@ describe.only('Prices Controller Tests', () => {
 
   describe('getPrices()', () => {
     describe('when input is valid', () => {
-      it('returns prices from the asset given', async () => {
+      it('returns prices from the given asset', async () => {
         const asset = faker.finance.currencySymbol()
 
         nock(baseUrl).get(`/prices/${asset}`).reply(200, pricesMock)

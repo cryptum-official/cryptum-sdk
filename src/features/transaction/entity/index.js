@@ -332,6 +332,23 @@ class HathorTransferTransactionInput extends TransferTransactionInput {
     this.inputs = inputs
   }
 }
+class CardanoTransferTransactionInput extends TransferTransactionInput {
+  /**
+   * Creates an instance of CardanoTransferTransactionInput.
+   *
+   * @param {object} args
+   * @param {import('../../wallet/entity').Wallet?} args.wallet wallet to transfer from
+   * @param {Array<Input>?} args.inputs inputs to transfer from
+   * @param {Array<Output>} args.outputs outputs to transfer to
+   * @param {Array<Output>} args.tokens outputs to transfer to
+   * @param {boolean} args.testnet
+   */
+  constructor({ outputs, inputs, ...args }) {
+    super(args)
+    this.outputs = outputs
+    this.inputs = inputs
+  }
+}
 /**
  * @typedef {Object} HathorTokenTransactionFromWalletInput
  * @property {TransactionType} type token transaction type
@@ -380,4 +397,5 @@ module.exports = {
   SmartContractDeployTransactionInput,
   TokenDeployTransactionInput,
   HathorTransferTransactionInput,
+  CardanoTransferTransactionInput,
 }

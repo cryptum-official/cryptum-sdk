@@ -12,6 +12,7 @@ const wallets = {
   celo: null,
   bitcoin: null,
   hathor: null,
+  cardano: null,
   avaxcchain: null
 }
 exports.mnemonic = mnemonic
@@ -48,6 +49,10 @@ exports.getWallets = async () => {
   })
   wallets.hathor = await controller.generateWallet({
     protocol: Protocol.HATHOR,
+    mnemonic,
+  })
+  wallets.cardano = await controller.generateWallet({
+    protocol: Protocol.CARDANO,
     mnemonic,
   })
   wallets.avaxcchain = await controller.generateWallet({

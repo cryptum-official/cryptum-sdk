@@ -6,6 +6,7 @@
 - [Stellar](#stellar)
 - [Ripple](#ripple)
 - [Hathor](#hathor)
+- [Cardano](#cardano)
 - [Send transactions to blockchain](#send-transactions-to-blockchain)
 
 First create an instance of transaction controller to call all methods below.
@@ -281,9 +282,68 @@ const transaction = await txController.createHathorTransferTransactionFromUTXO({
 })
 ```
 
+## Cardano
+
+#### `txController.createCardanoTransferTransactionFromWallet(opts)`
+
+Create a transfer transaction for the Cardano blockchain, you can transfer ADA or any other native tokens.
+
+* `opts.wallet` (Wallet) - wallet to sign the transaction with.
+* `opts.outputs` (array of Output)(__required__) - outputs to transfer to.
+  * `opts.outputs[].address` (string) - address to transfer to.
+  * `opts.outputs[].amount` (string) - amount of ADA to transfer.
+  * `opts.outputs[].token` (object) - optional token information (for token transactions only).
+    *`opts.outputs[].token.policy` (string) - PolicyID of the token you want to send.
+    *`opts.outputs[].token.asset` (string) - Asset name (in hex) of the token you want to send.
+    *`opts.outputs[].token.amount` (string) - Amount of tokens you want to send.
+
+```js
+// transfer ADA and tokens from one wallet to multiple output addresses
+const transaction = await sdk.getTransactionController().createCardanoTransferTransactionFromWallet({
+    wallet: walletOne,
+    outputs: [
+      { address: "address1", amount: "1" },
+      { address: "address2", amount: "2", token: { asset: '546...a3e', policy: 'f3eb9...5f4a1', amount: '1' } },
+      { address: "address3", amount: "1.5", token: { asset: 'a9e...698', policy: 'c43a...1743f', amount: '10' } },      
+    ]
+  })
+```
+#### `txController.createCardanoTransferTransactionFromUTXO(opts)`
+
+* `opts.inputs` (array of Input) - array of inputs to be used in the transaction.
+  * `opts.inputs[].txHash` (string) - transaction hash of the UTXO.
+  * `opts.inputs[].index` (number) - index of the UTXO output.
+  * `opts.inputs[].privateKey` (string) -  spending private key to sign the transaction with.
+* `opts.outputs` (array of Output)(__required__) - outputs to transfer to.
+  * `opts.outputs[].address` (string) - address to transfer to.
+  * `opts.outputs[].amount` (string) - amount of ADA to transfer.
+  * `opts.outputs[].token` (object) - optional token information (for token transactions only).
+    *`opts.outputs[].token.policy` (string) - PolicyID of the token you want to send.
+    *`opts.outputs[].token.asset` (string) - Asset name (in hex) of the token you want to send.
+    *`opts.outputs[].token.amount` (string) - Amount of tokens you want to send.
+
+```js
+// transfer ADA and tokens from 1 input to 3 output addresses
+const transaction = await txController.createCardanoTransferTransactionFromUTXO({
+  inputs: [
+    {
+      txHash: 'bcc91e0...aec1f28066821',
+      index: 0,
+      privateKey: '9c34271d8...636667e265d0a'
+    }
+  ],
+  outputs: [
+      { address: "address1", amount: "1" },
+      { address: "address2", amount: "2", token: { asset: '546...a3e', policy: 'f3eb9...5f4a1', amount: '1' } },
+      { address: "address3", amount: "1.5", token: { asset: 'a9e...698', policy: 'c43a...1743f', amount: '10' } },      
+    ]
+})
+```
+
+
 ## Send transactions to blockchain
 
-After creating a transaction, use this method to broadcast the transaction.
+After creating a transaction, use this method to broadcast the transaction to the blockchain.
 
 ```js
 const { hash } = await txController.sendTransaction(transaction)

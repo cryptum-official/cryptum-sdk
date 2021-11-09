@@ -32,8 +32,8 @@ const handleRequestError = (error) => {
   if (error) {
     if (error.response) {
       const message =
-        (error.response.data.error && error.response.data.error.message) || 'Service unavailable at the moment'
-      const code = (error.response.data.error && error.response.data.error.code) || 'InternalError'
+        (error.response.data.error && error.response.data.error.message) || (error.response.data.message) || 'Service unavailable at the moment'
+      const code = (error.response.data.error && error.response.data.error.code) || (error.response.data.code) || 'InternalError'
       throw new GenericException(message, code)
     }
   }

@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@celo-tools/celo-ethers-wrapper": "^0.0.5",
+    "@emurgo/cardano-serialization-lib-nodejs": "^9.1.0",
     "@ethereumjs/tx": "^3.2.1",
     "@hathor/wallet-lib": "^0.22.0",
     "axios": "^0.21.1",
@@ -23,7 +24,6 @@
     "bip39": "^3.0.4",
     "bitcoinjs-lib": "^5.2.0",
     "bitcore-lib": "^8.25.10",
-    "cardano-crypto.js": "^6.0.0",
     "ethereumjs-wallet": "^1.0.1",
     "ethers": "^5.5.1",
     "hdkey": "^2.0.1",
