@@ -6,6 +6,7 @@
 - [Stellar](#stellar)
 - [Ripple](#ripple)
 - [Hathor](#hathor)
+- [Cardano](#cardano)
 - [Send transactions to blockchain](#send-transactions-to-blockchain)
 
 First create an instance of transaction controller to call all methods below.
@@ -313,10 +314,13 @@ const transaction = await sdk.getTransactionController().createCardanoTransferTr
   * `opts.inputs[].txHash` (string) - transaction hash of the UTXO.
   * `opts.inputs[].index` (number) - index of the UTXO output.
   * `opts.inputs[].privateKey` (string) -  spending private key to sign the transaction with.
-* `opts.outputs[].token` (object) - optional token information (for token transactions only).
-  *`opts.outputs[].token.policy` (string) - PolicyID of the token you want to send.
-  *`opts.outputs[].token.asset` (string) - Asset name (in hex) of the token you want to send.
-  *`opts.outputs[].token.amount` (string) - Amount of tokens you want to send.
+* `opts.outputs` (array of Output)(__required__) - outputs to transfer to.
+  * `opts.outputs[].address` (string) - address to transfer to.
+  * `opts.outputs[].amount` (string) - amount of ADA to transfer.
+  * `opts.outputs[].token` (object) - optional token information (for token transactions only).
+    *`opts.outputs[].token.policy` (string) - PolicyID of the token you want to send.
+    *`opts.outputs[].token.asset` (string) - Asset name (in hex) of the token you want to send.
+    *`opts.outputs[].token.amount` (string) - Amount of tokens you want to send.
 
 ```js
 // transfer ADA and tokens from 1 input to 3 output addresses
