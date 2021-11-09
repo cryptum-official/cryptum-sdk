@@ -1,7 +1,13 @@
 const { handleRequestError, getApiMethod, mountHeaders } = require('../../../services')
 const requests = require('./requests.json')
 const Interface = require('./interface')
-const { Protocol, TRANSFER_METHOD_ABI, TRANSFER_COMMENT_METHOD_ABI } = require('../../../services/blockchain/constants')
+const {
+  Protocol,
+  TRANSFER_METHOD_ABI,
+  TRANSFER_COMMENT_METHOD_ABI,
+  CUSD_CONTRACT_ADDRESS,
+  CEUR_CONTRACT_ADDRESS,
+} = require('../../../services/blockchain/constants')
 const { getTokenAddress, toWei, toHTRUnit } = require('../../../services/blockchain/utils')
 
 const {
@@ -56,7 +62,7 @@ const {
 
 const { buildHathorTransferTransaction, buildHathorTokenTransaction } = require('../../../services/blockchain/hathor')
 const { buildOperation, buildOperationFromInputs } = require('../../../services/blockchain/cardano')
-const CardanoWasm = require("@emurgo/cardano-serialization-lib-nodejs");
+const CardanoWasm = require('@emurgo/cardano-serialization-lib-nodejs')
 
 class Controller extends Interface {
   /**
@@ -373,6 +379,7 @@ class Controller extends Interface {
   async createCeloTransferTransaction(input) {
     validateCeloTransferTransactionParams(input)
     let { wallet, tokenSymbol, amount, destination, memo, fee, testnet, contractAddress, feeCurrency } = input
+    testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
     const protocol = Protocol.CELO
     let type, method, params, value, contractAbi
     const amountWei = toWei(amount).toString()
@@ -393,6 +400,15 @@ class Controller extends Interface {
         contractAddress = getTokenAddress(Protocol.CELO, tokenSymbol, testnet)
       }
     }
+    if (feeCurrency) {
+      const network = testnet ? 'testnet' : 'mainnet'
+      feeCurrency =
+        feeCurrency === 'cUSD'
+          ? CUSD_CONTRACT_ADDRESS[network]
+          : feeCurrency === 'cEUR'
+          ? CEUR_CONTRACT_ADDRESS[network]
+          : feeCurrency
+    }
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
       type,
@@ -404,6 +420,7 @@ class Controller extends Interface {
       params,
       testnet,
       fee,
+      feeCurrency,
       protocol,
     })
     const signedTx = await buildCeloTransferTransaction({
@@ -414,7 +431,7 @@ class Controller extends Interface {
       memo,
       fee: networkFee,
       nonce: info.nonce,
-      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
+      testnet,
       contractAddress,
       feeCurrency,
     })
@@ -518,7 +535,7 @@ class Controller extends Interface {
     }
     let networkFee = fee
     if (!networkFee) {
-      ; ({ estimateValue: networkFee } = await this.getFee({
+      ;({ estimateValue: networkFee } = await this.getFee({
         type: TransactionType.TRANSFER,
         protocol,
       }))
@@ -616,6 +633,7 @@ class Controller extends Interface {
     method,
     params,
     fee,
+    feeCurrency,
     protocol,
     contractName,
     source,
@@ -639,6 +657,7 @@ class Controller extends Interface {
         contractName,
         source,
         tokenType,
+        feeCurrency,
       }),
     ])
     if (fee && fee.gas) networkFee.gas = fee && fee.gas
@@ -937,28 +956,32 @@ class Controller extends Interface {
   }
 
   /**
-     * Create transfer tokens transaction in Cardano blockchain
-     * @param {import('../entity').CardanoTransferTransactionInput} input
-     * @returns {Promise<SignedTransaction>}
-     */
+   * Create transfer tokens transaction in Cardano blockchain
+   * @param {import('../entity').CardanoTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>}
+   */
   async createCardanoTransferTransactionFromWallet(input) {
     try {
       let { wallet, outputs } = input
       const protocol = Protocol.CARDANO
       const keyAddressMapper = {}
-      keyAddressMapper[wallet.address] = { secretKey: wallet.privateKey.spendingPrivateKey.slice(0, 128), publicKey: wallet.privateKey.spendingPrivateKey.slice(128, 192) }
+      keyAddressMapper[wallet.address] = {
+        secretKey: wallet.privateKey.spendingPrivateKey.slice(0, 128),
+        publicKey: wallet.privateKey.spendingPrivateKey.slice(128, 192),
+      }
 
-      const privateKey = CardanoWasm.Bip32PrivateKey.from_128_xprv(new Uint8Array(wallet.privateKey.spendingPrivateKey.match(/.{1,2}/g).map(byte => parseInt(byte, 16))))
+      const privateKey = CardanoWasm.Bip32PrivateKey.from_128_xprv(
+        new Uint8Array(wallet.privateKey.spendingPrivateKey.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)))
+      )
       const headers = mountHeaders(this.config.apiKey)
       const utxoApiRequest = getApiMethod({
         requests,
         key: 'getUTXOs',
         config: this.config,
       })
-      const utxo = await utxoApiRequest(`${requests.getUTXOs.url}/${wallet.address}?protocol=${protocol}`,
-        {
-          headers,
-        })
+      const utxo = await utxoApiRequest(`${requests.getUTXOs.url}/${wallet.address}?protocol=${protocol}`, {
+        headers,
+      })
       let feelessUtxo = JSON.parse(JSON.stringify(utxo.data))
       const feelessTx = buildOperation(feelessUtxo, wallet.address, outputs)
       const apiRequest = getApiMethod({
@@ -966,73 +989,66 @@ class Controller extends Interface {
         key: 'preprocess',
         config: this.config,
       })
-      const options = await apiRequest(`${requests.preprocess.url}?protocol=${protocol}`,
+      const options = await apiRequest(
+        `${requests.preprocess.url}?protocol=${protocol}`,
         {
           operations: feelessTx.operations,
-          metadata: { relative_ttl: 1000 }
+          metadata: { relative_ttl: 1000 },
         },
         {
           headers,
-        })
-
-      const metadata = await apiRequest(`${requests.getMetadata.url}?protocol=${protocol}`,
-        {
-          ...options.data
         }
       )
+
+      const metadata = await apiRequest(`${requests.getMetadata.url}?protocol=${protocol}`, {
+        ...options.data,
+      })
 
       const builtTx = buildOperation(utxo.data, wallet.address, outputs, metadata.data.suggested_fee[0].value)
-      const payload = await apiRequest(`${requests.getPayload.url}?protocol=${protocol}`,
-        {
-          operations: builtTx.operations,
-          metadata: metadata.data.metadata,
-        }
-      )
+      const payload = await apiRequest(`${requests.getPayload.url}?protocol=${protocol}`, {
+        operations: builtTx.operations,
+        metadata: metadata.data.metadata,
+      })
 
       const signatures = payload.data.payloads.map((signing_payload) => {
         const {
           account_identifier: { address },
-        } = signing_payload;
+        } = signing_payload
         return {
           signing_payload,
           public_key: {
             hex_bytes: keyAddressMapper[address].publicKey,
-            curve_type: "edwards25519",
+            curve_type: 'edwards25519',
           },
-          signature_type: "ed25519",
+          signature_type: 'ed25519',
           hex_bytes: Buffer.from(
             CardanoWasm.make_vkey_witness(
-              CardanoWasm.TransactionHash.from_bytes(
-                Buffer.from(signing_payload.hex_bytes, "hex")
-              ),
+              CardanoWasm.TransactionHash.from_bytes(Buffer.from(signing_payload.hex_bytes, 'hex')),
               privateKey.to_raw_key()
             )
               .signature()
               .to_bytes()
-          ).toString("hex"),
-        };
-      });
-
-      const combine = await apiRequest(`${requests.combineSignatures.url}?protocol=${protocol}`,
-        {
-          unsigned_transaction: payload.data.unsigned_transaction,
-          signatures,
+          ).toString('hex'),
         }
-      )
+      })
+
+      const combine = await apiRequest(`${requests.combineSignatures.url}?protocol=${protocol}`, {
+        unsigned_transaction: payload.data.unsigned_transaction,
+        signatures,
+      })
       const signedTx = combine.data.signed_transaction
 
       return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
-    }
-    catch (error) {
+    } catch (error) {
       handleRequestError(error)
     }
   }
 
   /**
-     * Create transfer tokens transaction in Cardano blockchain
-     * @param {import('../entity').CardanoTransferTransactionInput} input
-     * @returns {Promise<SignedTransaction>}
-     */
+   * Create transfer tokens transaction in Cardano blockchain
+   * @param {import('../entity').CardanoTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>}
+   */
   async createCardanoTransferTransactionFromUTXO(input) {
     try {
       let { outputs, inputs } = input
@@ -1046,22 +1062,25 @@ class Controller extends Interface {
       const keyAddressMapper = {}
       const inputList = []
 
-      await Promise.all(inputs.map(async (i) => {
-        keyAddressMapper[i.address] = {
-          secretKey: CardanoWasm.Bip32PrivateKey.from_128_xprv(new Uint8Array(i.privateKey.match(/.{1,2}/g).map(byte => parseInt(byte, 16)))),
-          publicKey: i.privateKey.slice(128, 192),
-        }
-
-        let utxo = await utxoApiRequest(`${requests.getUTXOs.url}/${i.address}?protocol=${protocol}`, { headers })
-        utxo.data.map((u) => {
-          if (u.txHash === i.txHash && u.index.toString() === i.index) {
-            inputList.push({ ...u, address: i.address })
+      await Promise.all(
+        inputs.map(async (i) => {
+          keyAddressMapper[i.address] = {
+            secretKey: CardanoWasm.Bip32PrivateKey.from_128_xprv(
+              new Uint8Array(i.privateKey.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)))
+            ),
+            publicKey: i.privateKey.slice(128, 192),
           }
-        })
-      }))
 
-      if (inputList.length !== inputs.length)
-        throw new Error('One or more inputs are invalid')
+          let utxo = await utxoApiRequest(`${requests.getUTXOs.url}/${i.address}?protocol=${protocol}`, { headers })
+          utxo.data.map((u) => {
+            if (u.txHash === i.txHash && u.index.toString() === i.index) {
+              inputList.push({ ...u, address: i.address })
+            }
+          })
+        })
+      )
+
+      if (inputList.length !== inputs.length) throw new Error('One or more inputs are invalid')
 
       const apiRequest = getApiMethod({
         requests,
@@ -1070,57 +1089,51 @@ class Controller extends Interface {
       })
 
       const builtTx = buildOperationFromInputs(inputList, outputs)
-      const options = await apiRequest(`${requests.preprocess.url}?protocol=${protocol}`,
+      const options = await apiRequest(
+        `${requests.preprocess.url}?protocol=${protocol}`,
         {
           operations: builtTx.operations,
-          metadata: { relative_ttl: 1000 }
+          metadata: { relative_ttl: 1000 },
         },
         {
           headers,
-        })
+        }
+      )
 
-      const metadata = await apiRequest(`${requests.getMetadata.url}?protocol=${protocol}`,
-        {
-          ...options.data
-        }
-      )
-      const payload = await apiRequest(`${requests.getPayload.url}?protocol=${protocol}`,
-        {
-          operations: builtTx.operations,
-          metadata: metadata.data.metadata,
-        }
-      )
+      const metadata = await apiRequest(`${requests.getMetadata.url}?protocol=${protocol}`, {
+        ...options.data,
+      })
+      const payload = await apiRequest(`${requests.getPayload.url}?protocol=${protocol}`, {
+        operations: builtTx.operations,
+        metadata: metadata.data.metadata,
+      })
 
       const signatures = payload.data.payloads.map((signing_payload) => {
         const {
           account_identifier: { address },
-        } = signing_payload;
+        } = signing_payload
         return {
           signing_payload,
           public_key: {
             hex_bytes: keyAddressMapper[address].publicKey,
-            curve_type: "edwards25519",
+            curve_type: 'edwards25519',
           },
-          signature_type: "ed25519",
+          signature_type: 'ed25519',
           hex_bytes: Buffer.from(
             CardanoWasm.make_vkey_witness(
-              CardanoWasm.TransactionHash.from_bytes(
-                Buffer.from(signing_payload.hex_bytes, "hex")
-              ),
+              CardanoWasm.TransactionHash.from_bytes(Buffer.from(signing_payload.hex_bytes, 'hex')),
               keyAddressMapper[address].secretKey.to_raw_key()
             )
               .signature()
               .to_bytes()
-          ).toString("hex"),
-        };
-      });
-
-      const combine = await apiRequest(`${requests.combineSignatures.url}?protocol=${protocol}`,
-        {
-          unsigned_transaction: payload.data.unsigned_transaction,
-          signatures,
+          ).toString('hex'),
         }
-      )
+      })
+
+      const combine = await apiRequest(`${requests.combineSignatures.url}?protocol=${protocol}`, {
+        unsigned_transaction: payload.data.unsigned_transaction,
+        signatures,
+      })
       const signedTx = combine.data.signed_transaction
 
       return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
@@ -1128,6 +1141,5 @@ class Controller extends Interface {
       handleRequestError(error)
     }
   }
-
 }
 module.exports = Controller

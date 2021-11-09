@@ -290,12 +290,10 @@ class CeloTransferTransactionInput extends EthereumTransferTransactionInput {
    * @param {boolean} args.testnet
    * @param {string?} args.contractAddress
    * @param {string?} args.feeCurrency
-   * @param {string?} args.feeCurrencyContractAddress
    */
-  constructor({ feeCurrency, feeCurrencyContractAddress, ...args }) {
+  constructor({ feeCurrency, ...args }) {
     super(args)
     this.feeCurrency = feeCurrency
-    this.feeCurrencyContractAddress = feeCurrencyContractAddress
   }
 }
 class BitcoinTransferTransactionInput extends TransferTransactionInput {

@@ -26,17 +26,12 @@ module.exports.buildCeloTransferTransaction = async function ({
   const rawTransaction = {
     chainId,
     nonce: Web3.utils.toHex(nonce),
-    gasPrice: Web3.utils.toHex(gasPrice),
+    gasPrice: feeCurrency ? Web3.utils.toHex(new BigNumber(gasPrice).plus(200000000)) : Web3.utils.toHex(gasPrice),
     to: '',
     value: undefined,
     data: undefined,
     gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
-    feeCurrency:
-      feeCurrency === 'cUSD'
-        ? CUSD_CONTRACT_ADDRESS[network]
-        : feeCurrency === 'cEUR'
-          ? CEUR_CONTRACT_ADDRESS[network]
-          : feeCurrency,
+    feeCurrency
   }
   const value = Web3.utils.toWei(amount, 'ether')
   if (tokenSymbol === 'CELO') {
