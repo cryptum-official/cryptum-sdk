@@ -50,7 +50,11 @@ console.log(wallet)
 
 Generate a wallet for a blockchain protocol:
 * `opts.protocol` (string) (__required__) - blockchain protocol supported: `BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `STELLAR`, `RIPPLE`, `HATHOR`, `CARDANO`, `AVAXCCHAIN`.
-* `opts.privateKey` (string) (__required__) - private key string.
+* `opts.privateKey` (__required__)
+  * (string) - most protocols (`BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `STELLAR`, `RIPPLE`, `HATHOR`, `AVAXCCHAIN`) require a private key string.
+  * (object) - the `CARDANO` protocol requires an object containing two different private keys
+    * `opts.privateKey.spendingPrivateKey` (string) - private key used for spending operations
+    * `opts.privateKey.stakingPrivateKey` (string) - private key used for staking operations
 
 Example:
 ```js
@@ -58,6 +62,15 @@ Example:
 const wallet = await walletController.generateWalletFromPrivateKey({
   privateKey: '0x...',
   protocol: 'BSC',
+})
+
+// for the cardano network
+const cardanoWallet = await walletController.generateWalletFromPrivateKey({
+  privateKey: {
+    spendingPrivateKey: '0x...',
+    stakingPrivateKey: '0x...',
+    },
+  protocol: 'CARDANO',
 })
 ```
 
