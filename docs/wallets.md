@@ -5,6 +5,17 @@ You need only to instantiate Wallet controller to manage wallets.
 const walletController = sdk.getWalletController()
 ```
 
+#### `walletController.generateRandomMnemonic(strength)`
+
+Generate random mnemonic (words) to generate wallets.
+* `strength` (number)(__optional__) - strength number.
+
+```js
+const mnemonic = walletController.generateRandomMnemonic()
+console.log(mnemonic)
+// "window license ordinary apple toilet wrestle disease sudden until armor wealth room..."
+```
+
 #### `walletController.generateWallet(opts)`
 
 Generate a wallet for a blockchain protocol:

@@ -20,8 +20,7 @@ Create a trustline transaction in Stellar blockchain. It is used to create or de
 * `opts.issuer` (string)(__required__) - issuer account to be used in the trustline.
 * `opts.limit` (string)(__required__) - limit for the trustline. To create the trustline this limit should be bigger than 0 and to delete the trustline it should be 0.
 * `opts.memo` (string) - optional message to be attached with this transaction, otherwise leave it undefined. This memo must be a string up to 28-bytes long or a 32-byte hash.
-* `opts.fee` (string) - optional fee in stroops (XLM).
-* `opts.timeout` (number) - optional timeout in seconds.
+* `opts.fee` (string) - optional fee in stroops.
 
 Example:
 ```js
@@ -45,7 +44,7 @@ Create a trustline transaction in XRP blockchain. It is used to create or delete
 * `opts.issuer` (string) - required if you are transferring a custom asset so this is the issuer account, otherwise leave undefined.
 * `opts.limit` (string)(__required__) - limit for the trustline. To create the trustline this limit should be bigger than 0 and to delete the trustline it should be 0.
 * `opts.memo` (string) - message to be attached with this transaction, otherwise leave it undefined.
-* `opts.fee` (string) - optional fee in drops (XRP).
+* `opts.fee` (string) - optional fee in drops.
 
 Example:
 ```js

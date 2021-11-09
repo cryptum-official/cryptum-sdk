@@ -101,7 +101,10 @@ class Controller extends Interface {
    * @param {string?} input.method
    * @param {Array?} input.params
    * @param {Protocol} input.protocol
-   * @param input.amount
+   * @param {string} input.amount
+   * @param {string?} input.contractName
+   * @param {string?} input.source
+   * @param {string?} input.feeCurrency
    */
   async getFee({
     type = null,
@@ -115,6 +118,7 @@ class Controller extends Interface {
     protocol,
     contractName = null,
     source = null,
+    feeCurrency = null,
     tokenType = null,
   }) {
     try {
@@ -135,6 +139,7 @@ class Controller extends Interface {
       if (params) data.params = params
       if (contractName) data.contractName = contractName
       if (source) data.source = source
+      if (feeCurrency) data.feeCurrency = feeCurrency
       if (tokenType) data.tokenType = tokenType
       const response = await apiRequest(`${requests.getFee.url}?protocol=${protocol}`, data, {
         headers,
@@ -222,7 +227,7 @@ class Controller extends Interface {
    */
   async createStellarTrustlineTransaction(input) {
     validateStellarTrustlineTransactionParams(input)
-    const { wallet, assetSymbol, issuer, fee, limit, memo, timeout, testnet } = input
+    const { wallet, assetSymbol, issuer, fee, limit, memo, testnet } = input
     const protocol = Protocol.STELLAR
     const info = await new WalletController(this.config).getWalletInfo({
       address: wallet.publicKey,
@@ -246,7 +251,6 @@ class Controller extends Interface {
       fee: networkFee,
       sequence: info.sequence,
       testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
-      timeout,
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.CHANGE_TRUST })
   }
@@ -294,7 +298,7 @@ class Controller extends Interface {
    */
   async createStellarTransferTransaction(input) {
     validateStellarTransferTransactionParams(input)
-    const { wallet, assetSymbol, issuer, amount, destination, memo, fee, testnet, createAccount, timeout } = input
+    const { wallet, assetSymbol, issuer, amount, destination, memo, fee, testnet, createAccount } = input
     const protocol = Protocol.STELLAR
     const info = await new WalletController(this.config).getWalletInfo({
       address: wallet.publicKey,
@@ -320,7 +324,6 @@ class Controller extends Interface {
       sequence: info.sequence,
       testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       createAccount,
-      timeout,
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
@@ -581,7 +584,7 @@ class Controller extends Interface {
    */
   async callSmartContractMethod(input) {
     validateSmartContractCallParams(input)
-    const { contractAddress, contractAbi, method, params, protocol } = input
+    const { from, contractAddress, contractAbi, method, params, protocol } = input
     try {
       const apiRequest = getApiMethod({
         requests,
@@ -591,7 +594,7 @@ class Controller extends Interface {
       const headers = mountHeaders(this.config.apiKey)
       const response = await apiRequest(
         requests.callSmartContractMethod.url,
-        { contractAddress, contractAbi, method, params },
+        { from, contractAddress, contractAbi, method, params },
         {
           headers,
           params: { protocol },
@@ -775,7 +778,7 @@ class Controller extends Interface {
       outputs,
       tokens,
       changeAddress: wallet.address,
-      testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
@@ -808,7 +811,7 @@ class Controller extends Interface {
       inputs,
       outputs,
       tokens,
-      testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
@@ -879,7 +882,7 @@ class Controller extends Interface {
       mintAuthorityAddress,
       meltAuthorityAddress,
       amount,
-      testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       inputSum,
     })
     return new SignedTransaction({ signedTx, protocol, type })
@@ -926,7 +929,7 @@ class Controller extends Interface {
       meltAuthorityAddress,
       amount,
       tokenUid,
-      testnet,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       type,
       inputSum,
     })

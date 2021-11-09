@@ -13,7 +13,9 @@ const Bip39 = require("bip39");
 const DERIVATION_PATH_TEMPLATE = "m/{purpose}'/{coin}'/{account}'/{change}/{address}"
 
 const getDerivationPath = ({ purpose, coin, account = 0, change, address }) => {
-  let path = DERIVATION_PATH_TEMPLATE.replace('{purpose}', purpose).replace('{coin}', coin).replace('{account}', account)
+  let path = DERIVATION_PATH_TEMPLATE.replace('{purpose}', purpose)
+    .replace('{coin}', coin)
+    .replace('{account}', account)
   if (change !== undefined && typeof change === 'number') {
     path = path.replace('{change}', change)
   } else {
@@ -39,7 +41,8 @@ const getHathorDerivationPath = ({ account = 0, address }) =>
   getDerivationPath({ purpose: 44, coin: 280, account, address })
 const getCardanoDerivationPath = ({ account = 0, address }) =>
   getDerivationPath({ purpose: 1852, coin: 1815, account, address })
-
+const getAvalancheDerivationPath = ({ account = 0, address }) =>
+  getDerivationPath({ purpose: 44, coin: 9000, account, address })
 
 /**
  * Get Bitcoin address from private key
@@ -259,7 +262,7 @@ module.exports.getRippleAddressFromPrivateKey = (privateKey) => {
 module.exports.deriveHathorWalletFromDerivationPath = async (mnemonic, testnet, { account = 0, address } = {}) => {
   const accountIndex = account !== undefined ? account : 0
   const addressIndex = address !== undefined ? address : 0
-  const networkName = testnet === true ? 'testnet' : 'mainnet'
+  const networkName = testnet ? 'testnet' : 'mainnet'
   const partialDerivationPath = getHathorDerivationPath({ account: accountIndex }).substring(11)
   const xprivkey = hathorSdk.walletUtils.getXPrivKeyFromSeed(mnemonic, {
     networkName,
@@ -277,19 +280,16 @@ module.exports.deriveHathorWalletFromDerivationPath = async (mnemonic, testnet, 
   }
 }
 
-module.exports.getHathorAddressFromPrivateKey = (privateKey, testnet = true) => {
-  const network = new hathorSdk.Network(testnet === true ? 'testnet' : 'mainnet')
+module.exports.getHathorAddressFromPrivateKey = (privateKey, testnet) => {
+  const network = new hathorSdk.Network(testnet ? 'testnet' : 'mainnet')
   const privkey = new bitcore.PrivateKey(privateKey, network.bitcoreNetwork)
   return privkey.toAddress().toString()
 }
 
 module.exports.deriveHathorAddressFromXpub = (xpub, testnet, { address = 0 } = {}) => {
-  const networkName = testnet === true ? 'testnet' : 'mainnet'
+  const network = new hathorSdk.Network(testnet ? 'testnet' : 'mainnet')
   const hdPublicKey = new bitcore.HDPublicKey(xpub)
-  return new bitcore.Address(
-    hdPublicKey.derive(address).publicKey,
-    hathorSdk.network.getNetwork(networkName)
-  ).toString()
+  return new bitcore.Address(hdPublicKey.derive(address).publicKey, network.bitcoreNetwork).toString()
 }
 
 /**
@@ -392,3 +392,47 @@ module.exports.getCardanoAddressFromPrivateKey = (privateKey, testnet = true) =>
 
   return baseAddr
 }
+  
+
+/**
+ * Get Avalanche address from private key
+ *
+ * @param {string} privateKey private key code58/hex string
+ * @returns {object} address
+ */
+
+module.exports.getAvalancheAddressFromPrivateKey = (privateKey) => {
+  const { address } = this.privateKeyToEthAccount(privateKey)
+  return address.toLowerCase()
+}
+
+/**
+ * Derive avalanche address, private key and public key
+ *
+ * @param {string} mnemonic mnemonic seed string
+ * @param {object?} derivationPath derivation path object
+ * @param {number} derivationPath.account derivation path account index
+ * @param {number} derivationPath.change derivation path change index
+ * @param {number} derivationPath.address derivation path address index
+ * @returns
+ */
+
+module.exports.deriveAvalancheWalletFromDerivationPath = async (mnemonic, { account = 0, change = 0, address } = {}) => {
+  const accountIndex = account !== undefined ? account : 0
+  const changeIndex = change !== undefined ? change : 0
+  const addressIndex = address !== undefined ? address : 0
+  const derivedPath = hdkey
+    .fromMasterSeed(await mnemonicToSeed(mnemonic))
+    .derivePath(getAvalancheDerivationPath({ account: accountIndex, change: changeIndex }))
+  const xpub = derivedPath.publicExtendedKey().toString('hex')
+  const wallet = derivedPath.deriveChild(addressIndex).getWallet()
+  return {
+    address: wallet.getAddressString().toLocaleLowerCase(),
+    privateKey: wallet.getPrivateKeyString(),
+    publicKey: wallet.getPublicKeyString(),
+    xpub
+  }
+}
+module.exports.deriveAvalancheAddressFromXpub = async (xpub, { address = 0 } = {}) =>
+  this.deriveEthereumAddressFromXpub(xpub, { address })
+

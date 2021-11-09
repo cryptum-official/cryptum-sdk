@@ -161,14 +161,12 @@ class StellarTransferTransactionInput extends TransferTransactionInput {
    * @param {string?} args.memo
    * @param {Fee?} args.fee fee in stroops
    * @param {boolean?} args.createAccount true if the destination account does not exist yet
-   * @param {number?} args.timeout timeout in seconds
    * @param {boolean?} args.testnet
    */
-  constructor({ assetSymbol, createAccount, timeout, issuer, ...args }) {
+  constructor({ assetSymbol, createAccount, issuer, ...args }) {
     super(args)
     this.assetSymbol = assetSymbol
     this.createAccount = createAccount
-    this.timeout = timeout
     this.issuer = issuer
   }
 }
@@ -217,13 +215,15 @@ class SmartContractCallTransactionInput {
    * Creates an instance of SmartContractCallTransactionInput.
    *
    * @param {object} args
+   * @param {string?} args.from
    * @param {string} args.contractAddress
    * @param {Array<object>} args.contractAbi
    * @param {string} args.method
    * @param {Array} args.params
    * @param {string} args.protocol
    */
-  constructor({ contractAddress, contractAbi, method, params, protocol }) {
+  constructor({ from, contractAddress, contractAbi, method, params, protocol }) {
+    this.from = from
     this.contractAddress = contractAddress
     this.contractAbi = contractAbi
     this.method = method

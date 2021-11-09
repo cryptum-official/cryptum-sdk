@@ -10,6 +10,7 @@ const {
   getCeloAddressFromPrivateKey,
   getStellarPublicKeyFromPrivateKey,
   getRippleAddressFromPrivateKey,
+  getAvalancheAddressFromPrivateKey,
   deriveBitcoinWalletFromDerivationPath,
   deriveCeloWalletFromDerivationPath,
   deriveStellarWalletFromDerivationPath,
@@ -25,6 +26,8 @@ const {
   deriveCardanoWalletFromDerivationPath,
   deriveCardanoAddressFromXpub,
   getCardanoAddressFromPrivateKey,
+  deriveAvalancheWalletFromDerivationPath,
+  deriveAvalancheAddressFromXpub
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
 const { validateWalletInfo, validatePrivateKey, validateCardanoPrivateKey } = require('../../../services/validations')
@@ -73,6 +76,8 @@ class Controller extends Interface {
         return await this.generateHathorWallet({ mnemonic, derivation, testnet })
       case Protocol.CARDANO:
         return await this.generateCardanoWallet({ mnemonic, derivation, testnet })
+      case Protocol.AVAXCCHAIN:
+        return await this.generateAvalancheWallet({ mnemonic, derivation, testnet })
       default:
         throw new Error('Unsupported blockchain protocol')
     }
@@ -93,6 +98,8 @@ class Controller extends Interface {
       validatePrivateKey(privateKey)
     }
     testnet = testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
+    validatePrivateKey(privateKey)
+    testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
     const walletData = { address: null, publicKey: null, privateKey, protocol, testnet }
     switch (protocol) {
       case Protocol.BITCOIN:
@@ -118,6 +125,8 @@ class Controller extends Interface {
         break
       case Protocol.CARDANO:
         walletData.address = getCardanoAddressFromPrivateKey(privateKey, testnet)
+      case Protocol.AVAXCCHAIN:
+        walletData.address = getAvalancheAddressFromPrivateKey(privateKey)
         break
       default:
         throw new Error('Unsupported blockchain protocol')
@@ -153,6 +162,9 @@ class Controller extends Interface {
         break
       case Protocol.CARDANO:
         walletAddress = deriveCardanoAddressFromXpub(xpub, testnet, { address })
+        break
+      case Protocol.AVAXCCHAIN:
+        walletAddress = deriveAvalancheAddressFromXpub(xpub, { address })
         break
       default:
         throw new Error('Unsupported blockchain protocol')
@@ -230,7 +242,6 @@ class Controller extends Interface {
   async generateHathorWallet({ mnemonic, derivation, testnet }) {
     const { address, privateKey, publicKey, xpub } = await deriveHathorWalletFromDerivationPath(mnemonic, testnet, derivation)
     return new Wallet({
-      mnemonic,
       privateKey,
       publicKey,
       address,
@@ -243,13 +254,24 @@ class Controller extends Interface {
   async generateCardanoWallet({ mnemonic, derivation, testnet }) {
     const { address, privateKey, publicKey, xpub } = await deriveCardanoWalletFromDerivationPath(mnemonic, testnet, derivation)
     return new Wallet({
-      mnemonic,
       privateKey,
       publicKey,
       xpub,
       address,
       testnet,
       protocol: Protocol.CARDANO,
+    })
+  }
+
+  async generateAvalancheWallet({ mnemonic, derivation, testnet }) {
+    const { address, privateKey, publicKey, xpub } = await deriveAvalancheWalletFromDerivationPath(mnemonic, derivation)
+    return new Wallet({
+      privateKey,
+      publicKey,
+      xpub,
+      address,
+      testnet,
+      protocol: Protocol.AVAXCCHAIN,
     })
   }
 
