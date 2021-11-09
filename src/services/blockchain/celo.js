@@ -6,6 +6,7 @@ const {
   CEUR_CONTRACT_ADDRESS,
   TRANSFER_METHOD_ABI,
   TRANSFER_COMMENT_METHOD_ABI,
+  CELO_CONTRACT_ADDRESS,
 } = require('./constants')
 const { compileContract } = require('../../services/blockchain/contract')
 
@@ -34,11 +35,13 @@ module.exports.buildCeloTransferTransaction = async function ({
     feeCurrency
   }
   const value = Web3.utils.toWei(amount, 'ether')
-  if (tokenSymbol === 'CELO') {
+  if (tokenSymbol === 'CELO' && !memo) {
     rawTransaction.to = destination
     rawTransaction.value = Web3.utils.toHex(value)
   } else {
-    if (tokenSymbol === 'cUSD') {
+    if (tokenSymbol === 'CELO') {
+      rawTransaction.to = CELO_CONTRACT_ADDRESS[network]
+    } else if (tokenSymbol === 'cUSD') {
       rawTransaction.to = CUSD_CONTRACT_ADDRESS[network]
     } else if (tokenSymbol === 'cEUR') {
       rawTransaction.to = CEUR_CONTRACT_ADDRESS[network]
