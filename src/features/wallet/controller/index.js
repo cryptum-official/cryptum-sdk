@@ -98,7 +98,6 @@ class Controller extends Interface {
       validatePrivateKey(privateKey)
     }
     testnet = testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
-    validatePrivateKey(privateKey)
     testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
     const walletData = { address: null, publicKey: null, privateKey, protocol, testnet }
     switch (protocol) {
@@ -125,6 +124,7 @@ class Controller extends Interface {
         break
       case Protocol.CARDANO:
         walletData.address = getCardanoAddressFromPrivateKey(privateKey, testnet)
+        break
       case Protocol.AVAXCCHAIN:
         walletData.address = getAvalancheAddressFromPrivateKey(privateKey)
         break
