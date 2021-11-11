@@ -21,14 +21,14 @@ module.exports.buildStellarTrustlineTransaction = async function ({
   sequence,
   assetSymbol,
   issuer,
-  fee = null,
+  fee,
   limit = null,
   memo = null,
   testnet = true,
 }) {
   const account = new StellarSdk.Account(fromPublicKey, sequence)
   const transaction = new StellarSdk.TransactionBuilder(account, {
-    fee: fee ? fee : '100',
+    fee,
     memo: memo ? (memo.length > 28 ? StellarSdk.Memo.hash(memo) : StellarSdk.Memo.text(memo)) : null,
     networkPassphrase: testnet ? StellarSdk.Networks.TESTNET : StellarSdk.Networks.PUBLIC,
   })
@@ -70,13 +70,13 @@ module.exports.buildStellarTransferTransaction = async function ({
   amount,
   destination,
   createAccount = false,
-  fee = null,
+  fee,
   memo = null,
   testnet = true
 }) {
   const account = new StellarSdk.Account(fromPublicKey, sequence)
   const builder = new StellarSdk.TransactionBuilder(account, {
-    fee: fee ? fee : '100',
+    fee,
     memo: memo ? (memo.length > 28 ? StellarSdk.Memo.hash(memo) : StellarSdk.Memo.text(memo)) : null,
     networkPassphrase: testnet ? StellarSdk.Networks.TESTNET : StellarSdk.Networks.PUBLIC,
   }).setTimeout(100)

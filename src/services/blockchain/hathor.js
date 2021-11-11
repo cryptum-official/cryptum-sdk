@@ -71,9 +71,10 @@ module.exports.buildHathorTransferTransaction = async function ({ inputs, output
   hathorLib.transaction.completeTx(txData)
   const dataToSign = hathorLib.transaction.dataToSign(txData)
   const hashbuf = hathorLib.transaction.getDataToSignHash(dataToSign)
-  const network = hathorLib.network.getNetwork(testnet ? 'testnet' : 'mainnet')
+  const networkName = testnet ? 'testnet' : 'mainnet'
+  const network = new hathorLib.Network(networkName)
   for (let i = 0; i < inputs.length; ++i) {
-    const privateKey = bitcoreLib.PrivateKey(inputs[i].privateKey, network)
+    const privateKey = bitcoreLib.PrivateKey(inputs[i].privateKey, networkName)
     const sig = bitcoreLib.crypto.ECDSA.sign(hashbuf, privateKey, 'little').set({
       nhashtype: bitcoreLib.crypto.Signature.SIGHASH_ALL,
     })
@@ -82,7 +83,7 @@ module.exports.buildHathorTransferTransaction = async function ({ inputs, output
 
   hathorLib.transaction.verifyTxData(txData)
   hathorLib.transaction.setWeightIfNeeded(txData)
-  const tx = hathorLib.helpersUtils.createTxFromData(txData)
+  const tx = hathorLib.helpersUtils.createTxFromData(txData, network)
   const mineTx = new mineTransaction.default(tx)
   return new Promise((resolve, reject) => {
     mineTx.on('error', (message) => {
@@ -186,10 +187,11 @@ module.exports.buildHathorTokenTransaction = async function ({
   hathorLib.transaction.completeTx(_dataToken)
   const dataToSign = hathorLib.transaction.dataToSign(_dataToken)
   const hashbuf = hathorLib.transaction.getDataToSignHash(dataToSign)
-  const network = hathorLib.network.getNetwork(testnet ? 'testnet' : 'mainnet')
+  const networkName = testnet ? 'testnet' : 'mainnet'
+  const network = new hathorLib.Network(networkName)
 
   for (let i = 0; i < inputs.length; ++i) {
-    const privateKey = bitcoreLib.PrivateKey(inputs[i].privateKey, network)
+    const privateKey = bitcoreLib.PrivateKey(inputs[i].privateKey, networkName)
     const sig = bitcoreLib.crypto.ECDSA.sign(hashbuf, privateKey, 'little').set({
       nhashtype: bitcoreLib.crypto.Signature.SIGHASH_ALL,
     })
@@ -200,7 +202,7 @@ module.exports.buildHathorTokenTransaction = async function ({
   }
   hathorLib.transaction.verifyTxData(_dataToken)
   hathorLib.transaction.setWeightIfNeeded(_dataToken)
-  const tx = hathorLib.helpersUtils.createTxFromData(_dataToken)
+  const tx = hathorLib.helpersUtils.createTxFromData(_dataToken, network)
   const mineTx = new mineTransaction.default(tx)
 
   return new Promise((resolve, reject) => {
