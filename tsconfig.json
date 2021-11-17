@@ -1,0 +1,17 @@
+{
+  "include": ["axios", "errors", "src", "index.js"],
+  "compilerOptions": {
+    "target": "es2017",
+    "lib": ["es2017"],
+    "module": "commonjs",
+    "outDir": "./dist",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "allowJs": true,
+    "typeRoots": ["node_modules/@types"],
+    "types": ["node"],
+    "esModuleInterop": true,
+    "resolveJsonModule": true
+  },
+  "exclude": ["node_modules", "dist"]
+}
