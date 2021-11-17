@@ -1,3 +1,4 @@
+
 class Wallet {
   /**
    * Constructor
@@ -6,7 +7,7 @@ class Wallet {
    * @param {string} args.privateKey Wallet private key
    * @param {string} args.publicKey Wallet public key
    * @param {string} args.address Wallet address
-   * @param {string?} args.xpub Wallet xpub address
+   * @param {string=} args.xpub Wallet xpub address
    * @param {import('../../../services/blockchain/constants').Protocol} args.protocol blockchain protocol
    * @param {boolean} args.testnet blockchain testnet or mainnet
    */

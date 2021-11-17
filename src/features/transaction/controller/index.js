@@ -100,17 +100,17 @@ class Controller extends Interface {
    *
    * @param {object} input
    * @param {string} input.type
-   * @param {string?} input.from
-   * @param {string?} input.destination
-   * @param {string?} input.assetSymbol
-   * @param {string?} input.contractAddress
-   * @param {string?} input.method
-   * @param {Array?} input.params
+   * @param {string=} input.from
+   * @param {string=} input.destination
+   * @param {string=} input.assetSymbol
+   * @param {string=} input.contractAddress
+   * @param {string=} input.method
+   * @param {Array=} input.params
    * @param {Protocol} input.protocol
    * @param {string} input.amount
-   * @param {string?} input.contractName
-   * @param {string?} input.source
-   * @param {string?} input.feeCurrency
+   * @param {string=} input.contractName
+   * @param {string=} input.source
+   * @param {string=} input.feeCurrency
    */
   async getFee({
     type = null,

@@ -9,10 +9,10 @@ const StellarSdk = require('stellar-sdk')
  * @param {string} args.sequence account sequence number
  * @param {string} args.assetSymbol asset symbol
  * @param {string} args.issuer issuer account
- * @param {string?} args.fee fee in stroops
- * @param {string?} args.limit limit number for the trustline
- * @param {memo?} args.memo memo string
- * @param {boolean?} args.testnet
+ * @param {string=} args.fee fee in stroops
+ * @param {string=} args.limit limit number for the trustline
+ * @param {memo=} args.memo memo string
+ * @param {boolean=} args.testnet
  * @returns {Promise<string>} signed tx
  */
 module.exports.buildStellarTrustlineTransaction = async function ({
@@ -55,10 +55,10 @@ module.exports.buildStellarTrustlineTransaction = async function ({
  * @param {string} args.issuer issuer account
  * @param {string} args.amount amount number for the transfer
  * @param {string} args.destination destination account
- * @param {boolean?} args.createAccount true if the destination account does not exist
- * @param {string?} args.fee fee in stroops
- * @param {string?} args.memo memo string
- * @param {boolean?} args.testnet
+ * @param {boolean=} args.createAccount true if the destination account does not exist
+ * @param {string=} args.fee fee in stroops
+ * @param {string=} args.memo memo string
+ * @param {boolean=} args.testnet
  * @returns {Promise<string>} signed tx
  */
 module.exports.buildStellarTransferTransaction = async function ({

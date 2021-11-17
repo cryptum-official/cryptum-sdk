@@ -27,7 +27,7 @@ const {
   deriveCardanoAddressFromXpub,
   getCardanoAddressFromPrivateKey,
   deriveAvalancheWalletFromDerivationPath,
-  deriveAvalancheAddressFromXpub
+  deriveAvalancheAddressFromXpub,
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
 const { validateWalletInfo, validatePrivateKey, validateCardanoPrivateKey } = require('../../../services/validations')
@@ -35,7 +35,7 @@ const { validateWalletInfo, validatePrivateKey, validateCardanoPrivateKey } = re
 class Controller extends Interface {
   /**
    * Generate random words
-   * @param {number} strength 
+   * @param {number} strength
    * @returns {string} list of random words
    */
   generateRandomMnemonic(strength = 256) {
@@ -46,12 +46,12 @@ class Controller extends Interface {
    *
    * @param {object} args
    * @param {Protocol} args.protocol blockchain protocol to generate the wallet for
-   * @param {boolean?} args.testnet true for testnet and false for mainnet
-   * @param {string?} args.mnemonic mnemonic seed
-   * @param {object?} args.derivation object with information to derive one wallet (BIP44 derivation path)
-   * @param {number?} args.derivation.account account index to derive wallet
-   * @param {number?} args.derivation.change change index to derive wallet
-   * @param {number?} args.derivation.address address index to derive wallet
+   * @param {boolean=} args.testnet true for testnet and false for mainnet
+   * @param {string=} args.mnemonic mnemonic seed
+   * @param {object=} args.derivation object with information to derive one wallet (BIP44 derivation path)
+   * @param {number=} args.derivation.account account index to derive wallet
+   * @param {number=} args.derivation.change change index to derive wallet
+   * @param {number=} args.derivation.address address index to derive wallet
    * @returns {Promise<Wallet>}
    */
   async generateWallet({ protocol, mnemonic, testnet, derivation = { account: 0, change: 0 } }) {
@@ -88,7 +88,7 @@ class Controller extends Interface {
    * @param {object} args
    * @param {string} args.privateKey private key string
    * @param {Protocol} args.protocol blockchain protocol
-   * @param {boolean?} args.testnet true for testnet and false for mainnet
+   * @param {boolean=} args.testnet true for testnet and false for mainnet
    * @returns {Promise<Wallet>}
    */
   async generateWalletFromPrivateKey({ privateKey, protocol, testnet }) {
@@ -138,8 +138,8 @@ class Controller extends Interface {
    * @param {object} input
    * @param {string} input.xpub extended public key string
    * @param {Protocol} input.protocol blockchain protocol
-   * @param {boolean?} input.testnet testnet
-   * @param {number?} input.address address index number to derive the wallet address from
+   * @param {boolean=} input.testnet testnet
+   * @param {number=} input.address address index number to derive the wallet address from
    */
   async generateWalletAddressFromXpub({ xpub, protocol, testnet, address }) {
     testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
@@ -240,7 +240,11 @@ class Controller extends Interface {
   }
 
   async generateHathorWallet({ mnemonic, derivation, testnet }) {
-    const { address, privateKey, publicKey, xpub } = await deriveHathorWalletFromDerivationPath(mnemonic, testnet, derivation)
+    const { address, privateKey, publicKey, xpub } = await deriveHathorWalletFromDerivationPath(
+      mnemonic,
+      testnet,
+      derivation
+    )
     return new Wallet({
       privateKey,
       publicKey,
@@ -252,7 +256,11 @@ class Controller extends Interface {
   }
 
   async generateCardanoWallet({ mnemonic, derivation, testnet }) {
-    const { address, privateKey, publicKey, xpub } = await deriveCardanoWalletFromDerivationPath(mnemonic, testnet, derivation)
+    const { address, privateKey, publicKey, xpub } = await deriveCardanoWalletFromDerivationPath(
+      mnemonic,
+      testnet,
+      derivation
+    )
     return new Wallet({
       privateKey,
       publicKey,
@@ -281,7 +289,7 @@ class Controller extends Interface {
    * @param {object} input
    * @param {string} input.address wallet address or public key
    * @param {Protocol} input.protocol blockchain protocol
-   * @param {string[]?} input.tokenAddresses array of token addresses to fetch balance from
+   * @param {string[]=} input.tokenAddresses array of token addresses to fetch balance from
    * @returns {Promise<WalletInfoResponse>}
    */
   async getWalletInfo(input) {
