@@ -6,7 +6,7 @@
     "module": "commonjs",
     "outDir": "./dist",
     "declaration": true,
-    "emitDeclarationOnly": true,
+    "emitDeclarationOnly": false,
     "allowJs": true,
     "typeRoots": ["node_modules/@types"],
     "types": ["node"],
