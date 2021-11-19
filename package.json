@@ -1,6 +1,6 @@
 {
   "name": "cryptum-sdk",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "SDK to sync your application with Cryptum services",
   "main": "index.js",
   "repository": "https://github.com/blockforce-official/cryptum-sdk",
@@ -14,7 +14,8 @@
     "test": "mocha 'tests/**/*.js' --recursive --timeout 60000 --exit",
     "coverage": "istanbul cover _mocha -- ./tests/* --recursive",
     "lint": "eslint --fix --ext .js .",
-    "ts-compile": "tsc"
+    "ts-compile": "tsc",
+    "postinstall": "npm run ts-compile"
   },
   "dependencies": {
     "@celo-tools/celo-ethers-wrapper": "^0.0.5",
