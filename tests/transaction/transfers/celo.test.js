@@ -46,6 +46,7 @@ describe.only('Celo transfer transactions', () => {
         contractAbi: TRANSFER_METHOD_ABI,
         method: 'transfer',
         params: ['0x3f2f3D45196D7B99D0a615e8f530165eCb93e772', '10000000000000000'],
+        feeCurrency: CUSD_CONTRACT_ADDRESS.testnet,
       })
       .reply(200, {
         gas: 21000,
@@ -80,7 +81,6 @@ describe.only('Celo transfer transactions', () => {
       tokenSymbol: 'CELO',
       amount: '0.1',
       destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
-      testnet: true,
     })
     assert.include(transaction.signedTx, '0x')
     // console.log(await txController.sendTransaction(transaction))
@@ -92,7 +92,6 @@ describe.only('Celo transfer transactions', () => {
       amount: '0.01',
       destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
       feeCurrency: 'cUSD',
-      testnet: true,
     })
     assert.include(transaction.signedTx, '0x')
     // console.log(await txController.sendTransaction(transaction))
@@ -104,7 +103,6 @@ describe.only('Celo transfer transactions', () => {
       amount: '0.01',
       destination: '0x3f2f3D45196D7B99D0a615e8f530165eCb93e772',
       contractAddress: '0x07274039422F722076863ADa0b4dB77ad6c163dc',
-      testnet: true,
     })
     assert.include(transaction.signedTx, '0x')
     // console.log(await txController.sendTransaction(transaction))

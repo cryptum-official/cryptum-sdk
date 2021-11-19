@@ -182,8 +182,8 @@ class Controller extends Interface {
   /**
    * Get orders
    * @param {object} input
-   * @param {number?} input.limit
-   * @param {number?} input.offset
+   * @param {number=} input.limit
+   * @param {number=} input.offset
    * @param {Promise<SwapOrder[]>}
    */
   async getOrders(input = {}) {

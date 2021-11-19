@@ -9,9 +9,9 @@ const { fromDrop } = require('./utils')
  * @param {string} args.sequence account sequence number
  * @param {string} args.assetSymbol asset symbol
  * @param {string} args.issuer issuer account address
- * @param {string?} args.fee fee in drops
- * @param {string?} args.limit limit number
- * @param {memo?} args.memo memo string
+ * @param {string=} args.fee fee in drops
+ * @param {string=} args.limit limit number
+ * @param {memo=} args.memo memo string
  * @param args.maxLedgerVersion
  * @returns {Promise<string>} signed tx
  */
@@ -50,11 +50,11 @@ module.exports.buildRippleTrustlineTransaction = async function ({
  * @param {string} args.fromPrivateKey account private key to sign transaction
  * @param {string} args.sequence account sequence number
  * @param {string} args.assetSymbol asset symbol
- * @param {string?} args.issuer issuer account address
+ * @param {string=} args.issuer issuer account address
  * @param {string} args.amount amount number
  * @param {string} args.destination destination address
- * @param {string?} args.fee fee in drops
- * @param {string?} args.memo memo string
+ * @param {string=} args.fee fee in drops
+ * @param {string=} args.memo memo string
  * @param args.maxLedgerVersion
  * @returns {Promise<string>} signed tx
  */

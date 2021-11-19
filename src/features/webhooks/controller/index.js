@@ -33,11 +33,11 @@ class Controller extends Interface {
    * Method to get webhooks of the Cryptum
    * @param {object} input 
    * @param {string} input.protocol protocol to get yours webhooks
-   * @param {string?} input.asset asset to get respective webhooks
-   * @param {string?} input.limit pagination limit
-   * @param {string?} input.offset pagination offset
-   * @param {string?} input.startDate pagination start date
-   * @param {string?} input.endDate pagination end date
+   * @param {string=} input.asset asset to get respective webhooks
+   * @param {string=} input.limit pagination limit
+   * @param {string=} input.offset pagination offset
+   * @param {string=} input.startDate pagination start date
+   * @param {string=} input.endDate pagination end date
    */
   async getWebhooks({ asset, protocol, startDate, endDate, limit, offset }) {
     try {

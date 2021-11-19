@@ -101,17 +101,17 @@ class Controller extends Interface {
    *
    * @param {object} input
    * @param {string} input.type
-   * @param {string?} input.from
-   * @param {string?} input.destination
-   * @param {string?} input.assetSymbol
-   * @param {string?} input.contractAddress
-   * @param {string?} input.method
-   * @param {Array?} input.params
+   * @param {string=} input.from
+   * @param {string=} input.destination
+   * @param {string=} input.assetSymbol
+   * @param {string=} input.contractAddress
+   * @param {string=} input.method
+   * @param {Array=} input.params
    * @param {Protocol} input.protocol
    * @param {string} input.amount
-   * @param {string?} input.contractName
-   * @param {string?} input.source
-   * @param {string?} input.feeCurrency
+   * @param {string=} input.contractName
+   * @param {string=} input.source
+   * @param {string=} input.feeCurrency
    */
   async getFee({
     type = null,
@@ -1010,15 +1010,8 @@ class Controller extends Interface {
         new Uint8Array(wallet.privateKey.spendingPrivateKey.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)))
       )
       const headers = mountHeaders(this.config.apiKey)
-      const utxoApiRequest = getApiMethod({
-        requests,
-        key: 'getUTXOs',
-        config: this.config,
-      })
-      const utxo = await utxoApiRequest(`${requests.getUTXOs.url}/${wallet.address}?protocol=${protocol}`, {
-        headers,
-      })
-      let feelessUtxo = JSON.parse(JSON.stringify(utxo.data))
+      const utxo = await this.getUTXOs({ address: wallet.address, protocol })
+      let feelessUtxo = JSON.parse(JSON.stringify(utxo))
       const feelessTx = buildOperation(feelessUtxo, wallet.address, outputs)
       const apiRequest = getApiMethod({
         requests,
@@ -1040,7 +1033,7 @@ class Controller extends Interface {
         ...options.data,
       })
 
-      const builtTx = buildOperation(utxo.data, wallet.address, outputs, metadata.data.suggested_fee[0].value)
+      const builtTx = buildOperation(utxo, wallet.address, outputs, metadata.data.suggested_fee[0].value)
       const payload = await apiRequest(`${requests.getPayload.url}?protocol=${protocol}`, {
         operations: builtTx.operations,
         metadata: metadata.data.metadata,
@@ -1089,11 +1082,6 @@ class Controller extends Interface {
     try {
       let { outputs, inputs } = input
       const headers = mountHeaders(this.config.apiKey)
-      const utxoApiRequest = getApiMethod({
-        requests,
-        key: 'getUTXOs',
-        config: this.config,
-      })
       const protocol = Protocol.CARDANO
       const keyAddressMapper = {}
       const inputList = []
@@ -1107,8 +1095,8 @@ class Controller extends Interface {
             publicKey: i.privateKey.slice(128, 192),
           }
 
-          let utxo = await utxoApiRequest(`${requests.getUTXOs.url}/${i.address}?protocol=${protocol}`, { headers })
-          utxo.data.map((u) => {
+          let utxo = await this.getUTXOs({ address: i.address, protocol })
+          utxo.map((u) => {
             if (u.txHash === i.txHash && u.index.toString() === i.index) {
               inputList.push({ ...u, address: i.address })
             }
@@ -1123,7 +1111,6 @@ class Controller extends Interface {
         key: 'preprocess',
         config: this.config,
       })
-
       const builtTx = buildOperationFromInputs(inputList, outputs)
       const options = await apiRequest(
         `${requests.preprocess.url}?protocol=${protocol}`,
@@ -1143,7 +1130,6 @@ class Controller extends Interface {
         operations: builtTx.operations,
         metadata: metadata.data.metadata,
       })
-
       const signatures = payload.data.payloads.map((signing_payload) => {
         const {
           account_identifier: { address },
@@ -1165,13 +1151,11 @@ class Controller extends Interface {
           ).toString('hex'),
         }
       })
-
       const combine = await apiRequest(`${requests.combineSignatures.url}?protocol=${protocol}`, {
         unsigned_transaction: payload.data.unsigned_transaction,
         signatures,
       })
       const signedTx = combine.data.signed_transaction
-
       return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
     } catch (error) {
       handleRequestError(error)
