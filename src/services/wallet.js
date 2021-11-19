@@ -417,22 +417,6 @@ module.exports.getAvalancheAddressFromPrivateKey = (privateKey) => {
  * @returns
  */
 
-module.exports.deriveAvalancheWalletFromDerivationPath = async (mnemonic, { account = 0, change = 0, address } = {}) => {
-  const accountIndex = account !== undefined ? account : 0
-  const changeIndex = change !== undefined ? change : 0
-  const addressIndex = address !== undefined ? address : 0
-  const derivedPath = hdkey
-    .fromMasterSeed(await mnemonicToSeed(mnemonic))
-    .derivePath(getAvalancheDerivationPath({ account: accountIndex, change: changeIndex }))
-  const xpub = derivedPath.publicExtendedKey().toString('hex')
-  const wallet = derivedPath.deriveChild(addressIndex).getWallet()
-  return {
-    address: wallet.getAddressString().toLocaleLowerCase(),
-    privateKey: wallet.getPrivateKeyString(),
-    publicKey: wallet.getPublicKeyString(),
-    xpub
-  }
-}
 module.exports.deriveAvalancheAddressFromXpub = async (xpub, { address = 0 } = {}) =>
   this.deriveEthereumAddressFromXpub(xpub, { address })
 

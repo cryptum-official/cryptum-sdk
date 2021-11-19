@@ -264,15 +264,9 @@ class Controller extends Interface {
   }
 
   async generateAvalancheWallet({ mnemonic, derivation, testnet }) {
-    const { address, privateKey, publicKey, xpub } = await deriveAvalancheWalletFromDerivationPath(mnemonic, derivation)
-    return new Wallet({
-      privateKey,
-      publicKey,
-      xpub,
-      address,
-      testnet,
-      protocol: Protocol.AVAXCCHAIN,
-    })
+    const wallet = await this.generateEthereumWallet({ mnemonic, derivation, testnet })
+    wallet.protocol = Protocol.AVAXCCHAIN
+    return wallet
   }
 
   /**
