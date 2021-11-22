@@ -27,6 +27,44 @@ class WalletInfoResponse {
   }
 }
 
+/**
+ * @typedef {object} WalletInput
+ * @property {string} txHash
+ * @property {number} index
+ * @property {string} walletId
+ */
+/**
+ * @typedef {object} CardanoWalletOutputToken
+ * @property {string} policy
+ * @property {string} amount
+ * @property {string} asset
+ */
+/**
+ * @typedef {object} WalletOutput
+ * @property {string} address
+ * @property {string} amount
+ * @property {string | CardanoWalletOutputToken =} token
+ */
+
+/**
+ * @typedef {object} WalletTransaction
+ * @property {string} id Wallet transaction id
+ * @property {string=} walletId Wallet id
+ * @property {Array<WalletInput> =} inputs Inputs for transactions
+ * @property {string=} addressTo
+ * @property {Array<WalletOutput> =} outputs
+ * @property {string} amount
+ * @property {import('../../transaction/entity').TransactionType} transactionType
+ * @property {string} status
+ * @property {string} protocol
+ * @property {string} createdAt
+ * @property {string=} assetSymbol
+ * @property {string=} contractAddress
+ * @property {string=} issuer
+ * @property {string=} transactionHash
+ * @property {string=} limit
+  */
+
 module.exports = {
   Wallet,
   WalletInfoResponse,

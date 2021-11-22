@@ -1,8 +1,7 @@
 const { generateMnemonic, validateMnemonic } = require('bip39')
 const { Wallet, WalletInfoResponse } = require('../entity')
-const { getApiMethod, mountHeaders, handleRequestError } = require('../../../services')
+const { makeRequest } = require('../../../services')
 const Interface = require('./interface')
-const requests = require('./requests.json')
 const {
   getBitcoinAddressFromPrivateKey,
   getBscAddressFromPrivateKey,
@@ -298,26 +297,39 @@ class Controller extends Interface {
   async getWalletInfo(input) {
     validateWalletInfo(input)
     const { address, protocol, tokenAddresses } = input
-    try {
-      const apiRequest = getApiMethod({
-        requests,
-        key: 'getWalletInfo',
-        config: this.config,
-      })
-      const headers = mountHeaders(this.config.apiKey)
-      const qs = [`protocol=${protocol}`]
-      if (tokenAddresses) {
-        for (const token of tokenAddresses) {
-          qs.push(`tokenAddresses[]=${token}`)
-        }
+    const qs = [`protocol=${protocol}`]
+    if (tokenAddresses) {
+      for (const token of tokenAddresses) {
+        qs.push(`tokenAddresses[]=${token}`)
       }
-      const response = await apiRequest(`${requests.getWalletInfo.url}/${address}/info?${qs.join('&')}`, {
-        headers,
-      })
-      return new WalletInfoResponse(response.data)
-    } catch (error) {
-      handleRequestError(error)
     }
+    return new WalletInfoResponse(
+      await makeRequest({ method: 'get', url: `/wallet/${address}/info?${qs.join('&')}`, config: this.config })
+    )
+  }
+  /**
+   * Get wallet transaction id
+   * @param {string} id transaction id
+   * @returns {Promise<import('../entity').WalletTransaction>}
+   */
+  async getWalletTransactionById(id) {
+    return makeRequest({ method: 'get', url: `/wallet/transaction/${id}`, config: this.config })
+  }
+  /**
+   * Get wallet transaction id
+   * @param {string} id transaction id
+   * @returns {Promise<{ id: string }>}
+   */
+  async updateWalletTransactionById(id) {
+    return makeRequest({ method: 'put', url: `/wallet/transaction/${id}`, config: this.config })
+  }
+  /**
+   * Get wallet transaction id
+   * @param {string} id transaction id
+   * @returns {Promise<{ id: string }>}
+   */
+  async deleteWalletTransactionById(id) {
+    return makeRequest({ method: 'delete', url: `/wallet/transaction/${id}`, config: this.config })
   }
 }
 
