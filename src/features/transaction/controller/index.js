@@ -28,6 +28,7 @@ const {
   buildRippleTrustlineTransaction,
 } = require('../../../services/blockchain/ripple')
 const {
+  buildAvaxCChainTransferTransaction,
   buildBscTransferTransaction,
   buildEthereumTransferTransaction,
   buildEthereumSmartContractTransaction,
@@ -506,6 +507,41 @@ class Controller extends Interface {
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
+   /**
+   * Create avalanche transfer transaction
+   *
+   * @param {EthereumTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
+    async createAvaxCChainTransferTransaction(input) {
+      validateEthereumTransferTransactionParams(input)
+      const { wallet, tokenSymbol, amount, destination, fee, testnet, contractAddress } = input
+      const protocol = Protocol.AVAXCCHAIN
+      const { info, networkFee } = await this._getFeeInfo({
+        wallet,
+        type: tokenSymbol === 'AVAX' ? TransactionType.TRANSFER : TransactionType.CALL_CONTRACT_METHOD,
+        destination,
+        amount: tokenSymbol === 'AVAX' ? amount : null,
+        contractAddress,
+        contractAbi: tokenSymbol === 'AVAX' ? null : TRANSFER_METHOD_ABI,
+        method: tokenSymbol === 'AVAX' ? null : 'transfer',
+        params: tokenSymbol === 'AVAX' ? null : [destination, toWei(amount).toString()],
+        testnet,
+        fee,
+        protocol,
+      })
+      const signedTx = await buildAvaxCChainTransferTransaction({
+        fromPrivateKey: wallet.privateKey,
+        tokenSymbol,
+        amount,
+        destination,
+        fee: networkFee,
+        nonce: info.nonce,
+        testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
+        contractAddress,
+      })
+      return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
+    }
   /**
    * Create bitcoin transfer transaction
    *
