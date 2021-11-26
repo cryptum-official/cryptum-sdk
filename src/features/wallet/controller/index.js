@@ -312,6 +312,19 @@ class Controller extends Interface {
    * @param {string} id transaction id
    * @returns {Promise<import('../entity').WalletTransaction>}
    */
+  async getWalletTransactions({ status, limit, offset } = {}) {
+    const qs = [
+      `limit=${limit !== undefined ? limit : 100}&offset=${offset !== undefined ? offset : 0}&status=${
+        status !== undefined ? status : 'PENDING'
+      }`,
+    ]
+    return makeRequest({ method: 'get', url: `/wallet/transaction?${qs}`, config: this.config })
+  }
+  /**
+   * Get wallet transaction id
+   * @param {string} id transaction id
+   * @returns {Promise<import('../entity').WalletTransaction>}
+   */
   async getWalletTransactionById(id) {
     return makeRequest({ method: 'get', url: `/wallet/transaction/${id}`, config: this.config })
   }
