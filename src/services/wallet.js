@@ -54,7 +54,7 @@ const getSolanaDerivationPath = ({ account = 0, address }) =>
  * Get Bitcoin address from private key
  *
  * @param {string} privateKey private key hex string
- * @param {boolean?} testnet
+ * @param {boolean=} testnet
  * @returns {string} address
  */
 module.exports.getBitcoinAddressFromPrivateKey = (privateKey, testnet = true) => {
@@ -72,7 +72,7 @@ module.exports.getBitcoinAddressFromPrivateKey = (privateKey, testnet = true) =>
  *
  * @param {string} xpub extended public key string
  * @param {boolean} testnet true or false for testnet
- * @param {object?} derivationPath derivation path object
+ * @param {object=} derivationPath derivation path object
  * @param {number} derivationPath.address derivation path address index
  * @returns
  */
@@ -90,7 +90,7 @@ module.exports.deriveBitcoinAddressFromXpub = (xpub, testnet, { address = 0 } = 
  *
  * @param {string} mnemonic mnemonic seed string
  * @param {boolean} testnet true or false for testnet
- * @param {object?} derivationPath derivation path object
+ * @param {object=} derivationPath derivation path object
  * @param {number} derivationPath.account derivation path account index
  * @param {number} derivationPath.change derivation path change index
  * @param {number} derivationPath.address derivation path address index
@@ -147,7 +147,7 @@ module.exports.getEthereumAddressFromPrivateKey = (privateKey) => {
  * Derive ethereum address, private key and public key
  *
  * @param {string} mnemonic mnemonic seed string
- * @param {object?} derivationPath derivation path object
+ * @param {object=} derivationPath derivation path object
  * @param {number} derivationPath.account derivation path account index
  * @param {number} derivationPath.change derivation path change index
  * @param {number} derivationPath.address derivation path address index
@@ -174,7 +174,7 @@ module.exports.deriveEthereumWalletFromDerivationPath = async (mnemonic, { accou
  * Derive ethereum addresses from extended public key (xpub)
  *
  * @param {string} xpub extended public key string
- * @param {object?} derivationPath derivation path object
+ * @param {object=} derivationPath derivation path object
  * @param {number} derivationPath.address derivation path address index
  * @returns
  */
@@ -222,7 +222,7 @@ module.exports.deriveBscAddressFromXpub = async (xpub, { address = 0 } = {}) =>
  * Derive stellar private key and public key
  *
  * @param {string} mnemonic mnemonic seed string
- * @param {object?} derivationPath
+ * @param {object=} derivationPath
  * @param {number} derivationPath.account account index
  * @returns
  */
@@ -302,7 +302,7 @@ module.exports.deriveHathorAddressFromXpub = (xpub, testnet, { address = 0 } = {
  * Derive cardano address, private key and public key
  *
  * @param {string} mnemonic mnemonic seed string
- * @param {boolean?} testnet
+ * @param {boolean=} testnet
  * * @param {object} derivation derivation object
  * @returns
  */
@@ -416,29 +416,13 @@ module.exports.getAvalancheAddressFromPrivateKey = (privateKey) => {
  * Derive avalanche address, private key and public key
  *
  * @param {string} mnemonic mnemonic seed string
- * @param {object?} derivationPath derivation path object
+ * @param {object=} derivationPath derivation path object
  * @param {number} derivationPath.account derivation path account index
  * @param {number} derivationPath.change derivation path change index
  * @param {number} derivationPath.address derivation path address index
  * @returns
  */
 
-module.exports.deriveAvalancheWalletFromDerivationPath = async (mnemonic, { account = 0, change = 0, address } = {}) => {
-  const accountIndex = account !== undefined ? account : 0
-  const changeIndex = change !== undefined ? change : 0
-  const addressIndex = address !== undefined ? address : 0
-  const derivedPath = hdkey
-    .fromMasterSeed(await mnemonicToSeed(mnemonic))
-    .derivePath(getAvalancheDerivationPath({ account: accountIndex, change: changeIndex }))
-  const xpub = derivedPath.publicExtendedKey().toString('hex')
-  const wallet = derivedPath.deriveChild(addressIndex).getWallet()
-  return {
-    address: wallet.getAddressString().toLocaleLowerCase(),
-    privateKey: wallet.getPrivateKeyString(),
-    publicKey: wallet.getPublicKeyString(),
-    xpub
-  }
-}
 module.exports.deriveAvalancheAddressFromXpub = async (xpub, { address = 0 } = {}) =>
   this.deriveEthereumAddressFromXpub(xpub, { address })
 

@@ -124,7 +124,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       assert.strictEqual(wallet.protocol, Protocol.AVAXCCHAIN)
       assert.strictEqual(
         wallet.address,
-        '0xb67dce3b8272340d517ec6231e435319813a749b'
+        '0xcf61eaf64d895c3c71a8812e9eedc4c179b4ed60'
       )
     })
     it('generate bitcoin wallet', async () => {
