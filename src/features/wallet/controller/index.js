@@ -11,6 +11,7 @@ const {
   getStellarPublicKeyFromPrivateKey,
   getRippleAddressFromPrivateKey,
   getAvalancheAddressFromPrivateKey,
+  getSolanaAddressFromPrivateKey,
   deriveBitcoinWalletFromDerivationPath,
   deriveCeloWalletFromDerivationPath,
   deriveStellarWalletFromDerivationPath,
@@ -27,7 +28,8 @@ const {
   deriveCardanoAddressFromXpub,
   getCardanoAddressFromPrivateKey,
   deriveAvalancheWalletFromDerivationPath,
-  deriveAvalancheAddressFromXpub
+  deriveAvalancheAddressFromXpub,
+  deriveSolanaWalletFromDerivationPath,
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
 const { validateWalletInfo, validatePrivateKey, validateCardanoPrivateKey } = require('../../../services/validations')
@@ -78,6 +80,8 @@ class Controller extends Interface {
         return await this.generateCardanoWallet({ mnemonic, derivation, testnet })
       case Protocol.AVAXCCHAIN:
         return await this.generateAvalancheWallet({ mnemonic, derivation, testnet })
+      case Protocol.SOLANA:
+        return await this.generateSolanaWallet({ mnemonic, derivation, testnet })
       default:
         throw new Error('Unsupported blockchain protocol')
     }
@@ -127,6 +131,9 @@ class Controller extends Interface {
         break
       case Protocol.AVAXCCHAIN:
         walletData.address = getAvalancheAddressFromPrivateKey(privateKey)
+        break
+      case Protocol.SOLANA:
+        walletData.address = getSolanaAddressFromPrivateKey(privateKey)
         break
       default:
         throw new Error('Unsupported blockchain protocol')
@@ -272,6 +279,18 @@ class Controller extends Interface {
       address,
       testnet,
       protocol: Protocol.AVAXCCHAIN,
+    })
+  }
+
+  async generateSolanaWallet({ mnemonic, derivation, testnet }) {
+    const { address, privateKey, publicKey, xpub } = await deriveSolanaWalletFromDerivationPath(mnemonic, derivation)
+    return new Wallet({
+      privateKey,
+      publicKey,
+      xpub,
+      address,
+      testnet,
+      protocol: Protocol.SOLANA,
     })
   }
 

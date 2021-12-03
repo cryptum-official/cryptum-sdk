@@ -255,6 +255,98 @@ class SmartContractDeployTransactionInput {
   }
 }
 
+class SolanaTokenDeployInput {
+  /**
+   * Creates an instance of SolanaTokenDeployInput.
+   *
+   * @param {object} args
+   * @param {import('../../wallet/entity').Wallet} args.from
+   * @param {string} args.to
+   * @param {string} args.fixedSupply
+   * @param {number} args.decimals
+   * @param {string} args.amount
+   * @param {string} args.network
+   */
+  constructor({ from, to, fixedSupply, decimals, amount, network }) {
+    this.from = from
+    this.to = to
+    this.fixedSupply = fixedSupply
+    this.decimals = decimals
+    this.amount = amount
+    this.network = network
+  }
+}
+
+class SolanaNFTInput {
+  /**
+   * Creates an instance of SolanaNFTInput.
+   *
+   * @param {object} args
+   * @param {import('../../wallet/entity').Wallet} args.from
+   * @param {string} args.uri
+   * @param {string} args.maxSupply
+   * @param {string} args.network
+   */
+  constructor({ from, maxSupply, uri, network }) {
+    this.from = from
+    this.uri = uri
+    this.maxSupply = maxSupply
+    this.network = network
+  }
+}
+
+class SolanaNFTEditionInput {
+  /**
+   * Creates an instance of SolanaNFTEdition.
+   *
+   * @param {object} args
+   * @param {import('../../wallet/entity').Wallet} args.from
+   * @param {string} args.masterEdition
+   * @param {string} args.network
+   */
+  constructor({ from, masterEdition, network }) {
+    this.from = from
+    this.masterEdition = masterEdition
+    this.network = network
+  }
+}
+
+class SolanaUpdateMetadataInput {
+  /**
+   * Creates an instance of SolanaNFTEdition.
+   *
+   * @param {object} args
+   * @param {import('../../wallet/entity').Wallet} args.from
+   * @param {string} args.token
+   * @param {string} args.uri
+   * @param {string} args.network
+   */
+  constructor({ from, token, uri, network }) {
+    this.from = from
+    this.token = token
+    this.uri = uri
+    this.network = network
+  }
+}
+
+class SolanaCustomProgramInput {
+  /**
+   * Creates an instance of SolanaNFTEdition.
+   *
+   * @param {object} args
+   * @param {import('../../wallet/entity').Wallet} args.from
+   * @param {Array} args.keys
+   * @param {string} args.programId
+   * @param {Buffer} args.data
+   */
+  constructor({ from, keys, programId, data }) {
+    this.from = from
+    this.keys = keys
+    this.programId = programId
+    this.data = data
+  }
+}
+
 class TokenDeployTransactionInput {
   /**
    * Creates an instance of TokenDeployTransactionInput.
@@ -393,6 +485,11 @@ module.exports = {
   RippleTransferTransactionInput,
   BitcoinTransferTransactionInput,
   SmartContractCallTransactionInput,
+  SolanaTokenDeployInput,
+  SolanaNFTInput,
+  SolanaNFTEditionInput,
+  SolanaUpdateMetadataInput,
+  SolanaCustomProgramInput,
   SmartContractCallResponse,
   SmartContractDeployTransactionInput,
   TokenDeployTransactionInput,
