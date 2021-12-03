@@ -47,6 +47,23 @@ module.exports.BSC_COMMON_CHAIN = {
   },
 }
 
+module.exports.AVAXCCHAIN_COMMON_CHAIN = {
+  testnet: {
+    base: 'rinkeby',
+    chain: {
+      chainId: 43113,
+      networkId: 1,
+    },
+  },
+  mainnet: {
+    base: 'mainnet',
+    chain: {
+      chainId: 43114,
+      networkId: 1,
+    },
+  },
+}
+
 module.exports.TRANSFER_METHOD_ABI = [
   {
     constant: false,

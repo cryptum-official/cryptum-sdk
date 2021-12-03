@@ -85,7 +85,7 @@ class Output {
    * @param {object} output 
    * @param {string} output.address
    * @param {string} output.amount
-   * @param {string?} output.token
+   * @param {string=} output.token
    */
   constructor(output) {
     this.address = output.address
@@ -101,9 +101,9 @@ class TrustlineTransactionInput {
    * @param {import('../../wallet/entity').Wallet} args.wallet
    * @param {string} args.assetSymbol
    * @param {string} args.issuer issuer account for the trustline
-   * @param {string?} args.limit max number that the trustline can allow
-   * @param {string?} args.memo
-   * @param {Fee?} args.fee fee in stroops (stellar) or drops (xrp)
+   * @param {string=} args.limit max number that the trustline can allow
+   * @param {string=} args.memo
+   * @param {Fee=} args.fee fee in stroops (stellar) or drops (xrp)
    * @param {boolean} args.testnet
    */
   constructor({ wallet, assetSymbol, issuer, limit, memo, fee, testnet }) {
@@ -135,8 +135,8 @@ class TransferTransactionInput {
    * @param {import('../../wallet/entity').Wallet} args.wallet
    * @param {string} args.amount
    * @param {string} args.destination
-   * @param {string?} args.memo
-   * @param {Fee?} args.fee
+   * @param {string=} args.memo
+   * @param {Fee=} args.fee
    * @param {boolean} args.testnet
    */
   constructor({ wallet, amount, destination, memo, fee, testnet }) {
@@ -158,10 +158,10 @@ class StellarTransferTransactionInput extends TransferTransactionInput {
    * @param {string} args.issuer issuer account to identify the asset to be transferred
    * @param {string} args.amount amount to be transferred
    * @param {string} args.destination account to be transferred to
-   * @param {string?} args.memo
-   * @param {Fee?} args.fee fee in stroops
-   * @param {boolean?} args.createAccount true if the destination account does not exist yet
-   * @param {boolean?} args.testnet
+   * @param {string=} args.memo
+   * @param {Fee=} args.fee fee in stroops
+   * @param {boolean=} args.createAccount true if the destination account does not exist yet
+   * @param {boolean=} args.testnet
    */
   constructor({ assetSymbol, createAccount, issuer, ...args }) {
     super(args)
@@ -180,9 +180,9 @@ class RippleTransferTransactionInput extends TransferTransactionInput {
    * @param {string} args.issuer issuer account to identify the asset to be transferred
    * @param {string} args.amount amount to be transferred
    * @param {string} args.destination account to be transferred to
-   * @param {Fee?} args.fee fee in drops
-   * @param {string?} args.memo
-   * @param {boolean?} args.testnet
+   * @param {Fee=} args.fee fee in drops
+   * @param {string=} args.memo
+   * @param {boolean=} args.testnet
    */
   constructor({ assetSymbol, issuer, ...args }) {
     super(args)
@@ -199,10 +199,10 @@ class EthereumTransferTransactionInput extends TransferTransactionInput {
    * @param {string} args.tokenSymbol
    * @param {string} args.amount
    * @param {string} args.destination
-   * @param {string?} args.memo
-   * @param {Fee?} args.fee
+   * @param {string=} args.memo
+   * @param {Fee=} args.fee
    * @param {boolean} args.testnet
-   * @param {string?} args.contractAddress
+   * @param {string=} args.contractAddress
    */
   constructor({ tokenSymbol, contractAddress, ...args }) {
     super(args)
@@ -215,7 +215,7 @@ class SmartContractCallTransactionInput {
    * Creates an instance of SmartContractCallTransactionInput.
    *
    * @param {object} args
-   * @param {string?} args.from
+   * @param {string=} args.from
    * @param {string} args.contractAddress
    * @param {Array<object>} args.contractAbi
    * @param {string} args.method
@@ -242,7 +242,7 @@ class SmartContractDeployTransactionInput {
    * @param {string} args.contractName
    * @param {Array} args.params
    * @param {string} args.source
-   * @param {Fee?} args.fee
+   * @param {Fee=} args.fee
    * @param {boolean} args.testnet
    */
   constructor({ wallet, contractName, params, source, fee, testnet }) {
@@ -355,7 +355,7 @@ class TokenDeployTransactionInput {
    * @param {import('../../wallet/entity').Wallet} args.wallet
    * @param {Array} args.params
    * @param {string} args.tokenType
-   * @param {Fee?} args.fee
+   * @param {Fee=} args.fee
    * @param {Protocol} args.protocol
    * @param {boolean} args.testnet
    */
@@ -377,17 +377,15 @@ class CeloTransferTransactionInput extends EthereumTransferTransactionInput {
    * @param {string} args.tokenSymbol
    * @param {string} args.amount
    * @param {string} args.destination
-   * @param {string?} args.memo
-   * @param {Fee?} args.fee
+   * @param {string=} args.memo
+   * @param {Fee=} args.fee
    * @param {boolean} args.testnet
-   * @param {string?} args.contractAddress
-   * @param {string?} args.feeCurrency
-   * @param {string?} args.feeCurrencyContractAddress
+   * @param {string=} args.contractAddress
+   * @param {string=} args.feeCurrency
    */
-  constructor({ feeCurrency, feeCurrencyContractAddress, ...args }) {
+  constructor({ feeCurrency, ...args }) {
     super(args)
     this.feeCurrency = feeCurrency
-    this.feeCurrencyContractAddress = feeCurrencyContractAddress
   }
 }
 class BitcoinTransferTransactionInput extends TransferTransactionInput {
@@ -395,10 +393,10 @@ class BitcoinTransferTransactionInput extends TransferTransactionInput {
    * Creates an instance of BitcoinTransferTransactionInput.
    *
    * @param {object} args
-   * @param {import('../../wallet/entity').Wallet?} args.wallet wallet to transfer from
-   * @param {Array<Input>?} args.inputs inputs to transfer from
+   * @param {import('../../wallet/entity').Wallet=} args.wallet wallet to transfer from
+   * @param {Array<Input>=} args.inputs inputs to transfer from
    * @param {Array<Output>} args.outputs outputs to transfer to
-   * @param {Fee?} args.fee fee per byte in satoshi
+   * @param {Fee=} args.fee fee per byte in satoshi
    * @param {boolean} args.testnet
    */
   constructor({ outputs, inputs, ...args }) {
@@ -412,8 +410,8 @@ class HathorTransferTransactionInput extends TransferTransactionInput {
    * Creates an instance of HathorTransferTransactionInput.
    *
    * @param {object} args
-   * @param {import('../../wallet/entity').Wallet?} args.wallet wallet to transfer from
-   * @param {Array<Input>?} args.inputs inputs to transfer from
+   * @param {import('../../wallet/entity').Wallet=} args.wallet wallet to transfer from
+   * @param {Array<Input>=} args.inputs inputs to transfer from
    * @param {Array<Output>} args.outputs outputs to transfer to
    * @param {Array<Output>} args.tokens outputs to transfer to
    * @param {boolean} args.testnet
@@ -429,8 +427,8 @@ class CardanoTransferTransactionInput extends TransferTransactionInput {
    * Creates an instance of CardanoTransferTransactionInput.
    *
    * @param {object} args
-   * @param {import('../../wallet/entity').Wallet?} args.wallet wallet to transfer from
-   * @param {Array<Input>?} args.inputs inputs to transfer from
+   * @param {import('../../wallet/entity').Wallet=} args.wallet wallet to transfer from
+   * @param {Array<Input>=} args.inputs inputs to transfer from
    * @param {Array<Output>} args.outputs outputs to transfer to
    * @param {Array<Output>} args.tokens outputs to transfer to
    * @param {boolean} args.testnet
@@ -445,15 +443,15 @@ class CardanoTransferTransactionInput extends TransferTransactionInput {
  * @typedef {Object} HathorTokenTransactionFromWalletInput
  * @property {TransactionType} type token transaction type
  * @property {import('../../wallet/entity').Wallet} wallet wallet to create the token with
- * @property {string?} tokenName token name
- * @property {string?} tokenSymbol token symbol
- * @property {string?} tokenUid token uid
+ * @property {string=} tokenName token name
+ * @property {string=} tokenSymbol token symbol
+ * @property {string=} tokenUid token uid
  * @property {string} amount token amount to mint
  * @property {string} address destination address to receive the tokens
- * @property {string?} changeAddress change address
- * @property {string?} mintAuthorityAddress mint authority address
- * @property {string?} meltAuthorityAddress melt authority address
- * @property {boolean?} testnet
+ * @property {string=} changeAddress change address
+ * @property {string=} mintAuthorityAddress mint authority address
+ * @property {string=} meltAuthorityAddress melt authority address
+ * @property {boolean=} testnet
  */
 /**
  * @typedef {Object} HathorTokenTransactionFromUTXOInput
@@ -463,10 +461,10 @@ class CardanoTransferTransactionInput extends TransferTransactionInput {
  * @property {string} tokenSymbol token symbol
  * @property {string} amount token amount to mint
  * @property {string} address destination address to receive the tokens
- * @property {string?} changeAddress change address
- * @property {string?} mintAuthorityAddress mint authority address
- * @property {string?} meltAuthorityAddress melt authority address
- * @property {boolean?} testnet
+ * @property {string=} changeAddress change address
+ * @property {string=} mintAuthorityAddress mint authority address
+ * @property {string=} meltAuthorityAddress melt authority address
+ * @property {boolean=} testnet
  */
 
 module.exports = {
