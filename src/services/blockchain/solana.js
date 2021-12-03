@@ -254,6 +254,3 @@ module.exports.buildSolanaCustomProgramInteraction = async function ({
 
   return rawTransaction
 }
-
-// TO-DO
-// CREATE call smart contract function
