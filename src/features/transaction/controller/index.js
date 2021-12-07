@@ -78,7 +78,6 @@ class Controller extends Interface {
    */
   async sendTransaction(transaction) {
     try {
-      console.log(transaction)
       validateSignedTransaction(transaction)
       const apiRequest = getApiMethod({
         requests,
@@ -511,41 +510,6 @@ class Controller extends Interface {
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
-   /**
-   * Create avalanche transfer transaction
-   *
-   * @param {EthereumTransferTransactionInput} input
-   * @returns {Promise<SignedTransaction>} signed transaction data
-   */
-    async createAvaxCChainTransferTransaction(input) {
-      validateEthereumTransferTransactionParams(input)
-      const { wallet, tokenSymbol, amount, destination, fee, testnet, contractAddress } = input
-      const protocol = Protocol.AVAXCCHAIN
-      const { info, networkFee } = await this._getFeeInfo({
-        wallet,
-        type: tokenSymbol === 'AVAX' ? TransactionType.TRANSFER : TransactionType.CALL_CONTRACT_METHOD,
-        destination,
-        amount: tokenSymbol === 'AVAX' ? amount : null,
-        contractAddress,
-        contractAbi: tokenSymbol === 'AVAX' ? null : TRANSFER_METHOD_ABI,
-        method: tokenSymbol === 'AVAX' ? null : 'transfer',
-        params: tokenSymbol === 'AVAX' ? null : [destination, toWei(amount).toString()],
-        testnet,
-        fee,
-        protocol,
-      })
-      const signedTx = await buildAvaxCChainTransferTransaction({
-        fromPrivateKey: wallet.privateKey,
-        tokenSymbol,
-        amount,
-        destination,
-        fee: networkFee,
-        nonce: info.nonce,
-        testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
-        contractAddress,
-      })
-      return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
-    }
   /**
   * Create avalanche transfer transaction
   *
@@ -610,7 +574,7 @@ class Controller extends Interface {
     }
     let networkFee = fee
     if (!networkFee) {
-      ;({ estimateValue: networkFee } = await this.getFee({
+      ; ({ estimateValue: networkFee } = await this.getFee({
         type: TransactionType.TRANSFER,
         protocol,
       }))
@@ -793,7 +757,6 @@ class Controller extends Interface {
    * @returns {Promise<SignedTransaction>}
    */
   async createTokenDeployTransaction(input) {
-    console.log(input)
     validateTokenDeployTransactionParams(input)
     const { wallet, fee, testnet, params, protocol, feeCurrency, tokenType } = input
 
@@ -1243,7 +1206,7 @@ class Controller extends Interface {
 
     const signedTx = await buildSolanaTokenBurnTransaction({ from, token, amount, latestBlock })
 
-    return new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_ERC721 })
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
   }
 
   /**
