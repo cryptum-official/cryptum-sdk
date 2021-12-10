@@ -13,9 +13,8 @@ module.exports.buildSolanaTransferTransaction = async function ({
   network = 'testnet'
 }) {
   const fromAccount = solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey))
-
   let manualTransaction = new solanaWeb3.Transaction({
-    recentBlockhash: latestBlock,
+    recentBlockhash: latestBlock.toString(),
     feePayer: fromAccount.publicKey
   });
 
@@ -108,6 +107,49 @@ module.exports.deploySolanaToken = async function ({ from, to = from.publicKey, 
   return mint.publicKey.toBase58()
 }
 
+module.exports.mintSolanaToken = async function ({ from, to = from.publicKey, token, amount, latestBlock, network = 'testnet' }) {
+  const connection = new solanaWeb3.Connection(
+    solanaWeb3.clusterApiUrl(network),
+    'confirmed',
+  );
+
+  const fromAccount = solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey))
+  const toAccount = new solanaWeb3.PublicKey(to)
+  const tokenProgram = new splToken.Token(connection, new solanaWeb3.PublicKey(token), splToken.TOKEN_PROGRAM_ID, fromAccount)
+
+  let manualTransaction = new solanaWeb3.Transaction({
+    recentBlockhash: latestBlock.toString(),
+    feePayer: fromAccount.publicKey
+  });
+
+  const toTokenAccount = await tokenProgram.getOrCreateAssociatedAccountInfo(
+    toAccount
+  );
+
+  manualTransaction.add(
+    splToken.Token.createMintToInstruction(
+      splToken.TOKEN_PROGRAM_ID,
+      tokenProgram.publicKey,
+      toTokenAccount.address,
+      fromAccount.publicKey,
+      [],
+      amount
+    )
+  );
+
+  let transactionBuffer = manualTransaction.serializeMessage();
+  let signature = nacl.sign.detached(transactionBuffer, fromAccount.secretKey);
+  manualTransaction.addSignature(fromAccount.publicKey, signature);
+
+  let isVerifiedSignature = manualTransaction.verifySignatures();
+  if (!isVerifiedSignature)
+    throw new Error('Signatures are not valid.')
+
+  let rawTransaction = Buffer.from(manualTransaction.serialize()).toString('hex');
+
+  return rawTransaction
+}
+
 module.exports.deploySolanaNFT = async function ({ from, maxSupply, uri, network = 'testnet' }) {
   const connection = new metaplex.Connection(network)
   const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
@@ -148,10 +190,10 @@ module.exports.buildSolanaTokenBurnTransaction = async function ({
   const fromAccount = solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey))
 
   let manualTransaction = new solanaWeb3.Transaction({
-    recentBlockhash: latestBlock,
+    recentBlockhash: latestBlock.toString(),
     feePayer: fromAccount.publicKey
   });
-
+console.log(latestBlock.toString())
   const connection = new solanaWeb3.Connection(
     solanaWeb3.clusterApiUrl(network),
     'confirmed',
@@ -230,7 +272,7 @@ module.exports.buildSolanaCustomProgramInteraction = async function ({
   const fromAccount = solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey))
 
   let manualTransaction = new solanaWeb3.Transaction({
-    recentBlockhash: latestBlock,
+    recentBlockhash: latestBlock.toString(),
     feePayer: fromAccount.publicKey
   });
 

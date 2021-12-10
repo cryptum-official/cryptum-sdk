@@ -35,7 +35,7 @@ const {
   buildEthereumSmartContractDeployTransaction,
 } = require('../../../services/blockchain/ethereum')
 const {
-  buildSolanaTransferTransaction, deploySolanaToken, deploySolanaNFT, mintEdition, buildSolanaTokenBurnTransaction, updateMetaplexMetadata, buildSolanaCustomProgramInteraction,
+  buildSolanaTransferTransaction, deploySolanaToken, deploySolanaNFT, mintEdition, buildSolanaTokenBurnTransaction, updateMetaplexMetadata, buildSolanaCustomProgramInteraction, mintSolanaToken,
 } = require('../../../services/blockchain/solana')
 const { buildBitcoinTransferTransaction } = require('../../../services/blockchain/bitcoin')
 const WalletController = require('../../wallet/controller')
@@ -62,6 +62,10 @@ const {
   validateHathorTokenTransactionFromWallet,
   validateHathorTransferTransactionFromWallet,
   validateHathorTransferTransactionFromUTXO,
+  validateSolanaTransferTransaction,
+  validateSolanaDeployTransaction,
+  validateSolanaDeployNFT,
+  validateSolanaCustomProgramInput,
 } = require('../../../services/validations')
 
 const { buildHathorTransferTransaction, buildHathorTokenTransaction } = require('../../../services/blockchain/hathor')
@@ -1172,6 +1176,7 @@ class Controller extends Interface {
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createSolanaTransferTransaction(input) {
+    validateSolanaTransferTransaction(input)
     const { wallet, destination, token, amount } = input
     const protocol = Protocol.SOLANA
 
@@ -1180,7 +1185,7 @@ class Controller extends Interface {
       key: 'getBlock',
       config: this.config,
     })
-    const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data
+    const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data.blockhash
 
     const signedTx = await buildSolanaTransferTransaction({ from: wallet, to: destination, token, amount, latestBlock })
 
@@ -1194,7 +1199,8 @@ class Controller extends Interface {
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createSolanaTokenBurnTransaction(input) {
-    const { from, token, amount } = input
+    validateSolanaTransferTransaction(input)
+    const { wallet, token, amount } = input
     const protocol = Protocol.SOLANA
 
     const apiRequest = getApiMethod({
@@ -1202,9 +1208,32 @@ class Controller extends Interface {
       key: 'getBlock',
       config: this.config,
     })
-    const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data
+    const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data.blockhash
 
-    const signedTx = await buildSolanaTokenBurnTransaction({ from, token, amount, latestBlock })
+    const signedTx = await buildSolanaTokenBurnTransaction({ from: wallet, token, amount, latestBlock })
+
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
+  }
+
+  /**
+   * Create Solana token mint transaction
+   *
+   * @param {import('../entity').TransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
+  async createSolanaTokenMintTransaction(input) {
+    validateSolanaTransferTransaction(input)
+    const { wallet, destination, token, amount } = input
+    const protocol = Protocol.SOLANA
+
+    const apiRequest = getApiMethod({
+      requests,
+      key: 'getBlock',
+      config: this.config,
+    })
+    const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data.blockhash
+
+    const signedTx = await mintSolanaToken({ from: wallet, token, to: destination, amount, latestBlock })
 
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
   }
@@ -1216,9 +1245,10 @@ class Controller extends Interface {
      * @returns {Promise<TransactionResponse>} token signature
      */
   async createSolanaTokenDeployTransaction(input) {
-    const { from, to, fixedSupply, decimals, amount, network } = input
+    validateSolanaDeployTransaction(input)
+    const { wallet, destination, fixedSupply, decimals, amount, network } = input
 
-    const hash = await deploySolanaToken({ from, to, fixedSupply, decimals, amount, network })
+    const hash = await deploySolanaToken({ from: wallet, to: destination, fixedSupply, decimals, amount, network })
 
     return new TransactionResponse({ hash })
   }
@@ -1230,9 +1260,10 @@ class Controller extends Interface {
      * @returns {Promise<TransactionResponse>} token signature
      */
   async createSolanaNFT(input) {
-    const { from, maxSupply, uri, network } = input
+    validateSolanaDeployNFT(input)
+    const { wallet, maxSupply, uri, network } = input
 
-    const hash = await deploySolanaNFT({ from, maxSupply, uri, network })
+    const hash = await deploySolanaNFT({ from: wallet, maxSupply, uri, network })
 
     return new TransactionResponse({ hash })
   }
@@ -1244,9 +1275,10 @@ class Controller extends Interface {
      * @returns {Promise<TransactionResponse>} edition signature
      */
   async createSolanaNFTEdition(input) {
-    const { from, masterEdition, network } = input
+    validateSolanaDeployNFT(input)
+    const { wallet, masterEdition, network } = input
 
-    const hash = await mintEdition({ masterEdition, from, network })
+    const hash = await mintEdition({ masterEdition, from: wallet, network })
 
     return new TransactionResponse({ hash })
   }
@@ -1258,9 +1290,10 @@ class Controller extends Interface {
      * @returns {Promise<TransactionResponse>} token signature
      */
   async updateSolanaNFTMetadata(input) {
-    const { from, token, uri, network } = input
+    validateSolanaDeployNFT(input)
+    const { wallet, token, uri, network } = input
 
-    const hash = await updateMetaplexMetadata({ from, token, uri, network })
+    const hash = await updateMetaplexMetadata({ from: wallet, token, uri, network })
 
     return new TransactionResponse({ hash })
   }
@@ -1272,6 +1305,7 @@ class Controller extends Interface {
      * @returns {Promise<SignedTransaction>} signed transaction
      */
   async createSolanaCustomProgramInteraction(input) {
+    validateSolanaCustomProgramInput(input)
     const { from, keys, programId, data } = input
     const protocol = Protocol.SOLANA
 
@@ -1280,7 +1314,7 @@ class Controller extends Interface {
       key: 'getBlock',
       config: this.config,
     })
-    const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data
+    const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data.blockhash
 
     const signedTx = await buildSolanaCustomProgramInteraction({ from, keys, programId, data, latestBlock })
 
