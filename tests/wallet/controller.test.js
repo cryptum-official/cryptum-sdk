@@ -92,6 +92,14 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       })
       assert.strictEqual(wallet.address, 'addr_test1qq7xrd2acryragknqwnsgqaam9hxq2scfcuhjuu3p6kmepgxr2xgy4urjt8p0gf0x6ykqag4km2dzrz870n7j4ydjszqj93ujx')
     })
+    it('solana', async () => {
+      const controller = new WalletController(config)
+      const wallet = await controller.generateWalletFromPrivateKey({
+        protocol: Protocol.SOLANA,
+        privateKey: 'sGhVuqEYkGydzgnMCv2bd21uykMknighSFMcnAy7FxH6B4tjpPFUUQ5NWcS5hrvevMpn8cndp482ZacraX3HLb6'
+      })
+      assert.strictEqual(wallet.address, 'AgmaPkXMQAUyRUJc9QxywFnC8RjyWKt7WxS5e1ZFtQXe')
+    })
   })
 
   describe('From same mnemonic', () => {
@@ -201,6 +209,18 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       assert.strictEqual(
         wallet.address,
         'addr_test1qq7xrd2acryragknqwnsgqaam9hxq2scfcuhjuu3p6kmepgxr2xgy4urjt8p0gf0x6ykqag4km2dzrz870n7j4ydjszqj93ujx'
+      )
+    })
+    it('generate solana wallet', async () => {
+      const controller = new WalletController(config)
+      const wallet = await controller.generateWallet({
+        protocol: Protocol.SOLANA,
+        mnemonic,
+      })
+      assert.strictEqual(wallet.protocol, Protocol.SOLANA)
+      assert.strictEqual(
+        wallet.address,
+        'AgmaPkXMQAUyRUJc9QxywFnC8RjyWKt7WxS5e1ZFtQXe'
       )
     })
   })

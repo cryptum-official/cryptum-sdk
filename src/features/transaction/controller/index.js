@@ -34,6 +34,9 @@ const {
   buildEthereumSmartContractTransaction,
   buildEthereumSmartContractDeployTransaction,
 } = require('../../../services/blockchain/ethereum')
+const {
+  buildSolanaTransferTransaction, deploySolanaToken, deploySolanaNFT, mintEdition, buildSolanaTokenBurnTransaction, updateMetaplexMetadata, buildSolanaCustomProgramInteraction, mintSolanaToken,
+} = require('../../../services/blockchain/solana')
 const { buildBitcoinTransferTransaction } = require('../../../services/blockchain/bitcoin')
 const WalletController = require('../../wallet/controller')
 const { GenericException, HathorException } = require('../../../../errors')
@@ -59,6 +62,10 @@ const {
   validateHathorTokenTransactionFromWallet,
   validateHathorTransferTransactionFromWallet,
   validateHathorTransferTransactionFromUTXO,
+  validateSolanaTransferTransaction,
+  validateSolanaDeployTransaction,
+  validateSolanaDeployNFT,
+  validateSolanaCustomProgramInput,
 } = require('../../../services/validations')
 
 const { buildHathorTransferTransaction, buildHathorTokenTransaction } = require('../../../services/blockchain/hathor')
@@ -407,8 +414,8 @@ class Controller extends Interface {
         feeCurrency === 'cUSD'
           ? CUSD_CONTRACT_ADDRESS[network]
           : feeCurrency === 'cEUR'
-          ? CEUR_CONTRACT_ADDRESS[network]
-          : feeCurrency
+            ? CEUR_CONTRACT_ADDRESS[network]
+            : feeCurrency
     }
     const { info, networkFee } = await this._getFeeInfo({
       wallet,
@@ -507,41 +514,41 @@ class Controller extends Interface {
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
-   /**
-   * Create avalanche transfer transaction
-   *
-   * @param {EthereumTransferTransactionInput} input
-   * @returns {Promise<SignedTransaction>} signed transaction data
-   */
-    async createAvaxCChainTransferTransaction(input) {
-      validateEthereumTransferTransactionParams(input)
-      const { wallet, tokenSymbol, amount, destination, fee, testnet, contractAddress } = input
-      const protocol = Protocol.AVAXCCHAIN
-      const { info, networkFee } = await this._getFeeInfo({
-        wallet,
-        type: tokenSymbol === 'AVAX' ? TransactionType.TRANSFER : TransactionType.CALL_CONTRACT_METHOD,
-        destination,
-        amount: tokenSymbol === 'AVAX' ? amount : null,
-        contractAddress,
-        contractAbi: tokenSymbol === 'AVAX' ? null : TRANSFER_METHOD_ABI,
-        method: tokenSymbol === 'AVAX' ? null : 'transfer',
-        params: tokenSymbol === 'AVAX' ? null : [destination, toWei(amount).toString()],
-        testnet,
-        fee,
-        protocol,
-      })
-      const signedTx = await buildAvaxCChainTransferTransaction({
-        fromPrivateKey: wallet.privateKey,
-        tokenSymbol,
-        amount,
-        destination,
-        fee: networkFee,
-        nonce: info.nonce,
-        testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
-        contractAddress,
-      })
-      return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
-    }
+  /**
+  * Create avalanche transfer transaction
+  *
+  * @param {EthereumTransferTransactionInput} input
+  * @returns {Promise<SignedTransaction>} signed transaction data
+  */
+  async createAvaxCChainTransferTransaction(input) {
+    validateEthereumTransferTransactionParams(input)
+    const { wallet, tokenSymbol, amount, destination, fee, testnet, contractAddress } = input
+    const protocol = Protocol.AVAXCCHAIN
+    const { info, networkFee } = await this._getFeeInfo({
+      wallet,
+      type: tokenSymbol === 'AVAX' ? TransactionType.TRANSFER : TransactionType.CALL_CONTRACT_METHOD,
+      destination,
+      amount: tokenSymbol === 'AVAX' ? amount : null,
+      contractAddress,
+      contractAbi: tokenSymbol === 'AVAX' ? null : TRANSFER_METHOD_ABI,
+      method: tokenSymbol === 'AVAX' ? null : 'transfer',
+      params: tokenSymbol === 'AVAX' ? null : [destination, toWei(amount).toString()],
+      testnet,
+      fee,
+      protocol,
+    })
+    const signedTx = await buildAvaxCChainTransferTransaction({
+      fromPrivateKey: wallet.privateKey,
+      tokenSymbol,
+      amount,
+      destination,
+      fee: networkFee,
+      nonce: info.nonce,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
+      contractAddress,
+    })
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
+  }
   /**
    * Create bitcoin transfer transaction
    *
@@ -571,7 +578,7 @@ class Controller extends Interface {
     }
     let networkFee = fee
     if (!networkFee) {
-      ;({ estimateValue: networkFee } = await this.getFee({
+      ; ({ estimateValue: networkFee } = await this.getFee({
         type: TransactionType.TRANSFER,
         protocol,
       }))
@@ -1161,5 +1168,158 @@ class Controller extends Interface {
       handleRequestError(error)
     }
   }
+
+  /**
+   * Create Solana transfer transaction
+   *
+   * @param {import('../entity').TransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
+  async createSolanaTransferTransaction(input) {
+    validateSolanaTransferTransaction(input)
+    const { wallet, destination, token, amount } = input
+    const protocol = Protocol.SOLANA
+
+    const apiRequest = getApiMethod({
+      requests,
+      key: 'getBlock',
+      config: this.config,
+    })
+    const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data.blockhash
+
+    const signedTx = await buildSolanaTransferTransaction({ from: wallet, to: destination, token, amount, latestBlock })
+
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
+  }
+
+  /**
+   * Create Solana token burn transaction
+   *
+   * @param {import('../entity').TransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
+  async createSolanaTokenBurnTransaction(input) {
+    validateSolanaTransferTransaction(input)
+    const { wallet, token, amount } = input
+    const protocol = Protocol.SOLANA
+
+    const apiRequest = getApiMethod({
+      requests,
+      key: 'getBlock',
+      config: this.config,
+    })
+    const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data.blockhash
+
+    const signedTx = await buildSolanaTokenBurnTransaction({ from: wallet, token, amount, latestBlock })
+
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
+  }
+
+  /**
+   * Create Solana token mint transaction
+   *
+   * @param {import('../entity').TransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
+  async createSolanaTokenMintTransaction(input) {
+    validateSolanaTransferTransaction(input)
+    const { wallet, destination, token, amount } = input
+    const protocol = Protocol.SOLANA
+
+    const apiRequest = getApiMethod({
+      requests,
+      key: 'getBlock',
+      config: this.config,
+    })
+    const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data.blockhash
+
+    const signedTx = await mintSolanaToken({ from: wallet, token, to: destination, amount, latestBlock })
+
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
+  }
+
+  /**
+     * Create Solana token deploy transaction
+     *
+     * @param {import('../entity').SolanaTokenDeployInput} input
+     * @returns {Promise<TransactionResponse>} token signature
+     */
+  async createSolanaTokenDeployTransaction(input) {
+    validateSolanaDeployTransaction(input)
+    const { wallet, destination, fixedSupply, decimals, amount, network } = input
+
+    const hash = await deploySolanaToken({ from: wallet, to: destination, fixedSupply, decimals, amount, network })
+
+    return new TransactionResponse({ hash })
+  }
+
+  /**
+     * Create Solana NFT 
+     *
+     * @param {import('../entity').SolanaNFTInput} input
+     * @returns {Promise<TransactionResponse>} token signature
+     */
+  async createSolanaNFT(input) {
+    validateSolanaDeployNFT(input)
+    const { wallet, maxSupply, uri, network } = input
+
+    const hash = await deploySolanaNFT({ from: wallet, maxSupply, uri, network })
+
+    return new TransactionResponse({ hash })
+  }
+
+  /**
+     * Create Solana NFT Edition
+     *
+     * @param {import('../entity').SolanaNFTEditionInput} input
+     * @returns {Promise<TransactionResponse>} edition signature
+     */
+  async createSolanaNFTEdition(input) {
+    validateSolanaDeployNFT(input)
+    const { wallet, masterEdition, network } = input
+
+    const hash = await mintEdition({ masterEdition, from: wallet, network })
+
+    return new TransactionResponse({ hash })
+  }
+
+  /**
+     * Update Solana NFT Metadata
+     *
+     * @param {import('../entity').SolanaUpdateMetadataInput} input
+     * @returns {Promise<TransactionResponse>} token signature
+     */
+  async updateSolanaNFTMetadata(input) {
+    validateSolanaDeployNFT(input)
+    const { wallet, token, uri, network } = input
+
+    const hash = await updateMetaplexMetadata({ from: wallet, token, uri, network })
+
+    return new TransactionResponse({ hash })
+  }
+
+  /**
+     * Create a Custom Solana Program Interaction
+     *
+     * @param {import('../entity').SolanaCustomProgramInput} input
+     * @returns {Promise<SignedTransaction>} signed transaction
+     */
+  async createSolanaCustomProgramInteraction(input) {
+    validateSolanaCustomProgramInput(input)
+    const { from, keys, programId, data } = input
+    const protocol = Protocol.SOLANA
+
+    const apiRequest = getApiMethod({
+      requests,
+      key: 'getBlock',
+      config: this.config,
+    })
+    const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data.blockhash
+
+    const signedTx = await buildSolanaCustomProgramInteraction({ from, keys, programId, data, latestBlock })
+
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.CALL_CONTRACT_METHOD })
+  }
+
 }
 module.exports = Controller

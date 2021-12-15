@@ -9,6 +9,9 @@ const hathorSdk = require('@hathor/wallet-lib')
 const bitcore = require('bitcore-lib')
 const CardanoWasm = require("@emurgo/cardano-serialization-lib-nodejs");
 const Bip39 = require("bip39");
+const solanaWeb3 = require('@solana/web3.js');
+const ed25519 = require('ed25519-hd-key')
+const bs58 = require('bs58')
 
 const DERIVATION_PATH_TEMPLATE = "m/{purpose}'/{coin}'/{account}'/{change}/{address}"
 
@@ -43,6 +46,9 @@ const getCardanoDerivationPath = ({ account = 0, address }) =>
   getDerivationPath({ purpose: 1852, coin: 1815, account, address })
 const getAvalancheDerivationPath = ({ account = 0, address }) =>
   getDerivationPath({ purpose: 44, coin: 9000, account, address })
+const getSolanaDerivationPath = ({ account = 0, address }) =>
+  getDerivationPath({ purpose: 44, coin: 501, account, address })
+
 
 /**
  * Get Bitcoin address from private key
@@ -392,7 +398,7 @@ module.exports.getCardanoAddressFromPrivateKey = (privateKey, testnet = true) =>
 
   return baseAddr
 }
-  
+
 
 /**
  * Get Avalanche address from private key
@@ -420,3 +426,37 @@ module.exports.getAvalancheAddressFromPrivateKey = (privateKey) => {
 module.exports.deriveAvalancheAddressFromXpub = async (xpub, { address = 0 } = {}) =>
   this.deriveEthereumAddressFromXpub(xpub, { address })
 
+/**
+ * Derive Solana address, private key and public key
+ *
+ * @param {string} mnemonic mnemonic seed string
+ * @param {object?} derivationPath derivation path object
+ * @param {number} derivationPath.account derivation path account index
+ * @param {number} derivationPath.change derivation path change index
+ * @param {number} derivationPath.address derivation path address index
+ * @returns
+ */
+module.exports.deriveSolanaWalletFromDerivationPath = async (mnemonic, { account = 0, change = 0, address = 0 } = {}) => {  
+  const seed = Buffer.from(await mnemonicToSeed(mnemonic)).toString('hex')
+  const path = getSolanaDerivationPath({ account, address }).slice(0, 13)
+  const { key } = ed25519.derivePath(path, Buffer.from(seed, "hex"))
+  const keypair = solanaWeb3.Keypair.fromSeed(key)
+  
+  return {
+    address: keypair.publicKey.toString(),
+    privateKey: bs58.encode(keypair.secretKey) ,
+    publicKey: keypair.publicKey.toString(),
+    xpub: undefined,
+  }
+}
+
+/**
+ * Get Solana address from private key
+ *
+ * @param {string} privateKey private key code58 string
+ * @returns {object} address
+ */
+ module.exports.getSolanaAddressFromPrivateKey = (privateKey) => {
+  const keypair = solanaWeb3.Keypair.fromSecretKey(bs58.decode(privateKey))
+  return keypair.publicKey.toString()
+}

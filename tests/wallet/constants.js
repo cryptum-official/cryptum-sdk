@@ -13,7 +13,8 @@ const wallets = {
   bitcoin: null,
   hathor: null,
   cardano: null,
-  avaxcchain: null
+  avaxcchain: null,
+  solana: null
 }
 exports.mnemonic = mnemonic
 exports.config = {
@@ -57,6 +58,10 @@ exports.getWallets = async () => {
   })
   wallets.avaxcchain = await controller.generateWallet({
     protocol: Protocol.AVAXCCHAIN,
+    mnemonic,
+  })
+  wallets.solana = await controller.generateWallet({
+    protocol: Protocol.SOLANA,
     mnemonic,
   })
   return wallets
