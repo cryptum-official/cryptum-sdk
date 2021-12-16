@@ -7,6 +7,7 @@
 - [Ripple](#ripple)
 - [Hathor](#hathor)
 - [Cardano](#cardano)
+- [Solana](#solana)
 - [Send transactions to blockchain](#send-transactions-to-blockchain)
 
 First create an instance of transaction controller to call all methods below.
@@ -339,7 +340,33 @@ const transaction = await txController.createCardanoTransferTransactionFromUTXO(
     ]
 })
 ```
+## Solana
 
+#### `txController.createSolanaTransferTransaction(opts)`
+
+Create a transfer transaction in Ethereum blockchain, you can transfer ETH or any other tokens.
+* `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
+* `opts.token` (string) - token to transfer. If you are transferring Solana this parameter should be `SOL`, otherwise it should be the token ID
+* `opts.amount` (string)(__required__) - amount to be transferred. 
+* `opts.destination` (string)(__required__) - destination address to be transfered to.
+
+Examples:
+```js
+// transfer SOL
+const transaction = await txController.createSolanaTransferTransaction({
+    wallet,
+    destination: 'AUyRU...tQXe',
+    token: 'SOL',
+    amount: '0.05'
+  })
+// transfer SPL token
+const transaction = await txController.createSolanaTransferTransaction({
+  wallet,
+  token: 'zS857A...RN1Z',
+  amount: '900', // no decimals since each token has its own decimal variable number
+  destination: 'yWKt7...e1ZF',
+})
+```
 
 ## Send transactions to blockchain
 

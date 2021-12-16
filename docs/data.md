@@ -8,7 +8,7 @@ Get wallet address information from blockchain.
 
 * `opts.address` (string)(**required**) - wallet address. 
 * `opts.protocol` (string)(**required**) - blockchain protocol.
-* `opts.tokenAddresses` (array)(**optional**) - array of token addresses. Only for `ETHEREUM`, `CELO` and `BSC`.
+* `opts.tokenAddresses` (array)(**optional**) - array of token addresses. Only for `ETHEREUM`, `CELO`, `BSC` and `SOLANA`.
 
 ```js
 const wc = sdk.getWalletController()
@@ -78,7 +78,7 @@ const tx = await txController.getTransactionByHash({ hash: '<hash>', protocol: '
 Get UTXOs from a wallet address.
 
 * `opts.address` (string)(**required**) - transaction hash.
-* `opts.protocol` (string)(**required**) - blockchain protocol. Only `BITCOIN` and `HATHOR`.
+* `opts.protocol` (string)(**required**) - blockchain protocol. Only `BITCOIN`, `HATHOR` and `CARDANO`.
 
 ```js
 const txController = sdk.getTransactionController()

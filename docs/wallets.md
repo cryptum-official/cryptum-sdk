@@ -1,6 +1,6 @@
 # Wallets
 
-You need only to instantiate Wallet controller to manage wallets.
+You should instantiate a Wallet controller in order to manage wallets.
 ```js
 const walletController = sdk.getWalletController()
 ```
@@ -19,7 +19,7 @@ console.log(mnemonic)
 #### `walletController.generateWallet(opts)`
 
 Generate a wallet for a blockchain protocol:
-* `opts.protocol` (string) (__required__) - blockchain protocol supported: `BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `STELLAR`, `RIPPLE`, `HATHOR`, `CARDANO`, `AVAXCCHAIN`.
+* `opts.protocol` (string) (__required__) - blockchain protocol supported: `BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `STELLAR`, `RIPPLE`, `HATHOR`, `CARDANO`, `AVAXCCHAIN`, `SOLANA`.
 * `opts.mnemonic` (string) (__optional__) - mnemonic string to generate private and public keys.
 * `opts.derivation` (object) (__optional__) - derivation object (BIP44 derivation path).
 * `opts.derivation.account` (number) (__optional__) - derivation account index.
@@ -49,9 +49,9 @@ console.log(wallet)
 #### `walletController.generateWalletFromPrivateKey(opts)`
 
 Generate a wallet for a blockchain protocol:
-* `opts.protocol` (string) (__required__) - blockchain protocol supported: `BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `STELLAR`, `RIPPLE`, `HATHOR`, `CARDANO`, `AVAXCCHAIN`.
+* `opts.protocol` (string) (__required__) - blockchain protocol supported: `BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `STELLAR`, `RIPPLE`, `HATHOR`, `CARDANO`, `AVAXCCHAIN`,`SOLANA`.
 * `opts.privateKey` (__required__)
-  * (string) - most protocols (`BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `STELLAR`, `RIPPLE`, `HATHOR`, `AVAXCCHAIN`) require a private key string.
+  * (string) - most protocols (`BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `STELLAR`, `RIPPLE`, `HATHOR`, `AVAXCCHAIN`,`SOLANA`) require a private key string.
   * (object) - the `CARDANO` protocol requires an object containing two different private keys
     * `opts.privateKey.spendingPrivateKey` (string) - private key used for spending operations
     * `opts.privateKey.stakingPrivateKey` (string) - private key used for staking operations
