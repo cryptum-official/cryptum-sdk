@@ -308,7 +308,7 @@ class Controller extends Interface {
     )
   }
   /**
-   * Get wallet transaction id
+   * Get wallet transactions
    * @param {string} id transaction id
    * @returns {Promise<import('../entity').WalletTransaction>}
    */
@@ -329,16 +329,16 @@ class Controller extends Interface {
     return makeRequest({ method: 'get', url: `/wallet/transaction/${id}`, config: this.config })
   }
   /**
-   * Get wallet transaction id
+   * Update status of wallet transaction
    * @param {string} id transaction id
-   * @param {object} tx transaction body to update
+   * @param {string} status transaction status
    * @returns {Promise<{ id: string }>}
    */
-  async updateWalletTransactionById(id, tx) {
-    return makeRequest({ method: 'put', url: `/wallet/transaction/${id}`, body: tx, config: this.config })
+  async updateWalletTransactionById(id, status) {
+    return makeRequest({ method: 'put', url: `/wallet/transaction/${id}`, body: { status }, config: this.config })
   }
   /**
-   * Get wallet transaction id
+   * Delete wallet transaction id
    * @param {string} id transaction id
    * @returns {Promise<{ id: string }>}
    */
@@ -346,7 +346,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'delete', url: `/wallet/transaction/${id}`, config: this.config })
   }
   /**
-   * Get wallet transaction id
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionStellarTrustline} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -354,7 +354,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/trustline/stellar`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionRippleTrustline} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -362,7 +362,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/trustline/ripple`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionStellarTransfer} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -370,7 +370,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/transfer/stellar`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionRippleTransfer} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -378,7 +378,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/transfer/ripple`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionBitcoinTransfer} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -386,7 +386,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/transfer/bitcoin`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionCeloTransfer} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -394,7 +394,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/transfer/celo`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionEthereumTransfer} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -402,7 +402,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/transfer/ethereum`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionEthereumTransfer} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -410,7 +410,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/transfer/bsc`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionHathorTransfer} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -418,7 +418,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/transfer/hathor`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionCardanoTransfer} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -426,7 +426,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/transfer/cardano`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionEthereumSmartContractSend} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -434,7 +434,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/smartcontract/send/ethereum`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionEthereumSmartContractSend} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -442,7 +442,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/smartcontract/send/bsc`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionEthereumSmartContractDeploy} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -450,7 +450,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/smartcontract/deploy/ethereum`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionEthereumSmartContractDeploy} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -458,7 +458,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/smartcontract/deploy/bsc`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionCeloSmartContractSend} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -466,7 +466,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/smartcontract/send/celo`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionCeloSmartContractDeploy} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -474,7 +474,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/smartcontract/deploy/celo`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionEthereumTokenDeploy} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -482,7 +482,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/token/deploy/ethereum`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionEthereumTokenDeploy} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -490,7 +490,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/token/deploy/bsc`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionCeloTokenDeploy} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -498,7 +498,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/token/deploy/celo`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionHathorTokenDeploy} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -506,7 +506,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/token/deploy/hathor`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionHathorTokenMint} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
@@ -514,7 +514,7 @@ class Controller extends Interface {
     return makeRequest({ method: 'post', url: `/wallet/token/mint/hathor`, body: tx, config: this.config })
   }
   /**
-   * Get wallet transaction input
+   * Create wallet transaction
    * @param {import('../entity').WalletTransactionHathorTokenMelt} tx transaction input
    * @returns {Promise<{ tx: string }>}
    */
