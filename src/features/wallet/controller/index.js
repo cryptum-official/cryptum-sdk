@@ -1,8 +1,7 @@
 const { generateMnemonic, validateMnemonic } = require('bip39')
 const { Wallet, WalletInfoResponse } = require('../entity')
-const { getApiMethod, mountHeaders, handleRequestError } = require('../../../services')
+const { makeRequest } = require('../../../services')
 const Interface = require('./interface')
-const requests = require('./requests.json')
 const {
   getBitcoinAddressFromPrivateKey,
   getBscAddressFromPrivateKey,
@@ -311,26 +310,229 @@ class Controller extends Interface {
   async getWalletInfo(input) {
     validateWalletInfo(input)
     const { address, protocol, tokenAddresses } = input
-    try {
-      const apiRequest = getApiMethod({
-        requests,
-        key: 'getWalletInfo',
-        config: this.config,
-      })
-      const headers = mountHeaders(this.config.apiKey)
-      const qs = [`protocol=${protocol}`]
-      if (tokenAddresses) {
-        for (const token of tokenAddresses) {
-          qs.push(`tokenAddresses[]=${token}`)
-        }
+    const qs = [`protocol=${protocol}`]
+    if (tokenAddresses) {
+      for (const token of tokenAddresses) {
+        qs.push(`tokenAddresses[]=${token}`)
       }
-      const response = await apiRequest(`${requests.getWalletInfo.url}/${address}/info?${qs.join('&')}`, {
-        headers,
-      })
-      return new WalletInfoResponse(response.data)
-    } catch (error) {
-      handleRequestError(error)
     }
+    return new WalletInfoResponse(
+      await makeRequest({ method: 'get', url: `/wallet/${address}/info?${qs.join('&')}`, config: this.config })
+    )
+  }
+  /**
+   * Get wallet transactions
+   * @param {string} id transaction id
+   * @returns {Promise<import('../entity').WalletTransaction>}
+   */
+  async getWalletTransactions({ status, limit, offset } = {}) {
+    const qs = [
+      `limit=${limit !== undefined ? limit : 100}&offset=${offset !== undefined ? offset : 0}&status=${
+        status !== undefined ? status : 'PENDING'
+      }`,
+    ]
+    return makeRequest({ method: 'get', url: `/wallet/transaction?${qs}`, config: this.config })
+  }
+  /**
+   * Get wallet transaction id
+   * @param {string} id transaction id
+   * @returns {Promise<import('../entity').WalletTransaction>}
+   */
+  async getWalletTransactionById(id) {
+    return makeRequest({ method: 'get', url: `/wallet/transaction/${id}`, config: this.config })
+  }
+  /**
+   * Update status of wallet transaction
+   * @param {string} id transaction id
+   * @param {string} status transaction status
+   * @returns {Promise<{ id: string }>}
+   */
+  async updateWalletTransactionById(id, status) {
+    return makeRequest({ method: 'put', url: `/wallet/transaction/${id}`, body: { status }, config: this.config })
+  }
+  /**
+   * Delete wallet transaction id
+   * @param {string} id transaction id
+   * @returns {Promise<{ id: string }>}
+   */
+  async deleteWalletTransactionById(id) {
+    return makeRequest({ method: 'delete', url: `/wallet/transaction/${id}`, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionStellarTrustline} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createStellarTrustlineTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/trustline/stellar`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionRippleTrustline} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createRippleTrustlineTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/trustline/ripple`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionStellarTransfer} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createStellarTransferTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/transfer/stellar`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionRippleTransfer} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createRippleTransferTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/transfer/ripple`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionBitcoinTransfer} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createBitcoinTransferTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/transfer/bitcoin`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionCeloTransfer} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createCeloTransferTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/transfer/celo`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionEthereumTransfer} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createEthereumTransferTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/transfer/ethereum`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionEthereumTransfer} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createBscTransferTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/transfer/bsc`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionHathorTransfer} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createHathorTransferTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/transfer/hathor`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionCardanoTransfer} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createCardanoTransferTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/transfer/cardano`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionEthereumSmartContractSend} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createEthereumSmartContractCallTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/smartcontract/send/ethereum`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionEthereumSmartContractSend} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createBscSmartContractCallTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/smartcontract/send/bsc`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionEthereumSmartContractDeploy} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createEthereumSmartContractDeployTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/smartcontract/deploy/ethereum`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionEthereumSmartContractDeploy} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createBscSmartContractDeployTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/smartcontract/deploy/bsc`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionCeloSmartContractSend} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createCeloSmartContractCallTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/smartcontract/send/celo`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionCeloSmartContractDeploy} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createCeloSmartContractDeployTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/smartcontract/deploy/celo`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionEthereumTokenDeploy} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createEthereumTokenDeployTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/token/deploy/ethereum`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionEthereumTokenDeploy} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createBscTokenDeployTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/token/deploy/bsc`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionCeloTokenDeploy} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createCeloTokenDeployTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/token/deploy/celo`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionHathorTokenDeploy} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createHathorTokenDeployTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/token/deploy/hathor`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionHathorTokenMint} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createHathorMintTokenTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/token/mint/hathor`, body: tx, config: this.config })
+  }
+  /**
+   * Create wallet transaction
+   * @param {import('../entity').WalletTransactionHathorTokenMelt} tx transaction input
+   * @returns {Promise<{ tx: string }>}
+   */
+  async createHathorMeltTokenTransaction(tx) {
+    return makeRequest({ method: 'post', url: `/wallet/token/melt/hathor`, body: tx, config: this.config })
   }
 }
 
