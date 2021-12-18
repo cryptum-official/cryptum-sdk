@@ -322,8 +322,8 @@ class Controller extends Interface {
   }
   /**
    * Get wallet transactions
-   * @param {string} id transaction id
-   * @returns {Promise<import('../entity').WalletTransaction>}
+   * @param {{ status?: string; limit?: number=; offset?: number=; }} input
+   * @returns {Promise<import('../entity').WalletTransaction[]>}
    */
   async getWalletTransactions({ status, limit, offset } = {}) {
     const qs = [
@@ -345,10 +345,11 @@ class Controller extends Interface {
    * Update status of wallet transaction
    * @param {string} id transaction id
    * @param {string} status transaction status
+   * @param {string} hash transaction hash
    * @returns {Promise<{ id: string }>}
    */
-  async updateWalletTransactionById(id, status) {
-    return makeRequest({ method: 'put', url: `/wallet/transaction/${id}`, body: { status }, config: this.config })
+  async updateWalletTransactionById(id, status, hash) {
+    return makeRequest({ method: 'put', url: `/wallet/transaction/${id}`, body: { status, hash }, config: this.config })
   }
   /**
    * Delete wallet transaction id
