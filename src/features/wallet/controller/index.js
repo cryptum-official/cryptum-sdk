@@ -26,7 +26,6 @@ const {
   deriveCardanoWalletFromDerivationPath,
   deriveCardanoAddressFromXpub,
   getCardanoAddressFromPrivateKey,
-  deriveAvalancheWalletFromDerivationPath,
   deriveAvalancheAddressFromXpub,
   deriveSolanaWalletFromDerivationPath,
 } = require('../../../services/wallet')
