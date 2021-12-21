@@ -367,7 +367,6 @@ Solana tokens follow the SPL Token standard alongside the Metaplex NFT protocol.
 - `opts.amount` (string)(**required**) - token amount to be first minted.
 - `opts.fixedSupply` (boolean)(**required**) - whether future minting will be restricted or not.
 - `opts.decimals` (number)(**required**) - amount of decimal units for this token.
-- `opts.network` (string)(**required**) - network where tokens will be minted ('devnet' | 'testnet' | 'mainnet-beta').
 
 ```js
 const transaction = await txController.createSolanaTokenDeployTransaction({
@@ -375,8 +374,7 @@ const transaction = await txController.createSolanaTokenDeployTransaction({
     destination: wallet.address,
     fixedSupply: false,
     decimals: 2,
-    amount: '30',
-    network: 'testnet'
+    amount: '30'
 })
 ```
 ### Non Fungible Tokens
@@ -384,13 +382,11 @@ const transaction = await txController.createSolanaTokenDeployTransaction({
 - `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
 - `opts.maxSupply` (number)(**required**) - maximum supply for this token. (0 for unlimited; 1 for unique; 2 or more for multiple editions)
 - `opts.uri` (string)(**required**) - uri containing NFT metadata.
-- `opts.network` (string)(**required**) - network where token will be minted ('devnet' | 'testnet' | 'mainnet-beta').
 
 ```js
 const transaction = await txController.createSolanaNFT({
     wallet,
     maxSupply: 1,
-    network: 'testnet',
     uri: 'https://gateway.pinata.cloud/ipfs/abcd....xyz'
   })
 ```
@@ -415,13 +411,11 @@ const transaction = await txController.createSolanaTokenMintTransaction({
 #### `txController.createSolanaNFTEdition(opts)`
 - `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
 - `opts.masterEdition` (string)(**required**) - address of the master edition token that will be used to create copies (editions).
-- `opts.network` (string)(**required**) - network where token will be minted ('devnet' | 'testnet' | 'mainnet-beta').
 
 ```js
 const transaction = await txController.createSolanaNFTEdition({
     wallet,
-    masterEdition: 'B7k8G...U62XD',
-    network: 'testnet'
+    masterEdition: 'B7k8G...U62XD'
   })
 ```
 ## Burn Solana tokens
@@ -442,13 +436,11 @@ const transaction = await txController.createSolanaTokenBurnTransaction({
 - `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
 - `opts.token` (string)(**required**) - address of the token that will be updated.
 - `opts.uri` (string)(**required**) - uri containing the updated NFT metadata.
-- `opts.network` (string)(**required**) - network where the token was minted ('devnet' | 'testnet' | 'mainnet-beta').
   
 ```js
 const transaction = await txController.updateSolanaNFTMetadata({
     wallet,
     token: '5N6t...3knE9',
-    network: 'testnet',
     uri: 'https://gateway.pinata.cloud/ipfs/zyx...dcba'
   })
 ```
