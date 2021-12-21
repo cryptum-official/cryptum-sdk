@@ -32,14 +32,29 @@ const handleRequestError = (error) => {
   if (error) {
     if (error.response) {
       const message =
-        (error.response.data.error && error.response.data.error.message) || (error.response.data.message) || 'Service unavailable at the moment'
-      const code = (error.response.data.error && error.response.data.error.code) || (error.response.data.code) || 'InternalError'
+        (error.response.data.error && error.response.data.error.message) ||
+        error.response.data.message ||
+        'Service unavailable at the moment'
+      const code =
+        typeof error.response.data.error === 'string'
+          ? error.response.data.error
+          : (error.response.data.error && error.response.data.error.code) || error.response.data.code || 'InternalError'
       throw new GenericException(message, code)
     }
   }
   throw error
 }
 
+const makeRequest = async ({ method, url, params, headers, body, config }) => {
+  try {
+    const axios = new AxiosApi(config)
+    const api = axios.getInstance()
+    const response = await api({ method, url, params, headers, data: body })
+    return response.data
+  } catch (error) {
+    handleRequestError(error)
+  }
+}
 /**
  * Method to mount an hearders with api key
  *
@@ -67,4 +82,5 @@ module.exports = {
   handleRequestError,
   mountHeaders,
   isValidProtocol,
+  makeRequest,
 }

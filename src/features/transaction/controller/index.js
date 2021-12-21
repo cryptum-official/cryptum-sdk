@@ -271,7 +271,7 @@ class Controller extends Interface {
   /**
    * Create ripple trustline transaction
    *
-   * @param {import('../entity').RippleTransferTransactionInput} input
+   * @param {import('../entity').RippleTrustlineTransactionInput} input
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createRippleTrustlineTransaction(input) {
@@ -639,7 +639,7 @@ class Controller extends Interface {
 
   /**
    * Call a smart contract method
-   * @param {import('../entity').SmartContractCallTransactionInput} input
+   * @param {import('../entity').SmartContractCallMethodInput} input
    * @returns {Promise<SmartContractCallResponse>}
    */
   async callSmartContractMethod(input) {
