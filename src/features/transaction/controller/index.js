@@ -1246,9 +1246,9 @@ class Controller extends Interface {
      */
   async createSolanaTokenDeployTransaction(input) {
     validateSolanaDeployTransaction(input)
-    const { wallet, destination, fixedSupply, decimals, amount, network } = input
+    const { wallet, destination, fixedSupply, decimals, amount, testnet } = input
 
-    const hash = await deploySolanaToken({ from: wallet, to: destination, fixedSupply, decimals, amount, network })
+    const hash = await deploySolanaToken({ from: wallet, to: destination, fixedSupply, decimals, amount, testnet: testnet !== undefined ? testnet : this.config.environment === 'development' })
 
     return new TransactionResponse({ hash })
   }
@@ -1261,9 +1261,9 @@ class Controller extends Interface {
      */
   async createSolanaNFT(input) {
     validateSolanaDeployNFT(input)
-    const { wallet, maxSupply, uri, network } = input
+    const { wallet, maxSupply, uri, testnet } = input
 
-    const hash = await deploySolanaNFT({ from: wallet, maxSupply, uri, network })
+    const hash = await deploySolanaNFT({ from: wallet, maxSupply, uri, testnet: testnet !== undefined ? testnet : this.config.environment === 'development' })
 
     return new TransactionResponse({ hash })
   }
@@ -1276,9 +1276,9 @@ class Controller extends Interface {
      */
   async createSolanaNFTEdition(input) {
     validateSolanaDeployNFT(input)
-    const { wallet, masterEdition, network } = input
+    const { wallet, masterEdition, testnet } = input
 
-    const hash = await mintEdition({ masterEdition, from: wallet, network })
+    const hash = await mintEdition({ masterEdition, from: wallet, testnet: testnet !== undefined ? testnet : this.config.environment === 'development' })
 
     return new TransactionResponse({ hash })
   }
@@ -1291,9 +1291,9 @@ class Controller extends Interface {
      */
   async updateSolanaNFTMetadata(input) {
     validateSolanaDeployNFT(input)
-    const { wallet, token, uri, network } = input
+    const { wallet, token, uri, testnet } = input
 
-    const hash = await updateMetaplexMetadata({ from: wallet, token, uri, network })
+    const hash = await updateMetaplexMetadata({ from: wallet, token, uri, testnet: testnet !== undefined ? testnet : this.config.environment === 'development' })
 
     return new TransactionResponse({ hash })
   }

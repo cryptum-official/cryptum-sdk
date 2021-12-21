@@ -10,8 +10,9 @@ module.exports.buildSolanaTransferTransaction = async function ({
   token,
   amount,
   latestBlock,
-  network = 'testnet'
+  testnet = true
 }) {
+  const network = testnet ? 'testnet' : 'mainnet-beta'
   const fromAccount = solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey))
   let manualTransaction = new solanaWeb3.Transaction({
     recentBlockhash: latestBlock.toString(),
@@ -60,7 +61,8 @@ module.exports.buildSolanaTransferTransaction = async function ({
   return rawTransaction
 }
 
-module.exports.deploySolanaToken = async function ({ from, to = from.publicKey, amount, fixedSupply, network = 'testnet', decimals = 9 }) {
+module.exports.deploySolanaToken = async function ({ from, to = from.publicKey, amount, fixedSupply, testnet = true, decimals = 9 }) {
+  const network = testnet ? 'testnet' : 'mainnet-beta'
   const connection = new solanaWeb3.Connection(
     solanaWeb3.clusterApiUrl(network),
     'confirmed',
@@ -107,7 +109,8 @@ module.exports.deploySolanaToken = async function ({ from, to = from.publicKey, 
   return mint.publicKey.toBase58()
 }
 
-module.exports.mintSolanaToken = async function ({ from, to = from.publicKey, token, amount, latestBlock, network = 'testnet' }) {
+module.exports.mintSolanaToken = async function ({ from, to = from.publicKey, token, amount, latestBlock, testnet = true }) {
+  const network = testnet ? 'testnet' : 'mainnet-beta'
   const connection = new solanaWeb3.Connection(
     solanaWeb3.clusterApiUrl(network),
     'confirmed',
@@ -150,7 +153,8 @@ module.exports.mintSolanaToken = async function ({ from, to = from.publicKey, to
   return rawTransaction
 }
 
-module.exports.deploySolanaNFT = async function ({ from, maxSupply, uri, network = 'testnet' }) {
+module.exports.deploySolanaNFT = async function ({ from, maxSupply, uri, testnet = true }) {
+  const network = testnet ? 'testnet' : 'mainnet-beta'
   const connection = new metaplex.Connection(network)
   const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
 
@@ -164,7 +168,8 @@ module.exports.deploySolanaNFT = async function ({ from, maxSupply, uri, network
   return mintResponse.mint.toBase58()
 }
 
-module.exports.mintEdition = async function ({ masterEdition, from, network = 'testnet' }) {
+module.exports.mintEdition = async function ({ masterEdition, from, testnet = true }) {
+  const network = testnet ? 'testnet' : 'mainnet-beta'
   const connection = new metaplex.Connection(network)
   const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
 
@@ -185,15 +190,15 @@ module.exports.buildSolanaTokenBurnTransaction = async function ({
   token,
   amount,
   latestBlock,
-  network = 'testnet'
+  testnet = true
 }) {
+  const network = testnet ? 'testnet' : 'mainnet-beta'
   const fromAccount = solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey))
 
   let manualTransaction = new solanaWeb3.Transaction({
     recentBlockhash: latestBlock.toString(),
     feePayer: fromAccount.publicKey
   });
-console.log(latestBlock.toString())
   const connection = new solanaWeb3.Connection(
     solanaWeb3.clusterApiUrl(network),
     'confirmed',
@@ -227,7 +232,8 @@ console.log(latestBlock.toString())
 }
 
 
-module.exports.updateMetaplexMetadata = async function ({ token, from, uri, network = 'testnet' }) {
+module.exports.updateMetaplexMetadata = async function ({ token, from, uri, testnet = true }) {
+  const network = testnet ? 'testnet' : 'mainnet-beta'
   const connection = new metaplex.Connection(network)
   const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
 
