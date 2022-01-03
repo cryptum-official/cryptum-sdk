@@ -3,7 +3,7 @@
 - [Ethereum](#ethereum)
 - [Binance Smart Chain](#binance-smart-chain-bsc)
 - [Celo](#celo)
-- [Avalanche](#avalanche-(c-chain))
+- [Avalanche](#avalanche-c-chain)
 - [Stellar](#stellar)
 - [Ripple](#ripple)
 - [Hathor](#hathor)
@@ -108,7 +108,7 @@ const transaction = await txController.createCeloTransferTransaction({
   feeCurrency: 'cUSD',
 })
 ```
-## Avalanche (C-Chain)
+## Avalanche C-Chain
 
 #### `txController.createAvaxCChainTransferTransaction(opts)`
 
