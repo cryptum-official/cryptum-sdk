@@ -3,6 +3,7 @@
 - [Ethereum](#ethereum)
 - [Binance Smart Chain](#binance-smart-chain-bsc)
 - [Celo](#celo)
+- [Avalanche](#avalanche-(c-chain))
 - [Stellar](#stellar)
 - [Ripple](#ripple)
 - [Hathor](#hathor)
@@ -107,7 +108,37 @@ const transaction = await txController.createCeloTransferTransaction({
   feeCurrency: 'cUSD',
 })
 ```
+## Avalanche (C-Chain)
 
+#### `txController.createAvaxCChainTransferTransaction(opts)`
+
+Create a transfer transaction in Avalanche blockchain, you can transfer AVAX or any other tokens.
+* `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
+* `opts.tokenSymbol` (string) - token to transfer. If you are transferring avax this parameter should be `AVAX`, otherwise you can leave undefined.
+* `opts.contractAddress` (string) - required if you are transferring a ERC20 token, otherwise leave undefined.
+* `opts.amount` (string)(__required__) - amount to be transferred.
+* `opts.destination` (string)(__required__) - destination address to be transfer to.
+* `opts.fee` - optional fee object.
+  * `opts.fee.gas` (number) - gas value.
+  * `opts.fee.gasPrice` (string) - gas price.
+
+Examples:
+```js
+// transfer AVAX
+const transaction = await txController.createAvaxCChainTransferTransaction({
+  wallet,
+  tokenSymbol: 'AVAX',
+  amount: '0.01',
+  destination: '0x3f2f3D45196...5e8f530165eCb93e772',
+})
+// transfer Avalanche token
+const transaction = await txController.createAvaxCChainTransferTransaction({
+  wallet,
+  contractAddress: '0xcf1caf3f6aa5...50dd1206a7cc3c76dc10',
+  amount: '0.01',
+  destination: '0x3f2f3D45196D7...15e8f530165eCb93e772',
+})
+```
 ## Bitcoin
 
 #### `txController.createBitcoinTransferTransaction(opts)`
