@@ -151,7 +151,10 @@ module.exports.buildEthereumSmartContractTransaction = async ({
     common = new EthereumCommon({ chain: chainId })
   } else if (protocol === Protocol.BSC) {
     common = EthereumCommon.forCustomChain(BSC_COMMON_CHAIN[network].base, BSC_COMMON_CHAIN[network].chain)
-  } else {
+  } else if(protocol === Protocol.AVAXCCHAIN) {
+    common = EthereumCommon.forCustomChain(AVAXCCHAIN_COMMON_CHAIN[network].base, AVAXCCHAIN_COMMON_CHAIN[network].chain)
+  }
+  else {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
   const tx = new EthereumTransaction(rawTransaction, { common })

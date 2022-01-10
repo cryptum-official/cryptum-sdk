@@ -134,7 +134,7 @@ module.exports.validateSmartContractTransactionParams = ({
   if (feeCurrency && typeof feeCurrency !== 'string') {
     throw new GenericException('Invalid fee currency', 'InvalidTypeException')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN].includes(protocol)) {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
 }
@@ -172,7 +172,7 @@ module.exports.validateSmartContractDeployTransactionParams = ({
   if (feeCurrency && typeof feeCurrency !== 'string') {
     throw new GenericException('Invalid fee currency', 'InvalidTypeException')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN].includes(protocol)) {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
 }
@@ -206,7 +206,7 @@ module.exports.validateTokenDeployTransactionParams = ({
   if (feeCurrency && typeof feeCurrency !== 'string') {
     throw new GenericException('Invalid fee currency', 'InvalidTypeException')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.AVAXCCHAIN, Protocol.ETHEREUM].includes(protocol)) {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
 }
@@ -223,7 +223,7 @@ module.exports.validateSmartContractCallParams = ({ contractAddress, contractAbi
   if (params && !Array.isArray(params)) {
     throw new GenericException('Invalid contract params', 'InvalidTypeException')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.AVAXCCHAIN, Protocol.ETHEREUM].includes(protocol)) {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
 }

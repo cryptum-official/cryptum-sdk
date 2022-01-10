@@ -629,7 +629,7 @@ class Controller extends Interface {
     }
     if (protocol === Protocol.CELO) {
       signedTx = await buildCeloSmartContractTransaction(transactionOptions)
-    } else if ([Protocol.ETHEREUM, Protocol.BSC].includes(protocol)) {
+    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN].includes(protocol)) {
       signedTx = await buildEthereumSmartContractTransaction({ ...transactionOptions, protocol })
     } else {
       throw new GenericException('Invalid protocol', 'InvalidTypeException')
@@ -746,7 +746,7 @@ class Controller extends Interface {
 
     if (protocol === Protocol.CELO) {
       signedTx = await buildCeloSmartContractDeployTransaction(transactionOptions)
-    } else if ([Protocol.ETHEREUM, Protocol.BSC].includes(protocol)) {
+    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN].includes(protocol)) {
       signedTx = await buildEthereumSmartContractDeployTransaction({ ...transactionOptions, protocol })
     } else {
       throw new GenericException('Invalid protocol', 'InvalidTypeException')
@@ -790,7 +790,7 @@ class Controller extends Interface {
 
     if (protocol === Protocol.CELO) {
       signedTx = await buildCeloSmartContractDeployTransaction(transactionOptions)
-    } else if ([Protocol.ETHEREUM, Protocol.BSC].includes(protocol)) {
+    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN].includes(protocol)) {
       signedTx = await buildEthereumSmartContractDeployTransaction({ ...transactionOptions, protocol })
     } else {
       throw new GenericException('Invalid protocol', 'InvalidTypeException')
