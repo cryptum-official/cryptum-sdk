@@ -54,7 +54,7 @@ const { result } = await txController.callSmartContractMethod({
   ],
   method: 'message',
   params: [],
-  protocol: 'CELO', // CELO, ETHEREUM, BSC only
+  protocol: 'CELO', // CELO, ETHEREUM, BSC, AVAXCCHAIN only
 })
 console.log(result)
 // Result value from smart contract method
@@ -74,7 +74,7 @@ Call a method of a smart contract that will generate a transaction in the blockc
 - `opts.protocol` (string) (**required**) - blockchain protocol: `ETHEREUM`, `CELO`, `AVAXCCHAIN` or `BSC`.
 
 ```js
-// for Celo, Ethereum and BSC blockchain
+// for Celo, Avalanche, Ethereum and BSC blockchain
 const transaction = await txController.createSmartContractTransaction({
   wallet,
   contractAddress: '0x3f2f3D45196...8f530165eCb93e772',
@@ -95,7 +95,7 @@ const transaction = await txController.createSmartContractTransaction({
   ],
   method: 'executeMethodName',
   params: ['param1', 2, 3],
-  protocol: 'CELO', // CELO, ETHEREUM, BSC only
+  protocol: 'CELO', // CELO, ETHEREUM, BSC, AVAXCCHAIN only
 })
 ```
 
@@ -117,7 +117,7 @@ const transaction = await txController.createTokenDeployTransaction({
   wallet,
   tokenType: 'ERC20',
   params: ['Token name', 'TOK', '1000000'],
-  protocol: 'CELO', // CELO, ETHEREUM, BSC only
+  protocol: 'CELO', // CELO, ETHEREUM, AVAXCCHAIN, BSC only
 })
 ```
 
@@ -130,7 +130,7 @@ const transaction = await txController.createTokenDeployTransaction({
   wallet,
   tokenType: 'ERC721',
   params: ['NFT name', 'NFT'],
-  protocol: 'CELO', // CELO, ETHEREUM, BSC only
+  protocol: 'CELO', // CELO, ETHEREUM, BSC, AVAXCCHAIN only
 })
 ```
 
@@ -152,7 +152,7 @@ const transaction = await txController.createSmartContractDeployTransaction({
   contractName: 'HelloWorld',
   params: ['hello'],
   source: fs.readFileSync(`${__dirname}/contracts/HelloWorld.sol`, { encoding: 'utf8' }),
-  protocol: 'CELO', // CELO, ETHEREUM, BSC only
+  protocol: 'CELO', // CELO, ETHEREUM, BSC, AVAXCCHAIN only
 })
 ```
 
