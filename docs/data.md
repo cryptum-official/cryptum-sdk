@@ -8,7 +8,7 @@ Get wallet address information from blockchain.
 
 * `opts.address` (string)(**required**) - wallet address. 
 * `opts.protocol` (string)(**required**) - blockchain protocol.
-* `opts.tokenAddresses` (array)(**optional**) - array of token addresses. Only for `ETHEREUM`, `CELO`, `BSC` and `SOLANA`.
+* `opts.tokenAddresses` (array)(**optional**) - array of token addresses. Only for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `BSC` and `SOLANA`.
 
 ```js
 const wc = sdk.getWalletController()

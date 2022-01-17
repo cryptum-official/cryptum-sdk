@@ -29,7 +29,7 @@ Call a method of a smart contract and receive its value without creating a trans
 - `opts.contractAbi` (array) (**required**) - json interface of the method (for more info on [contract ABI](https://docs.soliditylang.org/en/develop/abi-spec.html)).
 - `opts.method` (string) (**required**) - smart contract method.
 - `opts.params` (array) - parameters to be passed to the method.
-- `opts.protocol` (string) (**required**) - blockchain protocol: `ETHEREUM`, `CELO` or `BSC`.
+- `opts.protocol` (string) (**required**) - blockchain protocol: `ETHEREUM`, `CELO` , `AVAXCCHAIN` or `BSC`.
 
 ```js
 const { result } = await txController.callSmartContractMethod({
@@ -54,7 +54,7 @@ const { result } = await txController.callSmartContractMethod({
   ],
   method: 'message',
   params: [],
-  protocol: 'CELO', // CELO, ETHEREUM, BSC only
+  protocol: 'CELO', // CELO, ETHEREUM, BSC, AVAXCCHAIN only
 })
 console.log(result)
 // Result value from smart contract method
@@ -71,10 +71,10 @@ Call a method of a smart contract that will generate a transaction in the blockc
 - `opts.contractAbi` (array) (**required**) - json interface of the method (for more info on [contract ABI](https://docs.soliditylang.org/en/develop/abi-spec.html)).
 - `opts.method` (string) (**required**) - smart contract method.
 - `opts.params` (array) - parameters to be passed to the method.
-- `opts.protocol` (string) (**required**) - blockchain protocol: `ETHEREUM`, `CELO` or `BSC`.
+- `opts.protocol` (string) (**required**) - blockchain protocol: `ETHEREUM`, `CELO`, `AVAXCCHAIN` or `BSC`.
 
 ```js
-// for Celo, Ethereum and BSC blockchain
+// for Celo, Avalanche, Ethereum and BSC blockchain
 const transaction = await txController.createSmartContractTransaction({
   wallet,
   contractAddress: '0x3f2f3D45196...8f530165eCb93e772',
@@ -95,7 +95,7 @@ const transaction = await txController.createSmartContractTransaction({
   ],
   method: 'executeMethodName',
   params: ['param1', 2, 3],
-  protocol: 'CELO', // CELO, ETHEREUM, BSC only
+  protocol: 'CELO', // CELO, ETHEREUM, BSC, AVAXCCHAIN only
 })
 ```
 
@@ -110,14 +110,14 @@ The smart contract used in this deployment is in the [contracts](./contracts/Tok
 - `opts.wallet` (Wallet) (**required**) - wallet calling the smart contract.
 - `opts.tokenType` (string) (**required**) - token type is either `ERC20` or `ERC721`.
 - `opts.params` (array) - parameters to be passed to the constructor of the deployment.
-- `opts.protocol` (string) (**required**) - blockchain protocol: `ETHEREUM`, `CELO` or `BSC`.
+- `opts.protocol` (string) (**required**) - blockchain protocol: `ETHEREUM`, `CELO`, `AVAXCCHAIN` or `BSC`.
 
 ```js
 const transaction = await txController.createTokenDeployTransaction({
   wallet,
   tokenType: 'ERC20',
   params: ['Token name', 'TOK', '1000000'],
-  protocol: 'CELO', // CELO, ETHEREUM, BSC only
+  protocol: 'CELO', // CELO, ETHEREUM, AVAXCCHAIN, BSC only
 })
 ```
 
@@ -130,7 +130,7 @@ const transaction = await txController.createTokenDeployTransaction({
   wallet,
   tokenType: 'ERC721',
   params: ['NFT name', 'NFT'],
-  protocol: 'CELO', // CELO, ETHEREUM, BSC only
+  protocol: 'CELO', // CELO, ETHEREUM, BSC, AVAXCCHAIN only
 })
 ```
 
@@ -144,7 +144,7 @@ Deploy a smart contract source code written in Solidity to the blockchain.
 - `opts.contractName` (string) (**required**) - main contract name. There could be many contracts in the source code, but you must specify which one is the main one to initialize it after deployment.
 - `opts.params` (array) (**required**) - parameters to be passed to the constructor of the main contract.
 - `opts.source` (string) (**required**) - source code of the contract encoded in UTF-8.
-- `opts.protocol` (string) (**required**) - blockchain protocol: `ETHEREUM`, `CELO` or `BSC`.
+- `opts.protocol` (string) (**required**) - blockchain protocol: `ETHEREUM`, `CELO`, `AVAXCCHAIN` or `BSC`.
 
 ```js
 const transaction = await txController.createSmartContractDeployTransaction({
@@ -152,7 +152,7 @@ const transaction = await txController.createSmartContractDeployTransaction({
   contractName: 'HelloWorld',
   params: ['hello'],
   source: fs.readFileSync(`${__dirname}/contracts/HelloWorld.sol`, { encoding: 'utf8' }),
-  protocol: 'CELO', // CELO, ETHEREUM, BSC only
+  protocol: 'CELO', // CELO, ETHEREUM, BSC, AVAXCCHAIN only
 })
 ```
 
