@@ -30,7 +30,7 @@ const {
   deriveSolanaWalletFromDerivationPath,
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
-const { validateWalletInfo, validatePrivateKey, validateCardanoPrivateKey } = require('../../../services/validations')
+const { validateWalletInfo, validatePrivateKey, validateCardanoPrivateKey, validateWalletNft } = require('../../../services/validations')
 const InvalidException = require('../../../../errors/InvalidException')
 
 class Controller extends Interface {
@@ -317,6 +317,22 @@ class Controller extends Interface {
     }
     return new WalletInfoResponse(
       await makeRequest({ method: 'get', url: `/wallet/${address}/info?${qs.join('&')}`, config: this.config })
+    )
+  }
+  /**
+   * Get nfts that belong to a certain wallet
+   *
+   * @param {object} input
+   * @param {string} input.address wallet address or public key
+   * @param {Protocol} input.protocol blockchain protocol
+   * @returns {Promise<any>}
+   */
+  async getWalletNft(input) {
+    validateWalletNft(input)
+    const { address, protocol } = input
+    const qs = [`protocol=${protocol}`]
+    return new WalletInfoResponse(
+      await makeRequest({ method: 'get', url: `/wallet/${address}/nft?${qs.join('&')}`, config: this.config })
     )
   }
   /**

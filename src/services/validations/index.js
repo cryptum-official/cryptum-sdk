@@ -589,6 +589,15 @@ module.exports.validateWalletInfo = ({ address, protocol, tokenAddresses }) => {
   }
 }
 
+module.exports.validateWalletNft = ({ address, protocol, tokenAddresses }) => {
+  if (!address || typeof address !== 'string') {
+    throw new InvalidTypeException('address', 'string')
+  }
+  if (!protocol || typeof protocol !== 'string') {
+    throw new InvalidTypeException('protocol', 'string')
+  }
+}
+
 module.exports.validateSolanaNFTMetadata = ({
   name,
   symbol,
