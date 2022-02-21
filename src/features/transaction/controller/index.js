@@ -35,7 +35,7 @@ const {
   buildEthereumSmartContractDeployTransaction,
 } = require('../../../services/blockchain/ethereum')
 const {
-  buildSolanaTransferTransaction, deploySolanaToken, deploySolanaNFT, mintEdition, buildSolanaTokenBurnTransaction, updateMetaplexMetadata, buildSolanaCustomProgramInteraction, mintSolanaToken,
+  buildSolanaTransferTransaction, deploySolanaToken, deploySolanaNFT, mintEdition, buildSolanaTokenBurnTransaction, updateMetaplexMetadata, buildSolanaCustomProgramInteraction, mintSolanaToken, updateAuctionAuthority, updateVaultAuthority, validateAuction, whitelistCreators,
 } = require('../../../services/blockchain/solana')
 const { buildBitcoinTransferTransaction } = require('../../../services/blockchain/bitcoin')
 const WalletController = require('../../wallet/controller')
@@ -1257,15 +1257,15 @@ class Controller extends Interface {
      * Create Solana NFT 
      *
      * @param {import('../entity').SolanaNFTInput} input
-     * @returns {Promise<TransactionResponse>} token signature
+     * @returns {Promise<any>} token signature
      */
   async createSolanaNFT(input) {
     validateSolanaDeployNFT(input)
     const { wallet, maxSupply, uri, testnet } = input
 
-    const hash = await deploySolanaNFT({ from: wallet, maxSupply, uri, testnet: testnet !== undefined ? testnet : this.config.environment === 'development' })
+    const response = await deploySolanaNFT({ from: wallet, maxSupply, uri, testnet: testnet !== undefined ? testnet : this.config.environment === 'development' })
 
-    return new TransactionResponse({ hash })
+    return ({ ...response })
   }
 
   /**
@@ -1319,6 +1319,91 @@ class Controller extends Interface {
     const signedTx = await buildSolanaCustomProgramInteraction({ from, keys, programId, data, latestBlock })
 
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.CALL_CONTRACT_METHOD })
+  }
+
+  /**
+   * Create Solana token mint transaction
+   *
+   * @param {import('../entity').TransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
+  async createSolanaUpdateAuctionAuthorityTransaction(input) {
+    // validateSolanaTransferTransaction(input)
+    const protocol = Protocol.SOLANA
+
+    const apiRequest = getApiMethod({
+      requests,
+      key: 'getBlock',
+      config: this.config,
+    })
+    const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data.blockhash
+
+    const signedTx = await updateAuctionAuthority({ ...input, latestBlock })
+
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
+  }
+
+  /**
+   * Create Solana token mint transaction
+   *
+   * @param {import('../entity').TransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
+  async createSolanaUpdateVaultAuthorityTransaction(input) {
+    const protocol = Protocol.SOLANA
+
+    const apiRequest = getApiMethod({
+      requests,
+      key: 'getBlock',
+      config: this.config,
+    })
+    const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data.blockhash
+
+    const signedTx = await updateVaultAuthority({ ...input, latestBlock })
+
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
+  }
+
+  /**
+   * Create Solana token mint transaction
+   *
+   * @param {import('../entity').TransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
+   async validateSolanaSafetyDepositBoxes(input) {
+    const protocol = Protocol.SOLANA
+
+    const apiRequest = getApiMethod({
+      requests,
+      key: 'getBlock',
+      config: this.config,
+    })
+    const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data.blockhash
+
+    const signedTx = await validateAuction({ ...input, latestBlock })
+
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
+  }
+
+  /**
+   * Create Solana token mint transaction
+   *
+   * @param {import('../entity').TransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
+   async whitelistCreatorsTransaction(input) {
+    const protocol = Protocol.SOLANA
+
+    const apiRequest = getApiMethod({
+      requests,
+      key: 'getBlock',
+      config: this.config,
+    })
+    const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data.blockhash
+
+    const signedTx = await whitelistCreators({ ...input, latestBlock })
+
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
   }
 
 }
