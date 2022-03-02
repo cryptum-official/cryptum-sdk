@@ -1322,7 +1322,7 @@ class Controller extends Interface {
   }
 
   /**
-   * Create Solana token mint transaction
+   * Create Solana update auction authority transaction
    *
    * @param {import('../entity').TransferTransactionInput} input
    * @returns {Promise<TransactionResponse>} signed transaction data
@@ -1345,13 +1345,13 @@ class Controller extends Interface {
   }
 
   /**
-   * Create Solana token mint transaction
+   * Create Solana update token vault authority transaction
    *
    * @param {import('../entity').TransferTransactionInput} input
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async solanaUpdateVaultAuthorityTransaction(input) {
-    // validateSolanaTransferTransaction(input)
+    
     const { testnet, from, auctionManager, vault } = input
     const protocol = Protocol.SOLANA
 
@@ -1368,13 +1368,12 @@ class Controller extends Interface {
   }
 
   /**
-   * Create Solana token mint transaction
+   * Create Solana validate auction transaction
    *
    * @param {import('../entity').TransferTransactionInput} input
-   * @returns {Promise<SignedTransaction>} signed transaction data
+   * @returns {Promise<TransactionResponse>}
    */
   async validateSolanaSafetyDepositBoxes(input) {
-    // validateSolanaTransferTransaction(input)
     const { testnet, from, vault, nft, store, metadata, tokenStore, tokenTracker } = input
     const protocol = Protocol.SOLANA
 
@@ -1391,10 +1390,10 @@ class Controller extends Interface {
   }
 
   /**
-   * Create Solana token mint transaction
+   * Create Solana whitelist creators transaction
    *
    * @param {import('../entity').TransferTransactionInput} input
-   * @returns {Promise<SignedTransaction>} signed transaction data
+   * @returns {Promise<TransactionResponse>}
    */
   async whitelistCreatorsTransaction(input) {
     const protocol = Protocol.SOLANA
@@ -1406,9 +1405,9 @@ class Controller extends Interface {
     })
     const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data.blockhash
 
-    const signedTx = await whitelistCreators({ ...input, latestBlock })
+    const txHash = await whitelistCreators({ ...input, latestBlock })
 
-    return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
+    return new TransactionResponse({ hash: txHash })
   }
 
 }

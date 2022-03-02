@@ -619,6 +619,7 @@ module.exports.whitelistCreators = async function ({ testnet, from, uri, store, 
     let rawTransaction = Buffer.from(manualTransaction.serialize()).toString('base64');
     const sentTx = await connection.sendEncodedTransaction(rawTransaction)
     await metaplexConfirm(network, sentTx)
+    return sentTx
   }
 }
 
