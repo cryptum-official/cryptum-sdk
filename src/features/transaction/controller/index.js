@@ -1325,10 +1325,11 @@ class Controller extends Interface {
    * Create Solana token mint transaction
    *
    * @param {import('../entity').TransferTransactionInput} input
-   * @returns {Promise<SignedTransaction>} signed transaction data
+   * @returns {Promise<TransactionResponse>} signed transaction data
    */
-  async createSolanaUpdateAuctionAuthorityTransaction(input) {
+  async solanaUpdateAuctionAuthorityTransaction(input) {
     // validateSolanaTransferTransaction(input)
+    const { testnet, from, auctionManager, auction } = input
     const protocol = Protocol.SOLANA
 
     const apiRequest = getApiMethod({
@@ -1338,9 +1339,9 @@ class Controller extends Interface {
     })
     const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data.blockhash
 
-    const signedTx = await updateAuctionAuthority({ ...input, latestBlock })
+    const txHash = await updateAuctionAuthority({ from, auctionManager, auction, testnet: testnet !== undefined ? testnet : this.config.environment === 'development', latestBlock })
 
-    return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
+    return new TransactionResponse({ hash: txHash })
   }
 
   /**
@@ -1349,7 +1350,9 @@ class Controller extends Interface {
    * @param {import('../entity').TransferTransactionInput} input
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
-  async createSolanaUpdateVaultAuthorityTransaction(input) {
+  async solanaUpdateVaultAuthorityTransaction(input) {
+    // validateSolanaTransferTransaction(input)
+    const { testnet, from, auctionManager, vault } = input
     const protocol = Protocol.SOLANA
 
     const apiRequest = getApiMethod({
@@ -1359,9 +1362,9 @@ class Controller extends Interface {
     })
     const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data.blockhash
 
-    const signedTx = await updateVaultAuthority({ ...input, latestBlock })
+    const txHash = await updateVaultAuthority({ from, auctionManager, vault, testnet: testnet !== undefined ? testnet : this.config.environment === 'development', latestBlock })
 
-    return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
+    return new TransactionResponse({ hash: txHash })
   }
 
   /**
@@ -1370,7 +1373,9 @@ class Controller extends Interface {
    * @param {import('../entity').TransferTransactionInput} input
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
-   async validateSolanaSafetyDepositBoxes(input) {
+  async validateSolanaSafetyDepositBoxes(input) {
+    // validateSolanaTransferTransaction(input)
+    const { testnet, from, vault, nft, store, metadata, tokenStore, tokenTracker } = input
     const protocol = Protocol.SOLANA
 
     const apiRequest = getApiMethod({
@@ -1380,9 +1385,9 @@ class Controller extends Interface {
     })
     const latestBlock = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`)).data.blockhash
 
-    const signedTx = await validateAuction({ ...input, latestBlock })
+    const txHash = await validateAuction({ testnet: testnet !== undefined ? testnet : this.config.environment === 'development', from, vault, nft, store, metadata, tokenStore, tokenTracker, latestBlock })
 
-    return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
+    return new TransactionResponse({ hash: txHash })
   }
 
   /**
@@ -1391,7 +1396,7 @@ class Controller extends Interface {
    * @param {import('../entity').TransferTransactionInput} input
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
-   async whitelistCreatorsTransaction(input) {
+  async whitelistCreatorsTransaction(input) {
     const protocol = Protocol.SOLANA
 
     const apiRequest = getApiMethod({
