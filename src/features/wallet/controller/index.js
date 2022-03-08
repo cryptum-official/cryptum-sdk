@@ -10,6 +10,7 @@ const {
   getStellarPublicKeyFromPrivateKey,
   getRippleAddressFromPrivateKey,
   getAvalancheAddressFromPrivateKey,
+  getPolygonAddressFromPrivateKey,
   getSolanaAddressFromPrivateKey,
   deriveBitcoinWalletFromDerivationPath,
   deriveCeloWalletFromDerivationPath,
@@ -27,6 +28,7 @@ const {
   deriveCardanoAddressFromXpub,
   getCardanoAddressFromPrivateKey,
   deriveAvalancheAddressFromXpub,
+  derivePolygonAddressFromXpub,
   deriveSolanaWalletFromDerivationPath,
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
@@ -81,6 +83,8 @@ class Controller extends Interface {
         return await this.generateCardanoWallet({ mnemonic, derivation, testnet })
       case Protocol.AVAXCCHAIN:
         return await this.generateAvalancheWallet({ mnemonic, derivation, testnet })
+      case Protocol.POLYGON:
+        return await this.generatePolygonWallet({ mnemonic, derivation, testnet })
       case Protocol.SOLANA:
         return await this.generateSolanaWallet({ mnemonic, derivation, testnet })
       default:
@@ -133,6 +137,9 @@ class Controller extends Interface {
       case Protocol.AVAXCCHAIN:
         walletData.address = getAvalancheAddressFromPrivateKey(privateKey)
         break
+      case Protocol.POLYGON:
+        walletData.address = getPolygonAddressFromPrivateKey(privateKey)
+        break
       case Protocol.SOLANA:
         walletData.address = getSolanaAddressFromPrivateKey(privateKey)
         break
@@ -173,6 +180,9 @@ class Controller extends Interface {
         break
       case Protocol.AVAXCCHAIN:
         walletAddress = deriveAvalancheAddressFromXpub(xpub, { address })
+        break
+      case Protocol.POLYGON:
+        walletAddress = derivePolygonAddressFromXpub(xpub, { address })
         break
       default:
         throw new InvalidException('Unsupported blockchain protocol')
@@ -285,6 +295,12 @@ class Controller extends Interface {
     return wallet
   }
 
+  async generatePolygonWallet({ mnemonic, derivation, testnet }) {
+    const wallet = await this.generateEthereumWallet({ mnemonic, derivation, testnet })
+    wallet.protocol = Protocol.POLYGON
+    return wallet
+  }
+
   async generateSolanaWallet({ mnemonic, derivation, testnet }) {
     const { address, privateKey, publicKey, xpub } = await deriveSolanaWalletFromDerivationPath(mnemonic, derivation)
     return new Wallet({
@@ -342,8 +358,7 @@ class Controller extends Interface {
    */
   async getWalletTransactions({ status, limit, offset } = {}) {
     const qs = [
-      `limit=${limit !== undefined ? limit : 100}&offset=${offset !== undefined ? offset : 0}&status=${
-        status !== undefined ? status : 'PENDING'
+      `limit=${limit !== undefined ? limit : 100}&offset=${offset !== undefined ? offset : 0}&status=${status !== undefined ? status : 'PENDING'
       }`,
     ]
     return makeRequest({ method: 'get', url: `/wallet/transaction?${qs}`, config: this.config })
