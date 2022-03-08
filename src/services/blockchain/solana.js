@@ -1,8 +1,30 @@
 const metaplex = require('@metaplex/js');
+// const mpl
 const solanaWeb3 = require('@solana/web3.js');
 const splToken = require("@solana/spl-token");
 const nacl = require('tweetnacl');
+const { serialize } = require('borsh')
 const bs58 = require('bs58');
+const BN = require('bn.js');
+const { default: axios } = require('axios');
+
+function toPublicKey(key) {
+  return new solanaWeb3.PublicKey(key)
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function metaplexConfirm(network, tx) {
+  let confirmedTx = null
+  for (let tries = 0; tries < MAX_RETRIES; tries++) {
+    confirmedTx = await new metaplex.Connection(network, "finalized").getTransaction(tx)
+    if (confirmedTx) break
+    await sleep(1000)
+  }
+  if (!confirmedTx) throw new Error("Could not find requested transaction")
+}
 
 module.exports.buildSolanaTransferTransaction = async function ({
   from,
@@ -32,9 +54,9 @@ module.exports.buildSolanaTransferTransaction = async function ({
       'confirmed',
     );
 
-    const tokenProgram = new splToken.Token(connection, new solanaWeb3.PublicKey(token), splToken.TOKEN_PROGRAM_ID, fromAccount)
+    const tokenProgram = new splToken.Token(connection, toPublicKey(token), splToken.TOKEN_PROGRAM_ID, fromAccount)
     const senderTokenAccount = await tokenProgram.getOrCreateAssociatedAccountInfo(fromAccount.publicKey)
-    const receiverTokenAccount = await tokenProgram.getOrCreateAssociatedAccountInfo(new solanaWeb3.PublicKey(to))
+    const receiverTokenAccount = await tokenProgram.getOrCreateAssociatedAccountInfo(toPublicKey(to))
 
     manualTransaction.add(
       splToken.Token.createTransferInstruction(
@@ -69,7 +91,7 @@ module.exports.deploySolanaToken = async function ({ from, to = from.publicKey, 
   );
 
   const fromAccount = solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey))
-  const toAccount = new solanaWeb3.PublicKey(to)
+  const toAccount = toPublicKey(to)
 
   const mint = await splToken.Token.createMint(
     connection,
@@ -117,8 +139,8 @@ module.exports.mintSolanaToken = async function ({ from, to = from.publicKey, to
   );
 
   const fromAccount = solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey))
-  const toAccount = new solanaWeb3.PublicKey(to)
-  const tokenProgram = new splToken.Token(connection, new solanaWeb3.PublicKey(token), splToken.TOKEN_PROGRAM_ID, fromAccount)
+  const toAccount = toPublicKey(to)
+  const tokenProgram = new splToken.Token(connection, toPublicKey(token), splToken.TOKEN_PROGRAM_ID, fromAccount)
 
   let manualTransaction = new solanaWeb3.Transaction({
     recentBlockhash: latestBlock.toString(),
@@ -165,7 +187,7 @@ module.exports.deploySolanaNFT = async function ({ from, maxSupply, uri, testnet
     maxSupply,
   });
 
-  return mintResponse.mint.toBase58()
+  return { ...mintResponse }
 }
 
 module.exports.mintEdition = async function ({ masterEdition, from, testnet = true }) {
@@ -173,7 +195,7 @@ module.exports.mintEdition = async function ({ masterEdition, from, testnet = tr
   const connection = new metaplex.Connection(network)
   const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
 
-  const masterEditionMint = new solanaWeb3.PublicKey(masterEdition)
+  const masterEditionMint = toPublicKey(masterEdition)
 
   const mintResponse = await metaplex.actions.mintEditionFromMaster({
     connection,
@@ -204,8 +226,8 @@ module.exports.buildSolanaTokenBurnTransaction = async function ({
     'confirmed',
   );
 
-  const tokenProgram = new splToken.Token(connection, new solanaWeb3.PublicKey(token), splToken.TOKEN_PROGRAM_ID, fromAccount)
-  const tokenAccount = await tokenProgram.getOrCreateAssociatedAccountInfo(new solanaWeb3.PublicKey(fromAccount.publicKey))
+  const tokenProgram = new splToken.Token(connection, toPublicKey(token), splToken.TOKEN_PROGRAM_ID, fromAccount)
+  const tokenAccount = await tokenProgram.getOrCreateAssociatedAccountInfo(toPublicKey(fromAccount.publicKey))
 
   manualTransaction.add(
     splToken.Token.createBurnInstruction(
@@ -237,7 +259,7 @@ module.exports.updateMetaplexMetadata = async function ({ token, from, uri, test
   const connection = new metaplex.Connection(network)
   const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
 
-  const editionMint = new solanaWeb3.PublicKey(token)
+  const editionMint = toPublicKey(token)
   const { name, symbol, seller_fee_basis_points, properties: { creators }, } = await metaplex.utils.metadata.lookup(uri);
   const creatorsData = creators.reduce((memo, { address, share }) => {
     const verified = address === wallet.publicKey.toString();
@@ -302,3 +324,710 @@ module.exports.buildSolanaCustomProgramInteraction = async function ({
 
   return rawTransaction
 }
+
+module.exports.createTokenVault = async function ({ testnet, from }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
+  const externalPriceAccountData = await metaplex.actions.createExternalPriceAccount({ connection: new metaplex.Connection(network, "confirmed"), wallet });
+  await metaplexConfirm(network, externalPriceAccountData.txId)
+  const response = await metaplex.actions.createVault({ connection: new metaplex.Connection(network, "confirmed"), wallet: wallet, priceMint: splToken.NATIVE_MINT, externalPriceAccount: externalPriceAccountData.externalPriceAccount })
+  return ({ ...response })
+}
+
+module.exports.addTokenToVault = async function ({ testnet, vault, token, from }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
+  const fromAccount = solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey))
+  const tokenProgram = new splToken.Token(new metaplex.Connection(network, "confirmed"), toPublicKey(token), splToken.TOKEN_PROGRAM_ID, fromAccount)
+  const tokenAccount = await tokenProgram.getOrCreateAssociatedAccountInfo(toPublicKey(from.publicKey))
+  await metaplexConfirm(network, vault.txId)
+  const response = await metaplex.actions.addTokensToVault({
+    connection: new metaplex.Connection(network, "confirmed"),
+    wallet,
+    vault: vault.vault,
+    nfts: [{
+      tokenAccount: tokenAccount.address, tokenMint: toPublicKey(token),
+      amount: new BN(1)
+    }]
+  })
+  return ({
+    txId: response.safetyDepositTokenStores[0].txId,
+    metadata: response.safetyDepositTokenStores[0].tokenAccount.toBase58(),
+    tokenStore: response.safetyDepositTokenStores[0].tokenStoreAccount.toBase58()
+  })
+}
+
+module.exports.activateVault = async function ({ testnet, vault, from }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
+  const activateResponse = await metaplex.actions.closeVault(({
+    connection: new metaplex.Connection(network, "confirmed"),
+    wallet,
+    vault: toPublicKey(vault),
+    priceMint: splToken.NATIVE_MINT
+  }))
+  await metaplexConfirm(network, activateResponse.txId)
+  return ({ ...activateResponse })
+}
+
+module.exports.createStore = async function ({ testnet, from }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const connection = new metaplex.Connection(network, "confirmed")
+  const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
+  const store = await metaplex.actions.initStoreV2({ connection, wallet, isPublic: true })
+  await metaplexConfirm(network, store.txId)
+  return ({ ...store })
+}
+
+module.exports.createAuction = async function ({ testnet, from, vault, tickSize, endAuctionGap, endAuctionAt, gapTickSizePercentage, minumumPrice }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const connection = new metaplex.Connection(network, "confirmed")
+  const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
+  const auctionSettings = {
+    instruction: 1,
+    tickSize,
+    auctionGap: endAuctionGap,
+    endAuctionAt,
+    gapTickSizePercentage,
+    winners: new metaplex.programs.auction.WinnerLimit({
+      type: metaplex.programs.auction.WinnerLimitType.Capped,
+      usize: new BN(1),
+    }),
+    tokenMint: splToken.NATIVE_MINT.toBase58(),
+    priceFloor: minumumPrice ?
+      new metaplex.programs.auction.PriceFloor({ type: metaplex.programs.auction.PriceFloorType.Minimum, minPrice: minumumPrice }) :
+      new metaplex.programs.auction.PriceFloor({ type: metaplex.programs.auction.PriceFloorType.None }),
+  };
+  const auction = await metaplex.actions.initAuction({ connection, wallet, vault: toPublicKey(vault), auctionSettings })
+  await metaplexConfirm(network, auction.txId)
+  return { ...auction }
+}
+
+module.exports.createAuctionAuthority = async function ({ testnet, from, vault, store, auction }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
+  const auctionManagerPDA = await metaplex.programs.metaplex.AuctionManager.getPDA(toPublicKey(auction));
+  const newTokenTracker = await metaplex.programs.metaplex.AuctionWinnerTokenTypeTracker.getPDA(auctionManagerPDA)
+  const rentExempt = await new metaplex.Connection(network, "confirmed").getMinimumBalanceForRentExemption(splToken.AccountLayout.span)
+  const createAccountTx = new solanaWeb3.Transaction({ feePayer: wallet.publicKey })
+  const account = solanaWeb3.Keypair.generate();
+  createAccountTx.add(solanaWeb3.SystemProgram.createAccount({
+    fromPubkey: wallet.publicKey,
+    newAccountPubkey: account.publicKey,
+    lamports: rentExempt,
+    space: splToken.AccountLayout.span,
+    programId: splToken.TOKEN_PROGRAM_ID
+  }))
+  createAccountTx.add(splToken.Token.createInitAccountInstruction(
+    splToken.TOKEN_PROGRAM_ID,
+    toPublicKey('So11111111111111111111111111111111111111112'),
+    account.publicKey,
+    auctionManagerPDA,
+  ))
+  const createAccountTxResponse = await new metaplex.Connection(network, "confirmed").sendTransaction(createAccountTx, [wallet.payer, account])
+  await metaplexConfirm(network, createAccountTxResponse)
+  const tx = new metaplex.programs.metaplex.InitAuctionManagerV2({ feePayer: toPublicKey(from.publicKey) }, {
+    vault: toPublicKey(vault),
+    auction: toPublicKey(auction),
+    store: toPublicKey(store),
+    auctionManager: auctionManagerPDA,
+    auctionManagerAuthority: toPublicKey(from.publicKey),
+    acceptPaymentAccount: account.publicKey,
+    tokenTracker: newTokenTracker,
+    amountType: metaplex.programs.core.TupleNumericType.U8,
+    lengthType: metaplex.programs.core.TupleNumericType.U8,
+    maxRanges: new BN(10)
+  })
+
+  const txResponse = await new metaplex.Connection(network, "confirmed").sendTransaction(tx, [wallet.payer])
+  await metaplexConfirm(network, txResponse)
+
+  return {
+    hash: txResponse,
+    auctionManager: auctionManagerPDA.toBase58(),
+    tokenTracker: newTokenTracker.toBase58(),
+    acceptPaymentAccount: account.publicKey.toBase58()
+  }
+}
+
+module.exports.updateAuctionAuthority = async function ({ testnet, from, auction, auctionManager, latestBlock }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const fromAccount = solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey))
+  let manualTransaction = new solanaWeb3.Transaction({
+    recentBlockhash: latestBlock.toString(),
+    feePayer: fromAccount.publicKey
+  });
+
+  const auctionProgramId = 'auctxRXPeJoc4817jDhf4HbjnhEcr1cCXenosMhK5R8';
+  const data = Buffer.from(serialize(AUCTION_SCHEMA, new SetAuthorityArgs()));
+  const keys = [
+    {
+      pubkey: toPublicKey(auction),
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: toPublicKey(from.publicKey),
+      isSigner: true,
+      isWritable: false,
+    },
+    {
+      pubkey: toPublicKey(auctionManager),
+      isSigner: false,
+      isWritable: false,
+    },
+  ];
+  manualTransaction.add(
+    new solanaWeb3.TransactionInstruction({
+      keys,
+      programId: toPublicKey(auctionProgramId),
+      data: data,
+    })
+  )
+  let transactionBuffer = manualTransaction.serializeMessage();
+  let signature = nacl.sign.detached(transactionBuffer, fromAccount.secretKey);
+  manualTransaction.addSignature(fromAccount.publicKey, signature);
+
+  let isVerifiedSignature = manualTransaction.verifySignatures();
+  if (!isVerifiedSignature)
+    throw new Error('Signatures are not valid.')
+
+  let rawTransaction = Buffer.from(manualTransaction.serialize()).toString('base64');
+  const tx = await new metaplex.Connection(network, "confirmed").sendEncodedTransaction(rawTransaction)
+  await metaplexConfirm(network, tx)
+  return tx
+}
+
+module.exports.updateVaultAuthority = async function ({ testnet, from, vault, auctionManager, latestBlock }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const fromAccount = solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey))
+  let manualTransaction = new solanaWeb3.Transaction({
+    recentBlockhash: latestBlock.toString(),
+    feePayer: fromAccount.publicKey
+  });
+
+  const vaultProgramId = 'vau1zxA2LbssAUEF7Gpw91zMM1LvXrvpzJtmZ58rPsn';
+  const data = Buffer.from([10]);
+  const keys = [
+    {
+      pubkey: toPublicKey(vault),
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: toPublicKey(from.publicKey),
+      isSigner: true,
+      isWritable: false,
+    },
+    {
+      pubkey: toPublicKey(auctionManager),
+      isSigner: false,
+      isWritable: false,
+    },
+  ];
+  manualTransaction.add(
+    new solanaWeb3.TransactionInstruction({
+      keys,
+      programId: toPublicKey(vaultProgramId),
+      data: data,
+    })
+  )
+  let transactionBuffer = manualTransaction.serializeMessage();
+  let signature = nacl.sign.detached(transactionBuffer, fromAccount.secretKey);
+  manualTransaction.addSignature(fromAccount.publicKey, signature);
+
+  let isVerifiedSignature = manualTransaction.verifySignatures();
+  if (!isVerifiedSignature)
+    throw new Error('Signatures are not valid.')
+
+  let rawTransaction = Buffer.from(manualTransaction.serialize()).toString('base64');
+  const tx = await new metaplex.Connection(network, "confirmed").sendEncodedTransaction(rawTransaction)
+  await metaplexConfirm(network, tx)
+  return tx
+}
+
+module.exports.whitelistCreators = async function ({ testnet, from, uri, store, latestBlock }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const connection = new metaplex.Connection(network, "confirmed")
+  const creators = (await axios.get(uri)).data.properties.creators
+  const fromAccount = solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey))
+  const metaplexProgramId = 'p1exdMJcjVao65QdewkaZRUnU6VPSXhus9n2GzWfh98';
+
+  for (let i = 0; i < creators.length; i++) {
+    let creator = creators[i].address;
+    let whitelistedCreatorPDA = await metaplex.programs.metaplex.WhitelistedCreator.getPDA(toPublicKey(store), creator)
+
+    let manualTransaction = new solanaWeb3.Transaction({
+      recentBlockhash: latestBlock.toString(),
+      feePayer: fromAccount.publicKey
+    });
+
+    let data = Buffer.from(serialize(WHITELIST_CREATOR_SCHEMA, new SetWhitelistedCreatorArgs({ activated: true })));
+
+    let keys = [
+      {
+        pubkey: toPublicKey(whitelistedCreatorPDA),
+        isSigner: false,
+        isWritable: true,
+      },
+      {
+        pubkey: fromAccount.publicKey,
+        isSigner: true,
+        isWritable: false,
+      },
+      {
+        pubkey: fromAccount.publicKey,
+        isSigner: true,
+        isWritable: false,
+      },
+      {
+        pubkey: toPublicKey(creator),
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: toPublicKey(store),
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: solanaWeb3.SystemProgram.programId,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: solanaWeb3.SYSVAR_RENT_PUBKEY,
+        isSigner: false,
+        isWritable: false,
+      },
+    ];
+    manualTransaction.add(
+      new solanaWeb3.TransactionInstruction({
+        keys,
+        programId: toPublicKey(metaplexProgramId),
+        data: data,
+      })
+    )
+    let transactionBuffer = manualTransaction.serializeMessage();
+    let signature = nacl.sign.detached(transactionBuffer, fromAccount.secretKey);
+    manualTransaction.addSignature(fromAccount.publicKey, signature);
+
+    let isVerifiedSignature = manualTransaction.verifySignatures();
+    if (!isVerifiedSignature)
+      throw new Error('Signatures are not valid.')
+
+    let rawTransaction = Buffer.from(manualTransaction.serialize()).toString('base64');
+    const sentTx = await connection.sendEncodedTransaction(rawTransaction)
+    await metaplexConfirm(network, sentTx)
+    return sentTx
+  }
+}
+
+module.exports.validateAuction = async function ({ testnet, from, latestBlock, vault, nft, store, metadata, tokenStore, tokenTracker }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const connection = new metaplex.Connection(network, "confirmed")
+  const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
+  const storeId = await metaplex.programs.metaplex.Store.getPDA(wallet.publicKey);
+  const auctionPDA = await metaplex.programs.auction.Auction.getPDA(vault);
+  const auctionManagerPDA = await metaplex.programs.metaplex.AuctionManager.getPDA(auctionPDA);
+  const loadedVault = await metaplex.programs.vault.Vault.load(connection, vault);
+  const sdb = await loadedVault.getSafetyDepositBoxes(connection)
+
+  const whitelistedCreator = await metaplex.programs.metaplex.WhitelistedCreator.getPDA(toPublicKey(store), wallet.publicKey)
+
+  const safetyDepositConfigKey = await metaplex.programs.metaplex.SafetyDepositConfig.getPDA(
+    auctionManagerPDA,
+    sdb[0].pubkey,
+  );
+  const edition = await metaplex.programs.metadata.Edition.getPDA(toPublicKey(nft))
+  const originalAuthority = await solanaWeb3.PublicKey.findProgramAddress([
+    Buffer.from('metaplex'),
+    auctionPDA.toBuffer(),
+    toPublicKey(metadata).toBuffer(),
+  ],
+    toPublicKey('p1exdMJcjVao65QdewkaZRUnU6VPSXhus9n2GzWfh98'))
+
+  const safetyDepositConfigArgs = new SafetyDepositConfig({
+    key: 9,
+    auctionManager: solanaWeb3.SystemProgram.programId.toBase58(),
+    order: new BN(0),
+    winningConfigType: 3,
+    amountType: metaplex.programs.core.TupleNumericType.U8,
+    lengthType: metaplex.programs.core.TupleNumericType.U8,
+    amountRanges: [new AmountRange({ amount: new BN(1), length: new BN(1) })],
+    participationConfig: null,
+    participationState: null,
+  })
+  const value = new ValidateSafetyDepositBoxV2Args(safetyDepositConfigArgs)
+  const data = Buffer.from(serialize(SAFETY_DEPOSIT_BOX_SCHEMA, value));
+
+  const fromAccount = solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey))
+  let manualTransaction = new solanaWeb3.Transaction({
+    recentBlockhash: latestBlock.toString(),
+    feePayer: fromAccount.publicKey
+  });
+
+  const keys = [
+    {
+      pubkey: toPublicKey(safetyDepositConfigKey),
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: toPublicKey(tokenTracker),
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: auctionManagerPDA,
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: toPublicKey(metadata),
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: originalAuthority[0],
+      isSigner: false,
+      isWritable: true,
+    },
+    {
+      pubkey: whitelistedCreator,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: storeId,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: sdb[0].pubkey,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: toPublicKey(tokenStore),
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: toPublicKey(nft),
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: edition,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: toPublicKey(vault),
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: wallet.publicKey,
+      isSigner: true,
+      isWritable: false,
+    },
+    {
+      pubkey: wallet.publicKey,
+      isSigner: true,
+      isWritable: false,
+    },
+
+    {
+      pubkey: wallet.publicKey,
+      isSigner: true,
+      isWritable: false,
+    },
+    {
+      pubkey: toPublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s'),
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: solanaWeb3.SystemProgram.programId,
+      isSigner: false,
+      isWritable: false,
+    },
+    {
+      pubkey: solanaWeb3.SYSVAR_RENT_PUBKEY,
+      isSigner: false,
+      isWritable: false,
+    },
+  ];
+
+  manualTransaction.add(
+    new solanaWeb3.TransactionInstruction({
+      keys,
+      programId: toPublicKey('p1exdMJcjVao65QdewkaZRUnU6VPSXhus9n2GzWfh98'),
+      data,
+    })
+  )
+  let transactionBuffer = manualTransaction.serializeMessage();
+  let signature = nacl.sign.detached(transactionBuffer, fromAccount.secretKey);
+  manualTransaction.addSignature(fromAccount.publicKey, signature);
+
+  let isVerifiedSignature = manualTransaction.verifySignatures();
+  if (!isVerifiedSignature)
+    throw new Error('Signatures are not valid.')
+
+
+  let rawTransaction = Buffer.from(manualTransaction.serialize()).toString('base64');
+  const sentTx = await connection.sendEncodedTransaction(rawTransaction)
+  await metaplexConfirm(network, sentTx)
+  return sentTx
+}
+
+module.exports.startAuction = async function ({ testnet, from, store, auction, auctionManager }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const connection = new metaplex.Connection(network, "confirmed")
+  const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
+  const tx = new metaplex.programs.metaplex.StartAuction({ feePayer: toPublicKey(from.publicKey) },
+    {
+      store: toPublicKey(store),
+      auction: toPublicKey(auction),
+      auctionManager: toPublicKey(auctionManager),
+      auctionManagerAuthority: wallet.publicKey
+    })
+  const txResponse = await connection.sendTransaction(tx, [wallet.payer])
+  await metaplexConfirm(network, txResponse)
+  return txResponse
+}
+
+module.exports.placeBid = async function ({ testnet, from, auction, amount }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const connection = new metaplex.Connection(network, "confirmed")
+  const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
+  const bid = await metaplex.actions.placeBid({
+    connection,
+    wallet,
+    amount: new BN(amount),
+    auction: toPublicKey(auction),
+  })
+  await metaplexConfirm(network, bid.txId)
+  return { ...bid }
+}
+
+module.exports.cancelBid = async function ({ testnet, from, auction, bidderPotToken }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const connection = new metaplex.Connection(network, "confirmed")
+  const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
+  const bid = await metaplex.actions.cancelBid({
+    connection,
+    wallet,
+    auction: toPublicKey(auction),
+    bidderPotToken: toPublicKey(bidderPotToken),
+  })
+  await metaplexConfirm(network, bid.txId)
+  return { ...bid }
+}
+
+module.exports.finishAuction = async function ({ testnet, from, auction, store, auctionManager, vault, auctionManagerAuthority }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const connection = new metaplex.Connection(network, "confirmed")
+  const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
+  const auctionExtended = await metaplex.programs.auction.AuctionExtended.getPDA(toPublicKey(vault))
+  const tx = new metaplex.programs.metaplex.EndAuction({ feePayer: toPublicKey(wallet.publicKey) }, {
+    store: toPublicKey(store),
+    auctionManager: toPublicKey(auctionManager),
+    auctionManagerAuthority: toPublicKey(auctionManagerAuthority),
+    auction: toPublicKey(auction),
+    auctionExtended
+  })
+  const txResponse = await connection.sendTransaction(tx, [wallet.payer])
+  await metaplexConfirm(network, txResponse)
+  return txResponse
+}
+
+module.exports.redeemAuction = async function ({ testnet, from, auction, store }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const connection = new metaplex.Connection(network, "confirmed")
+  const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
+  const redeem = await metaplex.actions.redeemPrintingV2Bid({ connection, wallet, store: toPublicKey(store), auction: toPublicKey(auction) })
+  await metaplexConfirm(network, redeem.txId)
+  return { ...redeem }
+}
+
+module.exports.claimWinnings = async function ({ testnet, from, auction, store, bidderPotToken }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const connection = new metaplex.Connection(network, "confirmed")
+  const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
+  const claim = await metaplex.actions.claimBid({ connection, wallet, auction: toPublicKey(auction), store: toPublicKey(store), bidderPotToken: toPublicKey(bidderPotToken) })
+  await metaplexConfirm(network, claim.txId)
+  return { ...claim }
+}
+
+module.exports.listAuctions = async function ({ testnet, from, authority }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const connection = new metaplex.Connection(network, "confirmed")
+  const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
+  const auctionResponse = await metaplex.programs.auction.Auction.findMany(connection, { authority: wallet.publicKey })
+  const list = new Map
+  auctionResponse.map(e => {
+    list.set(e.pubkey.toBase58(), e.data)
+  })
+  return list
+}
+
+module.exports.inspectAuction = async function ({ testnet, auction }) {
+  const network = testnet ? 'devnet' : 'mainnet-beta'
+  const connection = new metaplex.Connection(network, "confirmed")
+  // const auctionResponse = await metaplex.programs.auction.Auction.getInfo(connection,toPublicKey(auction))
+  const auctionResponse = (await metaplex.programs.auction.Auction.load(connection, toPublicKey(auction))).toJSON()
+  console.log(auctionResponse)
+  return auctionResponse
+}
+
+const MAX_RETRIES = 24
+
+class AmountRange {
+  amount;
+  length;
+  constructor(args) {
+    this.amount = args.amount;
+    this.length = args.length;
+  }
+}
+class ParticipationStateV2 {
+  collectedToAcceptPayment = new BN(0);
+
+  constructor(args) {
+    Object.assign(this, args);
+  }
+}
+class ParticipationConfigV2 {
+  winnerConstraint = 0;
+  nonWinningConstraint = 1;
+  fixedPrice = new BN(0);
+  constructor(args) {
+    Object.assign(this, args);
+  }
+}
+class SafetyDepositConfig {
+  key;
+  auctionManager;
+  order;
+  winningConfigType;
+  amountType;
+  lengthType;
+  amountRanges;
+  participationConfig;
+  participationState;
+  constructor(args) {
+    Object.assign(this, args)
+  };
+}
+
+
+class ValidateSafetyDepositBoxV2Args {
+  instruction = 18;
+  safetyDepositConfig;
+  constructor(safetyDeposit) {
+    this.safetyDepositConfig = safetyDeposit;
+  }
+}
+
+const SAFETY_DEPOSIT_BOX_SCHEMA = new Map([
+  [
+    SafetyDepositConfig,
+    {
+      kind: 'struct',
+      fields: [
+        ['key', 'u8'],
+        ['auctionManager', 'pubkeyAsString'],
+        ['order', 'u64'],
+        ['winningConfigType', 'u8'],
+        ['amountType', 'u8'],
+        ['lengthType', 'u8'],
+        ['amountRanges', [AmountRange]],
+        [
+          'participationConfig',
+          { kind: 'option', type: ParticipationConfigV2 },
+        ],
+        ['participationState', { kind: 'option', type: ParticipationStateV2 }],
+      ],
+    },
+  ],
+  [
+    ValidateSafetyDepositBoxV2Args,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['safetyDepositConfig', SafetyDepositConfig],
+      ],
+    },
+  ],
+  [
+    AmountRange,
+    {
+      kind: 'struct',
+      fields: [
+        ['amount', 'u64'],
+        ['length', 'u64'],
+      ],
+    },
+  ]
+]);
+
+class SetAuthorityArgs {
+  instruction = 5;
+}
+
+class WhitelistedCreator {
+  key = 4;
+  address;
+  activated = true;
+
+  constructor(args) {
+    this.address = args.address;
+    this.activated = args.activated;
+  }
+}
+
+class SetWhitelistedCreatorArgs {
+  instruction = 9;
+  activated;
+  constructor(args) {
+    this.activated = args.activated;
+  }
+}
+
+const AUCTION_SCHEMA = new Map([
+  [
+    SetAuthorityArgs,
+    {
+      kind: 'struct',
+      fields: [['instruction', 'u8']],
+    },
+  ]
+]);
+
+const WHITELIST_CREATOR_SCHEMA = new Map([
+  [
+    WhitelistedCreator,
+    {
+      kind: 'struct',
+      fields: [
+        ['key', 'u8'],
+        ['address', 'pubkeyAsString'],
+        ['activated', 'u8'],
+      ],
+    },
+  ],
+  [
+    SetWhitelistedCreatorArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['activated', 'u8'],
+      ],
+    },
+  ]
+])
