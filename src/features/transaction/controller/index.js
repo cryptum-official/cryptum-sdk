@@ -1351,7 +1351,7 @@ class Controller extends Interface {
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async solanaUpdateVaultAuthorityTransaction(input) {
-    
+
     const { testnet, from, auctionManager, vault } = input
     const protocol = Protocol.SOLANA
 
