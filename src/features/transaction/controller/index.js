@@ -30,6 +30,7 @@ const {
 const {
   buildAvaxCChainTransferTransaction,
   buildBscTransferTransaction,
+  buildPolygonTransferTransaction,
   buildEthereumTransferTransaction,
   buildEthereumSmartContractTransaction,
   buildEthereumSmartContractDeployTransaction,
@@ -515,6 +516,41 @@ class Controller extends Interface {
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
   /**
+   * Create polygon transfer transaction
+   *
+   * @param {EthereumTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
+  async createPolygonTransferTransaction(input) {
+    validateEthereumTransferTransactionParams(input)
+    const { wallet, tokenSymbol, amount, destination, fee, testnet, contractAddress } = input
+    const protocol = Protocol.POLYGON
+    const { info, networkFee } = await this._getFeeInfo({
+      wallet,
+      type: tokenSymbol === 'MATIC' ? TransactionType.TRANSFER : TransactionType.CALL_CONTRACT_METHOD,
+      destination,
+      amount: tokenSymbol === 'MATIC' ? amount : null,
+      contractAddress,
+      contractAbi: tokenSymbol === 'MATIC' ? null : TRANSFER_METHOD_ABI,
+      method: tokenSymbol === 'MATIC' ? null : 'transfer',
+      params: tokenSymbol === 'MATIC' ? null : [destination, toWei(amount).toString()],
+      testnet,
+      fee,
+      protocol,
+    })
+    const signedTx = await buildPolygonTransferTransaction({
+      fromPrivateKey: wallet.privateKey,
+      tokenSymbol,
+      amount,
+      destination,
+      fee: networkFee,
+      nonce: info.nonce,
+      testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
+      contractAddress,
+    })
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
+  }
+  /**
   * Create avalanche transfer transaction
   *
   * @param {EthereumTransferTransactionInput} input
@@ -629,7 +665,7 @@ class Controller extends Interface {
     }
     if (protocol === Protocol.CELO) {
       signedTx = await buildCeloSmartContractTransaction(transactionOptions)
-    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN].includes(protocol)) {
+    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
       signedTx = await buildEthereumSmartContractTransaction({ ...transactionOptions, protocol })
     } else {
       throw new GenericException('Invalid protocol', 'InvalidTypeException')
@@ -746,7 +782,7 @@ class Controller extends Interface {
 
     if (protocol === Protocol.CELO) {
       signedTx = await buildCeloSmartContractDeployTransaction(transactionOptions)
-    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN].includes(protocol)) {
+    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
       signedTx = await buildEthereumSmartContractDeployTransaction({ ...transactionOptions, protocol })
     } else {
       throw new GenericException('Invalid protocol', 'InvalidTypeException')
@@ -782,7 +818,6 @@ class Controller extends Interface {
       params,
       fee: networkFee,
       feeCurrency,
-
       testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       config: this.config,
       tokenType,
@@ -790,7 +825,7 @@ class Controller extends Interface {
 
     if (protocol === Protocol.CELO) {
       signedTx = await buildCeloSmartContractDeployTransaction(transactionOptions)
-    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN].includes(protocol)) {
+    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
       signedTx = await buildEthereumSmartContractDeployTransaction({ ...transactionOptions, protocol })
     } else {
       throw new GenericException('Invalid protocol', 'InvalidTypeException')
