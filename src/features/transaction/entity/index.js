@@ -486,6 +486,7 @@ class CardanoTransferTransactionInput extends TransferTransactionInput {
  * @property {string=} changeAddress change address
  * @property {string=} mintAuthorityAddress mint authority address
  * @property {string=} meltAuthorityAddress melt authority address
+ * @property {string=} nftData NFT data (URI, serial number, etc) if creating a NFT
  * @property {boolean=} testnet
  */
 /**
