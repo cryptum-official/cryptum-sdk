@@ -49,7 +49,7 @@ const makeRequest = async ({ method, url, params, headers, body, config }) => {
   try {
     const axios = new AxiosApi(config)
     const api = axios.getInstance()
-    const response = await api({ method, url, params, headers, data: body })
+    const response = await api({ method, url, params, headers: { ...headers, ...mountHeaders(config.apiKey) }, data: body })
     return response.data
   } catch (error) {
     handleRequestError(error)
