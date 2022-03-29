@@ -19,7 +19,10 @@
     - [Wallets](docs/wallets.md)
     - [Transfers](docs/transfers.md)
     - [Trustlines](docs/trustlines.md)
-    - [Tokens and Smart contracts](docs/tokens-contracts.md)
+    - Tokens and Smart contracts
+      - [Ethereum and other EVMs](docs/tokens/evm.md)
+      - [Solana](docs/tokens/solana.md)
+      - [Hathor](docs/tokens/hathor.md)
     - [Prices](docs/prices.md)
     - [Swap tokens](docs/swap.md)
     - [Blockchain info](docs/data.md)
