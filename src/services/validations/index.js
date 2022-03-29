@@ -4,6 +4,7 @@ const { isValidAddress } = require('ripple-lib/dist/npm/common/schema-validator'
 const { StrKey } = require('stellar-sdk')
 const Web3 = require('web3')
 const { GenericException, InvalidTypeException, HathorException } = require('../../../errors')
+const InvalidException = require('../../../errors/InvalidException')
 const { TransactionType } = require('../../features/transaction/entity')
 const { Protocol, TOKEN_TYPES } = require('../blockchain/constants')
 
@@ -288,6 +289,7 @@ module.exports.validateHathorTokenTransactionFromWallet = ({
   meltAuthorityAddress,
   amount,
   type,
+  nftData,
 }) => {
   if (!wallet) {
     throw new GenericException('Parameter wallet is null', 'InvalidTypeException')
@@ -307,6 +309,12 @@ module.exports.validateHathorTokenTransactionFromWallet = ({
     }
     if (!tokenSymbol || typeof tokenSymbol !== 'string') {
       throw new InvalidTypeException('tokenSymbol', 'string')
+    }
+    if (nftData && typeof nftData !== 'string') {
+      throw new InvalidTypeException('nftData', 'string')
+    }
+    if (nftData && !new BigNumber(amount).isInteger()) {
+      throw new InvalidException('Amount must be integer')
     }
   } else {
     if (!tokenUid || typeof tokenUid !== 'string') {
@@ -595,6 +603,9 @@ module.exports.validateWalletNft = ({ address, protocol, tokenAddresses }) => {
   }
   if (!protocol || typeof protocol !== 'string') {
     throw new InvalidTypeException('protocol', 'string')
+  }
+  if (tokenAddresses && !Array.isArray(tokenAddresses)) {
+    throw new InvalidTypeException('tokenAddresses', 'array of strings')
   }
 }
 

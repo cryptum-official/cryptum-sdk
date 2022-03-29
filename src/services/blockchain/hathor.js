@@ -115,26 +115,43 @@ module.exports.buildHathorTokenTransaction = async function ({
   inputSum,
   tokenUid,
   type,
+  nftData,
   testnet,
 }) {
   let txData = {
     inputs: inputs.map((input) => ({ tx_id: input.txHash, index: input.index })),
     outputs: []
   }
-  const tokenAmount = toHTRUnit(amount).toNumber()
+  let tokenAmount = toHTRUnit(amount).toNumber()
+  const isNFT = !!nftData
   const _dataToken =
     type === TransactionType.HATHOR_TOKEN_MELT
       ? txData
       : hathorLib.tokens.createMintData(null, null, address, tokenAmount, txData, {
-          changeAddress: changeAddress,
-          createAnotherMint: false,
-          createMelt: false,
-        })
+        changeAddress: changeAddress,
+        createAnotherMint: false,
+        createMelt: false,
+        isNFT,
+      })
 
   if (type === TransactionType.HATHOR_TOKEN_CREATION) {
     _dataToken.version = hathorLib.constants.CREATE_TOKEN_TX_VERSION
     _dataToken.name = tokenName
     _dataToken.symbol = tokenSymbol
+
+    if (isNFT) {
+      // After the transaction data is completed
+      // if it's an NFT I must add the first output as the data script
+      // For NFT data the value is always 0.01 HTR (i.e. 1 integer)
+      _dataToken.outputs.unshift({
+        type: 'data',
+        data: nftData,
+        value: 1,
+        tokenData: 0
+      })
+      tokenAmount += 1
+    }
+
   } else if (type === TransactionType.HATHOR_TOKEN_MINT || type === TransactionType.HATHOR_TOKEN_MELT) {
     _dataToken.version = hathorLib.constants.DEFAULT_TX_VERSION
     _dataToken.tokens = [tokenUid]

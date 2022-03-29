@@ -930,6 +930,7 @@ class Controller extends Interface {
       amount,
       address,
       changeAddress,
+      nftData,
       testnet,
     } = input
     let inputSum = 0
@@ -978,6 +979,7 @@ class Controller extends Interface {
       changeAddress: changeAddress || wallet.address,
       mintAuthorityAddress,
       meltAuthorityAddress,
+      nftData,
       amount,
       testnet: testnet !== undefined ? testnet : this.config.environment === 'development',
       inputSum,
