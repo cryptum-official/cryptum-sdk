@@ -1,4 +1,4 @@
-const { handleRequestError, getApiMethod, mountHeaders } = require('../../../services')
+const { handleRequestError, getApiMethod, mountHeaders, makeRequest } = require('../../../services')
 const requests = require('./requests.json')
 const Interface = require('./interface')
 const {
@@ -207,6 +207,20 @@ class Controller extends Interface {
         headers,
       })
       return response.data
+    } catch (error) {
+      handleRequestError(error)
+    }
+  }
+  /**
+   * Get transaction receipt by hash (tx id)
+   *
+   * @param {object} input
+   * @param {string} input.hash transaction hash
+   * @param {Protocol} input.protocol blockchain protocol
+   */
+  async getTransactionReceiptByHash({ hash, protocol }) {
+    try {
+      return await makeRequest({ method: 'get', url: `/transaction/${hash}/receipt?protocol=${protocol}`, config: this.config })
     } catch (error) {
       handleRequestError(error)
     }
