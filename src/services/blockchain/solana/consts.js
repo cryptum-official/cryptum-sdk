@@ -1,7 +1,7 @@
 const metaplex = require('@metaplex/js');
 const solanaWeb3 = require('@solana/web3.js');
 
-const MAX_RETRIES = 24
+const MAX_RETRIES = 48
 
 class AmountRange {
   amount;
