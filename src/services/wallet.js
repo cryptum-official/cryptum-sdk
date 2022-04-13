@@ -427,6 +427,32 @@ module.exports.deriveAvalancheAddressFromXpub = async (xpub, { address = 0 } = {
   this.deriveEthereumAddressFromXpub(xpub, { address })
 
 /**
+ * Get Polygon address from private key
+ *
+ * @param {string} privateKey private key code58/hex string
+ * @returns {object} address
+ */
+
+module.exports.getPolygonAddressFromPrivateKey = (privateKey) => {
+  const { address } = this.privateKeyToEthAccount(privateKey)
+  return address.toLowerCase()
+}
+
+/**
+ * Derive Polygon address, private key and public key
+ *
+ * @param {string} mnemonic mnemonic seed string
+ * @param {object=} derivationPath derivation path object
+ * @param {number} derivationPath.account derivation path account index
+ * @param {number} derivationPath.change derivation path change index
+ * @param {number} derivationPath.address derivation path address index
+ * @returns
+ */
+
+module.exports.derivePolygonAddressFromXpub = async (xpub, { address = 0 } = {}) =>
+  this.deriveEthereumAddressFromXpub(xpub, { address })
+
+/**
  * Derive Solana address, private key and public key
  *
  * @param {string} mnemonic mnemonic seed string
@@ -436,15 +462,14 @@ module.exports.deriveAvalancheAddressFromXpub = async (xpub, { address = 0 } = {
  * @param {number} derivationPath.address derivation path address index
  * @returns
  */
-module.exports.deriveSolanaWalletFromDerivationPath = async (mnemonic, { account = 0, change = 0, address = 0 } = {}) => {  
+module.exports.deriveSolanaWalletFromDerivationPath = async (mnemonic, { account = 0, change = 0, address = 0 } = {}) => {
   const seed = Buffer.from(await mnemonicToSeed(mnemonic)).toString('hex')
   const path = getSolanaDerivationPath({ account, address }).slice(0, 13)
   const { key } = ed25519.derivePath(path, Buffer.from(seed, "hex"))
   const keypair = solanaWeb3.Keypair.fromSeed(key)
-  
   return {
     address: keypair.publicKey.toString(),
-    privateKey: bs58.encode(keypair.secretKey) ,
+    privateKey: bs58.encode(keypair.secretKey),
     publicKey: keypair.publicKey.toString(),
     xpub: undefined,
   }
@@ -456,7 +481,7 @@ module.exports.deriveSolanaWalletFromDerivationPath = async (mnemonic, { account
  * @param {string} privateKey private key code58 string
  * @returns {object} address
  */
- module.exports.getSolanaAddressFromPrivateKey = (privateKey) => {
+module.exports.getSolanaAddressFromPrivateKey = (privateKey) => {
   const keypair = solanaWeb3.Keypair.fromSecretKey(bs58.decode(privateKey))
   return keypair.publicKey.toString()
 }

@@ -193,4 +193,15 @@ describe.only('Hathor token transactions', () => {
     })
     assert.include(transaction.signedTx, '000101020200000')
   })
+  it('create nft', async () => {
+    const transaction = await txController.createHathorTokenTransactionFromWallet({
+      wallet: wallets.hathor,
+      type: 'HATHOR_TOKEN_CREATION',
+      amount: '100',
+      tokenName: 'Shapes',
+      tokenSymbol: 'SHAPS',
+      nftData: 'ipfs://test',
+    })
+    assert.include(transaction.signedTx, '0002010300000631')
+  })
 })
