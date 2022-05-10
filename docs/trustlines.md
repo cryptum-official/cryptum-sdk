@@ -64,6 +64,6 @@ After creating a transaction, use this method to broadcast the transaction.
 
 ```js
 const { hash } = await txController.sendTransaction(transaction)
-console.log(hash)
 // Log transaction hash
+console.log(hash)
 ```

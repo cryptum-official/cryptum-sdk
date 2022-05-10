@@ -5,7 +5,7 @@
 - [Deploy tokens](#deploy-tokens)
 - [Deploy a smart contract](#deploy-a-smart-contract)
 
-Use the transaction controller to create the transactions below:
+Use the transaction controller to create transactions:
 
 ```js
 const txController = sdk.getTransactionController()
@@ -155,6 +155,6 @@ After creating a transaction, use this method to broadcast the transaction.
 
 ```js
 const { hash } = await txController.sendTransaction(transaction)
-console.log(hash)
 // Log transaction hash
+console.log(hash)
 ```

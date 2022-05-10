@@ -1,6 +1,6 @@
 # Staking on Celo blockchain
 
-To stake CELO basically you have to follow these steps below:
+To stake CELO you have to follow these steps below:
 
 - Register your account if it isn't registered yet
 - Lock tokens
@@ -13,7 +13,7 @@ To unstake you have the following steps to do:
 - Unlock tokens
 - Withdraw tokens
 
-Use the transaction controller to make the calls below:
+Use the transaction controller to make the following calls:
 ```js
 const txController = sdk.getStakingController({ protocol: 'CELO' })
 ```
@@ -94,7 +94,7 @@ const transaction = await txController.vote({
 
 ## Activate votes
 
-Before activating, you'll need to wait for the next epoch to begin. One epoch takes around one day to begin.
+Before activating, you'll need to wait for the next epoch to begin. One epoch lasts around one day.
 
 ### `txController.activate(opts)`
 * `opts.wallet` (Wallet) (__required__) - wallet used to activate.

@@ -5,7 +5,7 @@
 - [Melt Hathor tokens](#melt-hathor-tokens)
 - [Create Hathor NFTs](#create-hathor-nfts)
 
-Use the transaction controller to create the transactions below:
+Use the transaction controller to create transactions:
 
 ```js
 const txController = sdk.getTransactionController()
@@ -100,8 +100,7 @@ const transaction = await txController.createHathorTokenTransactionFromUTXO({
 
 ## Mint Hathor tokens
 
-Create and sign a transaction to mint an existing token in Hathor blockchain. Keep in mind that you need enough HTR tokens
-to pay for this transaction depending on the minting amount, as already explained above.
+Create and sign a transaction to mint an existing token in Hathor blockchain. Keep in mind that you need enough HTR tokens to pay for this transaction depending on the minting amount, as already explained above.
 
 ### `txController.createHathorTokenTransactionFromWallet(opts)`
 
@@ -256,6 +255,6 @@ After creating a transaction, use this method to broadcast the transaction.
 
 ```js
 const { hash } = await txController.sendTransaction(transaction)
-console.log(hash)
 // Log transaction hash
+console.log(hash)
 ```
