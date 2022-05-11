@@ -5,7 +5,7 @@
 - [Burn Solana tokens](#burn-solana-tokens)
 - [Update Solana NFT Metadata](#update-solana-nft-metadata)
 
-Use the transaction controller to create the transactions below:
+Use the transaction controller to create transactions:
 
 ```js
 const txController = sdk.getTransactionController()
@@ -80,6 +80,7 @@ const transaction = await txController.createSolanaNFTEdition({
 ```
 ## Burn Solana tokens
 
+This method works for both SPL tokens and NFT's.
 #### `txController.createSolanaTokenBurnTransaction(opts)`
 - `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
 - `opts.token` (string)(**required**) - address of the token that will be burned.
@@ -112,6 +113,6 @@ After creating a transaction, use this method to broadcast the transaction.
 
 ```js
 const { hash } = await txController.sendTransaction(transaction)
-console.log(hash)
 // Log transaction hash
+console.log(hash)
 ```

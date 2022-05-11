@@ -105,5 +105,5 @@ Get block information from blockchain.
 ```js
 const txController = sdk.getTransactionController()
 const tx = await txController.getBlock({ block: '111111', protocol: 'STELLAR' })
-// Blockchain raw block information returned
+// Raw block information returned from the Blockchain
 ```

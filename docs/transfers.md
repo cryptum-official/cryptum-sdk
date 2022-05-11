@@ -11,7 +11,7 @@
 - [Solana](#solana)
 - [Send transactions to blockchain](#send-transactions-to-blockchain)
 
-First create an instance of transaction controller to call all methods below.
+First create an instance of transaction controller to call all methods listed below.
 ```js
 const txController = sdk.getTransactionController()
 ```
@@ -20,7 +20,7 @@ const txController = sdk.getTransactionController()
 
 #### `txController.createEthereumTransferTransaction(opts)`
 
-Create a transfer transaction in Ethereum blockchain, you can transfer ETH or any other tokens.
+Create a transfer transaction in Ethereum blockchain, you can transfer ETH or any other tokens that were created in its network.
 * `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
 * `opts.tokenSymbol` (string) - token to transfer. If you are transferring ether this parameter should be `ETH`, otherwise you can leave undefined.
 * `opts.contractAddress` (string) - required if you are transferring a ERC20 token, otherwise leave undefined.
@@ -52,7 +52,7 @@ const transaction = await txController.createEthereumTransferTransaction({
 
 #### `txController.createBscTransferTransaction(opts)`
 
-Create a transfer transaction in BSC blockchain, you can transfer BNB or any other tokens.
+Create a transfer transaction in BSC blockchain, you can transfer BNB or any other tokens that were created in its network.
 * `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
 * `opts.tokenSymbol` (string) - token to transfer. If you are transferring bnb this parameter should be `BNB`, otherwise you can leave undefined.
 * `opts.contractAddress` (string) - required if you are transferring a BEP20 token, otherwise leave undefined.
@@ -85,7 +85,7 @@ const transaction = await txController.createBscTransferTransaction({
 
 #### `txController.createCeloTransferTransaction(opts)`
 
-Create a transfer transaction in Celo blockchain, you can transfer CELO, cUSD or any other tokens.
+Create a transfer transaction in Celo blockchain, you can transfer CELO, cUSD or any other tokens that were created in its network.
 * `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
 * `opts.tokenSymbol` (string) - required if you are transferring Celo or cUSD, this parameter should be `CELO` or `cUSD`, otherwise you can leave undefined.
 * `opts.contractAddress` (string) - required if you are transferring a ERC20 token, otherwise leave undefined.
@@ -112,7 +112,7 @@ const transaction = await txController.createCeloTransferTransaction({
 
 #### `txController.createAvaxCChainTransferTransaction(opts)`
 
-Create a transfer transaction in Avalanche blockchain, you can transfer AVAX or any other tokens.
+Create a transfer transaction in Avalanche C-Chain blockchain, you can transfer AVAX or any other tokens that were created in its network.
 * `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
 * `opts.tokenSymbol` (string) - token to transfer. If you are transferring avax this parameter should be `AVAX`, otherwise you can leave undefined.
 * `opts.contractAddress` (string) - required if you are transferring a ERC20 token, otherwise leave undefined.
@@ -186,7 +186,7 @@ const transaction = await txController.createBitcoinTransferTransaction({
 
 #### `txController.createStellarTransferTransaction(opts)`
 
-Create a transfer transaction in Stellar blockchain, you can transfer XLM or any other tokens.
+Create a transfer transaction in Stellar blockchain, you can transfer XLM or any other tokens that were created in its network.
 
 * `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
 * `opts.assetSymbol` (string)(__required__) - asset to transfer.
@@ -230,7 +230,7 @@ const transaction = await txController.createStellarTransferTransaction({
 
 #### `txController.createRippleTransferTransaction(opts)`
 
-Create a transfer transaction in XRP blockchain, you can transfer XRP or any other tokens.
+Create a transfer transaction in XRP blockchain, you can transfer XRP or any other tokens that were created in its network.
 
 * `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
 * `opts.assetSymbol` (string)(__required__) - asset to transfer.
@@ -264,9 +264,8 @@ const transaction = await txController.createRippleTransferTransaction({
 
 #### `txController.createHathorTransferTransactionFromWallet(opts)`
 
-Create a transfer transaction for Hathor blockchain, you can transfer HTR or any other tokens.
-If the sum of inputs from the wallet is greater than the sum of outputs then the change will be
-transferred back to the wallet.
+Create a transfer transaction for Hathor blockchain, you can transfer HTR or any other tokens that were created in its network.
+If the sum of inputs from the wallet is greater than the sum of outputs then the change will be transferred back to the wallet.
 
 * `opts.wallet` (Wallet) - wallet to sign the transaction with.
 * `opts.outputs` (array of Output)(__required__) - outputs to transfer to.
@@ -318,7 +317,7 @@ const transaction = await txController.createHathorTransferTransactionFromUTXO({
 
 #### `txController.createCardanoTransferTransactionFromWallet(opts)`
 
-Create a transfer transaction for the Cardano blockchain, you can transfer ADA or any other native tokens.
+Create a transfer transaction for the Cardano blockchain, you can transfer ADA or any other native Cardano token.
 
 * `opts.wallet` (Wallet) - wallet to sign the transaction with.
 * `opts.outputs` (array of Output)(__required__) - outputs to transfer to.
@@ -375,7 +374,7 @@ const transaction = await txController.createCardanoTransferTransactionFromUTXO(
 
 #### `txController.createSolanaTransferTransaction(opts)`
 
-Create a transfer transaction in Ethereum blockchain, you can transfer ETH or any other tokens.
+Create a transfer transaction in the Solana blockchain, you can transfer SOL or any other tokens created in its network.
 * `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
 * `opts.token` (string) - token to transfer. If you are transferring Solana this parameter should be `SOL`, otherwise it should be the token ID
 * `opts.amount` (string)(__required__) - amount to be transferred. 
@@ -405,6 +404,6 @@ After creating a transaction, use this method to broadcast the transaction to th
 
 ```js
 const { hash } = await txController.sendTransaction(transaction)
-console.log(hash)
 // Log transaction hash
+console.log(hash)
 ```
