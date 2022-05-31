@@ -36,6 +36,7 @@
 This project provides a handy way to integrage your JavaScript code with Cryptum's backend through simple function calls that do all the heavy lifting for you. Learn more about Cryptum [here](https://blockforce.in/).
 
 ## First Steps
+
 ### Requirements
 
 - NPM
@@ -57,14 +58,13 @@ npm install -S cryptum-sdk
 yarn add cryptum-sdk
 ```
 
-
 ### How To's
 
-Below is an short code example showing how you can use cryptum-sdk to connect your amazing application with several blockchains.
+Below is a short code example showing how you can use cryptum-sdk to connect your amazing application with several blockchains.
 
 #### Configuration
 
-To configure cryptum-sdk you need only provide an config in format JSON.
+To configure cryptum-sdk you need only to provide a config in format JSON.
 
 ```js
 const CryptumSDK = require('cryptum-sdk')
@@ -74,16 +74,18 @@ const sdk = new CryptumSDK({
   apiKey: 'my-secret-api-key',
 })
 ```
+
 <br>
 
-| Environments available |
-|------------------------|
-| development _(uses testnet)_|
-| production  _(uses mainnet)_|
+| Environments available       |
+| ---------------------------- |
+| development _(uses testnet)_ |
+| production _(uses mainnet)_  |
 
 <br>
 
 For more in-depth examples check the docs/ folder and our guides [here](https://blockforce.in/).
+
 ## Contributing
 
 Contributions are what make the open source community an incredible place to learn, inspire and create. Any contribution you make will be **much appreciated**.
@@ -99,7 +101,7 @@ Contributions are what make the open source community an incredible place to lea
 
 In order for us to accept your PR, you need to adhere to the following standards.
 
-1. Create using the code pattern currently used in cryptum-sk
+1. Create using the code pattern currently used in cryptum-sdk
 2. Test your update and show artifacts in PR.
 
 That's it 🤷🏻‍♂️
