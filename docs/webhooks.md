@@ -18,11 +18,9 @@ console.log(webhook)
 // Log your WebhookCryptum
 ```
 
-ps.: If you not provide an WebhookCryptum valid, the Cryptum sdk return an exception.
+ps.: If you not provide a valid WebhookCryptum, the Cryptum sdk will throw an exception.
 
 ## List you Webhooks
-
-You need only instantiate Webhook controller and your protocol to cryptum 🚀
 
 ```js
 const webhookController = sdk.getWebhooksController()
@@ -31,11 +29,7 @@ console.log(webhooks)
 // Log your WebhookCryptum list
 ```
 
-ps.: If you not provide an asset or protocol valid, the Cryptum sdk return an exception.
-
 ## Delete a Webhook
-
-You need only instantiate Webhook controller and send your asset, protocol and webhookId to cryptum 🚀
 
 ```js
 const webhookController = sdk.getWebhooksController()
@@ -44,5 +38,3 @@ const webhooks = await webhookController.destroyWebhook({
   webhookId: 'ba291cc3-1e29-4c70-b716-b4185891c569',
 })
 ```
-
-ps.: If you don't provide an asset, protocol and webhookId valid, the Cryptum sdk return an exception.

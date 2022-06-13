@@ -14,7 +14,7 @@ const swapController = sdk.getSwapController()
 ```
 
 ## Get supported currencies
-Get a list of all supported currencies to swap from and to. Examples: BTC, ETH, XLM, XRP, BNB, USDT and others.
+Get a list of all supported currencies to swap to and from. Examples: BTC, ETH, XLM, XRP, BNB, USDT and others.
 
 Examples:
 
