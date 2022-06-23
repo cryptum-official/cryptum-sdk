@@ -27,6 +27,7 @@ class CryptumSDK {
    *
    * @returns an WebhooksController instance class to manipulate
    */
+  get webhook() { return this.getWebhooksController() }
   getWebhooksController() {
     return new WebhooksController(this.config)
   }
@@ -36,6 +37,7 @@ class CryptumSDK {
    *
    * @returns WalletController instance
    */
+  get wallet() { return this.getWalletController() }
   getWalletController() {
     return new WalletController(this.config)
   }
@@ -45,9 +47,12 @@ class CryptumSDK {
    *
    * @returns TransactionController instance
    */
+  get transaction() { return this.getTransactionController() }
   getTransactionController() {
     return new TransactionController(this.config)
   }
+
+  get staking() { return new StakingController(this.config) }
   /**
    * Method to get a controller to manipulate transactions
    * @param {Object} args
@@ -58,7 +63,7 @@ class CryptumSDK {
     const controller = new StakingController(this.config)
     switch (protocol) {
       case Protocol.CELO:
-        return controller.celo()
+        return controller.celo
       default:
         throw new GenericException('Invalid protocol')
     }
@@ -69,25 +74,24 @@ class CryptumSDK {
    *
    * @returns PricesController instance
    */
+  get prices() { return this.getPricesController() }
   getPricesController() {
     return new PricesController(this.config)
   }
-
 
   /**
    * Method to get a controller to manipulate swap
    *
    * @returns SwapController instance
    */
+  get swap() { return this.getSwapController() }
   getSwapController() {
     return new SwapController(this.config)
   }
-  /**
-   * Method to get a controller to manipulate swap
-   *
-   * @returns InfoController instance
-   */
-  getInfoController() {
+
+
+  get token() { return this.getTokenController() }
+  getTokenController() {
     return new InfoController(this.config)
   }
 }
