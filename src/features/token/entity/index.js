@@ -2,6 +2,7 @@
  * @typedef {Object} TokenInfoInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
  * @property {string=} tokenUid
+ * @property {string=} tokenAddress
  */
 /**
  * @typedef {Object} TokenInfo

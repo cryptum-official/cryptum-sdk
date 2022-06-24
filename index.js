@@ -4,7 +4,8 @@ const PricesController = require('./src/features/prices/controller')
 const TransactionController = require('./src/features/transaction/controller')
 const StakingController = require('./src/features/staking/controller')
 const SwapController = require('./src/features/swap/controller')
-const InfoController = require('./src/features/info/controller')
+const TokenController = require('./src/features/token/controller')
+const NftController = require('./src/features/nft/controller')
 const { Protocol } = require('./src/services/blockchain/constants')
 const { GenericException } = require('./errors')
 /**
@@ -89,10 +90,14 @@ class CryptumSDK {
     return new SwapController(this.config)
   }
 
-
   get token() { return this.getTokenController() }
   getTokenController() {
-    return new InfoController(this.config)
+    return new TokenController(this.config)
+  }
+
+  get nft() { return this.getNftController() }
+  getNftController() {
+    return new NftController(this.config)
   }
 }
 

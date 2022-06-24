@@ -5,15 +5,22 @@ const Interface = require('./interface')
 
 class Controller extends Interface {
 	/**
-	 * Get token info
+	 * Get fungible token info
 	 * @param {import('../entity').TokenInfoInput} input
 	 * @returns {Promise<import('../entity').TokenInfo>}
 	 */
 	async getTokenInfo(input) {
-		const { protocol, tokenUid } = input
+		const { protocol, tokenUid, tokenAddress } = input
 		switch (protocol) {
 			case Protocol.HATHOR:
-				return makeRequest({ method: 'get', url: `/token/${tokenUid}?protocol=${protocol}`, config: this.config })
+				return makeRequest({ method: 'get', url: `/token/${tokenUid}/info?protocol=${protocol}`, config: this.config })
+			case Protocol.ETHEREUM:
+			case Protocol.CELO:
+			case Protocol.BSC:
+			case Protocol.POLYGON:
+			case Protocol.AVAXCCHAIN:
+			case Protocol.SOLANA:
+				return makeRequest({ method: 'get', url: `/token/${tokenAddress}/info?protocol=${protocol}`, config: this.config })
 			default:
 				throw new InvalidException('Unsupported protocol')
 		}
