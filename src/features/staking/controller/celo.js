@@ -10,6 +10,7 @@ const { toWei, fromWei } = require('../../../services/blockchain/utils')
 const { validateEthAddress, validatePositiveAmount, validatePositive } = require('../../../services/validations')
 const { GenericException } = require('../../../../errors')
 const { default: BigNumber } = require('bignumber.js')
+const { makeRequest } = require('../../../services')
 
 // Steps to stake:
 // 1. Register account
@@ -38,7 +39,7 @@ class CeloStakingController extends Interface {
     const method = 'isAccount'
     return await new TransactionController(this.config).callSmartContractMethod({
       contractAddress: CELO_ACCOUNTS_ADDRESS[network],
-      contractAbi: this._getMethodAbi('Accounts', method),
+      contractAbi: await this._getMethodAbi(CELO_ACCOUNTS_ADDRESS[network], method),
       method,
       params: [address],
       protocol: Protocol.CELO,
@@ -59,7 +60,7 @@ class CeloStakingController extends Interface {
     const tx = await txController.createSmartContractTransaction({
       wallet,
       contractAddress: CELO_ACCOUNTS_ADDRESS[network],
-      contractAbi: this._getMethodAbi('Accounts', method),
+      contractAbi: await this._getMethodAbi(CELO_ACCOUNTS_ADDRESS[network], method),
       method,
       params: [],
       value: '0',
@@ -86,7 +87,7 @@ class CeloStakingController extends Interface {
     const tx = await txController.createSmartContractTransaction({
       wallet,
       contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
-      contractAbi: this._getMethodAbi('LockedGold', method),
+      contractAbi: await this._getMethodAbi(CELO_LOCKEDGOLD_ADDRESS[network], method),
       method,
       params: [],
       value: toWei(amount).toString(),
@@ -118,7 +119,7 @@ class CeloStakingController extends Interface {
     const tx = await txController.createSmartContractTransaction({
       wallet,
       contractAddress: CELO_ELECTION_ADDRESS[network],
-      contractAbi: this._getMethodAbi('Election', method),
+      contractAbi: await this._getMethodAbi(CELO_ELECTION_ADDRESS[network], method),
       method,
       params: [validator, toWei(amount).toString(), lesser, greater],
       value: '0',
@@ -143,7 +144,7 @@ class CeloStakingController extends Interface {
     const tx = await txController.createSmartContractTransaction({
       wallet,
       contractAddress: CELO_ELECTION_ADDRESS[network],
-      contractAbi: this._getMethodAbi('Election', method),
+      contractAbi: await this._getMethodAbi(CELO_ELECTION_ADDRESS[network], method),
       method,
       params: [validator],
       value: '0',
@@ -175,7 +176,7 @@ class CeloStakingController extends Interface {
     const tx = await txController.createSmartContractTransaction({
       wallet,
       contractAddress: CELO_ELECTION_ADDRESS[network],
-      contractAbi: this._getMethodAbi('Election', method),
+      contractAbi: await this._getMethodAbi(CELO_ELECTION_ADDRESS[network], method),
       method,
       params: [validator, toWei(amount).toString(), lesser, greater, index],
       value: '0',
@@ -207,7 +208,7 @@ class CeloStakingController extends Interface {
     const tx = await txController.createSmartContractTransaction({
       wallet,
       contractAddress: CELO_ELECTION_ADDRESS[network],
-      contractAbi: this._getMethodAbi('Election', method),
+      contractAbi: await this._getMethodAbi(CELO_ELECTION_ADDRESS[network], method),
       method,
       params: [validator, toWei(amount).toString(), lesser, greater, index],
       value: '0',
@@ -234,7 +235,7 @@ class CeloStakingController extends Interface {
     const tx = await txController.createSmartContractTransaction({
       wallet,
       contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
-      contractAbi: this._getMethodAbi('LockedGold', method),
+      contractAbi: await this._getMethodAbi(CELO_LOCKEDGOLD_ADDRESS[network], method),
       method,
       params: [toWei(amount).toString()],
       value: '0',
@@ -263,7 +264,7 @@ class CeloStakingController extends Interface {
     const tx = await txController.createSmartContractTransaction({
       wallet,
       contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
-      contractAbi: this._getMethodAbi('LockedGold', method),
+      contractAbi: await this._getMethodAbi(CELO_LOCKEDGOLD_ADDRESS[network], method),
       method,
       params: [index, toWei(amount).toString()],
       value: '0',
@@ -289,7 +290,7 @@ class CeloStakingController extends Interface {
     const tx = await txController.createSmartContractTransaction({
       wallet,
       contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
-      contractAbi: this._getMethodAbi('LockedGold', method),
+      contractAbi: await this._getMethodAbi(CELO_LOCKEDGOLD_ADDRESS[network], method),
       method,
       params: [index],
       value: '0',
@@ -312,7 +313,7 @@ class CeloStakingController extends Interface {
     const txController = new TransactionController(this.config)
     return await txController.callSmartContractMethod({
       contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
-      contractAbi: this._getMethodAbi('LockedGold', method),
+      contractAbi: await this._getMethodAbi(CELO_LOCKEDGOLD_ADDRESS[network], method),
       method,
       params: [address],
       testnet,
@@ -333,7 +334,7 @@ class CeloStakingController extends Interface {
     const txController = new TransactionController(this.config)
     const { result } = await txController.callSmartContractMethod({
       contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
-      contractAbi: this._getMethodAbi('LockedGold', method),
+      contractAbi: await this._getMethodAbi(CELO_LOCKEDGOLD_ADDRESS[network], method),
       method,
       params: [address],
       testnet,
@@ -362,7 +363,7 @@ class CeloStakingController extends Interface {
     const txController = new TransactionController(this.config)
     return await txController.callSmartContractMethod({
       contractAddress: CELO_ELECTION_ADDRESS[network],
-      contractAbi: this._getMethodAbi('Election', method),
+      contractAbi: await this._getMethodAbi(CELO_ELECTION_ADDRESS[network], method),
       method,
       params: [address],
       testnet,
@@ -384,7 +385,7 @@ class CeloStakingController extends Interface {
     const [pending, active] = await Promise.all([
       txController.callSmartContractMethod({
         contractAddress: CELO_ELECTION_ADDRESS[network],
-        contractAbi: this._getMethodAbi('Election', 'getPendingVotesForGroupByAccount'),
+        contractAbi: await this._getMethodAbi(CELO_ELECTION_ADDRESS[network], 'getPendingVotesForGroupByAccount'),
         method: 'getPendingVotesForGroupByAccount',
         params: [group, address],
         testnet,
@@ -392,7 +393,7 @@ class CeloStakingController extends Interface {
       }),
       txController.callSmartContractMethod({
         contractAddress: CELO_ELECTION_ADDRESS[network],
-        contractAbi: this._getMethodAbi('Election', 'getActiveVotesForGroupByAccount'),
+        contractAbi: await this._getMethodAbi(CELO_ELECTION_ADDRESS[network], 'getActiveVotesForGroupByAccount'),
         method: 'getActiveVotesForGroupByAccount',
         params: [group, address],
         testnet,
@@ -420,7 +421,7 @@ class CeloStakingController extends Interface {
     const [nonvoting, total, pendingWithdrawals, groups] = await Promise.all([
       txController.callSmartContractMethod({
         contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
-        contractAbi: this._getMethodAbi('LockedGold', 'getAccountNonvotingLockedGold'),
+        contractAbi: await this._getMethodAbi(CELO_LOCKEDGOLD_ADDRESS[network], 'getAccountNonvotingLockedGold'),
         method: 'getAccountNonvotingLockedGold',
         params: [address],
         testnet,
@@ -428,7 +429,7 @@ class CeloStakingController extends Interface {
       }),
       txController.callSmartContractMethod({
         contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
-        contractAbi: this._getMethodAbi('LockedGold', 'getAccountTotalLockedGold'),
+        contractAbi: await this._getMethodAbi(CELO_LOCKEDGOLD_ADDRESS[network], 'getAccountTotalLockedGold'),
         method: 'getAccountTotalLockedGold',
         params: [address],
         testnet,
@@ -455,8 +456,9 @@ class CeloStakingController extends Interface {
     }
   }
 
-  _getMethodAbi(contract, method) {
-    const abi = require(`../abis/${contract}.json`)
+  async _getMethodAbi(contract, method) {
+    // const abi = require(`../abis/${contract}.json`)
+    const abi = await makeRequest({ method: 'get', url: `/contract/${contract}/abi?protocol=CELO`, config: this.config })
     return [abi.find((m) => m.name === method)]
   }
   async _findLesserGreater({ amount, validator, network }) {
@@ -464,7 +466,7 @@ class CeloStakingController extends Interface {
     /** @type {{ result:{ groups, values }}} */
     const { result: currentVotes } = await txController.callSmartContractMethod({
       contractAddress: CELO_ELECTION_ADDRESS[network],
-      contractAbi: this._getMethodAbi('Election', 'getTotalVotesForEligibleValidatorGroups'),
+      contractAbi: await this._getMethodAbi(CELO_ELECTION_ADDRESS[network], 'getTotalVotesForEligibleValidatorGroups'),
       method: 'getTotalVotesForEligibleValidatorGroups',
       params: [],
       protocol: Protocol.CELO,
