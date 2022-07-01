@@ -3,8 +3,6 @@ const requests = require('./requests.json')
 const Interface = require('./interface')
 const {
   Protocol,
-  TRANSFER_METHOD_ABI,
-  TRANSFER_COMMENT_METHOD_ABI,
   CUSD_CONTRACT_ADDRESS,
   CEUR_CONTRACT_ADDRESS,
 } = require('../../../services/blockchain/constants')
@@ -72,6 +70,7 @@ const {
 const { buildHathorTransferTransaction, buildHathorTokenTransaction } = require('../../../services/blockchain/hathor')
 const { buildOperation, buildOperationFromInputs } = require('../../../services/blockchain/cardano')
 const CardanoWasm = require('@emurgo/cardano-serialization-lib-nodejs')
+const { TRANSFER_METHOD_ABI, TRANSFER_COMMENT_METHOD_ABI } = require('../../../services/blockchain/eth/abis')
 
 class Controller extends Interface {
   /**

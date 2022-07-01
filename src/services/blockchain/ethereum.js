@@ -2,9 +2,10 @@ const { Transaction: EthereumTransaction } = require('@ethereumjs/tx')
 const { default: EthereumCommon } = require('@ethereumjs/common')
 const BigNumber = require('bignumber.js')
 const Web3 = require('web3')
-const { TRANSFER_METHOD_ABI, BSC_COMMON_CHAIN, POLYGON_COMMON_CHAIN, Protocol, AVAXCCHAIN_COMMON_CHAIN } = require('./constants')
+const { BSC_COMMON_CHAIN, POLYGON_COMMON_CHAIN, Protocol, AVAXCCHAIN_COMMON_CHAIN } = require('./constants')
 const { GenericException } = require('../../../errors')
 const { compileContract } = require('../../services/blockchain/contract')
+const { TRANSFER_METHOD_ABI } = require('./eth/abis')
 
 module.exports.buildEthereumTransferTransaction = async function ({
   fromPrivateKey,

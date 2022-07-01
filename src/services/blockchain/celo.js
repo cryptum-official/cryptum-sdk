@@ -4,11 +4,10 @@ const Web3 = require('web3')
 const {
   CUSD_CONTRACT_ADDRESS,
   CEUR_CONTRACT_ADDRESS,
-  TRANSFER_METHOD_ABI,
-  TRANSFER_COMMENT_METHOD_ABI,
   CELO_CONTRACT_ADDRESS,
 } = require('./constants')
 const { compileContract } = require('../../services/blockchain/contract')
+const { TRANSFER_METHOD_ABI, TRANSFER_COMMENT_METHOD_ABI } = require('./eth/abis')
 
 module.exports.buildCeloTransferTransaction = async function ({
   fromPrivateKey,

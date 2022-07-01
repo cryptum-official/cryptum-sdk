@@ -82,35 +82,6 @@ module.exports.POLYGON_COMMON_CHAIN = {
   },
 }
 
-module.exports.TRANSFER_METHOD_ABI = [
-  {
-    constant: false,
-    inputs: [
-      { name: 'to', type: 'address' },
-      { name: 'value', type: 'uint256' },
-    ],
-    name: 'transfer',
-    outputs: [{ name: '', type: 'bool' }],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-]
-module.exports.TRANSFER_COMMENT_METHOD_ABI = [
-  {
-    constant: false,
-    inputs: [
-      { internalType: 'address', name: 'to', type: 'address' },
-      { internalType: 'uint256', name: 'value', type: 'uint256' },
-      { internalType: 'string', name: 'comment', type: 'string' },
-    ],
-    name: 'transferWithComment',
-    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-]
 module.exports.CELO_ACCOUNTS_ADDRESS = {
   testnet: '0xed7f51A34B4e71fbE69B3091FcF879cD14bD73A9',
   mainnet: '0x7d21685C17607338b313a7174bAb6620baD0aaB7',
