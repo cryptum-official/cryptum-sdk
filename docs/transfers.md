@@ -274,7 +274,7 @@ If the sum of inputs from the wallet is greater than the sum of outputs then the
   * `opts.outputs[].token` (string) - token uid or HTR.
 
 ```js
-// transfer BTC from 1 input to 2 output addresses
+// transfer HTR from 1 input to 2 output addresses
 const transaction = await txController.createHathorTransferTransactionFromWallet({
   wallet,
   outputs: [
@@ -296,7 +296,7 @@ const transaction = await txController.createHathorTransferTransactionFromWallet
   * `opts.outputs[].token` (string) - token uid or HTR.
 
 ```js
-// transfer BTC from 1 input to 2 output addresses
+// transfer HTR from 1 input to 2 output addresses
 const transaction = await txController.createHathorTransferTransactionFromUTXO({
   inputs: [
     {
