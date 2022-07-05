@@ -3,9 +3,10 @@ const { default: EthereumCommon } = require('@ethereumjs/common')
 const BigNumber = require('bignumber.js')
 const Web3 = require('web3')
 const { BSC_COMMON_CHAIN, POLYGON_COMMON_CHAIN, Protocol, AVAXCCHAIN_COMMON_CHAIN } = require('./constants')
-const { GenericException } = require('../../../errors')
+const { GenericException } = require('../../errors')
 const { compileContract } = require('../../services/blockchain/contract')
 const { TRANSFER_METHOD_ABI } = require('./eth/abis')
+const { toWei } = require('./utils')
 
 module.exports.buildEthereumTransferTransaction = async function ({
   fromPrivateKey,
@@ -15,6 +16,7 @@ module.exports.buildEthereumTransferTransaction = async function ({
   amount,
   destination,
   fee,
+  decimals
 }) {
   const { gas, gasPrice, chainId } = fee
   const rawTransaction = {
@@ -26,7 +28,7 @@ module.exports.buildEthereumTransferTransaction = async function ({
     data: undefined,
     gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
   }
-  const value = Web3.utils.toWei(amount, 'ether')
+  const value = toWei(amount, decimals)
   if (tokenSymbol === 'ETH') {
     rawTransaction.to = destination
     rawTransaction.value = Web3.utils.toHex(value)
@@ -51,7 +53,8 @@ module.exports.buildAvaxCChainTransferTransaction = async function ({
   amount,
   destination,
   fee,
-  testnet
+  testnet,
+  decimals
 }) {
   const { gas, gasPrice, chainId } = fee
   const rawTransaction = {
@@ -63,7 +66,7 @@ module.exports.buildAvaxCChainTransferTransaction = async function ({
     data: undefined,
     gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
   }
-  const value = Web3.utils.toWei(amount, 'ether')
+  const value = toWei(amount, decimals)
   if (tokenSymbol === 'AVAX') {
     rawTransaction.to = destination
     rawTransaction.value = Web3.utils.toHex(value)
@@ -90,6 +93,7 @@ module.exports.buildPolygonTransferTransaction = async function ({
   destination,
   fee,
   testnet,
+  decimals
 }) {
   const { gas, gasPrice, chainId } = fee
   const rawTransaction = {
@@ -101,7 +105,7 @@ module.exports.buildPolygonTransferTransaction = async function ({
     data: undefined,
     gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
   }
-  const value = Web3.utils.toWei(amount, 'ether')
+  const value = toWei(amount, decimals)
   if (tokenSymbol === 'MATIC') {
     rawTransaction.to = destination
     rawTransaction.value = Web3.utils.toHex(value)
@@ -129,6 +133,7 @@ module.exports.buildBscTransferTransaction = async function ({
   destination,
   fee,
   testnet,
+  decimals
 }) {
   const { gas, gasPrice, chainId } = fee
   const rawTransaction = {
@@ -140,7 +145,7 @@ module.exports.buildBscTransferTransaction = async function ({
     data: undefined,
     gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
   }
-  const value = Web3.utils.toWei(amount, 'ether')
+  const value = toWei(amount, decimals)
   if (tokenSymbol === 'BNB') {
     rawTransaction.to = destination
     rawTransaction.value = Web3.utils.toHex(value)

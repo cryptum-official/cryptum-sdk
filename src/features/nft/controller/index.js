@@ -1,7 +1,8 @@
-const InvalidException = require('../../../../errors/InvalidException')
+const InvalidException = require('../../../errors/InvalidException')
 const { makeRequest } = require('../../../services')
 const { Protocol } = require('../../../services/blockchain/constants')
 const Interface = require('./interface')
+const TransactionController = require('../../transaction/controller')
 
 class Controller extends Interface {
   /**
@@ -74,7 +75,42 @@ class Controller extends Interface {
     }
   }
 
-  async transfer(input) { }
+  async transfer(input) {
+    const { protocol, token, wallet, destination, tokenId, amount, destinations } = input
+    const tc = new TransactionController(this.config)
+    let tx;
+    switch (protocol) {
+      case Protocol.HATHOR:
+        tx = await tc.createHathorTransferTransactionFromWallet({
+          wallet,
+          outputs: destination ? [{
+            address: destination, amount, token
+          }] : destinations
+        })
+        break
+      case Protocol.SOLANA:
+        tx = await tc.createSolanaTransferTransaction({ wallet, destination, token, amount })
+        break
+      case Protocol.ETHEREUM:
+      case Protocol.CELO:
+      case Protocol.BSC:
+      case Protocol.POLYGON:
+      case Protocol.AVAXCCHAIN:
+        
+        tx = await tc.createSmartContractTransaction({
+          wallet,
+          protocol,
+          contractAddress: token,
+          method: 'safeTransferFrom',
+          contractAbi: [],
+          params: [wallet.address, destination, tokenId]
+        })
+        break
+      default:
+        throw new InvalidException('Unsupported protocol')
+    }
+    return await tc.sendTransaction(tx)
+  }
 
   async mint(input) { }
 

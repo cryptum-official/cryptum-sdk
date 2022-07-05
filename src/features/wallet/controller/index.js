@@ -33,7 +33,7 @@ const {
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
 const { validateWalletInfo, validatePrivateKey, validateCardanoPrivateKey, validateWalletNft } = require('../../../services/validations')
-const InvalidException = require('../../../../errors/InvalidException')
+const InvalidException = require('../../../errors/InvalidException')
 
 class Controller extends Interface {
   /**

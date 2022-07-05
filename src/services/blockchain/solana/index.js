@@ -16,7 +16,9 @@ const {
   ValidateSafetyDepositBoxV2Args,
   WHITELIST_CREATOR_SCHEMA,
   metaplexConfirm,
-  toPublicKey } = require('./consts')
+  toPublicKey
+} = require('./consts');
+const { toLamports } = require('../utils');
 
 module.exports.buildSolanaTransferTransaction = async function ({
   from,
@@ -24,7 +26,8 @@ module.exports.buildSolanaTransferTransaction = async function ({
   token,
   amount,
   latestBlock,
-  testnet = true
+  decimals,
+  testnet
 }) {
   const network = testnet ? 'devnet' : 'mainnet-beta'
   const fromAccount = solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey))
@@ -37,10 +40,9 @@ module.exports.buildSolanaTransferTransaction = async function ({
     manualTransaction.add(solanaWeb3.SystemProgram.transfer({
       fromPubkey: fromAccount.publicKey,
       toPubkey: to,
-      lamports: amount * solanaWeb3.LAMPORTS_PER_SOL,
+      lamports: toLamports(amount).toNumber(),
     }));
   } else {
-
     const connection = new solanaWeb3.Connection(
       solanaWeb3.clusterApiUrl(network),
       'confirmed',
@@ -57,7 +59,7 @@ module.exports.buildSolanaTransferTransaction = async function ({
         receiverTokenAccount.address,
         fromAccount.publicKey,
         [],
-        amount
+        toLamports(amount, Number(decimals)).toNumber()
       )
     );
   }

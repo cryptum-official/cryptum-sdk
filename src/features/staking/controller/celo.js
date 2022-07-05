@@ -1,5 +1,5 @@
 const Interface = require('./interface')
-const TransactionController = require('../../transaction/controller')
+const { TransactionController } = require('../../transaction/controller')
 const {
   CELO_ACCOUNTS_ADDRESS,
   Protocol,
@@ -8,7 +8,7 @@ const {
 } = require('../../../services/blockchain/constants')
 const { toWei, fromWei } = require('../../../services/blockchain/utils')
 const { validateEthAddress, validatePositiveAmount, validatePositive } = require('../../../services/validations')
-const { GenericException } = require('../../../../errors')
+const { GenericException } = require('../../../errors')
 const { default: BigNumber } = require('bignumber.js')
 const { makeRequest } = require('../../../services')
 

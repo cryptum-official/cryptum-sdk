@@ -429,7 +429,7 @@ class BitcoinTransferTransactionInput extends TransferTransactionInput {
    *
    * @param {object} args
    * @param {import('../../wallet/entity').Wallet=} args.wallet wallet to transfer from
-   * @param {Array<Input>==} args.inputs inputs to transfer from
+   * @param {Array<Input>=} args.inputs inputs to transfer from
    * @param {Array<Output>} args.outputs outputs to transfer to
    * @param {Fee=} args.fee fee per byte in satoshi
    * @param {boolean=} args.testnet
@@ -446,7 +446,7 @@ class HathorTransferTransactionInput extends TransferTransactionInput {
    *
    * @param {object} args
    * @param {import('../../wallet/entity').Wallet=} args.wallet wallet to transfer from
-   * @param {Array<Input>==} args.inputs inputs to transfer from
+   * @param {Array<Input>=} args.inputs inputs to transfer from
    * @param {Array<Output>} args.outputs outputs to transfer to
    * @param {Array<Output>} args.tokens outputs to transfer to
    * @param {boolean=} args.testnet
@@ -463,7 +463,7 @@ class CardanoTransferTransactionInput extends TransferTransactionInput {
    *
    * @param {object} args
    * @param {import('../../wallet/entity').Wallet=} args.wallet wallet to transfer from
-   * @param {Array<Input>==} args.inputs inputs to transfer from
+   * @param {Array<Input>=} args.inputs inputs to transfer from
    * @param {Array<Output>} args.outputs outputs to transfer to
    * @param {Array<Output>} args.tokens outputs to transfer to
    * @param {boolean=} args.testnet

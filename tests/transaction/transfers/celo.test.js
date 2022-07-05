@@ -3,7 +3,7 @@ const chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 const assert = chai.assert
-const AxiosApi = require('../../../axios')
+const AxiosApi = require('../../../src/axios')
 const TransactionController = require('../../../src/features/transaction/controller')
 const { Protocol, CUSD_CONTRACT_ADDRESS, TRANSFER_METHOD_ABI } = require('../../../src/services/blockchain/constants')
 const { getWallets, config } = require('../../wallet/constants')

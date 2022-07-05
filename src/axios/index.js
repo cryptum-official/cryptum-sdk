@@ -5,9 +5,9 @@ class AxiosApi {
   /**
    * Constructor to initialize configs
    *
-   * @param {object} config an object with this data: { environment: 'development'/'production' }
+   * @param {import('../..').Config} config
    */
-  constructor (config) {
+  constructor(config) {
     this.config = config
   }
 
@@ -18,8 +18,8 @@ class AxiosApi {
    * @returns an text with base url to instance an new axios
    */
   getBaseUrl(environment) {
-    if (environment === 'development') return 'http://localhost:8008' //'https://api-hml.cryptum.io'
-    if (environment === 'production') return 'https://api.cryptum.io'
+    if (['testnet', 'development'].includes(environment)) return 'https://api-dev.cryptum.io'
+    if (['mainnet', 'production'].includes(environment)) return 'https://api.cryptum.io'
 
     throw new GenericException('Invalid environment', 'ConfigException')
   }

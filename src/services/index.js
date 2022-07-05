@@ -1,5 +1,5 @@
-const AxiosApi = require('../../axios')
-const { GenericException } = require('../../errors')
+const AxiosApi = require('../axios')
+const { GenericException } = require('../errors')
 
 /**
  * Method to get an specific api method how get, post, put and delete
@@ -17,7 +17,7 @@ const { GenericException } = require('../../errors')
 const getApiMethod = ({ requests, key, config }) => {
   const axios = new AxiosApi(config)
   const api = axios.getInstance()
-
+  
   const value = requests[key]
   const method = api[value.method.toLowerCase()]
   return method

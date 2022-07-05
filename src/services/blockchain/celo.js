@@ -8,6 +8,7 @@ const {
 } = require('./constants')
 const { compileContract } = require('../../services/blockchain/contract')
 const { TRANSFER_METHOD_ABI, TRANSFER_COMMENT_METHOD_ABI } = require('./eth/abis')
+const { toWei } = require('./utils')
 
 module.exports.buildCeloTransferTransaction = async function ({
   fromPrivateKey,
@@ -20,6 +21,7 @@ module.exports.buildCeloTransferTransaction = async function ({
   feeCurrency = null,
   memo = null,
   testnet = true,
+  decimals
 }) {
   const network = testnet ? 'testnet' : 'mainnet'
   const { gas, gasPrice, chainId } = fee
@@ -33,7 +35,7 @@ module.exports.buildCeloTransferTransaction = async function ({
     gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
     feeCurrency
   }
-  const value = Web3.utils.toWei(amount, 'ether')
+  const value = toWei(amount, decimals)
   if (tokenSymbol === 'CELO' && !memo) {
     rawTransaction.to = destination
     rawTransaction.value = Web3.utils.toHex(value)

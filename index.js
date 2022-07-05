@@ -1,16 +1,16 @@
 const WebhooksController = require('./src/features/webhooks/controller')
 const WalletController = require('./src/features/wallet/controller')
 const PricesController = require('./src/features/prices/controller')
-const TransactionController = require('./src/features/transaction/controller')
+const { TransactionController } = require('./src/features/transaction/controller')
 const StakingController = require('./src/features/staking/controller')
 const SwapController = require('./src/features/swap/controller')
-const TokenController = require('./src/features/token/controller')
+const { TokenController } = require('./src/features/token/controller')
 const NftController = require('./src/features/nft/controller')
 const { Protocol } = require('./src/services/blockchain/constants')
-const { GenericException } = require('./errors')
+const { GenericException } = require('./src/errors')
 /**
  * @typedef {object} Config
- * @property {string} environment
+ * @property {'testnet'|'mainnet'} environment
  * @property {string} apiKey
  */
 

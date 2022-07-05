@@ -1,5 +1,5 @@
 {
-  "include": ["axios", "errors", "src", "index.js"],
+  "include": ["src", "index.js"],
   "compilerOptions": {
     "target": "es2017",
     "lib": ["es2017"],

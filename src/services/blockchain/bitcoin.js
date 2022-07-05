@@ -1,6 +1,6 @@
 const { default: BigNumber } = require('bignumber.js')
 const bitcoin = require('bitcoinjs-lib')
-const { GenericException } = require('../../../errors')
+const { GenericException } = require('../../errors')
 const { toSatoshi } = require('./utils')
 
 /**

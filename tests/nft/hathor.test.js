@@ -3,18 +3,18 @@ const chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 const assert = chai.assert
-const AxiosApi = require('../../axios')
-const InfoController = require('../../src/features/info/controller')
+const AxiosApi = require('../../src/axios')
+const NftController = require('../../src/features/nft/controller')
 const { Protocol } = require('../../src/services/blockchain/constants')
 const { config } = require('../wallet/constants')
-const infoController = new InfoController(config)
+const nftController = new NftController(config)
 const axiosApi = new AxiosApi(config)
 const baseUrl = axiosApi.getBaseUrl(config.environment)
 
 describe.only('Hathor blockchain info', () => {
   before(async () => {
     nock(baseUrl)
-      .get(`/token/000024f0ad325bd5ae8bd8710d2341d1df5ed9b97e2afaf559534ae77d160edd`)
+      .get(`/nft/000024f0ad325bd5ae8bd8710d2341d1df5ed9b97e2afaf559534ae77d160edd/info`)
       .query({
         protocol: Protocol.HATHOR,
       })
@@ -32,7 +32,7 @@ describe.only('Hathor blockchain info', () => {
   })
 
   it('get token info', async () => {
-    const res = await infoController.getTokenInfo({
+    const res = await nftController.getInfo({
       protocol: 'HATHOR',
       tokenUid: '000024f0ad325bd5ae8bd8710d2341d1df5ed9b97e2afaf559534ae77d160edd'
     })
