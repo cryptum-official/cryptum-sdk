@@ -144,12 +144,6 @@ class Controller extends Interface {
     tokenType = null,
   }) {
     try {
-      const apiRequest = getApiMethod({
-        requests,
-        key: 'getFee',
-        config: this.config,
-      })
-      const headers = mountHeaders(this.config.apiKey)
       const data = {}
       if (type) data.type = type
       if (from) data.from = from
@@ -163,10 +157,8 @@ class Controller extends Interface {
       if (source) data.source = source
       if (feeCurrency) data.feeCurrency = feeCurrency
       if (tokenType) data.tokenType = tokenType
-      const response = await apiRequest(`${requests.getFee.url}?protocol=${protocol}`, data, {
-        headers,
-      })
-      return new FeeResponse(response.data)
+      const response = await makeRequest({ method: 'post', url: `/fee?protocol=${protocol}`, body: data, config: this.config })
+      return new FeeResponse(response)
     } catch (error) {
       handleRequestError(error)
     }
@@ -1240,10 +1232,12 @@ class Controller extends Interface {
    */
   async createSolanaTransferTransaction(input) {
     validateSolanaTransferTransaction(input)
-    const { wallet, destination, token, amount } = input
+    const { wallet, destination, token, amount, isNFT } = input
     const protocol = Protocol.SOLANA
     let decimals = null
-    if (token !== 'SOL') {
+    if (isNFT) {
+      decimals = 0
+    } else if (token !== 'SOL') {
       ({ decimals } = await getTokenControllerInstance(this.config).getInfo({ tokenAddress: token, protocol }))
     }
     const { blockhash } = await this.getBlock({ block: 'latest', protocol })

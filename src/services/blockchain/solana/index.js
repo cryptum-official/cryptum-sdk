@@ -856,7 +856,7 @@ module.exports.claimWinnings = async function ({ testnet, from, auction, store, 
   return { ...claim }
 }
 
-module.exports.listAuctions = async function ({ testnet, from, authority }) {
+module.exports.listAuctions = async function ({ testnet, from }) {
   const network = testnet ? 'devnet' : 'mainnet-beta'
   const connection = new metaplex.Connection(network, "confirmed")
   const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))

@@ -2,7 +2,10 @@ const InvalidException = require('../../../errors/InvalidException')
 const { makeRequest } = require('../../../services')
 const { Protocol } = require('../../../services/blockchain/constants')
 const Interface = require('./interface')
-const TransactionController = require('../../transaction/controller')
+const { getTransactionControllerInstance } = require('../../transaction/controller')
+const { ERC721_SAFE_TRANSFER_METHOD_ABI, ERC1155_SAFE_TRANSFER_METHOD_ABI } = require('../../../services/blockchain/eth/abis')
+const { supportsERC721 } = require('../../../services/blockchain/contract')
+const { validateEvmTokenTransfer } = require('../../../services/validations/evm')
 
 class Controller extends Interface {
   /**
@@ -74,10 +77,14 @@ class Controller extends Interface {
         throw new InvalidException('Unsupported protocol')
     }
   }
-
+  /**
+   * Get metadata of nft
+   * @param {import('../entity').NftTransferInput} input
+   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+   */
   async transfer(input) {
     const { protocol, token, wallet, destination, tokenId, amount, destinations } = input
-    const tc = new TransactionController(this.config)
+    const tc = getTransactionControllerInstance(this.config)
     let tx;
     switch (protocol) {
       case Protocol.HATHOR:
@@ -89,23 +96,35 @@ class Controller extends Interface {
         })
         break
       case Protocol.SOLANA:
-        tx = await tc.createSolanaTransferTransaction({ wallet, destination, token, amount })
+        tx = await tc.createSolanaTransferTransaction({ wallet, destination, token, amount, isNFT: true })
         break
       case Protocol.ETHEREUM:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
-      case Protocol.AVAXCCHAIN:
-        
+      case Protocol.AVAXCCHAIN: {
+        validateEvmTokenTransfer(input)
+        let params, contractAbi
+        if (await supportsERC721({ protocol, contractAddress: token, config: this.config })) {
+          params = [wallet.address, destination, tokenId]
+          contractAbi = ERC721_SAFE_TRANSFER_METHOD_ABI
+        } else {
+          if (!amount || isNaN(amount) || Number(amount) < 0) {
+            throw new InvalidException('Invalid amount')
+          }
+          params = [wallet.address, destination, tokenId, amount, []]
+          contractAbi = ERC1155_SAFE_TRANSFER_METHOD_ABI
+        }
         tx = await tc.createSmartContractTransaction({
           wallet,
           protocol,
           contractAddress: token,
           method: 'safeTransferFrom',
-          contractAbi: [],
-          params: [wallet.address, destination, tokenId]
+          contractAbi,
+          params
         })
         break
+      }
       default:
         throw new InvalidException('Unsupported protocol')
     }

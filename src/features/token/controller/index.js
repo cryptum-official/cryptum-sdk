@@ -29,8 +29,8 @@ class Controller extends Interface {
   }
   /**
    * Get token balance
-   * @param {import('../entity').NftBalanceInfoInput} input
-   * @returns {Promise<import('../entity').NftBalanceInfo>}
+   * @param {import('../entity').TokenBalanceInfoInput} input
+   * @returns {Promise<import('../entity').TokenBalanceInfo>}
    */
   async getBalance(input) {
     const { protocol, tokenUid, tokenAddress, address } = input
@@ -54,7 +54,7 @@ class Controller extends Interface {
   /**
    * Transfer tokens from wallet to destination address
    * @param {import('../entity').TokenTransferInput} input
-   * @returns {Promise<HashResponse>}
+   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async transfer(input) {
     const { protocol, token, wallet, destination, amount, destinations, issuer, memo, feeCurrency } = input

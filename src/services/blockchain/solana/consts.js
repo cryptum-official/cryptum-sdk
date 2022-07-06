@@ -4,38 +4,23 @@ const solanaWeb3 = require('@solana/web3.js');
 const MAX_RETRIES = 48
 
 class AmountRange {
-  amount;
-  length;
   constructor(args) {
     this.amount = args.amount;
     this.length = args.length;
   }
 }
 class ParticipationStateV2 {
-  collectedToAcceptPayment = new BN(0);
 
   constructor(args) {
     Object.assign(this, args);
   }
 }
 class ParticipationConfigV2 {
-  winnerConstraint = 0;
-  nonWinningConstraint = 1;
-  fixedPrice = new BN(0);
   constructor(args) {
     Object.assign(this, args);
   }
 }
 class SafetyDepositConfig {
-  key;
-  auctionManager;
-  order;
-  winningConfigType;
-  amountType;
-  lengthType;
-  amountRanges;
-  participationConfig;
-  participationState;
   constructor(args) {
     Object.assign(this, args)
   };
@@ -43,8 +28,6 @@ class SafetyDepositConfig {
 
 
 class ValidateSafetyDepositBoxV2Args {
-  instruction = 18;
-  safetyDepositConfig;
   constructor(safetyDeposit) {
     this.safetyDepositConfig = safetyDeposit;
   }
@@ -112,24 +95,24 @@ const SAFETY_DEPOSIT_BOX_SCHEMA = new Map([
 ]);
 
 class SetAuthorityArgs {
-  instruction = 5;
+  constructor() {
+    this.instruction = 5;
+  }
 }
 
 class WhitelistedCreator {
-  key = 4;
-  address;
-  activated = true;
 
   constructor(args) {
+    this.key = 4
     this.address = args.address;
     this.activated = args.activated;
   }
 }
 
 class SetWhitelistedCreatorArgs {
-  instruction = 9;
-  activated;
+
   constructor(args) {
+    this.instruction = 9
     this.activated = args.activated;
   }
 }

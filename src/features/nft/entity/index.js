@@ -11,11 +11,22 @@
  * @property {string=} type
  * @property {string=} tokenUid
  * @property {string=} totalSupply
- * @property {string=} uri
+ * @property {string=} nftData
 
  * @typedef {{ protocol: string, tokenUid?:string, tokenAddress?:string, tokenId?:string }} NftMetadataInput
 
  * @typedef {{ protocol:string, tokenUid?:string, tokenAddress?:string, tokenId?:string, address:string }} NftBalanceInfoInput
 
- * @typedef {{ tokenAddress:string; tokenUid: string; owner:string; amount:string; }} NftBalanceInfo 
+ * @typedef {{ tokenAddress?:string; tokenUid?: string; owner:string; balance:string; }} NftBalanceInfo 
  */
+/**
+ * @typedef {Object} NftTransferInput
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} token token name or address to transfer
+ * @property {string=} destination destination address
+ * @property {string | number} amount amount to be transferred
+ * @property {string=} tokenId token id to be transferred only for EVMs (ethereum, bsc, celo, polygon)
+ * @property {Array<import('../../transaction/entity').Output>=} destinations destinations only for bitcoin, hathor and cardano transactions
+ */
+module.exports = {}
