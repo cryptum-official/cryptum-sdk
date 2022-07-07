@@ -975,7 +975,6 @@ class Controller extends Interface {
             ),
             publicKey: i.privateKey.slice(128, 192),
           }
-
           let utxo = await this.getUTXOs({ address: i.address, protocol })
           utxo.map((u) => {
             if (u.txHash === i.txHash && u.index.toString() === i.index) {
@@ -1039,11 +1038,9 @@ class Controller extends Interface {
       handleRequestError(error)
     }
   }
-
   /**
    * Create Solana transfer transaction
-   *
-   * @param {import('../entity').TransferTransactionInput} input
+   * @param {import('../entity').SolanaTransferTransactionInput} input
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createSolanaTransferTransaction(input) {
@@ -1062,11 +1059,9 @@ class Controller extends Interface {
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
-
   /**
    * Create Solana token burn transaction
-   *
-   * @param {import('../entity').TransferTransactionInput} input
+   * @param {import('../entity').SolanaTokenBurnTransactionInput} input
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createSolanaTokenBurnTransaction(input) {
@@ -1075,14 +1070,13 @@ class Controller extends Interface {
     const protocol = Protocol.SOLANA
     const { blockhash } = await this.getBlock({ block: 'latest', protocol })
     const signedTx = await buildSolanaTokenBurnTransaction({
-      from: wallet, token, amount, latestBlock: blockhash, testnet: isTestnet(this.config.environment)
+      from: wallet, token, amount: Number(amount), latestBlock: blockhash, testnet: isTestnet(this.config.environment)
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
   }
   /**
    * Create Solana token mint transaction
-   *
-   * @param {import('../entity').TransferTransactionInput} input
+   * @param {import('../entity').SolanaTokenMintTransactionInput} input
    * @returns {Promise<SignedTransaction>} signed transaction data
    */
   async createSolanaTokenMintTransaction(input) {
@@ -1095,7 +1089,6 @@ class Controller extends Interface {
   }
   /**
      * Create Solana token deploy transaction
-     *
      * @param {import('../entity').SolanaTokenDeployInput} input
      * @returns {Promise<TransactionResponse>} token signature
      */

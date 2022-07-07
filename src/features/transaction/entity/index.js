@@ -488,8 +488,7 @@ class CardanoTransferTransactionInput extends TransferTransactionInput {
  * @property {string=} meltAuthorityAddress melt authority address
  * @property {string=} nftData NFT data (URI, serial number, etc) if creating a NFT
  * @property {boolean=} testnet
- */
-/**
+
  * @typedef {Object} HathorTokenTransactionFromUTXOInput
  * @property {TransactionType} type token transaction type
  * @property {Input[]} inputs UTXOs to create the token with
@@ -501,6 +500,24 @@ class CardanoTransferTransactionInput extends TransferTransactionInput {
  * @property {string=} mintAuthorityAddress mint authority address
  * @property {string=} meltAuthorityAddress melt authority address
  * @property {boolean=} testnet
+
+ * @typedef {Object} SolanaTransferTransactionInput
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} destination
+ * @property {string} token
+ * @property {string|number} amount
+ * @property {boolean=} isNFT
+ * 
+ * @typedef {Object} SolanaTokenBurnTransactionInput
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} token
+ * @property {string|number} amount
+ * 
+ * @typedef {Object} SolanaTokenMintTransactionInput
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} destination
+ * @property {string} token
+ * @property {string|number} amount
  */
 
 module.exports = {
