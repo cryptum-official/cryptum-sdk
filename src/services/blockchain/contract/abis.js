@@ -62,7 +62,6 @@ module.exports.ERC20_BURN_METHOD_ABI = [
   {
     constant: false,
     inputs: [
-      { name: 'from', type: 'address' },
       { name: 'amount', type: 'uint256' },
     ],
     name: 'burn',
