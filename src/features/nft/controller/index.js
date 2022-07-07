@@ -1,3 +1,5 @@
+module.exports.getNftControllerInstance = (config) => new Controller(config)
+
 const InvalidException = require('../../../errors/InvalidException')
 const { makeRequest } = require('../../../services')
 const { Protocol } = require('../../../services/blockchain/constants')
@@ -57,7 +59,7 @@ class Controller extends Interface {
   /**
    * Get metadata of nft
    * @param {import('../entity').NftMetadataInput} input
-   * @returns {Promise<import('../entity').NftInfo>}
+   * @returns {Promise<import('../entity').NftMetadata>}
    */
   async getMetadata(input) {
     const { protocol, tokenUid, tokenAddress, tokenId } = input
@@ -137,4 +139,4 @@ class Controller extends Interface {
   async burn(input) { }
 }
 
-module.exports = Controller
+module.exports.NftController = Controller

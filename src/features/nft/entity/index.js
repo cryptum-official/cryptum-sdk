@@ -14,6 +14,7 @@
  * @property {string=} nftData
 
  * @typedef {{ protocol: string, tokenUid?:string, tokenAddress?:string, tokenId?:string }} NftMetadataInput
+ * @typedef {{ tokenUid?:string, tokenAddress?:string, uri:string, metadata?:any }} NftMetadata
 
  * @typedef {{ protocol:string, tokenUid?:string, tokenAddress?:string, tokenId?:string, address:string }} NftBalanceInfoInput
 

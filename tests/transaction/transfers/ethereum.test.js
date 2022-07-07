@@ -4,7 +4,7 @@ var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 const assert = chai.assert
 const AxiosApi = require('../../../src/axios')
-const TransactionController = require('../../../src/features/transaction/controller')
+const { TransactionController } = require('../../../src/features/transaction/controller')
 const { Protocol, TRANSFER_METHOD_ABI } = require('../../../src/services/blockchain/constants')
 const { getWallets, config } = require('../../wallet/constants')
 const { TransactionType } = require('../../../src/features/transaction/entity')

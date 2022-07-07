@@ -5,7 +5,7 @@ const Web3 = require('web3')
 const { BSC_COMMON_CHAIN, POLYGON_COMMON_CHAIN, Protocol, AVAXCCHAIN_COMMON_CHAIN } = require('./constants')
 const { GenericException } = require('../../errors')
 const { compileContract } = require('../../services/blockchain/contract')
-const { TRANSFER_METHOD_ABI } = require('./eth/abis')
+const { TRANSFER_METHOD_ABI } = require('./contract/abis')
 const { toWei } = require('./utils')
 
 module.exports.buildEthereumTransferTransaction = async function ({

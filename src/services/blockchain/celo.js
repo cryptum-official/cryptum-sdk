@@ -7,7 +7,7 @@ const {
   CELO_CONTRACT_ADDRESS,
 } = require('./constants')
 const { compileContract } = require('../../services/blockchain/contract')
-const { TRANSFER_METHOD_ABI, TRANSFER_COMMENT_METHOD_ABI } = require('./eth/abis')
+const { TRANSFER_METHOD_ABI, TRANSFER_COMMENT_METHOD_ABI } = require('./contract/abis')
 const { toWei } = require('./utils')
 
 module.exports.buildCeloTransferTransaction = async function ({

@@ -5,9 +5,10 @@ const { TransactionController } = require('./src/features/transaction/controller
 const StakingController = require('./src/features/staking/controller')
 const SwapController = require('./src/features/swap/controller')
 const { TokenController } = require('./src/features/token/controller')
-const NftController = require('./src/features/nft/controller')
+const { NftController } = require('./src/features/nft/controller')
 const { Protocol } = require('./src/services/blockchain/constants')
 const { GenericException } = require('./src/errors')
+const { ContractController } = require('./src/features/contract/controller')
 /**
  * @typedef {object} Config
  * @property {'testnet'|'mainnet'} environment
@@ -98,6 +99,11 @@ class CryptumSDK {
   get nft() { return this.getNftController() }
   getNftController() {
     return new NftController(this.config)
+  }
+
+  get contract() { return this.getContractController() }
+  getContractController() {
+    return new ContractController(this.config)
   }
 }
 

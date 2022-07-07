@@ -4,7 +4,7 @@ const InvalidException = require('../../../errors/InvalidException')
 const { makeRequest } = require('../../../services')
 const { buildCeloSmartContractTransaction, buildCeloSmartContractDeployTransaction } = require('../../../services/blockchain/celo')
 const { Protocol } = require('../../../services/blockchain/constants')
-const { SUPPORTS_INTERFACE_ABI } = require('../../../services/blockchain/eth/abis')
+const { SUPPORTS_INTERFACE_ABI } = require('../../../services/blockchain/contract/abis')
 const { buildEthereumSmartContractTransaction, buildEthereumSmartContractDeployTransaction } = require('../../../services/blockchain/ethereum')
 const { isTestnet } = require('../../../services/utils')
 const { validateSmartContractCallParams,
