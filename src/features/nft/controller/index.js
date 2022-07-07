@@ -3,9 +3,10 @@ const { makeRequest } = require('../../../services')
 const { Protocol } = require('../../../services/blockchain/constants')
 const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
-const { ERC721_SAFE_TRANSFER_METHOD_ABI, ERC1155_SAFE_TRANSFER_METHOD_ABI } = require('../../../services/blockchain/eth/abis')
-const { supportsERC721 } = require('../../../services/blockchain/contract')
+const { ERC721_SAFE_TRANSFER_METHOD_ABI, ERC1155_SAFE_TRANSFER_METHOD_ABI } = require('../../../services/blockchain/contract/abis')
 const { validateEvmTokenTransfer } = require('../../../services/validations/evm')
+const { getContractControllerInstance } = require('../../contract/controller')
+const { ERC721_INTERFACE_ID } = require('../../../services/blockchain/contract/constants')
 
 class Controller extends Interface {
   /**
@@ -104,8 +105,9 @@ class Controller extends Interface {
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN: {
         validateEvmTokenTransfer(input)
+        const cc = getContractControllerInstance(this.config)
         let params, contractAbi
-        if (await supportsERC721({ protocol, contractAddress: token, config: this.config })) {
+        if (await cc.supportsInterfaceId({ protocol, contractAddress: token, interfaceId: ERC721_INTERFACE_ID })) {
           params = [wallet.address, destination, tokenId]
           contractAbi = ERC721_SAFE_TRANSFER_METHOD_ABI
         } else {
@@ -115,7 +117,7 @@ class Controller extends Interface {
           params = [wallet.address, destination, tokenId, amount, []]
           contractAbi = ERC1155_SAFE_TRANSFER_METHOD_ABI
         }
-        tx = await tc.createSmartContractTransaction({
+        return await cc.callMethodTransaction({
           wallet,
           protocol,
           contractAddress: token,
@@ -123,7 +125,6 @@ class Controller extends Interface {
           contractAbi,
           params
         })
-        break
       }
       default:
         throw new InvalidException('Unsupported protocol')

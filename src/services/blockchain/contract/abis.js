@@ -44,6 +44,92 @@ module.exports.ERC1155_SAFE_TRANSFER_METHOD_ABI = [
     type: 'function',
   },
 ]
+module.exports.ERC20_MINT_METHOD_ABI = [
+  {
+    constant: false,
+    inputs: [
+      { name: 'to', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'mint',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+]
+module.exports.ERC20_BURN_METHOD_ABI = [
+  {
+    constant: false,
+    inputs: [
+      { name: 'from', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'burn',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+]
+module.exports.ERC721_MINT_METHOD_ABI = [
+  {
+    constant: false,
+    inputs: [
+      { name: 'to', type: 'address' },
+      { name: 'tokenId', type: 'uint256' },
+    ],
+    name: 'mint',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+]
+module.exports.ERC721_BURN_METHOD_ABI = [
+  {
+    constant: false,
+    inputs: [
+      { name: 'tokenId', type: 'uint256' },
+    ],
+    name: 'burn',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+]
+module.exports.ERC1155_MINT_METHOD_ABI = [
+  {
+    constant: false,
+    inputs: [
+      { name: 'to', type: 'address' },
+      { name: 'tokenId', type: 'uint256' },
+      { name: 'amount', type: 'uint256' },
+      { name: 'data', type: 'bytes' },
+    ],
+    name: 'mint',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+]
+module.exports.ERC1155_BURN_METHOD_ABI = [
+  {
+    constant: false,
+    inputs: [
+      { name: 'from', type: 'address' },
+      { name: 'tokenId', type: 'uint256' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'burn',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+]
 module.exports.TRANSFER_COMMENT_METHOD_ABI = [
   {
     constant: false,
