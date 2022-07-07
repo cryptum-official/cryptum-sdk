@@ -36,7 +36,7 @@ const {
   buildEthereumSmartContractDeployTransaction,
 } = require('../../../services/blockchain/ethereum')
 const {
-  buildSolanaTransferTransaction, deploySolanaToken, deploySolanaNFT, mintEdition, buildSolanaTokenBurnTransaction, updateMetaplexMetadata, buildSolanaCustomProgramInteraction, mintSolanaToken, updateAuctionAuthority, updateVaultAuthority, validateAuction, whitelistCreators,
+  buildSolanaTransferTransaction, deploySolanaToken, deploySolanaNFT, mintEdition, buildSolanaTokenBurnTransaction, updateMetaplexMetadata, buildSolanaCustomProgramInteraction, mintSolanaToken, updateAuctionAuthority, updateVaultAuthority, validateAuction, whitelistCreators, deploySolanaCollection,
 } = require('../../../services/blockchain/solana')
 const { buildBitcoinTransferTransaction } = require('../../../services/blockchain/bitcoin')
 const WalletController = require('../../wallet/controller')
@@ -1305,18 +1305,79 @@ class Controller extends Interface {
   }
 
   /**
+     * Create Solana Collection 
+     *
+     * @param {import('../entity').SolanaNFTInput} input
+     * @returns {Promise<any>} token signature
+     */
+   async createSolanaCollectionTransaction(input) {
+    // validateSolanaDeployNFT(input)
+    const { wallet, name, symbol, uri, testnet } = input
+    const protocol = Protocol.SOLANA
+    let apiRequest = getApiMethod({
+      requests,
+      key: 'getFee',
+      config: this.config,
+    })
+    const headers = mountHeaders(this.config.apiKey)
+    const mintRent = (await apiRequest(`${requests.getFee.url}?protocol=${protocol}`, {
+      headers,
+    })).data.mintRentExemption
+
+    apiRequest = getApiMethod({
+      requests,
+      key: 'getBlock',
+      config: this.config,
+    })
+    const recentBlockhash = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`, {
+      headers,
+    })).data.blockhash
+
+    const response = await deploySolanaCollection({ name, symbol, uri, mintRent, from: wallet, recentBlockhash, testnet: testnet !== undefined ? testnet : this.config.environment === 'development' })
+
+    return {
+      collection: response.collection,
+      transaction: new SignedTransaction({ signedTx: response.rawTransaction, protocol, type: TransactionType.SOLANA_COLLECTION_MINT })
+    }
+  }
+
+  /**
      * Create Solana NFT 
      *
      * @param {import('../entity').SolanaNFTInput} input
      * @returns {Promise<any>} token signature
      */
-  async createSolanaNFT(input) {
-    validateSolanaDeployNFT(input)
-    const { wallet, maxSupply, uri, testnet } = input
+  async createSolanaNFTTransaction(input) {
+    // validateSolanaDeployNFT(input)
+    const { wallet, maxSupply, uri, name, symbol, creators, royaltiesFee, collection, testnet } = input
 
-    const response = await deploySolanaNFT({ from: wallet, maxSupply, uri, testnet: testnet !== undefined ? testnet : this.config.environment === 'development' })
+    const protocol = Protocol.SOLANA
+    let apiRequest = getApiMethod({
+      requests,
+      key: 'getFee',
+      config: this.config,
+    })
+    const headers = mountHeaders(this.config.apiKey)
+    const mintRent = (await apiRequest(`${requests.getFee.url}?protocol=${protocol}`, {
+      headers,
+    })).data.mintRentExemption
 
-    return ({ ...response })
+    apiRequest = getApiMethod({
+      requests,
+      key: 'getBlock',
+      config: this.config,
+    })
+    const recentBlockhash = (await apiRequest(`${requests.getBlock.url}/latest?protocol=${protocol}`, {
+      headers,
+    })).data.blockhash
+
+    const response = await deploySolanaNFT({ from: wallet, maxSupply, uri, name, mintRent,recentBlockhash, symbol, creators, royaltiesFee, collection, testnet: testnet !== undefined ? testnet : this.config.environment === 'development' })
+
+    return {
+      mint: response.mint,
+      metadata: response.metadata,
+      transaction: new SignedTransaction({ signedTx: response.rawTransaction, protocol, type: TransactionType.SOLANA_NFT_MINT })
+    }
   }
 
   /**
