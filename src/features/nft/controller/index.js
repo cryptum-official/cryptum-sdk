@@ -117,7 +117,8 @@ class Controller extends Interface {
           name,
           symbol,
           creators: options && options.creators,
-          royaltiesFee: options && options.royaltiesFee
+          royaltiesFee: options && options.royaltiesFee,
+          collection: options && options.collection
         }))
         break
       default:

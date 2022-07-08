@@ -114,7 +114,7 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async create(input) {
-    const { protocol, wallet, symbol, name, amount, options } = input
+    const { protocol, wallet, symbol, name, amount, issuer, limit, options } = input
     const tc = getTransactionControllerInstance(this.config)
     let tx;
     switch (protocol) {
@@ -136,6 +136,22 @@ class Controller extends Interface {
           amount,
           fixedSupply: options && options.fixedSupply,
           decimals: options && options.decimals
+        })
+        break
+      case Protocol.STELLAR:
+        tx = await tc.createStellarTrustlineTransaction({
+          wallet,
+          assetSymbol: symbol,
+          issuer,
+          limit
+        })
+        break
+      case Protocol.RIPPLE:
+        tx = await tc.createRippleTrustlineTransaction({
+          wallet,
+          assetSymbol: symbol,
+          issuer,
+          limit
         })
         break
       default:

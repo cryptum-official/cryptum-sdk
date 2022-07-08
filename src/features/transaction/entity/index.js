@@ -52,12 +52,13 @@ class TransactionResponse {
   }
 }
 class FeeResponse {
-  constructor({ estimateValue, currency, gas, gasPrice, chainId }) {
+  constructor({ estimateValue, currency, gas, gasPrice, chainId, ...rest }) {
     this.estimateValue = estimateValue
     this.currency = currency
     this.gas = gas
     this.gasPrice = gasPrice
     this.chainId = chainId
+    Object.assign(this, rest)
   }
 }
 class SmartContractCallResponse {
