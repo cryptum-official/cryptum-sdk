@@ -65,9 +65,9 @@ describe.only('Hathor NFTs', () => {
     assert.include(res.hash, '000101010200000')
   })
   it('mint', async () => {
-    const res = await nft.getMetadata({
+    const res = await nft.mint({
       protocol: 'HATHOR',
-      tokenUid: '003b7e66586d774b35ac52cd161cad9c392fb468dfdfe3aade1a93d7fcdb2f03',
+      tokenUid: '00000df210d1eeca2c5eb412118f775b2138000cf64198cfb7b219690d62a82a',
     })
     assert.deepEqual(res, {
       tokenUid: '003b7e66586d774b35ac52cd161cad9c392fb468dfdfe3aade1a93d7fcdb2f03',
