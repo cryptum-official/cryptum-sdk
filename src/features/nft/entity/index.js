@@ -27,6 +27,11 @@
  * 
  * @typedef {Object} CeloTokenOptions
  * @property {string=} feeCurrency
+ * 
+ * @typedef {Object} SolanaTokenOptions
+ * @property {import('../../transaction/entity').SolanaCreator[]=} creators
+ * @property {number=} royaltiesFee
+ * @property {=} collection
  */
 /**
  * @typedef {Object} NftCreationInput
@@ -36,7 +41,7 @@
  * @property {string} symbol token symbol
  * @property {string} amount amount to be created
  * @property {string=} uri metadata URI string for hathor and solana only
- * @property {HathorTokenOptions|CeloTokenOptions=} options
+ * @property {HathorTokenOptions|CeloTokenOptions|SolanaTokenOptions=} options
  * 
  * @typedef {Object} NftTransferInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol

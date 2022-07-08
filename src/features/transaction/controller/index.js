@@ -4,14 +4,7 @@ const requests = require('./requests.json')
 const Interface = require('./interface')
 const { Protocol, CUSD_CONTRACT_ADDRESS, CEUR_CONTRACT_ADDRESS } = require('../../../services/blockchain/constants')
 const { getTokenAddress, toWei, toHTRUnit } = require('../../../services/blockchain/utils')
-const {
-  FeeResponse,
-  TransactionResponse,
-  SignedTransaction,
-  UTXO,
-  TransactionType,
-  Input,
-} = require('../entity')
+const { FeeResponse, TransactionResponse, SignedTransaction, UTXO, TransactionType, Input } = require('../entity')
 const { buildStellarTransferTransaction, buildStellarTrustlineTransaction } = require('../../../services/blockchain/stellar')
 const { buildRippleTransferTransaction, buildRippleTrustlineTransaction } = require('../../../services/blockchain/ripple')
 const {
@@ -33,11 +26,12 @@ const {
   updateVaultAuthority,
   validateAuction,
   whitelistCreators,
+  deploySolanaCollection,
 } = require('../../../services/blockchain/solana')
 const { buildBitcoinTransferTransaction } = require('../../../services/blockchain/bitcoin')
 const WalletController = require('../../wallet/controller')
 const { GenericException, HathorException } = require('../../../errors')
-const { buildCeloTransferTransaction, } = require('../../../services/blockchain/celo')
+const { buildCeloTransferTransaction } = require('../../../services/blockchain/celo')
 const {
   validateCeloTransferTransactionParams,
   validateBitcoinTransferTransactionParams,
@@ -50,11 +44,7 @@ const {
   validateHathorTokenTransactionFromUTXO,
   validateHathorTokenTransactionFromWallet,
   validateHathorTransferTransactionFromWallet,
-  validateHathorTransferTransactionFromUTXO,
-  validateSolanaTransferTransaction,
-  validateSolanaDeployTransaction,
-  validateSolanaDeployNFT,
-  validateSolanaCustomProgramInput,
+  validateHathorTransferTransactionFromUTXO
 } = require('../../../services/validations')
 const { buildHathorTransferTransaction, buildHathorTokenTransaction } = require('../../../services/blockchain/hathor')
 const { buildOperation, buildOperationFromInputs } = require('../../../services/blockchain/cardano')
@@ -62,6 +52,14 @@ const CardanoWasm = require('@emurgo/cardano-serialization-lib-nodejs')
 const { TRANSFER_METHOD_ABI, TRANSFER_COMMENT_METHOD_ABI } = require('../../../services/blockchain/contract/abis')
 const { isTestnet } = require('../../../services/utils')
 const { getTokenControllerInstance } = require('../../token/controller')
+const {
+  validateSolanaCollectionInput,
+  validateSolanaNFTInput,
+  validateSolanaTransferTransaction,
+  validateSolanaDeployTransaction,
+  validateSolanaDeployNFT,
+  validateSolanaCustomProgramInput
+} = require('../../../services/validations/solana')
 
 class Controller extends Interface {
   /**
@@ -621,7 +619,7 @@ class Controller extends Interface {
     }
     let networkFee = fee
     if (!networkFee) {
-      ; ({ estimateValue: networkFee } = await this.getFee({
+      ({ estimateValue: networkFee } = await this.getFee({
         type: TransactionType.TRANSFER,
         protocol,
       }))
@@ -1106,16 +1104,42 @@ class Controller extends Interface {
     return new TransactionResponse({ hash })
   }
   /**
-   * Create Solana NFT
-   *
-   * @param {import('../entity').SolanaNFTInput} input
-   * @returns {Promise<any>} token signature
-   */
-  async createSolanaNFT(input) {
-    validateSolanaDeployNFT(input)
-    const { wallet, maxSupply, uri } = input
-    const response = await deploySolanaNFT({ from: wallet, maxSupply, uri, testnet: isTestnet(this.config.environment) })
-    return ({ ...response })
+     * Create Solana Collection
+     * @param {import('../entity').SolanaNFTCollectionInput} input
+     */
+  async createSolanaCollectionTransaction(input) {
+    validateSolanaCollectionInput(input)
+    const { wallet, name, symbol, uri } = input
+    const protocol = Protocol.SOLANA
+    const mintRent = (await this.getFee({ protocol, type: TransactionType.SOLANA_NFT_MINT })).mintRentExemption
+    const { blockhash: recentBlockhash } = await this.getBlock({ block: 'latest', protocol })
+    const response = await deploySolanaCollection({
+      name, symbol, uri, mintRent, from: wallet, recentBlockhash, testnet: isTestnet(this.config.environment)
+    })
+    return {
+      collection: response.collection,
+      transaction: new SignedTransaction({ signedTx: response.rawTransaction, protocol, type: TransactionType.SOLANA_COLLECTION_MINT })
+    }
+  }
+  /**
+     * Create Solana NFT transaction
+     * @param {import('../entity').SolanaNFTTransactionInput} input
+     */
+  async createSolanaNFTTransaction(input) {
+    validateSolanaNFTInput(input)
+    const { wallet, maxSupply, uri, name, symbol, creators, royaltiesFee, collection } = input
+    const protocol = Protocol.SOLANA
+    const mintRent = (await this.getFee({ protocol, type: TransactionType.SOLANA_NFT_MINT })).mintRentExemption
+    const { blockhash: recentBlockhash } = await this.getBlock({ block: 'latest', protocol })
+
+    const response = await deploySolanaNFT({
+      from: wallet, maxSupply, uri, name, mintRent, recentBlockhash, symbol, creators, royaltiesFee, collection, testnet: isTestnet(this.config.environment)
+    })
+    return {
+      mint: response.mint,
+      metadata: response.metadata,
+      transaction: new SignedTransaction({ signedTx: response.rawTransaction, protocol, type: TransactionType.SOLANA_NFT_MINT })
+    }
   }
   /**
    * Create Solana NFT Edition

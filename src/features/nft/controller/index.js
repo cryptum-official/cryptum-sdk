@@ -5,7 +5,13 @@ const { makeRequest } = require('../../../services')
 const { Protocol } = require('../../../services/blockchain/constants')
 const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
-const { ERC721_SAFE_TRANSFER_METHOD_ABI, ERC1155_SAFE_TRANSFER_METHOD_ABI, ERC721_MINT_METHOD_ABI } = require('../../../services/blockchain/contract/abis')
+const {
+  ERC721_SAFE_TRANSFER_METHOD_ABI,
+  ERC1155_SAFE_TRANSFER_METHOD_ABI,
+  ERC721_MINT_METHOD_ABI,
+  ERC721_BURN_METHOD_ABI,
+  ERC1155_BURN_METHOD_ABI
+} = require('../../../services/blockchain/contract/abis')
 const { validateEvmTokenTransfer, validateEvmTokenMint } = require('../../../services/validations/evm')
 const { getContractControllerInstance } = require('../../contract/controller')
 const { ERC721_INTERFACE_ID } = require('../../../services/blockchain/contract/constants')
@@ -82,11 +88,11 @@ class Controller extends Interface {
     }
   }
   /**
-   * Create tokens
+   * Create NFTs
    * @param {import('../entity').NftCreationInput} input
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
-   async create(input) {
+  async create(input) {
     const { protocol, wallet, symbol, name, amount, uri, options } = input
     const tc = getTransactionControllerInstance(this.config)
     let tx;
@@ -104,11 +110,15 @@ class Controller extends Interface {
         })
         break
       case Protocol.SOLANA:
-        tx = await tc.createSolanaNFT({
+        ({ transaction: tx } = await tc.createSolanaNFTTransaction({
           wallet,
           maxSupply: Number(amount),
-          uri
-        })
+          uri,
+          name,
+          symbol,
+          creators: options && options.creators,
+          royaltiesFee: options && options.royaltiesFee
+        }))
         break
       default:
         throw new InvalidException('Unsupported protocol')
@@ -190,7 +200,7 @@ class Controller extends Interface {
         })
         break
       case Protocol.SOLANA:
-        tx = await tc.createSolanaTokenMintTransaction({ wallet, destination, token, amount })
+        tx = await tc.createSolanaNFTTransaction({ wallet, destination, token, amount })
         break
       case Protocol.ETHEREUM:
       case Protocol.CELO:
@@ -232,7 +242,58 @@ class Controller extends Interface {
    * @param {import('../entity').NftBurnInput} input
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
-  async burn(input) { }
+  async burn(input) {
+    const { protocol, token, wallet, destination, amount, tokenId, options } = input
+    const tc = getTransactionControllerInstance(this.config)
+    let tx;
+    switch (protocol) {
+      case Protocol.HATHOR:
+        tx = await tc.createHathorTokenTransactionFromWallet({
+          type: TransactionType.HATHOR_TOKEN_MELT,
+          wallet,
+          tokenUid: token,
+          amount,
+          address: destination,
+          changeAddress: options && options.changeAddress,
+          meltAuthorityAddress: options && options.meltAuthorityAddress,
+        })
+        break
+      case Protocol.SOLANA:
+        tx = await tc.createSolanaTokenBurnTransaction({ wallet, token, amount })
+        break
+      case Protocol.ETHEREUM:
+      case Protocol.CELO:
+      case Protocol.BSC:
+      case Protocol.POLYGON:
+      case Protocol.AVAXCCHAIN: {
+        validateEvmTokenMint(input)
+        const cc = getContractControllerInstance(this.config)
+        let params, contractAbi
+        if (await cc.supportsInterfaceId({ protocol, contractAddress: token, interfaceId: ERC721_INTERFACE_ID })) {
+          params = [tokenId]
+          contractAbi = ERC721_BURN_METHOD_ABI
+        } else {
+          if (!amount || isNaN(amount) || Number(amount) < 0) {
+            throw new InvalidException('Invalid amount')
+          }
+          params = [destination, tokenId, amount]
+          contractAbi = ERC1155_BURN_METHOD_ABI
+        }
+        return await getContractControllerInstance(this.config).callMethodTransaction({
+          wallet,
+          protocol,
+          contractAddress: token,
+          method: 'burn',
+          contractAbi,
+          params,
+          feeCurrency: options && options.feeCurrency
+        })
+      }
+      default:
+        throw new InvalidException('Unsupported protocol')
+    }
+    return await tc.sendTransaction(tx)
+  }
 }
 
 module.exports.NftController = Controller

@@ -1,5 +1,9 @@
 const metaplex = require('@metaplex/js');
 const solanaWeb3 = require('@solana/web3.js');
+const BN = require('bn.js');
+const splToken = require("@solana/spl-token");
+const buffer = require('buffer');
+const { sleep } = require('../../utils');
 
 const MAX_RETRIES = 48
 
@@ -23,7 +27,7 @@ class ParticipationConfigV2 {
 class SafetyDepositConfig {
   constructor(args) {
     Object.assign(this, args)
-  };
+  }
 }
 
 
@@ -35,10 +39,6 @@ class ValidateSafetyDepositBoxV2Args {
 
 function toPublicKey(key) {
   return new solanaWeb3.PublicKey(key)
-}
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function metaplexConfirm(network, tx) {
@@ -91,7 +91,7 @@ const SAFETY_DEPOSIT_BOX_SCHEMA = new Map([
         ['length', 'u64'],
       ],
     },
-  ]
+  ],
 ]);
 
 class SetAuthorityArgs {
@@ -117,6 +117,16 @@ class SetWhitelistedCreatorArgs {
   }
 }
 
+class EmptyPaymentAccountArgs {
+
+  constructor(args) {
+    this.instruction = 7;
+    this.winningConfigIndex = args.winningConfigIndex;
+    this.winningConfigItemIndex = args.winningConfigItemIndex;
+    this.creatorIndex = args.creatorIndex;
+  }
+}
+
 const AUCTION_SCHEMA = new Map([
   [
     SetAuthorityArgs,
@@ -126,6 +136,21 @@ const AUCTION_SCHEMA = new Map([
     },
   ]
 ]);
+
+const EMPTY_PAYMENT_ACCOUNT_SCHEMA = new Map([
+  [
+    EmptyPaymentAccountArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['winningConfigIndex', { kind: 'option', type: 'u8' }],
+        ['winningConfigItemIndex', { kind: 'option', type: 'u8' }],
+        ['creatorIndex', { kind: 'option', type: 'u8' }],
+      ],
+    },
+  ]
+])
 
 const WHITELIST_CREATOR_SCHEMA = new Map([
   [
@@ -151,6 +176,79 @@ const WHITELIST_CREATOR_SCHEMA = new Map([
   ]
 ])
 
+class CreateAssociatedTokenAccount extends metaplex.programs.core.Transaction {
+  constructor(options, params) {
+    const { feePayer } = options;
+    const { associatedTokenAddress, walletAddress, splTokenMintAddress } = params;
+    super(options);
+    this.add(new solanaWeb3.TransactionInstruction({
+      keys: [
+        {
+          pubkey: feePayer,
+          isSigner: true,
+          isWritable: true,
+        },
+        {
+          pubkey: associatedTokenAddress,
+          isSigner: false,
+          isWritable: true,
+        },
+        {
+          pubkey: walletAddress !== null && walletAddress !== void 0 ? walletAddress : feePayer,
+          isSigner: false,
+          isWritable: false,
+        },
+        {
+          pubkey: splTokenMintAddress,
+          isSigner: false,
+          isWritable: false,
+        },
+        {
+          pubkey: solanaWeb3.SystemProgram.programId,
+          isSigner: false,
+          isWritable: false,
+        },
+        {
+          pubkey: splToken.TOKEN_PROGRAM_ID,
+          isSigner: false,
+          isWritable: false,
+        },
+        {
+          pubkey: solanaWeb3.SYSVAR_RENT_PUBKEY,
+          isSigner: false,
+          isWritable: false,
+        },
+      ],
+      programId: splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+      data: buffer.Buffer.from([]),
+    }));
+  }
+}
+class MintTo extends metaplex.programs.core.Transaction {
+  constructor(options, params) {
+    const { feePayer } = options;
+    const { mint, dest, authority, amount } = params;
+    super(options);
+    this.add(splToken.Token.createMintToInstruction(splToken.TOKEN_PROGRAM_ID, mint, dest, authority !== null && authority !== void 0 ? authority : feePayer, [], (new BN(amount)).toNumber()));
+  }
+}
+
+class CreateMint extends metaplex.programs.core.Transaction {
+  constructor(options, params) {
+    const { feePayer } = options;
+    const { newAccountPubkey, lamports, decimals, owner, freezeAuthority } = params;
+    super(options);
+    this.add(solanaWeb3.SystemProgram.createAccount({
+      fromPubkey: feePayer,
+      newAccountPubkey,
+      lamports,
+      space: splToken.MintLayout.span,
+      programId: splToken.TOKEN_PROGRAM_ID,
+    }));
+    this.add(splToken.Token.createInitMintInstruction(splToken.TOKEN_PROGRAM_ID, newAccountPubkey, decimals !== null && decimals !== void 0 ? decimals : 0, owner !== null && owner !== void 0 ? owner : feePayer, freezeAuthority !== null && freezeAuthority !== void 0 ? freezeAuthority : feePayer));
+  }
+}
+
 module.exports = {
   MAX_RETRIES,
   AUCTION_SCHEMA,
@@ -161,6 +259,12 @@ module.exports = {
   SetWhitelistedCreatorArgs,
   ValidateSafetyDepositBoxV2Args,
   WHITELIST_CREATOR_SCHEMA,
+  ParticipationConfigV2,
+  EmptyPaymentAccountArgs,
+  EMPTY_PAYMENT_ACCOUNT_SCHEMA,
   toPublicKey,
-  metaplexConfirm
+  metaplexConfirm,
+  CreateAssociatedTokenAccount,
+  MintTo,
+  CreateMint
 }

@@ -16,6 +16,8 @@ const TransactionType = {
   SOLANA_TOKEN_CREATION: 'SOLANA_TOKEN_CREATION',
   SOLANA_TOKEN_MINT: 'SOLANA_TOKEN_MINT',
   SOLANA_TOKEN_BURN: 'SOLANA_TOKEN_BURN',
+  SOLANA_COLLECTION_MINT: 'SOLANA_COLLECTION_MINT',
+  SOLANA_NFT_MINT:'SOLANA_NFT_MINT'
 }
 /**
  * @typedef {object | string} Fee
@@ -518,6 +520,27 @@ class CardanoTransferTransactionInput extends TransferTransactionInput {
  * @property {string} destination
  * @property {string} token
  * @property {string|number} amount
+ * 
+ * @typedef {Object} SolanaNFTCollectionTransactionInput
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} name
+ * @property {string} symbol
+ * @property {string} uri
+ * 
+ * @typedef {Object} SolanaCreator
+ * @property {string} address
+ * @property {number} share
+ * @property {boolean} verified
+ * 
+ * @typedef {Object} SolanaNFTTransactionInput
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} name
+ * @property {string} symbol
+ * @property {string} uri
+ * @property {string} maxSupply
+ * @property {SolanaCreator[]=} creators
+ * @property {number=} royaltiesFee
+ * @property {string=} collection
  */
 
 module.exports = {
