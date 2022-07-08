@@ -77,6 +77,7 @@ module.exports.ERC721_MINT_METHOD_ABI = [
     inputs: [
       { name: 'to', type: 'address' },
       { name: 'tokenId', type: 'uint256' },
+      { name: 'uri', type: 'string' },
     ],
     name: 'mint',
     outputs: [],
@@ -105,6 +106,7 @@ module.exports.ERC1155_MINT_METHOD_ABI = [
       { name: 'to', type: 'address' },
       { name: 'tokenId', type: 'uint256' },
       { name: 'amount', type: 'uint256' },
+      { name: 'uri', type: 'string' },
       { name: 'data', type: 'bytes' },
     ],
     name: 'mint',

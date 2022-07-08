@@ -21,13 +21,48 @@
  * @typedef {{ tokenAddress?:string; tokenUid?: string; owner:string; balance:string; }} NftBalanceInfo 
  */
 /**
+ * @typedef {Object} HathorTokenOptions
+ * @property {string=} mintAuthorityAddress
+ * @property {string=} meltAuthorityAddress
+ * 
+ * @typedef {Object} CeloTokenOptions
+ * @property {string=} feeCurrency
+ */
+/**
+ * @typedef {Object} NftCreationInput
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} name token name
+ * @property {string} symbol token symbol
+ * @property {string} amount amount to be created
+ * @property {string=} uri metadata URI string for hathor and solana only
+ * @property {HathorTokenOptions|CeloTokenOptions=} options
+ * 
  * @typedef {Object} NftTransferInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
  * @property {import('../../wallet/entity').Wallet} wallet
  * @property {string} token token name or address to transfer
  * @property {string=} destination destination address
  * @property {string | number} amount amount to be transferred
- * @property {string=} tokenId token id to be transferred only for EVMs (ethereum, bsc, celo, polygon)
+ * @property {string=} tokenId token id to be transferred only for EVMs (ethereum, bsc, celo, polygon, avax)
  * @property {Array<import('../../transaction/entity').Output>=} destinations destinations only for bitcoin, hathor and cardano transactions
+ * 
+ * @typedef {Object} NftMintInput
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} token token name or address to transfer
+ * @property {string=} destination destination address
+ * @property {string} amount amount to be transferred
+ * @property {string=} tokenId token id to be transferred only for EVMs (ethereum, bsc, celo, polygon, avax)
+ * @property {HathorTokenOptions|CeloTokenOptions=} options
+ * 
+ * @typedef {Object} NftBurnInput
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} token token name or address to transfer
+ * @property {string=} destination destination address
+ * @property {string} amount amount to be transferred
+ * @property {string=} tokenId token id to be transferred only for EVMs (ethereum, bsc, celo, polygon, avax)
+ * @property {HathorTokenOptions|CeloTokenOptions=} options
  */
 module.exports = {}

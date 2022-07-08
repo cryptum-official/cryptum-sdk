@@ -125,8 +125,8 @@ class Controller extends Interface {
           tokenSymbol: symbol,
           tokenName: name,
           amount,
-          mintAuthorityAddress: options || options.mintAuthorityAddress,
-          meltAuthorityAddress: options || options.meltAuthorityAddress,
+          mintAuthorityAddress: options && options.mintAuthorityAddress,
+          meltAuthorityAddress: options && options.meltAuthorityAddress,
         })
         break
       case Protocol.SOLANA:
@@ -134,8 +134,8 @@ class Controller extends Interface {
           wallet,
           destination: wallet.address,
           amount,
-          fixedSupply: options || options.fixedSupply,
-          decimals: options || options.decimals
+          fixedSupply: options && options.fixedSupply,
+          decimals: options && options.decimals
         })
         break
       default:
@@ -160,8 +160,8 @@ class Controller extends Interface {
           tokenUid: token,
           amount,
           address: destination,
-          changeAddress: options || options.changeAddress,
-          mintAuthorityAddress: options || options.mintAuthorityAddress,
+          changeAddress: options && options.changeAddress,
+          mintAuthorityAddress: options && options.mintAuthorityAddress,
         })
         break
       case Protocol.SOLANA:
@@ -180,7 +180,7 @@ class Controller extends Interface {
           method: 'mint',
           contractAbi: ERC20_MINT_METHOD_ABI,
           params: [destination, amount],
-          feeCurrency: options || options.feeCurrency
+          feeCurrency: options && options.feeCurrency
         })
       }
       default:
@@ -188,7 +188,11 @@ class Controller extends Interface {
     }
     return await tc.sendTransaction(tx)
   }
-
+  /**
+   * Burn tokens
+   * @param {import('../entity').TokenBurnInput} input
+   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+   */
   async burn(input) {
     const { protocol, token, wallet, destination, amount, options } = input
     const tc = getTransactionControllerInstance(this.config)
@@ -201,8 +205,8 @@ class Controller extends Interface {
           tokenUid: token,
           amount,
           address: destination,
-          changeAddress: options || options.changeAddress,
-          meltAuthorityAddress: options || options.meltAuthorityAddress,
+          changeAddress: options && options.changeAddress,
+          meltAuthorityAddress: options && options.meltAuthorityAddress,
         })
         break
       case Protocol.SOLANA:
@@ -221,7 +225,7 @@ class Controller extends Interface {
           method: 'burn',
           contractAbi: ERC20_BURN_METHOD_ABI,
           params: [amount],
-          feeCurrency: options || options.feeCurrency
+          feeCurrency: options && options.feeCurrency
         })
       }
       default:
@@ -229,6 +233,5 @@ class Controller extends Interface {
     }
     return await tc.sendTransaction(tx)
   }
-
 }
 module.exports.TokenController = Controller

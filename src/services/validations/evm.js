@@ -55,5 +55,11 @@ module.exports.validateEvmTokenMint = ({
     if (options.feeCurrency && typeof options.feeCurrency !== 'string') {
       throw new InvalidException('Invalid feeCurrency')
     }
+    if (options.mintAuthorityAddress && typeof options.mintAuthorityAddress !== 'string') {
+      throw new InvalidException('Invalid mintAuthorityAddress')
+    }
+    if (options.meltAuthorityAddress && typeof options.meltAuthorityAddress !== 'string') {
+      throw new InvalidException('Invalid meltAuthorityAddress')
+    }
   }
 }

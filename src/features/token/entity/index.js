@@ -60,4 +60,13 @@
  * @property {string} amount amount to be transferred
  * @property {HathorTokenOptions|CeloTokenOptions=} options
  */
+/**
+ * @typedef {Object} TokenBurnInput
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} token token name or address to transfer
+ * @property {string=} destination destination address
+ * @property {string} amount amount to be transferred
+ * @property {HathorTokenOptions|CeloTokenOptions=} options
+ */
 module.exports = {}
