@@ -2,7 +2,7 @@
 
 ## Wallet info
 
-### `walletController.getWalletInfo(opts)`
+### `sdk.wallet.getWalletInfo(opts)`
 
 Get wallet address information from blockchain.
 
@@ -11,9 +11,12 @@ Get wallet address information from blockchain.
 * `opts.tokenAddresses` (array)(**optional**) - array of token addresses. Only for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `BSC` and `SOLANA`.
 
 ```js
-const wc = sdk.getWalletController()
+const sdk = new CryptumSdk({
+  environment: 'testnet',
+  apiKey: 'YOUR-API-KEY'
+})
 // For Hathor protocol
-const info = await wc.getWalletInfo({ address: 'WgzYfVxZiL7bCN37Wj8myVY9HKZ5GCACsh', protocol: 'HATHOR' })
+const info = await sdk.wallet.getWalletInfo({ address: 'WgzYfVxZiL7bCN37Wj8myVY9HKZ5GCACsh', protocol: 'HATHOR' })
 // WalletInfo {
 // 	"address": "WgzYfVxZiL7bCN37Wj8myVY9HKZ5GCACsh",
 // 	"link": "https://explorer.testnet.hathor.network/address/WgzYfVxZiL7bCN37Wj8myVY9HKZ5GCACsh",
@@ -28,7 +31,7 @@ const info = await wc.getWalletInfo({ address: 'WgzYfVxZiL7bCN37Wj8myVY9HKZ5GCAC
 // }
 
 // For Celo protocol
-const info = await wc.getWalletInfo({
+const info = await sdk.wallet.getWalletInfo({
 	address: '0x31ec6686ee1597a41747507A931b5e12cacb920e',
 	protocol: 'CELO',
 	tokenAddresses: ['0xC89356398B5b66F9535417354D128b6B4fa7A38E']
@@ -58,7 +61,7 @@ const info = await wc.getWalletInfo({
 
 ## Get transaction by hash
 
-### `txController.getTransactionByHash(opts)`
+### `sdk.transaction.getTransactionByHash(opts)`
 
 Get transaction info from blockchain using the transaction hash (transaction id).
 
@@ -66,14 +69,13 @@ Get transaction info from blockchain using the transaction hash (transaction id)
 * `opts.protocol` (string)(**required**) - blockchain protocol.
 
 ```js
-const txController = sdk.getTransactionController()
-const tx = await txController.getTransactionByHash({ hash: '<hash>', protocol: 'STELLAR' })
+const tx = await sdk.transaction.getTransactionByHash({ hash: '<hash>', protocol: 'STELLAR' })
 // Blockchain raw transaction returned
 ```
 
 ## Get UTXOs (Unspent transaction outputs)
 
-### `txController.getUTXOs(opts)`
+### `sdk.transaction.getUTXOs(opts)`
 
 Get UTXOs from a wallet address.
 
@@ -81,8 +83,7 @@ Get UTXOs from a wallet address.
 * `opts.protocol` (string)(**required**) - blockchain protocol. Only `BITCOIN`, `HATHOR` and `CARDANO`.
 
 ```js
-const txController = sdk.getTransactionController()
-const tx = await txController.getUTXOs({ address: 'WgzYfVxZiL7bCN37Wj8myVY9HKZ5GCACsh', protocol: 'HATHOR' })
+const tx = await sdk.transaction.getUTXOs({ address: 'WgzYfVxZiL7bCN37Wj8myVY9HKZ5GCACsh', protocol: 'HATHOR' })
 // UTXOs [
 //     {
 //         "index": 0,
@@ -95,7 +96,7 @@ const tx = await txController.getUTXOs({ address: 'WgzYfVxZiL7bCN37Wj8myVY9HKZ5G
 
 ## Get Block info
 
-### `txController.getBlock(opts)`
+### `sdk.transaction.getBlock(opts)`
 
 Get block information from blockchain.
 
@@ -103,7 +104,6 @@ Get block information from blockchain.
 * `opts.protocol` (string)(**required**) - blockchain protocol.
 
 ```js
-const txController = sdk.getTransactionController()
-const tx = await txController.getBlock({ block: '111111', protocol: 'STELLAR' })
+const tx = await sdk.transaction.getBlock({ block: '111111', protocol: 'STELLAR' })
 // Raw block information returned from the Blockchain
 ```

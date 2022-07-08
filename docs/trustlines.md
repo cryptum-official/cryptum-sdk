@@ -4,14 +4,16 @@
 - [Ripple](#ripple)
 - [Send transactions to blockchain](#send-transactions-to-blockchain)
 
-First create an instance of transaction controller to call all methods below.
 ```js
-const txController = sdk.getTransactionController()
+const sdk = new CryptumSdk({
+  environment: 'testnet',
+  apiKey: 'YOUR-API-KEY'
+})
 ```
 
 ### Stellar
 
-#### `txController.createStellarTrustlineTransaction(opts)`
+#### `sdk.transaction.createStellarTrustlineTransaction(opts)`
 
 Create a trustline transaction in Stellar blockchain. It is used to create or delete assets (trustline).
 
@@ -24,7 +26,7 @@ Create a trustline transaction in Stellar blockchain. It is used to create or de
 
 Example:
 ```js
-const transaction = await txController.createStellarTrustlineTransaction({
+const transaction = await sdk.transaction.createStellarTrustlineTransaction({
   wallet,
   assetSymbol: 'FOO',
   issuer: 'GDTAUZE6T...3EYISAOAPYIQMVP2JO',
@@ -35,7 +37,7 @@ const transaction = await txController.createStellarTrustlineTransaction({
 
 ### Ripple
 
-#### `txController.createRippleTrustlineTransaction(opts)`
+#### `sdk.transaction.createRippleTrustlineTransaction(opts)`
 
 Create a trustline transaction in XRP blockchain. It is used to create or delete assets (trustline).
 
@@ -49,7 +51,7 @@ Create a trustline transaction in XRP blockchain. It is used to create or delete
 Example:
 ```js
 // Ripple
-const transaction = await txController.createRippleTrustlineTransaction({
+const transaction = await sdk.transaction.createRippleTrustlineTransaction({
   wallet,
   assetSymbol: 'FOO',
   issuer: 'rPT1Sjq2YGr...jKu9dyfzbpAYe',
@@ -63,7 +65,7 @@ const transaction = await txController.createRippleTrustlineTransaction({
 After creating a transaction, use this method to broadcast the transaction.
 
 ```js
-const { hash } = await txController.sendTransaction(transaction)
+const { hash } = await sdk.transaction.sendTransaction(transaction)
 // Log transaction hash
 console.log(hash)
 ```

@@ -5,9 +5,12 @@ List currency price quotations in realtime.
 Possible tokens are: XLM, XRP, BTC, ETH, CELO, BNB, MDA, HTR, ADA, AVAX, SOL, BRL, USD.
 
 ```js
-const controller = sdk.getPricesController()
+const sdk = new CryptumSdk({
+  environment: 'testnet',
+  apiKey: 'YOUR-API-KEY'
+})
 // list for XLM
-const prices = await controller.getPrices('XLM')
+const prices = await sdk.prices.getPrices('XLM')
 // Prices {
 //   "BRL": 1.811,
 //   "USD": 0.3495,

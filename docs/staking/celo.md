@@ -15,18 +15,21 @@ To unstake you have the following steps to do:
 
 Use the transaction controller to make the following calls:
 ```js
-const txController = sdk.getStakingController({ protocol: 'CELO' })
+const sdk = new CryptumSdk({
+  environment: 'testnet',
+  apiKey: 'YOUR-API-KEY'
+})
 ```
 
 
 ## Query information about account
 
-### `txController.getAccountSummary(opts)`
+### `sdk.staking.celo.getAccountSummary(opts)`
 
 * `opts.address` (string) (__required__) - wallet address.
 
 ```js
-const summary = await txController.getAccountSummary({
+const summary = await sdk.staking.celo.getAccountSummary({
 	address: '0xaaaaaaaaaaaaa',
 }))
 // summary {
@@ -45,47 +48,47 @@ const summary = await txController.getAccountSummary({
 
 ## Register account
 
-### `txController.isRegisteredAccount(opts)`
+### `sdk.staking.celo.isRegisteredAccount(opts)`
 
 Check if account is registered already for staking.
 
 * `opts.address` (string) (__required__) - wallet address.
 ```js
-const { result } = await txController.isRegisteredAccount({
+const { result } = await sdk.staking.celo.isRegisteredAccount({
 	address: '0xaaaaaa'
 }))
 ```
 
-### `txController.registerAccount(opts)`
+### `sdk.staking.celo.registerAccount(opts)`
 
 Register account.
 
 * `opts.wallet` (Wallet) (__required__) - wallet to be registered.
 
 ```js
-const transaction = await txController.registerAccount({ wallet }))
+const transaction = await sdk.staking.celo.registerAccount({ wallet }))
 ```
 
 ## Lock tokens
 
-### `txController.lock(opts)`
+### `sdk.staking.celo.lock(opts)`
 
 * `opts.wallet` (Wallet) (__required__) - wallet used to lock the amount with.
 * `opts.amount` (string) (__required__) - amount to be locked.
 
 ```js
-const transaction = await txController.lock({ wallet, amount: '0.22' }))
+const transaction = await sdk.staking.celo.lock({ wallet, amount: '0.22' }))
 ```
 
 ## Vote for validator group
-### `txController.vote(opts)`
+### `sdk.staking.celo.vote(opts)`
 
 * `opts.wallet` (Wallet) (__required__) - wallet used to vote.
 * `opts.amount` (string) (__required__) - Celo amount used to vote.
 * `opts.validator` (string) (__required__) - validator group address.
 
 ```js
-const transaction = await txController.vote({
+const transaction = await sdk.staking.celo.vote({
 	wallet,
 	amount: '1.77',
 	validator: '0xbbbbbbbb',
@@ -96,37 +99,37 @@ const transaction = await txController.vote({
 
 Before activating, you'll need to wait for the next epoch to begin. One epoch lasts around one day.
 
-### `txController.activate(opts)`
+### `sdk.staking.celo.activate(opts)`
 * `opts.wallet` (Wallet) (__required__) - wallet used to activate.
 * `opts.validator` (string) (__required__) - validator group address.
 
 ```js
-const transaction = await txController.activate({
+const transaction = await sdk.staking.celo.activate({
 	wallet,
 	validator: '0xbbbbbbbb',
 }))
 ```
 
 ## Revoke votes
-### `txController.revokePending(opts)`
+### `sdk.staking.celo.revokePending(opts)`
 
 * `opts.wallet` (Wallet) (__required__) - wallet used to revoke pending votes.
 * `opts.amount` (string) (__required__) - Celo amount used to revoke.
 * `opts.validator` (string) (__required__) - validator group address to revoke from.
 ```js
-const transaction = await txController.revokePending({
+const transaction = await sdk.staking.celo.revokePending({
 	wallet,
 	amount: '1',
 	validator: '0x5555555555',
 }))
 ```
-### `txController.revokeActive(opts)`
+### `sdk.staking.celo.revokeActive(opts)`
 
 * `opts.wallet` (Wallet) (__required__) - wallet used to revoke active votes.
 * `opts.amount` (string) (__required__) - Celo amount used to revoke.
 * `opts.validator` (string) (__required__) - validator group address to revoke from.
 ```js
-const transaction = await txController.revokeActive({
+const transaction = await sdk.staking.celo.revokeActive({
 	wallet,
 	amount: '0.2218',
 	validator: '0xcccccccccccccc',
@@ -134,12 +137,12 @@ const transaction = await txController.revokeActive({
 ```
 
 ## Unlock tokens
-### `txController.unlock(opts)`
+### `sdk.staking.celo.unlock(opts)`
 
 * `opts.wallet` (Wallet) (__required__) - wallet used to unlock amount.
 * `opts.amount` (string) (__required__) - Celo amount used to unlock.
 ```js
-const transaction = await txController.unlock({
+const transaction = await sdk.staking.celo.unlock({
 	wallet,
 	amount: '0.01218',
 }))
@@ -149,35 +152,35 @@ const transaction = await txController.unlock({
 
 Use this method to withdraw pending amounts. After unlocking the tokens you have to wait for 3 days to withdraw.
 
-### `txController.getPendingWithdrawals(opts)`
+### `sdk.staking.celo.getPendingWithdrawals(opts)`
 
 * `opts.address` (string) (__required__) - wallet address to get the pending withdrawals from.
 
 ```js
-const pendingWithdrawals = await txController.getPendingWithdrawals({
+const pendingWithdrawals = await sdk.staking.celo.getPendingWithdrawals({
 	address: '0xaaaaaaaaaa',
 }))
 ```
 
-### `txController.withdraw(opts)`
+### `sdk.staking.celo.withdraw(opts)`
 
 * `opts.wallet` (Wallet) (__required__) - wallet used to withdraw.
 * `opts.index` (number) (__required__) - index of pending withdrawals.
 ```js
-const transaction = await txController.withdraw({ wallet, index: 1 }))
+const transaction = await sdk.staking.celo.withdraw({ wallet, index: 1 }))
 ```
 
 ## Relock tokens
 
 Relock tokens that are pending withdrawals.
-### `txController.relock(opts)`
+### `sdk.staking.celo.relock(opts)`
 
 * `opts.wallet` (Wallet) (__required__) - wallet used to withdraw.
 * `opts.amount` (string) (__required__) - amount to relock.
 * `opts.index` (number) (__required__) - index of pending withdrawals.
 
 ```js
-const transaction = await txController.relock({
+const transaction = await sdk.staking.celo.relock({
 	wallet,
 	amount: '0.01218',
 	index: 0,
