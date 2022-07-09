@@ -8,7 +8,7 @@ const compileContract = async ({ protocol, config, source, contractName, tokenTy
     if (tokenType) data.tokenType = tokenType
     if (params) data.params = params
 
-    return await makeRequest({ url: `/transaction/contract/compile?protocol=${protocol}`, method: 'post', config })
+    return await makeRequest({ url: `/transaction/contract/compile?protocol=${protocol}`, method: 'post', body: data, config })
   } catch (error) {
     handleRequestError(error)
   }

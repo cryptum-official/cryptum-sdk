@@ -3,6 +3,7 @@ const InvalidException = require('../../../errors/InvalidException')
 const { makeRequest } = require('../../../services')
 const { Protocol } = require('../../../services/blockchain/constants')
 const { ERC20_MINT_METHOD_ABI, ERC20_BURN_METHOD_ABI } = require('../../../services/blockchain/contract/abis')
+const { toWei } = require('../../../services/blockchain/utils')
 const { validateEvmTokenMint } = require('../../../services/validations/evm')
 const { getContractControllerInstance } = require('../../contract/controller')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
@@ -114,7 +115,9 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async create(input) {
-    const { protocol, wallet, symbol, name, amount, issuer, limit, options } = input
+    const {
+      protocol, wallet, symbol, name, amount, mintAuthorityAddress, meltAuthorityAddress, fixedSupply, decimals, feeCurrency
+    } = input
     const tc = getTransactionControllerInstance(this.config)
     let tx;
     switch (protocol) {
@@ -125,19 +128,47 @@ class Controller extends Interface {
           tokenSymbol: symbol,
           tokenName: name,
           amount,
-          mintAuthorityAddress: options && options.mintAuthorityAddress,
-          meltAuthorityAddress: options && options.meltAuthorityAddress,
+          mintAuthorityAddress,
+          meltAuthorityAddress,
         })
         break
       case Protocol.SOLANA:
-        tx = await tc.createSolanaTokenDeployTransaction({
+        return await tc.createSolanaTokenDeployTransaction({
           wallet,
           destination: wallet.address,
           amount,
-          fixedSupply: options && options.fixedSupply,
-          decimals: options && options.decimals
+          fixedSupply,
+          decimals
         })
-        break
+      case Protocol.ETHEREUM:
+      case Protocol.CELO:
+      case Protocol.BSC:
+      case Protocol.POLYGON:
+      case Protocol.AVAXCCHAIN: {
+        const decimalPlaces = !isNaN(decimals) ? Number(decimals) : 18
+        return await getContractControllerInstance(this.config).deployToken({
+          wallet,
+          protocol,
+          tokenType: 'ERC20',
+          params: [name, symbol, decimalPlaces, amount],
+          feeCurrency
+        })
+      }
+      default:
+        throw new InvalidException('Unsupported protocol')
+    }
+    return await tc.sendTransaction(tx)
+  }
+  /**
+   * Set trustline for stellar and ripple assets
+   * @param {import('../entity').SetTrustlineInput} input
+   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+   */
+  async setTrustline(input) {
+    const { protocol, wallet, symbol, issuer, limit } = input
+    const tc = getTransactionControllerInstance(this.config)
+    let tx;
+    switch (protocol) {
       case Protocol.STELLAR:
         tx = await tc.createStellarTrustlineTransaction({
           wallet,
@@ -165,7 +196,7 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async mint(input) {
-    const { protocol, token, wallet, destination, amount, options } = input
+    const { protocol, token, wallet, destination, amount, mintAuthorityAddress, changeAddress, feeCurrency } = input
     const tc = getTransactionControllerInstance(this.config)
     let tx;
     switch (protocol) {
@@ -176,8 +207,8 @@ class Controller extends Interface {
           tokenUid: token,
           amount,
           address: destination,
-          changeAddress: options && options.changeAddress,
-          mintAuthorityAddress: options && options.mintAuthorityAddress,
+          changeAddress,
+          mintAuthorityAddress
         })
         break
       case Protocol.SOLANA:
@@ -189,14 +220,15 @@ class Controller extends Interface {
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN: {
         validateEvmTokenMint(input)
+        const { decimals } = await this.getInfo({ protocol, tokenAddress: token })
         return await getContractControllerInstance(this.config).callMethodTransaction({
           wallet,
           protocol,
           contractAddress: token,
           method: 'mint',
           contractAbi: ERC20_MINT_METHOD_ABI,
-          params: [destination, amount],
-          feeCurrency: options && options.feeCurrency
+          params: [destination, toWei(amount, decimals).toString()],
+          feeCurrency
         })
       }
       default:
@@ -210,7 +242,7 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async burn(input) {
-    const { protocol, token, wallet, destination, amount, options } = input
+    const { protocol, token, wallet, destination, amount, changeAddress, meltAuthorityAddress, feeCurrency } = input
     const tc = getTransactionControllerInstance(this.config)
     let tx;
     switch (protocol) {
@@ -221,8 +253,8 @@ class Controller extends Interface {
           tokenUid: token,
           amount,
           address: destination,
-          changeAddress: options && options.changeAddress,
-          meltAuthorityAddress: options && options.meltAuthorityAddress,
+          changeAddress,
+          meltAuthorityAddress,
         })
         break
       case Protocol.SOLANA:
@@ -234,14 +266,15 @@ class Controller extends Interface {
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN: {
         validateEvmTokenMint(input)
+        const { decimals } = await this.getInfo({ protocol, tokenAddress: token })
         return await getContractControllerInstance(this.config).callMethodTransaction({
           wallet,
           protocol,
           contractAddress: token,
           method: 'burn',
           contractAbi: ERC20_BURN_METHOD_ABI,
-          params: [amount],
-          feeCurrency: options && options.feeCurrency
+          params: [toWei(amount, decimals).toString()],
+          feeCurrency
         })
       }
       default:
