@@ -1082,7 +1082,9 @@ class Controller extends Interface {
     const { wallet, destination, token, amount } = input
     const protocol = Protocol.SOLANA
     const { blockhash } = await this.getBlock({ block: 'latest', protocol })
-    const signedTx = await mintSolanaToken({ from: wallet, token, to: destination, amount, latestBlock: blockhash })
+    const signedTx = await mintSolanaToken({
+      from: wallet, token, to: destination, amount, latestBlock: blockhash, testnet: isTestnet(this.config.environment)
+    })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
   }
   /**
@@ -1234,7 +1236,7 @@ class Controller extends Interface {
   async whitelistCreatorsTransaction(input) {
     const protocol = Protocol.SOLANA
     const { blockhash } = await this.getBlock({ block: 'latest', protocol })
-    const txHash = await whitelistCreators({ ...input, latestBlock: blockhash })
+    const txHash = await whitelistCreators({ ...input, latestBlock: blockhash, testnet: isTestnet(this.config.environment) })
     return new TransactionResponse({ hash: txHash })
   }
 }

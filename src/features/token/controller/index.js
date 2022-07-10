@@ -3,8 +3,8 @@ const InvalidException = require('../../../errors/InvalidException')
 const { makeRequest } = require('../../../services')
 const { Protocol } = require('../../../services/blockchain/constants')
 const { ERC20_MINT_METHOD_ABI, ERC20_BURN_METHOD_ABI } = require('../../../services/blockchain/contract/abis')
-const { toWei } = require('../../../services/blockchain/utils')
-const { validateEvmTokenMint } = require('../../../services/validations/evm')
+const { toWei, toLamports } = require('../../../services/blockchain/utils')
+const { validateEvmTokenMint, validateEvmTokenBurn } = require('../../../services/validations/evm')
 const { getContractControllerInstance } = require('../../contract/controller')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { TransactionType } = require('../../transaction/entity')
@@ -211,9 +211,11 @@ class Controller extends Interface {
           mintAuthorityAddress
         })
         break
-      case Protocol.SOLANA:
-        tx = await tc.createSolanaTokenMintTransaction({ wallet, destination, token, amount })
+      case Protocol.SOLANA: {
+        const { decimals } = await this.getInfo({ protocol, tokenAddress: token })
+        tx = await tc.createSolanaTokenMintTransaction({ wallet, destination, token, amount: toLamports(amount, decimals).toNumber() })
         break
+      }
       case Protocol.ETHEREUM:
       case Protocol.CELO:
       case Protocol.BSC:
@@ -257,15 +259,17 @@ class Controller extends Interface {
           meltAuthorityAddress,
         })
         break
-      case Protocol.SOLANA:
-        tx = await tc.createSolanaTokenBurnTransaction({ wallet, destination, token, amount })
+      case Protocol.SOLANA: {
+        const { decimals } = await this.getInfo({ protocol, tokenAddress: token })
+        tx = await tc.createSolanaTokenBurnTransaction({ wallet, destination, token, amount: toLamports(amount, decimals).toString() })
         break
+      }
       case Protocol.ETHEREUM:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN: {
-        validateEvmTokenMint(input)
+        validateEvmTokenBurn(input)
         const { decimals } = await this.getInfo({ protocol, tokenAddress: token })
         return await getContractControllerInstance(this.config).callMethodTransaction({
           wallet,
