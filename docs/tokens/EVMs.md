@@ -1,6 +1,9 @@
-# Tokens and NFTs on EVMs (Etherum-based blockchains)
+# Tokens on EVMs (Etherum-based blockchains)
 
-- [Deploy ERC20 token](#deploy-erc20-token)
+- [Create ERC20 token](#create-erc20-token)
+- [Transfer tokens](#transfer-tokens)
+- [Mint tokens](#mint-tokens)
+- [Burn tokens](#burn-tokens)
 
 ```js
 const sdk = new CryptumSdk({
@@ -9,9 +12,9 @@ const sdk = new CryptumSdk({
 })
 ```
 
-## Deploy ERC20 token
+## Create ERC20 token
 
-### `sdk.contract.deploy(opts)`
+### `sdk.token.create(opts)`
 
 The smart contract used in this deployment is already precompiled in Cryptum.
 For more details, you can see the source code here `./contracts/TokenERC20.sol`.
