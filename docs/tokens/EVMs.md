@@ -23,6 +23,8 @@ For more details, you can see the source code here `./contracts/TokenERC20.sol`.
 - `opts.amount` (string) (**required**) - token amount to be first minted. (this is in largest unit ether)
 - `opts.protocol` (string) (**required**) - [EVMs only](../protocols.md#ethereum-based-blockchains-evms).
 
+This function returns the transaction hash from the blockchain. This hash can be used later to retrieve the token address.
+
 ```js
 const { hash } = await sdk.token.create({
   wallet,
@@ -45,6 +47,8 @@ Transfer native and ERC20 tokens.
 - `opts.amount` (string) (**required**) - token amount to be transferred. (this is in largest unit ether)
 - `opts.destination` (string) (**required**) - destination address.
 - `opts.protocol` (string) (**required**) - [EVMs only](../protocols.md#ethereum-based-blockchains-evms).
+
+This function returns the hash of this transferring transaction from the blockchain.
 
 ```js
 // native token
@@ -71,13 +75,15 @@ const { hash } = await sdk.token.transfer({
 
 Mint ERC20 tokens.
 
-***Obs: This method will only work for the tokens created with the method [sdk.token.create](#deploy-erc20-token).**
+**\*Obs: This method will only work for the tokens created with the method [sdk.token.create](#deploy-erc20-token).**
 
 - `opts.wallet` (Wallet) (**required**) - wallet minting tokens.
 - `opts.token` (string) (**required**) - token address.
 - `opts.amount` (string) (**required**) - token amount to be minted. (this is in largest unit ether considering the token decimal places)
 - `opts.destination` (string) (**required**) - destination address.
 - `opts.protocol` (string) (**required**) - [EVMs only](../protocols.md#ethereum-based-blockchains-evms).
+
+This function returns the hash of this minting transaction from the blockchain.
 
 ```js
 const { hash } = await sdk.token.mint({
@@ -95,12 +101,14 @@ const { hash } = await sdk.token.mint({
 
 Burn ERC20 tokens.
 
-***Obs: This method will only work for the tokens created with the method [sdk.token.create](#deploy-erc20-token).**
+**\*Obs: This method will only work for the tokens created with the method [sdk.token.create](#deploy-erc20-token).**
 
 - `opts.wallet` (Wallet) (**required**) - wallet burning tokens.
 - `opts.token` (string) (**required**) - token address.
 - `opts.amount` (string) (**required**) - token amount to be burnt. (this is in largest unit ether considering the token decimal places)
 - `opts.protocol` (string) (**required**) - [EVMs only](../protocols.md#ethereum-based-blockchains-evms).
+
+This function returns the hash of this burning transaction from the blockchain.
 
 ```js
 const { hash } = await sdk.token.burn({
