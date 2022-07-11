@@ -31,6 +31,7 @@ module.exports.validateEvmTokenTransfer = ({
 module.exports.validateEvmTokenMint = ({
   wallet,
   token,
+  tokenId,
   destination,
   amount,
   protocol,
@@ -42,10 +43,13 @@ module.exports.validateEvmTokenMint = ({
   if (!token || typeof token !== 'string') {
     throw new InvalidException('Invalid token address')
   }
+  if (isNaN(tokenId)) {
+    throw new InvalidException('Invalid token id')
+  }
   if (!destination || typeof destination !== 'string') {
     throw new InvalidException('Invalid destination address')
   }
-  if (!amount || isNaN(amount) || Number(amount) < 0) {
+  if (amount !== undefined && (isNaN(amount) || Number(amount) < 0)) {
     throw new InvalidException('Invalid amount')
   }
   if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
@@ -59,6 +63,7 @@ module.exports.validateEvmTokenMint = ({
 module.exports.validateEvmTokenBurn = ({
   wallet,
   token,
+  tokenId,
   amount,
   protocol,
   feeCurrency
@@ -69,7 +74,10 @@ module.exports.validateEvmTokenBurn = ({
   if (!token || typeof token !== 'string') {
     throw new InvalidException('Invalid token address')
   }
-  if (!amount || isNaN(amount) || Number(amount) < 0) {
+  if (isNaN(tokenId)) {
+    throw new InvalidException('Invalid token id')
+  }
+  if (amount !== undefined && (isNaN(amount) || Number(amount) < 0)) {
     throw new InvalidException('Invalid amount')
   }
   if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
