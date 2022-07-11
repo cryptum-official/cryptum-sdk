@@ -297,7 +297,6 @@ module.exports.deploySolanaNFT = async function ({ from, maxSupply, uri, name, s
     maxSupply: new BN(maxSupply),
   })
 
-
   let tx = metaplex.programs.core.Transaction.fromCombined([
     createNftMintTx,
     createNftMetadataTx,
@@ -311,7 +310,6 @@ module.exports.deploySolanaNFT = async function ({ from, maxSupply, uri, name, s
   tx = await wallet.signTransaction(tx)
 
   // let txHash = await connection.sendRawTransaction(tx.serialize().toString(), { skipPreflight: false })
-
   return { rawTransaction: tx.serialize().toString('hex'), mint: nftMint.publicKey.toBase58(), metadata: nftMetadataPDA.toBase58() }
 }
 
