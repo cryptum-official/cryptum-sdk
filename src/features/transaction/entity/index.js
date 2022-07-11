@@ -52,12 +52,13 @@ class TransactionResponse {
   }
 }
 class FeeResponse {
-  constructor({ estimateValue, currency, gas, gasPrice, chainId }) {
+  constructor({ estimateValue, currency, gas, gasPrice, chainId, ...rest }) {
     this.estimateValue = estimateValue
     this.currency = currency
     this.gas = gas
     this.gasPrice = gasPrice
     this.chainId = chainId
+    Object.assign(this, rest)
   }
 }
 class SmartContractCallResponse {
@@ -96,6 +97,18 @@ class Output {
     this.address = output.address
     this.amount = output.amount
     this.token = output.token
+  }
+}
+class CardanoOutput extends Output {
+  /**
+   *
+   * @param {object} output
+   * @param {string} output.address
+   * @param {string} output.amount
+   * @param {{ policy:string; asset:string; amount:string }=} output.token
+   */
+   constructor(output) {
+    super(output)
   }
 }
 class TrustlineTransactionInput {
@@ -450,7 +463,6 @@ class HathorTransferTransactionInput extends TransferTransactionInput {
    * @param {import('../../wallet/entity').Wallet=} args.wallet wallet to transfer from
    * @param {Array<Input>=} args.inputs inputs to transfer from
    * @param {Array<Output>} args.outputs outputs to transfer to
-   * @param {Array<Output>} args.tokens outputs to transfer to
    * @param {boolean=} args.testnet
    */
   constructor({ outputs, inputs, ...args }) {
@@ -466,9 +478,7 @@ class CardanoTransferTransactionInput extends TransferTransactionInput {
    * @param {object} args
    * @param {import('../../wallet/entity').Wallet=} args.wallet wallet to transfer from
    * @param {Array<Input>=} args.inputs inputs to transfer from
-   * @param {Array<Output>} args.outputs outputs to transfer to
-   * @param {Array<Output>} args.tokens outputs to transfer to
-   * @param {boolean=} args.testnet
+   * @param {Array<CardanoOutput>} args.outputs outputs to transfer to
    */
   constructor({ outputs, inputs, ...args }) {
     super(args)
@@ -551,6 +561,7 @@ module.exports = {
   UTXO,
   Input,
   Output,
+  CardanoOutput,
   StellarTrustlineTransactionInput,
   RippleTrustlineTransactionInput,
   EthereumTransferTransactionInput,

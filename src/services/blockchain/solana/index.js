@@ -130,7 +130,7 @@ module.exports.deploySolanaToken = async function ({ from, to = from.publicKey, 
 
 module.exports.mintSolanaToken = async function ({ from, to = from.publicKey, token, amount, latestBlock, testnet = true }) {
   const network = testnet ? 'devnet' : 'mainnet-beta'
-  const connection = new solanaWeb3.Connection(network, 'confirmed',)
+  const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl(network), 'confirmed',)
 
   const fromAccount = solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey))
   const toAccount = toPublicKey(to)
@@ -167,7 +167,7 @@ module.exports.mintSolanaToken = async function ({ from, to = from.publicKey, to
 
 module.exports.deploySolanaCollection = async function ({ from, name, symbol, uri, testnet = true }) {
   const network = testnet ? 'devnet' : 'mainnet-beta'
-  const connection = new metaplex.Connection(network)
+  const connection = new metaplex.Connection(solanaWeb3.clusterApiUrl(network))
   const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
 
   const mint = solanaWeb3.Keypair.generate()
@@ -225,7 +225,7 @@ module.exports.deploySolanaCollection = async function ({ from, name, symbol, ur
 
 module.exports.deploySolanaNFT = async function ({ from, maxSupply, uri, name, symbol, creators = null, royaltiesFee = 0, collection = null, testnet = true }) {
   const network = testnet ? 'devnet' : 'mainnet-beta'
-  const connection = new metaplex.Connection(network)
+  const connection = new metaplex.Connection(solanaWeb3.clusterApiUrl(network))
   const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
 
   const nftMint = solanaWeb3.Keypair.generate()
@@ -297,7 +297,6 @@ module.exports.deploySolanaNFT = async function ({ from, maxSupply, uri, name, s
     maxSupply: new BN(maxSupply),
   })
 
-
   let tx = metaplex.programs.core.Transaction.fromCombined([
     createNftMintTx,
     createNftMetadataTx,
@@ -311,13 +310,12 @@ module.exports.deploySolanaNFT = async function ({ from, maxSupply, uri, name, s
   tx = await wallet.signTransaction(tx)
 
   // let txHash = await connection.sendRawTransaction(tx.serialize().toString(), { skipPreflight: false })
-
   return { rawTransaction: tx.serialize().toString('hex'), mint: nftMint.publicKey.toBase58(), metadata: nftMetadataPDA.toBase58() }
 }
 
 module.exports.mintEdition = async function ({ masterEdition, from, testnet = true }) {
   const network = testnet ? 'devnet' : 'mainnet-beta'
-  const connection = new metaplex.Connection(network)
+  const connection = new metaplex.Connection(solanaWeb3.clusterApiUrl(network))
   const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
 
   const masterEditionMint = toPublicKey(masterEdition)
@@ -381,7 +379,7 @@ module.exports.buildSolanaTokenBurnTransaction = async function ({
 
 module.exports.updateMetaplexMetadata = async function ({ token, from, uri, testnet = true }) {
   const network = testnet ? 'devnet' : 'mainnet-beta'
-  const connection = new metaplex.Connection(network)
+  const connection = new metaplex.Connection(solanaWeb3.clusterApiUrl(network))
   const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
 
   const editionMint = toPublicKey(token)
@@ -455,7 +453,12 @@ module.exports.createTokenVault = async function ({ testnet, from }) {
   const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
   const externalPriceAccountData = await metaplex.actions.createExternalPriceAccount({ connection: new metaplex.Connection(network, "confirmed"), wallet })
   await metaplexConfirm(network, externalPriceAccountData.txId)
-  const response = await metaplex.actions.createVault({ connection: new metaplex.Connection(network, "confirmed"), wallet: wallet, priceMint: splToken.NATIVE_MINT, externalPriceAccount: externalPriceAccountData.externalPriceAccount })
+  const response = await metaplex.actions.createVault({
+    connection: new metaplex.Connection(network, "confirmed"),
+    wallet,
+    priceMint: splToken.NATIVE_MINT,
+    externalPriceAccount: externalPriceAccountData.externalPriceAccount
+  })
   return ({ ...response })
 }
 

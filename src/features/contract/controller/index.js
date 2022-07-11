@@ -26,7 +26,7 @@ class Controller extends Interface {
   async callMethod(input) {
     validateSmartContractCallParams(input)
     const { from, contractAddress, contractAbi, method, params, protocol } = input
-    const data = makeRequest({
+    const data = await makeRequest({
       method: 'post',
       url: `/tx/call-method?protocol=${protocol}`,
       body: { from, contractAddress, contractAbi, method, params },

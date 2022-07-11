@@ -10,9 +10,11 @@ const {
   ERC1155_SAFE_TRANSFER_METHOD_ABI,
   ERC721_MINT_METHOD_ABI,
   ERC721_BURN_METHOD_ABI,
-  ERC1155_BURN_METHOD_ABI
+  ERC1155_BURN_METHOD_ABI,
+  ERC1155_MINT_WITH_URI_METHOD_ABI,
+  ERC1155_MINT_METHOD_ABI
 } = require('../../../services/blockchain/contract/abis')
-const { validateEvmTokenTransfer, validateEvmTokenMint } = require('../../../services/validations/evm')
+const { validateEvmTokenTransfer, validateEvmTokenMint, validateEvmTokenBurn, validateEvmTokenCreation } = require('../../../services/validations/evm')
 const { getContractControllerInstance } = require('../../contract/controller')
 const { ERC721_INTERFACE_ID } = require('../../../services/blockchain/contract/constants')
 const { TransactionType } = require('../../transaction/entity')
@@ -93,7 +95,9 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async create(input) {
-    const { protocol, wallet, symbol, name, amount, uri, options } = input
+    const {
+      protocol, wallet, symbol, name, amount, uri, mintAuthorityAddress, meltAuthorityAddress, creators, royaltiesFee, collection, feeCurrency, type
+    } = input
     const tc = getTransactionControllerInstance(this.config)
     let tx;
     switch (protocol) {
@@ -105,8 +109,8 @@ class Controller extends Interface {
           tokenName: name,
           amount,
           nftData: uri,
-          mintAuthorityAddress: options && options.mintAuthorityAddress,
-          meltAuthorityAddress: options && options.meltAuthorityAddress,
+          mintAuthorityAddress,
+          meltAuthorityAddress,
         })
         break
       case Protocol.SOLANA:
@@ -116,10 +120,25 @@ class Controller extends Interface {
           uri,
           name,
           symbol,
-          creators: options && options.creators,
-          royaltiesFee: options && options.royaltiesFee
+          creators,
+          royaltiesFee,
+          collection
         }))
         break
+      case Protocol.ETHEREUM:
+      case Protocol.CELO:
+      case Protocol.BSC:
+      case Protocol.POLYGON:
+      case Protocol.AVAXCCHAIN: {
+        validateEvmTokenCreation(input)
+        return await getContractControllerInstance(this.config).deployToken({
+          wallet,
+          protocol,
+          tokenType: type,
+          params: [name, symbol, uri || ''],
+          feeCurrency
+        })
+      }
       default:
         throw new InvalidException('Unsupported protocol')
     }
@@ -184,7 +203,7 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async mint(input) {
-    const { protocol, token, wallet, destination, amount, options } = input
+    const { protocol, token, wallet, destination, amount, tokenId, uri, mintAuthorityAddress, feeCurrency } = input
     const tc = getTransactionControllerInstance(this.config)
     let tx;
     switch (protocol) {
@@ -195,8 +214,8 @@ class Controller extends Interface {
           tokenUid: token,
           amount,
           address: destination,
-          changeAddress: options && options.changeAddress,
-          mintAuthorityAddress: options && options.mintAuthorityAddress,
+          changeAddress: wallet.address,
+          mintAuthorityAddress,
         })
         break
       case Protocol.SOLANA:
@@ -209,18 +228,17 @@ class Controller extends Interface {
       case Protocol.AVAXCCHAIN: {
         validateEvmTokenMint(input)
         const cc = getContractControllerInstance(this.config)
-        let params, contractAbi, _options = options || {}
-        _options.tokenId = _options.tokenId || Math.round(Math.random() * Number.MAX_SAFE_INTEGER)
-        _options.uri = _options.uri || ''
+        let params, contractAbi, _tokenId
+        _tokenId = tokenId !== undefined ? tokenId : Math.round(Math.random() * Number.MAX_SAFE_INTEGER)
         if (await cc.supportsInterfaceId({ protocol, contractAddress: token, interfaceId: ERC721_INTERFACE_ID })) {
-          params = [destination, _options.tokenId, _options.uri]
+          params = [destination, _tokenId, uri || '']
           contractAbi = ERC721_MINT_METHOD_ABI
         } else {
           if (!amount || isNaN(amount) || Number(amount) < 0) {
             throw new InvalidException('Invalid amount')
           }
-          params = [destination, _options.tokenId, amount, _options.uri, []]
-          contractAbi = ERC1155_SAFE_TRANSFER_METHOD_ABI
+          params = uri !== undefined ? [destination, _tokenId, amount, uri, []] : [destination, _tokenId, amount, []]
+          contractAbi = uri !== undefined ? ERC1155_MINT_WITH_URI_METHOD_ABI : ERC1155_MINT_METHOD_ABI
         }
         return await getContractControllerInstance(this.config).callMethodTransaction({
           wallet,
@@ -229,7 +247,7 @@ class Controller extends Interface {
           method: 'mint',
           contractAbi,
           params,
-          feeCurrency: options && options.feeCurrency
+          feeCurrency
         })
       }
       default:
@@ -243,7 +261,7 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async burn(input) {
-    const { protocol, token, wallet, destination, amount, tokenId, options } = input
+    const { protocol, token, wallet, amount, tokenId, feeCurrency, meltAuthorityAddress } = input
     const tc = getTransactionControllerInstance(this.config)
     let tx;
     switch (protocol) {
@@ -253,9 +271,9 @@ class Controller extends Interface {
           wallet,
           tokenUid: token,
           amount,
-          address: destination,
-          changeAddress: options && options.changeAddress,
-          meltAuthorityAddress: options && options.meltAuthorityAddress,
+          address: wallet.address,
+          changeAddress: wallet.address,
+          meltAuthorityAddress,
         })
         break
       case Protocol.SOLANA:
@@ -266,7 +284,7 @@ class Controller extends Interface {
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN: {
-        validateEvmTokenMint(input)
+        validateEvmTokenBurn(input)
         const cc = getContractControllerInstance(this.config)
         let params, contractAbi
         if (await cc.supportsInterfaceId({ protocol, contractAddress: token, interfaceId: ERC721_INTERFACE_ID })) {
@@ -276,7 +294,7 @@ class Controller extends Interface {
           if (!amount || isNaN(amount) || Number(amount) < 0) {
             throw new InvalidException('Invalid amount')
           }
-          params = [destination, tokenId, amount]
+          params = [wallet.address, tokenId, amount]
           contractAbi = ERC1155_BURN_METHOD_ABI
         }
         return await getContractControllerInstance(this.config).callMethodTransaction({
@@ -286,7 +304,7 @@ class Controller extends Interface {
           method: 'burn',
           contractAbi,
           params,
-          feeCurrency: options && options.feeCurrency
+          feeCurrency
         })
       }
       default:

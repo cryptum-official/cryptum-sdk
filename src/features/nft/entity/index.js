@@ -21,27 +21,20 @@
  * @typedef {{ tokenAddress?:string; tokenUid?: string; owner:string; balance:string; }} NftBalanceInfo 
  */
 /**
- * @typedef {Object} HathorTokenOptions
- * @property {string=} mintAuthorityAddress
- * @property {string=} meltAuthorityAddress
- * 
- * @typedef {Object} CeloTokenOptions
- * @property {string=} feeCurrency
- * 
- * @typedef {Object} SolanaTokenOptions
- * @property {import('../../transaction/entity').SolanaCreator[]=} creators
- * @property {number=} royaltiesFee
- * @property {=} collection
- */
-/**
  * @typedef {Object} NftCreationInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
  * @property {import('../../wallet/entity').Wallet} wallet
  * @property {string} name token name
  * @property {string} symbol token symbol
  * @property {string} amount amount to be created
- * @property {string=} uri metadata URI string for hathor and solana only
- * @property {HathorTokenOptions|CeloTokenOptions|SolanaTokenOptions=} options
+ * @property {string=} uri metadata URI string for hathor and solana only, for EVMs this will be the base URI
+ * @property {'ERC721'|'ERC1155'=} type token type for EVMs only
+ * @property {string=} mintAuthorityAddress address responsible to mint more tokens (for hathor only)
+ * @property {string=} meltAuthorityAddress address responsible to burn more tokens (for hathor only)
+ * @property {string=} feeCurrency fee currency (for celo only)
+ * @property {import('../../transaction/entity').SolanaCreator[]=} creators true if this token has fixed supply (for solana only)
+ * @property {number=} royaltiesFee (for solana only)
+ * @property {string=} collection (for solana only)
  * 
  * @typedef {Object} NftTransferInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
@@ -50,24 +43,26 @@
  * @property {string=} destination destination address
  * @property {string | number} amount amount to be transferred
  * @property {string=} tokenId token id to be transferred only for EVMs (ethereum, bsc, celo, polygon, avax)
- * @property {Array<import('../../transaction/entity').Output>=} destinations destinations only for bitcoin, hathor and cardano transactions
+ * @property {string=} feeCurrency fee currency (for celo only)
  * 
  * @typedef {Object} NftMintInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
  * @property {import('../../wallet/entity').Wallet} wallet
  * @property {string} token token name or address to transfer
- * @property {string=} destination destination address
- * @property {string} amount amount to be transferred
- * @property {string=} tokenId token id to be transferred only for EVMs (ethereum, bsc, celo, polygon, avax)
- * @property {HathorTokenOptions|CeloTokenOptions=} options
+ * @property {string} destination destination address
+ * @property {string} amount amount to be minted
+ * @property {string=} tokenId token id to be minted only for EVMs (ethereum, bsc, celo, polygon, avax)
+ * @property {string=} uri metadata URI string for EVMs this will be the base URI
+ * @property {string=} mintAuthorityAddress mint authority address for hathor only
+ * @property {string=} feeCurrency fee currency (for celo only)
  * 
  * @typedef {Object} NftBurnInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
  * @property {import('../../wallet/entity').Wallet} wallet
- * @property {string} token token name or address to transfer
- * @property {string=} destination destination address
- * @property {string} amount amount to be transferred
- * @property {string=} tokenId token id to be transferred only for EVMs (ethereum, bsc, celo, polygon, avax)
- * @property {HathorTokenOptions|CeloTokenOptions=} options
+ * @property {string} token token name or address to burn
+ * @property {string} amount amount to be burnt
+ * @property {string=} tokenId token id to be burnt only for EVMs (ethereum, bsc, celo, polygon, avax)
+ * @property {string=} meltAuthorityAddress melt authority address for hathor only
+ * @property {string=} feeCurrency fee currency (for celo only)
  */
 module.exports = {}

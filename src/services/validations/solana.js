@@ -57,8 +57,8 @@ module.exports.validateSolanaTransferTransaction = (
   if (!token || typeof token !== 'string') {
     throw new GenericException('Invalid token type, expected string.', 'InvalidTypeException')
   }
-  if (!amount || typeof amount !== 'string') {
-    throw new GenericException('Invalid amount type, expected string.', 'InvalidTypeException')
+  if (isNaN(amount) || Number(amount) < 0) {
+    throw new InvalidException('Invalid amount')
   }
 }
 
@@ -74,11 +74,11 @@ module.exports.validateSolanaDeployTransaction = (
   if (typeof fixedSupply !== 'boolean') {
     throw new GenericException('Invalid fixedSupply type, expected boolean.', 'InvalidTypeException')
   }
-  if (!amount || typeof amount !== 'string') {
-    throw new GenericException('Invalid amount type, expected string.', 'InvalidTypeException')
+  if (isNaN(amount) || Number(amount) < 0) {
+    throw new InvalidException('Invalid amount')
   }
-  if (!decimals || typeof decimals !== 'number') {
-    throw new GenericException('Invalid decimals type, expected string.', 'InvalidTypeException')
+  if (isNaN(decimals) || (Number(decimals) < 0 && Number(decimals) > 9)) {
+    throw new InvalidException('Invalid decimals, must be a number between 0 and 9')
   }
   if (network && typeof network !== 'string') {
     throw new GenericException('Invalid network type, expected string.', 'InvalidTypeException')

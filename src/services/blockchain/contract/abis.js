@@ -106,6 +106,22 @@ module.exports.ERC1155_MINT_METHOD_ABI = [
       { name: 'to', type: 'address' },
       { name: 'tokenId', type: 'uint256' },
       { name: 'amount', type: 'uint256' },
+      { name: 'data', type: 'bytes' },
+    ],
+    name: 'mint',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+]
+module.exports.ERC1155_MINT_WITH_URI_METHOD_ABI = [
+  {
+    constant: false,
+    inputs: [
+      { name: 'to', type: 'address' },
+      { name: 'tokenId', type: 'uint256' },
+      { name: 'amount', type: 'uint256' },
       { name: 'uri', type: 'string' },
       { name: 'data', type: 'bytes' },
     ],
