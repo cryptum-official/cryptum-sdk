@@ -1,4 +1,13 @@
-# Blockchain info
+# Blockchain queries
+
+Use the SDK to query blockchain information like balances, transactions, etc.
+
+```js
+const sdk = new CryptumSdk({
+  environment: 'testnet',
+  apiKey: 'YOUR-API-KEY'
+})
+```
 
 ## Wallet info
 
@@ -11,10 +20,6 @@ Get wallet address information from blockchain.
 * `opts.tokenAddresses` (array)(**optional**) - array of token addresses. Only for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `BSC` and `SOLANA`.
 
 ```js
-const sdk = new CryptumSdk({
-  environment: 'testnet',
-  apiKey: 'YOUR-API-KEY'
-})
 // For Hathor protocol
 const info = await sdk.wallet.getWalletInfo({ address: 'WgzYfVxZiL7bCN37Wj8myVY9HKZ5GCACsh', protocol: 'HATHOR' })
 // WalletInfo {
@@ -71,6 +76,20 @@ Get transaction info from blockchain using the transaction hash (transaction id)
 ```js
 const tx = await sdk.transaction.getTransactionByHash({ hash: '<hash>', protocol: 'STELLAR' })
 // Blockchain raw transaction returned
+```
+
+## Get transaction receipt by hash
+
+### `sdk.transaction.getTransactionReceiptByHash(opts)`
+
+Get transaction receipt using the transaction hash (transaction id). This method is supported only for EVMs (ETHEREUM, CELO, POLYGON, BSC, ...)
+
+* `opts.hash` (string)(**required**) - transaction hash.
+* `opts.protocol` (string)(**required**) - blockchain protocol.
+
+```js
+const tx = await sdk.transaction.getTransactionReceiptByHash({ hash: '<hash>', protocol: 'BSC' })
+// Blockchain transaction receipt returned
 ```
 
 ## Get UTXOs (Unspent transaction outputs)
