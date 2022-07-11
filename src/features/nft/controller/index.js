@@ -14,7 +14,7 @@ const {
   ERC1155_MINT_WITH_URI_METHOD_ABI,
   ERC1155_MINT_METHOD_ABI
 } = require('../../../services/blockchain/contract/abis')
-const { validateEvmTokenTransfer, validateEvmTokenMint, validateEvmTokenBurn } = require('../../../services/validations/evm')
+const { validateEvmTokenTransfer, validateEvmTokenMint, validateEvmTokenBurn, validateEvmTokenCreation } = require('../../../services/validations/evm')
 const { getContractControllerInstance } = require('../../contract/controller')
 const { ERC721_INTERFACE_ID } = require('../../../services/blockchain/contract/constants')
 const { TransactionType } = require('../../transaction/entity')
@@ -130,6 +130,7 @@ class Controller extends Interface {
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN: {
+        validateEvmTokenCreation(input)
         return await getContractControllerInstance(this.config).deployToken({
           wallet,
           protocol,
