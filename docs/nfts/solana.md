@@ -24,8 +24,8 @@ Create an NFT in Solana.
 - `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
 - `opts.name` (string)(**required**) - token name.
 - `opts.symbol` (string)(**required**) - token symbol.
-- `opts.amount` (string)(**required**) - token amount to be first minted.
-- `opts.maxSupply` (number)(**required**) - maximum supply for this token. (0 for unlimited; 1 for unique; 2 or more for multiple editions)
+- `opts.maxSupply` (number) - maximum supply for this token (0 for unlimited; 1 for unique; 2 or more for multiple editions). Required to create master edition and copies with limited supply.
+- `opts.amount` (string) - token amount to be first minted. Required only if maxSupply is 0 or undefined.
 - `opts.uri` (string)(**required**) - URI containing NFT metadata.
 - `opts.creators` (array of SolanaCreators)(**optional**) - list of creators.
 - `opts.royaltiesFee` (number)(**optional**) - royalties fee.
@@ -33,9 +33,10 @@ Create an NFT in Solana.
 
 This function returns the token address.
 
-Example:
+Examples:
 
 ```js
+// Creating NFT with master edition and max supply of 10 copies
 const { hash } = await sdk.nft.create({
   protocol: 'SOLANA',
   wallet,
@@ -43,7 +44,17 @@ const { hash } = await sdk.nft.create({
   symbol: 'NFT',
   amount: '1000',
   uri: 'https://....',
-  maxSupply: '1000',
+  maxSupply: '10',
+})
+// Creating NFT without master edition and no max supply
+const { hash } = await sdk.nft.create({
+  protocol: 'SOLANA',
+  wallet,
+  name: 'NFT',
+  symbol: 'NFT',
+  amount: '1000',
+  uri: 'https://....',
+  amount: '100000',
 })
 ```
 
@@ -57,7 +68,7 @@ Mint an additional amount of an existing token.
 - `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
 - `opts.token` (string)(**required**) - token address to be minted. If this token is a master edition, this is the address of the master edition token that will be used to create copies (editions).
 - `opts.destination` (string)(**required**) - destination address.
-- `opts.amount` (string)(**optional**) - amount to be minted if this token doesn't have a master edition, leave it undefined otherwise.
+- `opts.amount` (string) - amount to be minted. Required if this token doesn't have a master edition, leave it undefined otherwise.
 
 This function returns the hash of the transaction.
 
