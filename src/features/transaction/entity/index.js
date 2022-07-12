@@ -348,14 +348,12 @@ class SolanaNFTEditionInput {
    * Creates an instance of SolanaNFTEdition.
    *
    * @param {object} args
-   * @param {import('../../wallet/entity').Wallet} args.from
+   * @param {import('../../wallet/entity').Wallet} args.wallet
    * @param {string} args.masterEdition
-   * @param {string} args.network
    */
-  constructor({ from, masterEdition, network }) {
-    this.from = from
+  constructor({ wallet, masterEdition }) {
+    this.wallet = wallet
     this.masterEdition = masterEdition
-    this.network = network
   }
 }
 
@@ -547,6 +545,7 @@ class CardanoTransferTransactionInput extends TransferTransactionInput {
  * @property {string} name
  * @property {string} symbol
  * @property {string} uri
+ * @property {string} amount
  * @property {string} maxSupply
  * @property {SolanaCreator[]=} creators
  * @property {number=} royaltiesFee

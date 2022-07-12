@@ -1085,7 +1085,7 @@ class Controller extends Interface {
     const signedTx = await mintSolanaToken({
       from: wallet, token, to: destination, amount, latestBlock: blockhash, testnet: isTestnet(this.config.environment)
     })
-    return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_MINT })
   }
   /**
      * Create Solana token deploy transaction
@@ -1129,13 +1129,24 @@ class Controller extends Interface {
      */
   async createSolanaNFTTransaction(input) {
     validateSolanaNFTInput(input)
-    const { wallet, maxSupply, uri, name, symbol, creators, royaltiesFee, collection } = input
+    const { wallet, maxSupply, uri, name, symbol, amount, creators, royaltiesFee, collection } = input
     const protocol = Protocol.SOLANA
     const mintRent = (await this.getFee({ protocol, type: TransactionType.SOLANA_NFT_MINT })).mintRentExemption
     const { blockhash: recentBlockhash } = await this.getBlock({ block: 'latest', protocol })
 
     const response = await deploySolanaNFT({
-      from: wallet, maxSupply, uri, name, mintRent, recentBlockhash, symbol, creators, royaltiesFee, collection, testnet: isTestnet(this.config.environment)
+      from: wallet,
+      maxSupply,
+      amount,
+      uri,
+      name,
+      mintRent,
+      recentBlockhash,
+      symbol,
+      creators,
+      royaltiesFee,
+      collection,
+      testnet: isTestnet(this.config.environment)
     })
     return {
       mint: response.mint,

@@ -223,34 +223,33 @@ module.exports.deploySolanaCollection = async function ({ from, name, symbol, ur
 
 }
 
-module.exports.deploySolanaNFT = async function ({ from, maxSupply, uri, name, symbol, creators = null, royaltiesFee = 0, collection = null, testnet = true }) {
+module.exports.deploySolanaNFT = async function ({
+  from, maxSupply, uri, name, symbol, amount, creators = null, royaltiesFee = 0, collection = null, testnet = true
+}) {
   const network = testnet ? 'devnet' : 'mainnet-beta'
   const connection = new metaplex.Connection(solanaWeb3.clusterApiUrl(network))
   const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
-
   const nftMint = solanaWeb3.Keypair.generate()
   const mintRent = await connection.getMinimumBalanceForRentExemption(splToken.MintLayout.span)
-
   // Creates mint
   const createNftMintTx = new CreateMint({ feePayer: toPublicKey(wallet.publicKey) }, {
     newAccountPubkey: nftMint.publicKey,
     lamports: mintRent,
   })
-  const nftRecipient = await splToken.Token.getAssociatedTokenAddress(splToken.ASSOCIATED_TOKEN_PROGRAM_ID, splToken.TOKEN_PROGRAM_ID, nftMint.publicKey, toPublicKey(wallet.publicKey))
-
+  const nftRecipient = await splToken.Token.getAssociatedTokenAddress(
+    splToken.ASSOCIATED_TOKEN_PROGRAM_ID, splToken.TOKEN_PROGRAM_ID, nftMint.publicKey, toPublicKey(wallet.publicKey)
+  )
   // Create mint's recipient account
   const createAssociatedNftTokenAccountTx = new CreateAssociatedTokenAccount({ feePayer: toPublicKey(wallet.publicKey) }, {
     associatedTokenAddress: nftRecipient,
     splTokenMintAddress: nftMint.publicKey,
   })
-
   // Actually mints
   const mintNftToTx = new MintTo({ feePayer: toPublicKey(wallet.publicKey) }, {
     mint: nftMint.publicKey,
     dest: nftRecipient,
-    amount: 1,
+    amount: maxSupply === 1 ? 1 : amount,
   })
-
   let parsedCreators = []
   if (creators) {
     creators.forEach(creator => {
@@ -263,7 +262,6 @@ module.exports.deploySolanaNFT = async function ({ from, maxSupply, uri, name, s
       )
     })
   }
-
   // Creates metadata
   const nftMetadataPDA = await metaplex.programs.metadata.Metadata.getPDA(nftMint.publicKey)
   const createNftMetadataTx = new metaplex.programs.metadata.CreateMetadataV2({ feePayer: toPublicKey(wallet.publicKey) }, {
@@ -285,30 +283,29 @@ module.exports.deploySolanaNFT = async function ({ from, maxSupply, uri, name, s
     mintAuthority: toPublicKey(wallet.publicKey),
   })
 
-  const editionPDA = await metaplex.programs.metadata.MasterEdition.getPDA(nftMint.publicKey)
-
-  // Creates Master Edition info
-  const masterEditionTx = new metaplex.programs.metadata.CreateMasterEditionV3({ feePayer: toPublicKey(wallet.publicKey) }, {
-    edition: editionPDA,
-    metadata: nftMetadataPDA,
-    updateAuthority: toPublicKey(wallet.publicKey),
-    mint: nftMint.publicKey,
-    mintAuthority: toPublicKey(wallet.publicKey),
-    maxSupply: new BN(maxSupply),
-  })
-
-  let tx = metaplex.programs.core.Transaction.fromCombined([
+  const transactions = [
     createNftMintTx,
     createNftMetadataTx,
     createAssociatedNftTokenAccountTx,
-    mintNftToTx,
-    masterEditionTx
-  ], { feePayer: wallet.publicKey })
-  tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+    mintNftToTx
+  ]
+  if (maxSupply === 1) {
+    const editionPDA = await metaplex.programs.metadata.MasterEdition.getPDA(nftMint.publicKey)
+    // Creates Master Edition info
+    transactions.push(new metaplex.programs.metadata.CreateMasterEditionV3({ feePayer: toPublicKey(wallet.publicKey) }, {
+      edition: editionPDA,
+      metadata: nftMetadataPDA,
+      updateAuthority: toPublicKey(wallet.publicKey),
+      mint: nftMint.publicKey,
+      mintAuthority: toPublicKey(wallet.publicKey),
+      maxSupply: new BN(maxSupply),
+    }))
+  }
 
+  let tx = metaplex.programs.core.Transaction.fromCombined(transactions, { feePayer: wallet.publicKey })
+  tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
   tx.partialSign(nftMint)
   tx = await wallet.signTransaction(tx)
-
   // let txHash = await connection.sendRawTransaction(tx.serialize().toString(), { skipPreflight: false })
   return { rawTransaction: tx.serialize().toString('hex'), mint: nftMint.publicKey.toBase58(), metadata: nftMetadataPDA.toBase58() }
 }

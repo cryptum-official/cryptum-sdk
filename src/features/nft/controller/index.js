@@ -17,7 +17,7 @@ const {
 const { validateEvmTokenTransfer, validateEvmTokenMint, validateEvmTokenBurn, validateEvmTokenCreation } = require('../../../services/validations/evm')
 const { getContractControllerInstance } = require('../../contract/controller')
 const { ERC721_INTERFACE_ID } = require('../../../services/blockchain/contract/constants')
-const { TransactionType } = require('../../transaction/entity')
+const { TransactionType, TransactionResponse } = require('../../transaction/entity')
 
 class Controller extends Interface {
   /**
@@ -96,10 +96,10 @@ class Controller extends Interface {
    */
   async create(input) {
     const {
-      protocol, wallet, symbol, name, amount, uri, mintAuthorityAddress, meltAuthorityAddress, creators, royaltiesFee, collection, feeCurrency, type
+      protocol, wallet, symbol, name, amount, uri, mintAuthorityAddress, meltAuthorityAddress, creators, royaltiesFee, collection, maxSupply, feeCurrency, type
     } = input
     const tc = getTransactionControllerInstance(this.config)
-    let tx;
+    let tx, mint;
     switch (protocol) {
       case Protocol.HATHOR:
         tx = await tc.createHathorTokenTransactionFromWallet({
@@ -113,10 +113,11 @@ class Controller extends Interface {
           meltAuthorityAddress,
         })
         break
-      case Protocol.SOLANA:
-        ({ transaction: tx } = await tc.createSolanaNFTTransaction({
+      case Protocol.SOLANA: {
+        ({ transaction: tx, mint } = await tc.createSolanaNFTTransaction({
           wallet,
-          maxSupply: Number(amount),
+          maxSupply: Number(maxSupply),
+          amount: Number(amount),
           uri,
           name,
           symbol,
@@ -124,7 +125,9 @@ class Controller extends Interface {
           royaltiesFee,
           collection
         }))
-        break
+        await tc.sendTransaction(tx)
+        return new TransactionResponse({ hash: mint })
+      }
       case Protocol.ETHEREUM:
       case Protocol.CELO:
       case Protocol.BSC:
@@ -218,9 +221,14 @@ class Controller extends Interface {
           mintAuthorityAddress,
         })
         break
-      case Protocol.SOLANA:
-        tx = await tc.createSolanaNFTTransaction({ wallet, destination, token, amount })
+      case Protocol.SOLANA: {
+        if (amount !== undefined) { 
+          tx = await tc.createSolanaTokenMintTransaction({ wallet, destination, token, amount })
+        } else {
+          return await tc.createSolanaNFTEdition({ wallet, masterEdition: token })
+        }
         break
+      }
       case Protocol.ETHEREUM:
       case Protocol.CELO:
       case Protocol.BSC:
