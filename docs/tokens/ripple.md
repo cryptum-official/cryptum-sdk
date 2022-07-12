@@ -1,5 +1,6 @@
 # Tokens in Ripple
 
+- [Transfer tokens](#transfer-tokens)
 - [Establish trustline in Ripple](#establish-trustline-in-ripple)
 
 Instantiate Cryptum SDK first:
@@ -7,6 +8,34 @@ Instantiate Cryptum SDK first:
 const sdk = new CryptumSdk({
   environment: 'testnet',
   apiKey: 'YOUR-API-KEY'
+})
+```
+
+## Transfer tokens
+
+Transfer tokens in XRPL blockchain.
+
+#### `sdk.token.transfer(opts)`
+
+- `opts.protocol` (string)(**required**) - blockchain protocol must be `RIPPLE`.
+- `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
+- `opts.token` (string)(**required**) - token symbol to transfer or `XRP` if you're transferring the native token.
+- `opts.issuer` (string)(**optional**) - token issuer account. Required only if you're not transferring the native token.
+- `opts.amount` (string)(**required**) - token amount to be transferred.
+- `opts.destination` (string)(**required**) - destination address.
+- `opts.memo` (string)(**optional**) - memo string.
+
+This function returns the transaction hash.
+
+```js
+const { hash } = await sdk.token.transfer({
+  protocol: 'RIPPLE',
+  wallet,
+  token: 'FOO',
+  issuer: 'rPT1Sjq2YGr...jKu9dyfzbpAYe'
+  destination: 'rmpvgigZ4p...sbK8pyV45WtP',
+  amount: '7.5',
+  memo: ''
 })
 ```
 

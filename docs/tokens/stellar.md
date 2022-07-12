@@ -1,5 +1,6 @@
 # Tokens in Stellar
 
+- [Transfer tokens](#transfer-tokens)
 - [Establish trustline in Stellar](#establish-trustline-in-stellar)
 
 Instantiate Cryptum SDK first:
@@ -7,6 +8,34 @@ Instantiate Cryptum SDK first:
 const sdk = new CryptumSdk({
   environment: 'testnet',
   apiKey: 'YOUR-API-KEY'
+})
+```
+
+## Transfer tokens
+
+Transfer tokens in Stellar blockchain.
+
+#### `sdk.token.transfer(opts)`
+
+- `opts.protocol` (string)(**required**) - blockchain protocol must be `STELLAR`.
+- `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
+- `opts.token` (string)(**required**) - token symbol to transfer or `XLM` if you're transferring the native token.
+- `opts.issuer` (string)(**optional**) - token issuer account. Required only if you're not transferring the native token.
+- `opts.amount` (string)(**required**) - token amount to be transferred.
+- `opts.destination` (string)(**required**) - destination address.
+- `opts.memo` (string)(**optional**) - optional message to be attached with this transaction, otherwise leave it undefined. This memo must be a string up to 28-bytes long or a 32-byte hash.
+
+This function returns the transaction hash.
+
+```js
+const { hash } = await sdk.token.transfer({
+  protocol: 'STELLAR',
+  wallet,
+  token: 'FOO',
+  issuer: 'GRPT1SJQ2YGR...JKU9DYFZBPAYE'
+  destination: 'GARMPVGIGZ4P...SBK8PYV45WTP',
+  amount: '7.5',
+  memo: ''
 })
 ```
 

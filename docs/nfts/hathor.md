@@ -1,6 +1,7 @@
 # Hathor NFTs
 
 - [Create NFT](#create-nft)
+- [Transfer NFTs](#transfer-nfts)
 - [Mint NFTs](#mint-nfts)
 - [Melt NFTs](#melt-nfts)
 
@@ -44,6 +45,10 @@ const { hash } = await sdk.nft.create({
   meltAuthorityAddress: 'address...',
 })
 ```
+
+## Transfer NFTs
+
+Transfer NFTs in Hathor is the same as any other tokens. See how to transfer here in [token transfers](../tokens/hathor.md#transfer-tokens)
 
 ## Mint NFTs
 

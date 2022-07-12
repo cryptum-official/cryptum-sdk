@@ -1,12 +1,12 @@
 # Hathor Tokens
 
 - [Create token](#create-token)
+- [Transfer tokens](#transfer-token)
 - [Mint tokens](#mint-tokens)
 - [Melt tokens](#melt-tokens)
 - [Create token with UTXOs](#create-token-with-utxos)
 - [Mint tokens with UTXOs](#mint-tokens-with-utxos)
 - [Melt tokens with UTXOs](#melt-tokens-with-utxos)
-- [Send transaction to blockchain](#send-transaction-to-the-blockchain)
 
 Instantiate the Cryptum SDK first:
 
@@ -44,6 +44,30 @@ const { hash } = await sdk.token.create({
   amount: '1000000',
   mintAuthorityAddress: 'address...',
   meltAuthorityAddress: 'address...',
+})
+```
+
+## Transfer tokens
+
+Transfer tokens in Hathor blockchain.
+
+#### `sdk.token.transfer(opts)`
+
+- `opts.protocol` (string)(**required**) - blockchain protocol must be `HATHOR`.
+- `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
+- `opts.token` (string)(**required**) - token UID to transfer or `HTR` if you're transferring the native token HTR.
+- `opts.amount` (string)(**required**) - token amount to be transferred.
+- `opts.destination` (string)(**optional**) - destination address.
+
+This function returns the transaction hash.
+
+```js
+const { hash } = await sdk.token.transfer({
+  protocol: 'HATHOR',
+  wallet,
+  token: '00000957924c03a56e773a34...7d7a9f6aceb24efeff',
+  destination: 'WmpvgigZ4p...sbK8pyV45WtP',
+  amount: '0.1',
 })
 ```
 
@@ -153,7 +177,9 @@ const transaction = await sdk.transaction.createHathorTokenTransactionFromUTXO({
   mintAuthorityAddress: 'address-1',
   meltAuthorityAddress: 'address-2',
 })
+const { hash } = await sdk.transaction.sendTransaction(transaction)
 ```
+
 ## Mint tokens with UTXOs
 
 ### `sdk.transaction.createHathorTokenTransactionFromUTXO(opts)`
@@ -186,7 +212,9 @@ const transaction = await sdk.transaction.createHathorTokenTransactionFromUTXO({
   changeAddress: 'address-1',
   mintAuthorityAddress: 'address-1',
 })
+const { hash } = await sdk.transaction.sendTransaction(transaction)
 ```
+
 ## Melt tokens with UTXOs
 
 ### `sdk.transaction.createHathorTokenTransactionFromUTXO(opts)`
@@ -219,14 +247,5 @@ const transaction = await sdk.transaction.createHathorTokenTransactionFromUTXO({
   changeAddress: 'address-1',
   meltAuthorityAddress: 'address-1',
 })
-```
-
-## Send transaction to the blockchain
-
-Use this method to broadcast the transaction after creating it.
-
-```js
 const { hash } = await sdk.transaction.sendTransaction(transaction)
-// Log transaction hash
-console.log(hash)
 ```
