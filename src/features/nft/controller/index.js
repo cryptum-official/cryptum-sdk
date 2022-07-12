@@ -116,7 +116,7 @@ class Controller extends Interface {
       case Protocol.SOLANA: {
         ({ transaction: tx, mint } = await tc.createSolanaNFTTransaction({
           wallet,
-          maxSupply: Number(maxSupply),
+          maxSupply: maxSupply !== undefined ? Number(maxSupply) : 0,
           amount: Number(amount),
           uri,
           name,
@@ -222,7 +222,7 @@ class Controller extends Interface {
         })
         break
       case Protocol.SOLANA: {
-        if (amount !== undefined) { 
+        if (amount !== undefined || Number(amount) > 1) {
           tx = await tc.createSolanaTokenMintTransaction({ wallet, destination, token, amount })
         } else {
           return await tc.createSolanaNFTEdition({ wallet, masterEdition: token })

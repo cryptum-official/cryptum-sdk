@@ -248,7 +248,7 @@ module.exports.deploySolanaNFT = async function ({
   const mintNftToTx = new MintTo({ feePayer: toPublicKey(wallet.publicKey) }, {
     mint: nftMint.publicKey,
     dest: nftRecipient,
-    amount: maxSupply === 1 ? 1 : amount,
+    amount: maxSupply > 0 ? 1 : amount,
   })
   let parsedCreators = []
   if (creators) {
@@ -289,7 +289,7 @@ module.exports.deploySolanaNFT = async function ({
     createAssociatedNftTokenAccountTx,
     mintNftToTx
   ]
-  if (maxSupply === 1) {
+  if (maxSupply > 0) {
     const editionPDA = await metaplex.programs.metadata.MasterEdition.getPDA(nftMint.publicKey)
     // Creates Master Edition info
     transactions.push(new metaplex.programs.metadata.CreateMasterEditionV3({ feePayer: toPublicKey(wallet.publicKey) }, {

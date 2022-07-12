@@ -444,8 +444,6 @@ class BitcoinTransferTransactionInput extends TransferTransactionInput {
    * @param {import('../../wallet/entity').Wallet=} args.wallet wallet to transfer from
    * @param {Array<Input>=} args.inputs inputs to transfer from
    * @param {Array<Output>} args.outputs outputs to transfer to
-   * @param {Fee=} args.fee fee per byte in satoshi
-   * @param {boolean=} args.testnet
    */
   constructor({ outputs, inputs, ...args }) {
     super(args)
