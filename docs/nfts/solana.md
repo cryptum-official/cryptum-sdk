@@ -42,7 +42,6 @@ const { hash } = await sdk.nft.create({
   wallet,
   name: 'NFT',
   symbol: 'NFT',
-  amount: '1000',
   uri: 'https://....',
   maxSupply: '10',
 })
@@ -52,7 +51,6 @@ const { hash } = await sdk.nft.create({
   wallet,
   name: 'NFT',
   symbol: 'NFT',
-  amount: '1000',
   uri: 'https://....',
   amount: '100000',
 })
