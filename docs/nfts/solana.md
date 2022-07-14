@@ -3,7 +3,7 @@
 - [Create NFTs](#create-nfts)
 - [Mint NFTs](#mint-nfts)
 - [Burn NFTs](#burn-nfts)
-- [Update NFT Metadata](#update-solana-nft-metadata)
+- [Update NFT Metadata](#update-nft-metadata)
 
 Instantiate Cryptum SDK first:
 
