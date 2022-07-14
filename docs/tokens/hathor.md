@@ -3,10 +3,10 @@
 - [Create token](#create-token)
 - [Transfer tokens](#transfer-token)
 - [Mint tokens](#mint-tokens)
-- [Melt tokens](#melt-tokens)
+- [Burn tokens](#burn-tokens)
 - [Create token with UTXOs](#create-token-with-utxos)
 - [Mint tokens with UTXOs](#mint-tokens-with-utxos)
-- [Melt tokens with UTXOs](#melt-tokens-with-utxos)
+- [Burn tokens with UTXOs](#burn-tokens-with-utxos)
 
 Instantiate the Cryptum SDK first:
 
@@ -100,9 +100,9 @@ const { hash } = await sdk.token.mint({
 })
 ```
 
-## Melt tokens
+## Burn tokens
 
-Melt (burn) tokens in Hathor blockchain.
+Burn (melt) tokens in Hathor blockchain.
 
 ### `sdk.token.burn(opts)`
 
@@ -215,7 +215,7 @@ const transaction = await sdk.transaction.createHathorTokenTransactionFromUTXO({
 const { hash } = await sdk.transaction.sendTransaction(transaction)
 ```
 
-## Melt tokens with UTXOs
+## Burn tokens with UTXOs
 
 ### `sdk.transaction.createHathorTokenTransactionFromUTXO(opts)`
 
