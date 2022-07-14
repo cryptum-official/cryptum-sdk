@@ -81,7 +81,7 @@ Mint Hathor tokens.
 
 - `opts.protocol` (string)(**required**) - blockchain must be `HATHOR`.
 - `opts.wallet` (Wallet)(**required**) - wallet minting tokens.
-- `opts.tokenUid` (string)(**required**) - token identifier to be minted.
+- `opts.token` (string)(**required**) - token identifier to be minted.
 - `opts.amount` (string)(**required**) - token amount to be minted.
 - `opts.destination` (string)(**required**) - destination wallet address to receive the minted tokens.
 - `opts.mintAuthorityAddress` (string)(**optional**) - wallet address to be the mint authority. Required if you want to mint more tokens later.
@@ -108,7 +108,7 @@ Melt (burn) tokens in Hathor blockchain.
 
 - `opts.protocol` (string)(**required**) - blockchain must be `HATHOR`.
 - `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
-- `opts.tokenUid` (string)(**required**) - token identifier to be burnt.
+- `opts.token` (string)(**required**) - token identifier to be burnt.
 - `opts.amount` (string)(**required**) - token amount to be burnt.
 - `opts.meltAuthorityAddress` (string)(**optional**) - wallet address to be the melt authority. Required if you want to melt more tokens later.
 
