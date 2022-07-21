@@ -5,7 +5,7 @@ const assert = chai.assert
 const nock = require('nock')
 
 const { TransactionResponse, TransactionType } = require('../../src/features/transaction/entity')
-const TransactionController = require('../../src/features/transaction/controller')
+const { TransactionController } = require('../../src/features/transaction/controller')
 
 describe.only('Test Suite of the Transaction (Controller)', function () {
   this.beforeAll(() => {

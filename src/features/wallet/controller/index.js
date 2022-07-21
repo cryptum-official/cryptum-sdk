@@ -33,7 +33,8 @@ const {
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
 const { validateWalletInfo, validatePrivateKey, validateCardanoPrivateKey, validateWalletNft } = require('../../../services/validations')
-const InvalidException = require('../../../../errors/InvalidException')
+const InvalidException = require('../../../errors/InvalidException')
+const { isTestnet } = require('../../../services/utils')
 
 class Controller extends Interface {
   /**
@@ -49,7 +50,6 @@ class Controller extends Interface {
    *
    * @param {object} args
    * @param {Protocol} args.protocol blockchain protocol to generate the wallet for
-   * @param {boolean=} args.testnet true for testnet and false for mainnet
    * @param {string=} args.mnemonic mnemonic seed
    * @param {object=} args.derivation object with information to derive one wallet (BIP44 derivation path)
    * @param {number=} args.derivation.account account index to derive wallet
@@ -57,12 +57,12 @@ class Controller extends Interface {
    * @param {number=} args.derivation.address address index to derive wallet
    * @returns {Promise<Wallet>}
    */
-  async generateWallet({ protocol, mnemonic, testnet, derivation = { account: 0, change: 0 } }) {
+  async generateWallet({ protocol, mnemonic, derivation = { account: 0, change: 0 } }) {
     mnemonic = mnemonic ? mnemonic : this.generateRandomMnemonic()
     if (!validateMnemonic(mnemonic)) {
       throw new InvalidException('Invalid mnemonic')
     }
-    testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
 
     switch (protocol) {
       case Protocol.BITCOIN:
@@ -97,17 +97,15 @@ class Controller extends Interface {
    * @param {object} args
    * @param {string} args.privateKey private key string
    * @param {Protocol} args.protocol blockchain protocol
-   * @param {boolean=} args.testnet true for testnet and false for mainnet
    * @returns {Promise<Wallet>}
    */
-  async generateWalletFromPrivateKey({ privateKey, protocol, testnet }) {
+  async generateWalletFromPrivateKey({ privateKey, protocol }) {
     if (protocol === Protocol.CARDANO) {
       validateCardanoPrivateKey(privateKey)
     } else {
       validatePrivateKey(privateKey)
     }
-    testnet = testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
-    testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const walletData = { address: null, publicKey: null, privateKey, protocol, testnet }
     switch (protocol) {
       case Protocol.BITCOIN:
@@ -153,11 +151,10 @@ class Controller extends Interface {
    * @param {object} input
    * @param {string} input.xpub extended public key string
    * @param {Protocol} input.protocol blockchain protocol
-   * @param {boolean=} input.testnet testnet
    * @param {number=} input.address address index number to derive the wallet address from
    */
-  async generateWalletAddressFromXpub({ xpub, protocol, testnet, address }) {
-    testnet = testnet !== undefined ? testnet : this.config.environment === 'development'
+  async generateWalletAddressFromXpub({ xpub, protocol, address }) {
+    const testnet = isTestnet(this.config.environment)
     let walletAddress
     switch (protocol) {
       case Protocol.BITCOIN:

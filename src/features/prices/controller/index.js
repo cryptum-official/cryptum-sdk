@@ -4,7 +4,7 @@ const Prices = require('../entity')
 const requests = require('./requests.json');
 const {
   InvalidTypeException,
-} = require('../../../../errors')
+} = require('../../../errors')
 
 class Controller extends Interface {
   /**

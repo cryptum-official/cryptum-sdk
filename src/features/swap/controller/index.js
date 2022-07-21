@@ -1,7 +1,7 @@
 const { getApiMethod, mountHeaders, handleRequestError } = require('../../../services')
 const Interface = require('./interface')
 const requests = require('./requests.json')
-const { InvalidTypeException } = require('../../../../errors')
+const { InvalidTypeException } = require('../../../errors')
 
 class Controller extends Interface {
   /**

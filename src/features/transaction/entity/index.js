@@ -52,12 +52,13 @@ class TransactionResponse {
   }
 }
 class FeeResponse {
-  constructor({ estimateValue, currency, gas, gasPrice, chainId }) {
+  constructor({ estimateValue, currency, gas, gasPrice, chainId, ...rest }) {
     this.estimateValue = estimateValue
     this.currency = currency
     this.gas = gas
     this.gasPrice = gasPrice
     this.chainId = chainId
+    Object.assign(this, rest)
   }
 }
 class SmartContractCallResponse {
@@ -96,6 +97,18 @@ class Output {
     this.address = output.address
     this.amount = output.amount
     this.token = output.token
+  }
+}
+class CardanoOutput extends Output {
+  /**
+   *
+   * @param {object} output
+   * @param {string} output.address
+   * @param {string} output.amount
+   * @param {{ policy:string; asset:string; amount:string }=} output.token
+   */
+   constructor(output) {
+    super(output)
   }
 }
 class TrustlineTransactionInput {
@@ -335,14 +348,12 @@ class SolanaNFTEditionInput {
    * Creates an instance of SolanaNFTEdition.
    *
    * @param {object} args
-   * @param {import('../../wallet/entity').Wallet} args.from
+   * @param {import('../../wallet/entity').Wallet} args.wallet
    * @param {string} args.masterEdition
-   * @param {string} args.network
    */
-  constructor({ from, masterEdition, network }) {
-    this.from = from
+  constructor({ wallet, masterEdition }) {
+    this.wallet = wallet
     this.masterEdition = masterEdition
-    this.network = network
   }
 }
 
@@ -431,10 +442,8 @@ class BitcoinTransferTransactionInput extends TransferTransactionInput {
    *
    * @param {object} args
    * @param {import('../../wallet/entity').Wallet=} args.wallet wallet to transfer from
-   * @param {Array<Input>==} args.inputs inputs to transfer from
+   * @param {Array<Input>=} args.inputs inputs to transfer from
    * @param {Array<Output>} args.outputs outputs to transfer to
-   * @param {Fee=} args.fee fee per byte in satoshi
-   * @param {boolean=} args.testnet
    */
   constructor({ outputs, inputs, ...args }) {
     super(args)
@@ -448,9 +457,8 @@ class HathorTransferTransactionInput extends TransferTransactionInput {
    *
    * @param {object} args
    * @param {import('../../wallet/entity').Wallet=} args.wallet wallet to transfer from
-   * @param {Array<Input>==} args.inputs inputs to transfer from
+   * @param {Array<Input>=} args.inputs inputs to transfer from
    * @param {Array<Output>} args.outputs outputs to transfer to
-   * @param {Array<Output>} args.tokens outputs to transfer to
    * @param {boolean=} args.testnet
    */
   constructor({ outputs, inputs, ...args }) {
@@ -465,10 +473,8 @@ class CardanoTransferTransactionInput extends TransferTransactionInput {
    *
    * @param {object} args
    * @param {import('../../wallet/entity').Wallet=} args.wallet wallet to transfer from
-   * @param {Array<Input>==} args.inputs inputs to transfer from
-   * @param {Array<Output>} args.outputs outputs to transfer to
-   * @param {Array<Output>} args.tokens outputs to transfer to
-   * @param {boolean=} args.testnet
+   * @param {Array<Input>=} args.inputs inputs to transfer from
+   * @param {Array<CardanoOutput>} args.outputs outputs to transfer to
    */
   constructor({ outputs, inputs, ...args }) {
     super(args)
@@ -490,8 +496,7 @@ class CardanoTransferTransactionInput extends TransferTransactionInput {
  * @property {string=} meltAuthorityAddress melt authority address
  * @property {string=} nftData NFT data (URI, serial number, etc) if creating a NFT
  * @property {boolean=} testnet
- */
-/**
+
  * @typedef {Object} HathorTokenTransactionFromUTXOInput
  * @property {TransactionType} type token transaction type
  * @property {Input[]} inputs UTXOs to create the token with
@@ -503,6 +508,46 @@ class CardanoTransferTransactionInput extends TransferTransactionInput {
  * @property {string=} mintAuthorityAddress mint authority address
  * @property {string=} meltAuthorityAddress melt authority address
  * @property {boolean=} testnet
+
+ * @typedef {Object} SolanaTransferTransactionInput
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} destination
+ * @property {string} token
+ * @property {string|number} amount
+ * @property {boolean=} isNFT
+ * 
+ * @typedef {Object} SolanaTokenBurnTransactionInput
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} token
+ * @property {string|number} amount
+ * 
+ * @typedef {Object} SolanaTokenMintTransactionInput
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} destination
+ * @property {string} token
+ * @property {string|number} amount
+ * 
+ * @typedef {Object} SolanaNFTCollectionTransactionInput
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} name
+ * @property {string} symbol
+ * @property {string} uri
+ * 
+ * @typedef {Object} SolanaCreator
+ * @property {string} address
+ * @property {number} share
+ * @property {boolean} verified
+ * 
+ * @typedef {Object} SolanaNFTTransactionInput
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} name
+ * @property {string} symbol
+ * @property {string} uri
+ * @property {string} amount
+ * @property {string} maxSupply
+ * @property {SolanaCreator[]=} creators
+ * @property {number=} royaltiesFee
+ * @property {string=} collection
  */
 
 module.exports = {
@@ -513,6 +558,7 @@ module.exports = {
   UTXO,
   Input,
   Output,
+  CardanoOutput,
   StellarTrustlineTransactionInput,
   RippleTrustlineTransactionInput,
   EthereumTransferTransactionInput,

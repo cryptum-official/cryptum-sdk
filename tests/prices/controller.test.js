@@ -1,8 +1,8 @@
 const { assert } = require('chai')
 const faker = require('faker')
 const nock = require('nock')
-const AxiosApi = require('../../axios')
-const { InvalidTypeException, GenericException } = require('../../errors')
+const AxiosApi = require('../../src/axios')
+const { InvalidTypeException, GenericException } = require('../../src/errors')
 const PricesController = require('../../src/features/prices/controller')
 const { pricesMock } = require('./mocks')
 

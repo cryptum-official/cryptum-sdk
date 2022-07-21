@@ -2,7 +2,7 @@ const bitcoreLib = require('bitcore-lib')
 const hathorLib = require('@hathor/wallet-lib')
 const mineTransaction = require('@hathor/wallet-lib/lib/wallet/mineTransaction')
 const { toHTRUnit } = require('./utils')
-const { HathorException } = require('../../../errors')
+const { HathorException } = require('../../errors')
 const { default: BigNumber } = require('bignumber.js')
 const { TransactionType } = require('../../features/transaction/entity')
 

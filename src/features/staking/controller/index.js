@@ -3,7 +3,7 @@ const Interface = require('./interface');
 
 class StakingController extends Interface {
 
-	celo() {
+	get celo() {
 		return new CeloStakingController(this.config)
 	}
 }

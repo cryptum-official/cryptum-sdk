@@ -1,7 +1,7 @@
 const assert = require('assert')
 const nock = require('nock')
 
-const { NotCanMountException, NotImplementedException, InvalidTypeException } = require('../../errors')
+const { NotCanMountException, NotImplementedException, InvalidTypeException } = require('../../src/errors')
 const { getApiMethod, mountHeaders, handleRequestError, isValidProtocol } = require('../../src/services')
 
 describe.only('Test Suite of the Services (All project)', function () {

@@ -1,6 +1,6 @@
 const { default: BigNumber } = require('bignumber.js')
 const bitcoin = require('bitcoinjs-lib')
-const { GenericException } = require('../../../errors')
+const { GenericException } = require('../../errors')
 const { toSatoshi } = require('./utils')
 
 /**
@@ -23,7 +23,7 @@ module.exports.buildBitcoinTransferTransaction = async function ({ wallet, input
   const tx = new bitcoin.Psbt({ network })
   tx.setMaximumFeeRate(new BigNumber(feePerByte).toNumber())
   let availableSatoshi = new BigNumber(0)
-  let calcFee = new BigNumber(0)
+  let calcFee = new BigNumber(0), transactionSize = 0
   for (let i = 0; i < inputs.length; ++i) {
     const utxo = inputs[i]
     if (!utxo.blockhash) {
@@ -34,7 +34,7 @@ module.exports.buildBitcoinTransferTransaction = async function ({ wallet, input
       index: utxo.index,
       nonWitnessUtxo: Buffer.from(utxo.hex, 'hex'),
     })
-    const transactionSize = calculateTransactionSize(tx.inputCount, outputs.length)
+    transactionSize = calculateTransactionSize(tx.inputCount, outputs.length)
     calcFee = new BigNumber(feePerByte).times(transactionSize)
     if (wallet) {
       availableSatoshi = availableSatoshi.plus(utxo.value)
@@ -43,7 +43,13 @@ module.exports.buildBitcoinTransferTransaction = async function ({ wallet, input
       }
     }
   }
+
   tx.addOutputs(outputDatas)
+  if (!availableSatoshi.isEqualTo(outputSum) && wallet !== undefined) {
+    const fee = transactionSize + 100
+    const changeValue = availableSatoshi.minus(outputSum).minus(fee).toNumber()
+    tx.addOutput({ address: wallet.address, value: changeValue })
+  }
   for (let i = 0; i < inputs.length; ++i) {
     tx.signInput(i, bitcoin.ECPair.fromPrivateKey(Buffer.from(inputs[i].privateKey, 'hex'), { network }))
     if (!tx.validateSignaturesOfInput(i)) {
