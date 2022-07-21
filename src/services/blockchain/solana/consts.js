@@ -14,13 +14,16 @@ class AmountRange {
   }
 }
 class ParticipationStateV2 {
-
   constructor(args) {
+    this.collectedToAcceptPayment = new BN(0);
     Object.assign(this, args);
   }
 }
 class ParticipationConfigV2 {
   constructor(args) {
+    this.winnerConstraint = 0;
+    this.nonWinningConstraint = 1;
+    this.fixedPrice = new BN(0)
     Object.assign(this, args);
   }
 }
@@ -33,6 +36,7 @@ class SafetyDepositConfig {
 
 class ValidateSafetyDepositBoxV2Args {
   constructor(safetyDeposit) {
+    this.instruction = 18;
     this.safetyDepositConfig = safetyDeposit;
   }
 }
