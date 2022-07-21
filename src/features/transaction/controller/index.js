@@ -598,7 +598,7 @@ class Controller extends Interface {
    */
   async createBitcoinTransferTransaction(input) {
     validateBitcoinTransferTransactionParams(input)
-    let { wallet, inputs, outputs, fee } = input
+    let { wallet, inputs, outputs } = input
     const protocol = Protocol.BITCOIN
     if (wallet) {
       const utxos = await this.getUTXOs({ address: wallet.address, protocol })
@@ -617,14 +617,11 @@ class Controller extends Interface {
         inputs[i].blockhash = tx.blockhash
       }
     }
-    let networkFee = fee
-    if (!networkFee) {
-      ({ estimateValue: networkFee } = await this.getFee({
-        type: TransactionType.TRANSFER,
-        protocol,
-      }))
-    }
 
+    const { estimateValue: networkFee } = await this.getFee({
+      type: TransactionType.TRANSFER,
+      protocol,
+    })
     const signedTx = await buildBitcoinTransferTransaction({
       wallet,
       inputs,

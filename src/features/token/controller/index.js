@@ -93,7 +93,7 @@ class Controller extends Interface {
         tx = await tc.createAvaxCChainTransferTransaction({ wallet, tokenSymbol: token, contractAddress: token, destination, amount })
         break
       case Protocol.BITCOIN:
-        tx = await tc.createBitcoinTransferTransaction({ wallet, outputs: destinations })
+        tx = await tc.createBitcoinTransferTransaction({ wallet, outputs: destination ? [{ address: destination, amount }] : destinations })
         break
       case Protocol.CARDANO:
         tx = await tc.createCardanoTransferTransactionFromWallet({ wallet, outputs: destinations })
