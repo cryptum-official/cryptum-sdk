@@ -14,7 +14,12 @@ const {
   ERC1155_MINT_WITH_URI_METHOD_ABI,
   ERC1155_MINT_METHOD_ABI
 } = require('../../../services/blockchain/contract/abis')
-const { validateEvmTokenTransfer, validateEvmTokenMint, validateEvmTokenBurn, validateEvmTokenCreation } = require('../../../services/validations/evm')
+const {
+  validateEvmNftTransfer,
+  validateEvmTokenCreation,
+  validateEvmNftMint,
+  validateEvmNftBurn
+} = require('../../../services/validations/evm')
 const { getContractControllerInstance } = require('../../contract/controller')
 const { ERC721_INTERFACE_ID } = require('../../../services/blockchain/contract/constants')
 const { TransactionType, TransactionResponse } = require('../../transaction/entity')
@@ -173,7 +178,7 @@ class Controller extends Interface {
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN: {
-        validateEvmTokenTransfer(input)
+        validateEvmNftTransfer(input)
         const cc = getContractControllerInstance(this.config)
         let params, contractAbi
         if (await cc.supportsInterfaceId({ protocol, contractAddress: token, interfaceId: ERC721_INTERFACE_ID })) {
@@ -234,7 +239,7 @@ class Controller extends Interface {
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN: {
-        validateEvmTokenMint(input)
+        validateEvmNftMint(input)
         const cc = getContractControllerInstance(this.config)
         let params, contractAbi, _tokenId
         _tokenId = tokenId !== undefined ? tokenId : Math.round(Math.random() * Number.MAX_SAFE_INTEGER)
@@ -292,7 +297,7 @@ class Controller extends Interface {
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN: {
-        validateEvmTokenBurn(input)
+        validateEvmNftBurn(input)
         const cc = getContractControllerInstance(this.config)
         let params, contractAbi
         if (await cc.supportsInterfaceId({ protocol, contractAddress: token, interfaceId: ERC721_INTERFACE_ID })) {
