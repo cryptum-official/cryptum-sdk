@@ -1,118 +1,86 @@
 # Solana Tokens
 
-- [Create Solana tokens](#create-solana-tokens)
-- [Mint Solana tokens](#mint-solana-tokens)
-- [Burn Solana tokens](#burn-solana-tokens)
-- [Update Solana NFT Metadata](#update-solana-nft-metadata)
+- [Create tokens](#create-tokens)
+- [Mint tokens](#mint-tokens)
+- [Burn tokens](#burn-tokens)
 
-Use the transaction controller to create transactions:
+Instantiate Cryptum SDK first:
 
 ```js
-const txController = sdk.getTransactionController()
+const sdk = new CryptumSdk({
+  environment: 'testnet',
+  apiKey: 'YOUR-API-KEY',
+})
 ```
 
-## Create Solana tokens
+## Create tokens
+
 Solana tokens follow the SPL Token standard alongside the Metaplex NFT protocol.
 
-### Fungible Tokens
+### `sdk.token.create(opts)`
 
-#### `txController.createSolanaTokenDeployTransaction(opts)`
+- `opts.protocol` (string)(**required**) - blockchain protocol must be `SOLANA`.
 - `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
-- `opts.destination` (string)(**required**) - wallet address to receive the newly minted tokens.
+- `opts.name` (string)(**required**) - token name.
+- `opts.symbol` (string)(**required**) - token symbol.
 - `opts.amount` (string)(**required**) - token amount to be first minted.
 - `opts.fixedSupply` (boolean)(**required**) - whether future minting will be restricted or not.
 - `opts.decimals` (number)(**required**) - amount of decimal units for this token.
 
+This function returns hash of the token created.
+
 ```js
-const transaction = await txController.createSolanaTokenDeployTransaction({
-    wallet,
-    destination: wallet.address,
-    fixedSupply: false,
-    decimals: 2,
-    amount: '30'
+const { hash } = await sdk.token.create({
+  protocol: 'SOLANA',
+  wallet,
+  symbol: 'TEST',
+  name: 'TEST',
+  amount: '1000000',
+  fixedSupply: false,
+  decimals: 9,
 })
 ```
-### Non Fungible Tokens
 
-#### `txController.createSolanaNFT(opts)`
-- `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
-- `opts.maxSupply` (number)(**required**) - maximum supply for this token. (0 for unlimited; 1 for unique; 2 or more for multiple editions)
-- `opts.uri` (string)(**required**) - uri containing NFT metadata.
-
-```js
-const transaction = await txController.createSolanaNFT({
-    wallet,
-    maxSupply: 1,
-    uri: 'https://gateway.pinata.cloud/ipfs/abcd....xyz'
-  })
-```
-## Mint Solana tokens
+## Mint tokens
 
 Mint an additional amount of an existing token.
 
-### Fungible Tokens
+#### `sdk.token.mint(opts)`
 
-#### `txController.createSolanaTokenMintTransaction(opts)`
+- `opts.protocol` (string)(**required**) - blockchain protocol must be `SOLANA`.
 - `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
-- `opts.destination` (string)(**required**) - wallet address to receive the newly minted tokens.
 - `opts.token` (string)(**required**) - address of the token that will be minted.
-- `opts.amount` (string)(**required**) - token amount to be minted (no decimals).
+- `opts.amount` (string)(**required**) - token amount to be minted.
+- `opts.destination` (string)(**required**) - destination address.
+
+This function returns the hash of the minting transaction.
 
 ```js
-const transaction = await txController.createSolanaTokenMintTransaction({
-    wallet,
-    destination: wallet.address,
-    token: 'EzqZ5...nCNd',
-    amount: '10000'
-  })
+const { hash } = await sdk.token.mint({
+  wallet,
+  protocol: 'SOLANA',
+  token,
+  amount: '20.42',
+  destination: 'DohbPo7UFV6phQ9DJF...psM2uwLQxEj94hmj2ohr',
+})
 ```
-### Non Fungible Tokens
 
-#### `txController.createSolanaNFTEdition(opts)`
-- `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
-- `opts.masterEdition` (string)(**required**) - address of the master edition token that will be used to create copies (editions).
+## Burn tokens
 
-```js
-const transaction = await txController.createSolanaNFTEdition({
-    wallet,
-    masterEdition: 'B7k8G...U62XD'
-  })
-```
-## Burn Solana tokens
+#### `sdk.token.burn(opts)`
 
-This method works for both SPL tokens and NFT's.
-#### `txController.createSolanaTokenBurnTransaction(opts)`
+- `opts.protocol` (string)(**required**) - blockchain protocol must be `SOLANA`.
 - `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
 - `opts.token` (string)(**required**) - address of the token that will be burned.
-- `opts.amount` (string)(**required**) - token amount to be burned (no decimals).
+- `opts.amount` (string)(**required**) - token amount to be burned.
+
+This function returns the hash of the burning transaction.
 
 ```js
-const transaction = await txController.createSolanaTokenBurnTransaction({
-    wallet,
-    token: 'EzqZ...qnCNd',
-    amount: '100'
-  })
-```
-## Update Solana NFT Metadata
-
-#### `txController.createSolanaTokenBurnTransaction(opts)`
-- `opts.wallet` (Wallet)(**required**) - wallet to sign the transaction with.
-- `opts.token` (string)(**required**) - address of the token that will be updated.
-- `opts.uri` (string)(**required**) - uri containing the updated NFT metadata.
-  
-```js
-const transaction = await txController.updateSolanaNFTMetadata({
-    wallet,
-    token: '5N6t...3knE9',
-    uri: 'https://gateway.pinata.cloud/ipfs/zyx...dcba'
-  })
-```
-## Send transactions to the blockchain
-
-After creating a transaction, use this method to broadcast the transaction.
-
-```js
-const { hash } = await txController.sendTransaction(transaction)
-// Log transaction hash
-console.log(hash)
+const { hash } = await sdk.token.burn({
+  protocol: 'SOLANA',
+  wallet,
+  token: 'EzqZ...qnCNd',
+  amount: '100.34',
+})
 ```

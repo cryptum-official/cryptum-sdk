@@ -14,16 +14,22 @@
   - [Installation](#installation)
   - [How To's](#how-tos)
     - [Configuration](#configuration)
+    - [Blockchain queries](docs/queries.md)
     - [Wallets](docs/wallets.md)
-    - [Transfers](docs/transfers.md)
-    - [Trustlines](docs/trustlines.md)
-    - Tokens and Smart contracts
-      - [Ethereum and other EVMs](docs/tokens/evm.md)
+    - Tokens (ERC20)
+      - [Ethereum and other EVMs](docs/tokens/EVMs.md)
       - [Solana](docs/tokens/solana.md)
       - [Hathor](docs/tokens/hathor.md)
+      - [Stellar](docs/tokens/stellar.md)
+      - [Ripple](docs/tokens/ripple.md)
+      - [Bitcoin](docs/tokens/bitcoin.md)
+      - [Cardano](docs/tokens/cardano.md)
+    - NFTs
+      - [Ethereum and other EVMs](docs/nfts/EVMs.md)
+      - [Solana](docs/nfts/solana.md)
+      - [Hathor](docs/nfts/hathor.md)
     - [Prices](docs/prices.md)
     - [Swap tokens](docs/swap.md)
-    - [Blockchain info](docs/data.md)
     - [Webhooks](docs/webhooks.md)
     - [Staking](docs/staking/index.md)
 - [Contributing](#contributing)
@@ -70,17 +76,10 @@ To configure cryptum-sdk you need only to provide a config in format JSON.
 const CryptumSDK = require('cryptum-sdk')
 
 const sdk = new CryptumSDK({
-  enviroment: 'development',
+  enviroment: 'development', // 'testnet' or 'development', 'mainnet' or 'production'
   apiKey: 'my-secret-api-key',
 })
 ```
-
-<br>
-
-| Environments available       |
-| ---------------------------- |
-| development _(uses testnet)_ |
-| production _(uses mainnet)_  |
 
 <br>
 

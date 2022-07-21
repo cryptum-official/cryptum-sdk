@@ -10,7 +10,10 @@
 First create an instance of swap controller to call all methods below.
 
 ```js
-const swapController = sdk.getSwapController()
+const sdk = new CryptumSdk({
+  environment: 'testnet',
+  apiKey: 'YOUR-API-KEY'
+})
 ```
 
 ## Get supported currencies
@@ -20,7 +23,7 @@ Examples:
 
 ```js
 
-swapController.getSupportedCurrencies().then((curencies) => {
+sdk.swap.getSupportedCurrencies().then((curencies) => {
    console.log(curencies);
 })
 ```
@@ -28,7 +31,7 @@ swapController.getSupportedCurrencies().then((curencies) => {
 ## Get minimum amount
 Get the minimum amount to swap.
 
-### `swapController.getMinimumAmount(opts)`
+### `sdk.swap.getMinimumAmount(opts)`
 Params:
 * `opts.currencyFrom` (string) (__required__) criptocurrency to swap from.
 * `opts.currencyTo` (string) (__required__) criptocurrency to swap to.
@@ -36,7 +39,7 @@ Params:
 Examples:
 
 ```js
-swapController.getMinimumAmount({
+sdk.swap.getMinimumAmount({
    currencyFrom: "DASH",
    currencyTo: "BTC"
 }).then((minimumAmount) => {
@@ -47,7 +50,7 @@ swapController.getMinimumAmount({
 ## Get estimate amount
 Get estimate amount to receive from the swap.
 
-### `swapController.getEstimateAmount(opts)`
+### `sdk.swap.getEstimateAmount(opts)`
 Params:
 * `opts.currencyFrom` (string) (__required__) criptocurrency to swap from.
 * `opts.currencyTo` (string) (__required__) criptocurrency to swap to.
@@ -56,7 +59,7 @@ Params:
 Examples:
 
 ```js
-swapController.getEstimateAmount({
+sdk.swap.getEstimateAmount({
   currencyFrom: "BTC",
   currencyTo: "ETH",
   amount: "0.06"
@@ -67,13 +70,13 @@ swapController.getEstimateAmount({
 ## Get order
 Get the swap order by its id.
 
-### `swapController.getOrder(id)`
+### `sdk.swap.getOrder(id)`
 Params:
 * `id` (string) (__required__) swap order id.
 
 Example:
 ```js
-swapController.getOrder('41c62023-ec12-4d5c-8ea3-b1b93a4d63ac').then((order) => {
+sdk.swap.getOrder('41c62023-ec12-4d5c-8ea3-b1b93a4d63ac').then((order) => {
   console.log(order);
 })
 ```
@@ -81,7 +84,7 @@ swapController.getOrder('41c62023-ec12-4d5c-8ea3-b1b93a4d63ac').then((order) => 
 ## Create order
 Create new swap order.
 
-### `swapController.createOrder(opts)`
+### `sdk.swap.createOrder(opts)`
 Params:
 * `opts.currencyFrom` (string) (__required__) currency to swap from
 * `opts.currencyTo` (string) (__required__) currency to swap to
@@ -93,7 +96,7 @@ Params:
 
 Example:
 ```js
-swapController.createOrder({
+sdk.swap.createOrder({
   currencyFrom: "SOL",
   currencyTo: "ETH",
   amountFrom: "5.81",
@@ -109,14 +112,14 @@ swapController.createOrder({
 ## Get orders
 Get all swap orders.
 
-### `swapController.getOrders(opts)`
+### `sdk.swap.getOrders(opts)`
 Params:
 * `opts.limit` (number) (__required__)
 * `opts.offset` (number) (__required__)
 
 Example
 ```js
-swapController.getOrders({
+sdk.swap.getOrders({
    limit: 10,
    offset: 1
 }).then((orders) => {

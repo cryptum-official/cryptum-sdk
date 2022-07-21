@@ -196,7 +196,7 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async mint(input) {
-    const { protocol, token, wallet, destination, amount, mintAuthorityAddress, changeAddress, feeCurrency } = input
+    const { protocol, token, wallet, destination, amount, mintAuthorityAddress, feeCurrency } = input
     const tc = getTransactionControllerInstance(this.config)
     let tx;
     switch (protocol) {
@@ -207,7 +207,7 @@ class Controller extends Interface {
           tokenUid: token,
           amount,
           address: destination,
-          changeAddress,
+          changeAddress: wallet.address,
           mintAuthorityAddress
         })
         break
@@ -244,7 +244,7 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async burn(input) {
-    const { protocol, token, wallet, destination, amount, changeAddress, meltAuthorityAddress, feeCurrency } = input
+    const { protocol, token, wallet, amount, meltAuthorityAddress, feeCurrency } = input
     const tc = getTransactionControllerInstance(this.config)
     let tx;
     switch (protocol) {
@@ -254,14 +254,16 @@ class Controller extends Interface {
           wallet,
           tokenUid: token,
           amount,
-          address: destination,
-          changeAddress,
+          address: wallet.address,
+          changeAddress: wallet.address,
           meltAuthorityAddress,
         })
         break
       case Protocol.SOLANA: {
         const { decimals } = await this.getInfo({ protocol, tokenAddress: token })
-        tx = await tc.createSolanaTokenBurnTransaction({ wallet, destination, token, amount: toLamports(amount, decimals).toString() })
+        tx = await tc.createSolanaTokenBurnTransaction({
+          wallet, destination: wallet.address, token, amount: toLamports(amount, decimals).toString()
+        })
         break
       }
       case Protocol.ETHEREUM:

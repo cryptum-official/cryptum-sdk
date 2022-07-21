@@ -58,7 +58,6 @@
  * @property {string} token token name or address to transfer
  * @property {string=} destination destination address
  * @property {string} amount amount to be transferred
- * @property {string=} changeAddress change address (for hathor only)
  * @property {string=} mintAuthorityAddress address responsible to mint more tokens (for hathor only)
  * @property {string=} feeCurrency fee currency (for celo only)
  */
@@ -67,7 +66,6 @@
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
  * @property {import('../../wallet/entity').Wallet} wallet
  * @property {string} token token name or address to transfer
- * @property {string=} destination destination address
  * @property {string} amount amount to be transferred
  * @property {string=} meltAuthorityAddress address responsible to burn more tokens (for hathor only)
  * @property {string=} feeCurrency fee currency (for celo only)

@@ -1,22 +1,24 @@
 # Wallets
 
-You should instantiate a Wallet controller in order to manage wallets.
 ```js
-const walletController = sdk.getWalletController()
+const sdk = new CryptumSdk({
+  environment: 'testnet',
+  apiKey: 'YOUR-API-KEY'
+})
 ```
 
-#### `walletController.generateRandomMnemonic(strength)`
+#### `sdk.wallet.generateRandomMnemonic(strength)`
 
 Generate random mnemonic (words) to generate wallets.
 * `strength` (number)(__optional__) - strength number.
 
 ```js
-const mnemonic = walletController.generateRandomMnemonic()
+const mnemonic = sdk.wallet.generateRandomMnemonic()
 console.log(mnemonic)
 // "window license ordinary apple toilet wrestle disease sudden until armor wealth room..."
 ```
 
-#### `walletController.generateWallet(opts)`
+#### `sdk.wallet.generateWallet(opts)`
 
 Generate a wallet for a blockchain protocol:
 * `opts.protocol` (string) (__required__) - blockchain protocol supported: `BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `STELLAR`, `RIPPLE`, `HATHOR`, `CARDANO`, `AVAXCCHAIN`, `SOLANA`.
@@ -29,10 +31,10 @@ Generate a wallet for a blockchain protocol:
 Example:
 ```js
 // generate random wallet for blockchain protocol
-const wallet = await walletController.generateWallet({ protocol: 'STELLAR' })
+const wallet = await sdk.wallet.generateWallet({ protocol: 'STELLAR' })
 
 // or using an existing mnemonic
-const wallet = await walletController.generateWallet({
+const wallet = await sdk.wallet.generateWallet({
   protocol: 'ETHEREUM',
   mnemonic: '<words>...',
   derivation: { account: 10, address: 2 }
@@ -46,7 +48,7 @@ console.log(wallet)
 // }
 ```
 
-#### `walletController.generateWalletFromPrivateKey(opts)`
+#### `sdk.wallet.generateWalletFromPrivateKey(opts)`
 
 Generate a wallet for a blockchain protocol:
 * `opts.protocol` (string) (__required__) - blockchain protocol supported: `BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `STELLAR`, `RIPPLE`, `HATHOR`, `CARDANO`, `AVAXCCHAIN`,`SOLANA`.
@@ -59,22 +61,22 @@ Generate a wallet for a blockchain protocol:
 Example:
 ```js
 // using an existing private key
-const wallet = await walletController.generateWalletFromPrivateKey({
+const wallet = await sdk.wallet.generateWalletFromPrivateKey({
   privateKey: '0x...',
   protocol: 'BSC',
 })
 
 // for the cardano network
-const cardanoWallet = await walletController.generateWalletFromPrivateKey({
+const cardanoWallet = await sdk.wallet.generateWalletFromPrivateKey({
   privateKey: {
     spendingPrivateKey: '0x...',
     stakingPrivateKey: '0x...',
-    },
+  },
   protocol: 'CARDANO',
 })
 ```
 
-#### `walletController.generateWalletAddressFromXpub(opts)`
+#### `sdk.wallet.generateWalletAddressFromXpub(opts)`
 
 Generate a wallet address from xpub for a blockchain protocol:
 * `opts.protocol` (string) (__required__) - blockchain protocol supported: `BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `HATHOR`, `CARDANO`,`AVAXCCHAIN`.
@@ -83,7 +85,7 @@ Generate a wallet address from xpub for a blockchain protocol:
 
 Example:
 ```js
-const walletAddress = await walletController.generateWalletAddressFromXpub({
+const walletAddress = await sdk.wallet.generateWalletAddressFromXpub({
   xpub: 'xpub...',
   protocol: 'BSC',
   address: 0
