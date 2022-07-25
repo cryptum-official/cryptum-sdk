@@ -7,7 +7,7 @@ const { toWei, toLamports } = require('../../../services/blockchain/utils')
 const { validateEvmTokenMint, validateEvmTokenBurn } = require('../../../services/validations/evm')
 const { getContractControllerInstance } = require('../../contract/controller')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
-const { TransactionType } = require('../../transaction/entity')
+const { TransactionType, TransactionResponse } = require('../../transaction/entity')
 const Interface = require('./interface')
 
 class Controller extends Interface {
@@ -119,7 +119,7 @@ class Controller extends Interface {
       protocol, wallet, symbol, name, amount, mintAuthorityAddress, meltAuthorityAddress, fixedSupply, decimals, feeCurrency
     } = input
     const tc = getTransactionControllerInstance(this.config)
-    let tx;
+    let tx, mint;
     switch (protocol) {
       case Protocol.HATHOR:
         tx = await tc.createHathorTokenTransactionFromWallet({
@@ -133,13 +133,16 @@ class Controller extends Interface {
         })
         break
       case Protocol.SOLANA:
-        return await tc.createSolanaTokenDeployTransaction({
+        ({ transaction: tx, mint } = await tc.createSolanaTokenDeployTransaction({
           wallet,
-          destination: wallet.address,
           amount,
+          name,
+          symbol,
           fixedSupply,
           decimals
-        })
+        }))
+        await tc.sendTransaction(tx)
+        return new TransactionResponse({ hash: mint })
       case Protocol.ETHEREUM:
       case Protocol.CELO:
       case Protocol.BSC:

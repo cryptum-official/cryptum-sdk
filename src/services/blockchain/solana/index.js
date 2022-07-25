@@ -24,6 +24,7 @@ const {
 } = require('./consts')
 const { toLamports } = require('../utils')
 const { sleep } = require('../../utils')
+const { createCreateMetadataAccountV2Instruction } = require('@metaplex-foundation/mpl-token-metadata')
 
 module.exports.buildSolanaTransferTransaction = async function ({
   from,
@@ -82,28 +83,23 @@ module.exports.buildSolanaTransferTransaction = async function ({
   return rawTransaction
 }
 
-module.exports.deploySolanaToken = async function ({ from, to = from.publicKey, amount, fixedSupply, testnet = true, decimals = 9 }) {
+module.exports.deploySolanaToken = async function ({ from, name, symbol, amount, fixedSupply, testnet = true, decimals = 9 }) {
   const network = testnet ? 'devnet' : 'mainnet-beta'
-  const connection = new solanaWeb3.Connection(
-    solanaWeb3.clusterApiUrl(network),
-    'confirmed',
-  )
-
+  const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl(network), 'confirmed')
+  const wallet = new metaplex.NodeWallet(solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey)))
   const fromAccount = solanaWeb3.Keypair.fromSecretKey(bs58.decode(from.privateKey))
-  const toAccount = toPublicKey(to)
+  const toAccount = toPublicKey(fromAccount.publicKey)
 
   const mint = await splToken.Token.createMint(
     connection,
     fromAccount,
     fromAccount.publicKey,
-    null,
+    fromAccount.publicKey,
     decimals,
     splToken.TOKEN_PROGRAM_ID,
   )
-
-  const toTokenAccount = await mint.getOrCreateAssociatedAccountInfo(
-    toAccount
-  )
+  const toTokenAccount = await mint.getOrCreateAssociatedAccountInfo(toAccount)
+  const metadataPDA = await metaplex.programs.metadata.Metadata.getPDA(mint.publicKey)
 
   await mint.mintTo(
     toTokenAccount.address,
@@ -112,8 +108,34 @@ module.exports.deploySolanaToken = async function ({ from, to = from.publicKey, 
     new splToken.u64(amount * 10 ** decimals),
   )
 
+  const transaction = new solanaWeb3.Transaction()
+  transaction.add(
+    createCreateMetadataAccountV2Instruction({
+      metadata: metadataPDA,
+      mint: mint.publicKey,
+      mintAuthority: fromAccount.publicKey,
+      payer: fromAccount.publicKey,
+      updateAuthority: fromAccount.publicKey,
+    },
+      {
+        createMetadataAccountArgsV2:
+        {
+          data: {
+            name,
+            symbol,
+            uri: '',
+            sellerFeeBasisPoints: 0,
+            creators: null,
+            collection: null,
+            uses: null
+          },
+          isMutable: true
+        }
+      }
+    )
+  )
   if (fixedSupply) {
-    const transaction = new solanaWeb3.Transaction().add(
+    transaction.add(
       splToken.Token.createSetAuthorityInstruction(
         splToken.TOKEN_PROGRAM_ID,
         mint.publicKey,
@@ -123,9 +145,13 @@ module.exports.deploySolanaToken = async function ({ from, to = from.publicKey, 
         []
       )
     )
-    await solanaWeb3.sendAndConfirmTransaction(connection, transaction, [fromAccount])
   }
-  return mint.publicKey.toBase58()
+
+  transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+  transaction.feePayer = fromAccount.publicKey
+  const tx = await wallet.signTransaction(transaction)
+  console.log(tx.serialize().toString('base64'))
+  return { mint: mint.publicKey.toBase58(), rawTransaction: tx.serialize().toString('hex') }
 }
 
 module.exports.mintSolanaToken = async function ({ from, to = from.publicKey, token, amount, latestBlock, testnet = true }) {

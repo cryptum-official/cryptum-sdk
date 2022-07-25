@@ -66,28 +66,14 @@ class Controller extends Interface {
    * Method to send an transaction to Cryptum
    *
    * @param {SignedTransaction} transaction object with all transaction data
-   * @param {Protocol} transaction.protocol
    * @returns {Promise<TransactionResponse>}
    */
   async sendTransaction(transaction) {
     try {
       validateSignedTransaction(transaction)
-      const apiRequest = getApiMethod({
-        requests,
-        key: 'sendTransaction',
-        config: this.config,
-      })
-      const headers = mountHeaders(this.config.apiKey)
       const { protocol, signedTx, type } = transaction
-      const response = await apiRequest(
-        requests.sendTransaction.url,
-        { signedTx, type },
-        {
-          headers,
-          params: { protocol },
-        }
-      )
-      return new TransactionResponse(response.data)
+      const response = await makeRequest({ method: 'post', url: `/tx?protocol=${protocol}`, body: { signedTx, type }, config: this.config })
+      return new TransactionResponse(response)
     } catch (error) {
       handleRequestError(error)
     }
@@ -1087,20 +1073,25 @@ class Controller extends Interface {
   /**
      * Create Solana token deploy transaction
      * @param {import('../entity').SolanaTokenDeployInput} input
-     * @returns {Promise<TransactionResponse>} token signature
      */
   async createSolanaTokenDeployTransaction(input) {
     validateSolanaDeployTransaction(input)
-    const { wallet, destination, fixedSupply, decimals, amount } = input
-    const hash = await deploySolanaToken({
+    const protocol = Protocol.SOLANA
+    const { wallet, fixedSupply, name, symbol, decimals, amount } = input
+    const response = await deploySolanaToken({
       from: wallet,
-      to: destination,
       fixedSupply,
+      name,
+      symbol,
       decimals,
       amount,
       testnet: isTestnet(this.config.environment)
     })
-    return new TransactionResponse({ hash })
+    return {
+      mint: response.mint,
+      metadata: response.metadata,
+      transaction: new SignedTransaction({ signedTx: response.rawTransaction, protocol, type: TransactionType.SOLANA_TOKEN_CREATION })
+    }
   }
   /**
      * Create Solana Collection
