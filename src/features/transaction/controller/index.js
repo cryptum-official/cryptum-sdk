@@ -1036,7 +1036,7 @@ class Controller extends Interface {
     }
     const { blockhash } = await this.getBlock({ block: 'latest', protocol })
     const signedTx = await buildSolanaTransferTransaction({
-      from: wallet, to: destination, token, amount: Number(amount), latestBlock: blockhash, decimals, testnet: isTestnet(this.config.environment)
+      from: wallet, to: destination, token, amount: Number(amount), latestBlock: blockhash, decimals, config: this.config
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
@@ -1051,7 +1051,7 @@ class Controller extends Interface {
     const protocol = Protocol.SOLANA
     const { blockhash } = await this.getBlock({ block: 'latest', protocol })
     const signedTx = await buildSolanaTokenBurnTransaction({
-      from: wallet, token, amount: Number(amount), latestBlock: blockhash, testnet: isTestnet(this.config.environment)
+      from: wallet, token, amount: Number(amount), latestBlock: blockhash, config: this.config
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_BURN })
   }
@@ -1066,7 +1066,7 @@ class Controller extends Interface {
     const protocol = Protocol.SOLANA
     const { blockhash } = await this.getBlock({ block: 'latest', protocol })
     const signedTx = await mintSolanaToken({
-      from: wallet, token, to: destination, amount, latestBlock: blockhash, testnet: isTestnet(this.config.environment)
+      from: wallet, token, to: destination, amount, latestBlock: blockhash, config: this.config
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.SOLANA_TOKEN_MINT })
   }
@@ -1085,7 +1085,7 @@ class Controller extends Interface {
       symbol,
       decimals,
       amount,
-      testnet: isTestnet(this.config.environment)
+      config: this.config
     })
     return {
       mint: response.mint,
@@ -1104,7 +1104,7 @@ class Controller extends Interface {
     const mintRent = (await this.getFee({ protocol, type: TransactionType.SOLANA_NFT_MINT })).mintRentExemption
     const { blockhash: recentBlockhash } = await this.getBlock({ block: 'latest', protocol })
     const response = await deploySolanaCollection({
-      name, symbol, uri, mintRent, from: wallet, recentBlockhash, testnet: isTestnet(this.config.environment)
+      name, symbol, uri, mintRent, from: wallet, recentBlockhash, config: this.config
     })
     return {
       collection: response.collection,
@@ -1134,7 +1134,7 @@ class Controller extends Interface {
       creators,
       royaltiesFee,
       collection,
-      testnet: isTestnet(this.config.environment)
+      config: this.config
     })
     return {
       mint: response.mint,
@@ -1151,7 +1151,7 @@ class Controller extends Interface {
   async createSolanaNFTEdition(input) {
     validateSolanaDeployNFT(input)
     const { wallet, masterEdition } = input
-    const hash = await mintEdition({ masterEdition, from: wallet, testnet: isTestnet(this.config.environment) })
+    const hash = await mintEdition({ masterEdition, from: wallet, config: this.config })
     return new TransactionResponse({ hash })
   }
   /**
@@ -1163,7 +1163,7 @@ class Controller extends Interface {
   async updateSolanaNFTMetadata(input) {
     validateSolanaDeployNFT(input)
     const { wallet, token, uri } = input
-    const hash = await updateMetaplexMetadata({ from: wallet, token, uri, testnet: isTestnet(this.config.environment) })
+    const hash = await updateMetaplexMetadata({ from: wallet, token, uri, config: this.config })
     return new TransactionResponse({ hash })
   }
   /**
@@ -1192,7 +1192,7 @@ class Controller extends Interface {
     const protocol = Protocol.SOLANA
     const { blockhash } = await this.getBlock({ block: 'latest', protocol })
     const txHash = await updateAuctionAuthority({
-      from, auctionManager, auction, testnet: isTestnet(this.config.environment), latestBlock: blockhash
+      from, auctionManager, auction, config: this.config, latestBlock: blockhash
     })
     return new TransactionResponse({ hash: txHash })
   }
@@ -1207,7 +1207,7 @@ class Controller extends Interface {
     const protocol = Protocol.SOLANA
     const { blockhash } = await this.getBlock({ block: 'latest', protocol })
     const txHash = await updateVaultAuthority({
-      from, auctionManager, vault, testnet: isTestnet(this.config.environment), latestBlock: blockhash
+      from, auctionManager, vault, config: this.config, latestBlock: blockhash
     })
     return new TransactionResponse({ hash: txHash })
   }
@@ -1222,7 +1222,7 @@ class Controller extends Interface {
     const protocol = Protocol.SOLANA
     const { blockhash } = await this.getBlock({ block: 'latest', protocol })
     const txHash = await validateAuction({
-      testnet: isTestnet(this.config.environment), from, vault, nft, store, metadata, tokenStore, tokenTracker, latestBlock: blockhash
+      config: this.config, from, vault, nft, store, metadata, tokenStore, tokenTracker, latestBlock: blockhash
     })
     return new TransactionResponse({ hash: txHash })
   }
@@ -1235,7 +1235,7 @@ class Controller extends Interface {
   async whitelistCreatorsTransaction(input) {
     const protocol = Protocol.SOLANA
     const { blockhash } = await this.getBlock({ block: 'latest', protocol })
-    const txHash = await whitelistCreators({ ...input, latestBlock: blockhash, testnet: isTestnet(this.config.environment) })
+    const txHash = await whitelistCreators({ ...input, latestBlock: blockhash, config: this.config })
     return new TransactionResponse({ hash: txHash })
   }
 }
