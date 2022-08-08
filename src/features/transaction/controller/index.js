@@ -1120,7 +1120,6 @@ class Controller extends Interface {
     const { wallet, maxSupply, uri, name, symbol, amount, creators, royaltiesFee, collection } = input
     const protocol = Protocol.SOLANA
     const mintRent = (await this.getFee({ protocol, type: TransactionType.SOLANA_NFT_MINT })).mintRentExemption
-    const { blockhash: recentBlockhash } = await this.getBlock({ block: 'latest', protocol })
 
     const response = await deploySolanaNFT({
       from: wallet,
@@ -1129,7 +1128,6 @@ class Controller extends Interface {
       uri,
       name,
       mintRent,
-      recentBlockhash,
       symbol,
       creators,
       royaltiesFee,
