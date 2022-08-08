@@ -308,24 +308,20 @@ class SolanaTokenDeployInput {
    * Creates an instance of SolanaTokenDeployInput.
    *
    * @param {object} args
-   * @param {import('../../wallet/entity').Wallet} args.from
-   * @param {string} args.to
+   * @param {import('../../wallet/entity').Wallet} args.wallet
    * @param {boolean} args.fixedSupply
    * @param {string} args.name
    * @param {string} args.symbol
    * @param {number} args.decimals
    * @param {string} args.amount
-   * @param {string} args.network
    */
-  constructor({ from, to, fixedSupply, decimals, amount, network, name, symbol }) {
-    this.from = from
-    this.to = to
+  constructor({ wallet,  fixedSupply, decimals, amount, name, symbol }) {
+    this.wallet = wallet
     this.fixedSupply = fixedSupply
     this.symbol = symbol
     this.name = name
     this.decimals = decimals
     this.amount = amount
-    this.network = network
   }
 }
 

@@ -51,11 +51,20 @@ class Controller extends Interface {
     return result
   }
   /**
-   * Call and create smart contract transaction
+   * Create and send smart contract call transaction
    * @param {import('../entity').SmartContractCallTransactionInput} input
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async callMethodTransaction(input) {
+    const tx = await this.buildMethodTransaction(input)
+    return await getTransactionControllerInstance(this.config).sendTransaction(tx)
+  }
+  /**
+   * Create smart contract call transaction
+   * @param {import('../entity').SmartContractCallTransactionInput} input
+   * @returns {Promise<import('../../transaction/entity').SignedTransaction>}
+   */
+  async buildMethodTransaction(input) {
     validateSmartContractTransactionParams(input)
     const { wallet, fee, value, contractAddress, contractAbi, method, params, protocol, feeCurrency } = input
     const tc = getTransactionControllerInstance(this.config)
@@ -89,7 +98,7 @@ class Controller extends Interface {
     } else {
       throw new InvalidException('Invalid protocol')
     }
-    return await tc.sendTransaction(new SignedTransaction({ signedTx, protocol, type: TransactionType.CALL_CONTRACT_METHOD }))
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.CALL_CONTRACT_METHOD })
   }
   /**
    * Deploy smart contract to blockchain
@@ -97,6 +106,15 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async deploy(input) {
+    const tx = await this.buildDeployTransaction(input)
+    return await getTransactionControllerInstance(this.config).sendTransaction(tx)
+  }
+  /**
+   * Deploy smart contract to blockchain
+   * @param {import('../entity').SmartContractDeployTransactionInput} input
+   * @returns {Promise<import('../../transaction/entity').SignedTransaction>}
+   */
+  async buildDeployTransaction(input) {
     validateSmartContractDeployTransactionParams(input)
     const { wallet, fee, params, protocol, feeCurrency, source, contractName } = input
     const tc = getTransactionControllerInstance(this.config)
@@ -129,7 +147,7 @@ class Controller extends Interface {
     } else {
       throw new InvalidException('Invalid protocol')
     }
-    return await tc.sendTransaction(new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT }))
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT })
   }
   /**
    * Create call transaction to token/asset issue
@@ -137,6 +155,15 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async deployToken(input) {
+    const tx = await this.buildDeployTokenTransaction(input)
+    return await getTransactionControllerInstance(this.config).sendTransaction(tx)
+  }
+  /**
+   * Create call transaction to token/asset issue
+   * @param {import('../entity').TokenDeployTransactionInput} input
+   * @returns {Promise<import('../../transaction/entity').SignedTransaction>}
+   */
+  async buildDeployTokenTransaction(input) {
     validateTokenDeployTransactionParams(input)
     const { wallet, fee, params, protocol, feeCurrency, tokenType } = input
     const tc = getTransactionControllerInstance(this.config)
@@ -167,8 +194,9 @@ class Controller extends Interface {
     } else {
       throw new InvalidException('Invalid protocol')
     }
-    return await tc.sendTransaction(new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT }))
+    return new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT })
   }
 }
+
 
 module.exports.ContractController = Controller
