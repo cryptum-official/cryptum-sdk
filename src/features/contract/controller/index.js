@@ -56,47 +56,15 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async callMethodTransaction(input) {
-    validateSmartContractTransactionParams(input)
-    const { wallet, fee, value, contractAddress, contractAbi, method, params, protocol, feeCurrency } = input
-    const tc = getTransactionControllerInstance(this.config)
-    const { info, networkFee } = await tc._getFeeInfo({
-      wallet,
-      type: TransactionType.CALL_CONTRACT_METHOD,
-      contractAddress,
-      contractAbi,
-      method,
-      params,
-      fee,
-      protocol,
-    })
-    let signedTx
-    const transactionOptions = {
-      fromPrivateKey: wallet.privateKey,
-      nonce: info.nonce,
-      value,
-      contractAddress,
-      contractAbi,
-      method,
-      params,
-      fee: networkFee,
-      feeCurrency,
-      testnet: isTestnet(this.config.environment),
-    }
-    if (protocol === Protocol.CELO) {
-      signedTx = await buildCeloSmartContractTransaction(transactionOptions)
-    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
-      signedTx = await buildEthereumSmartContractTransaction({ ...transactionOptions, protocol })
-    } else {
-      throw new InvalidException('Invalid protocol')
-    }
-    return await tc.sendTransaction(new SignedTransaction({ signedTx, protocol, type: TransactionType.CALL_CONTRACT_METHOD }))
+    const tx = await this.buildMethodTransaction(input)
+    return await getTransactionControllerInstance(this.config).sendTransaction(tx)
   }
   /**
    * Create smart contract call transaction
    * @param {import('../entity').SmartContractCallTransactionInput} input
    * @returns {Promise<import('../../transaction/entity').SignedTransaction>}
    */
-   async buildMethodTransaction(input) {
+  async buildMethodTransaction(input) {
     validateSmartContractTransactionParams(input)
     const { wallet, fee, value, contractAddress, contractAbi, method, params, protocol, feeCurrency } = input
     const tc = getTransactionControllerInstance(this.config)
@@ -138,46 +106,15 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async deploy(input) {
-    validateSmartContractDeployTransactionParams(input)
-    const { wallet, fee, params, protocol, feeCurrency, source, contractName } = input
-    const tc = getTransactionControllerInstance(this.config)
-    const { info, networkFee } = await tc._getFeeInfo({
-      wallet,
-      type: TransactionType.DEPLOY_CONTRACT,
-      params,
-      fee,
-      protocol,
-      source,
-      contractName,
-    })
-
-    let signedTx
-    const transactionOptions = {
-      source,
-      contractName,
-      fromPrivateKey: wallet.privateKey,
-      nonce: info.nonce,
-      params,
-      fee: networkFee,
-      feeCurrency,
-      testnet: isTestnet(this.config.environment),
-      config: this.config,
-    }
-    if (protocol === Protocol.CELO) {
-      signedTx = await buildCeloSmartContractDeployTransaction(transactionOptions)
-    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
-      signedTx = await buildEthereumSmartContractDeployTransaction({ ...transactionOptions, protocol })
-    } else {
-      throw new InvalidException('Invalid protocol')
-    }
-    return await tc.sendTransaction(new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT }))
+    const tx = await this.buildDeployTransaction(input)
+    return await getTransactionControllerInstance(this.config).sendTransaction(tx)
   }
   /**
    * Deploy smart contract to blockchain
    * @param {import('../entity').SmartContractDeployTransactionInput} input
    * @returns {Promise<import('../../transaction/entity').SignedTransaction>}
    */
-   async buildDeployTransaction(input) {
+  async buildDeployTransaction(input) {
     validateSmartContractDeployTransactionParams(input)
     const { wallet, fee, params, protocol, feeCurrency, source, contractName } = input
     const tc = getTransactionControllerInstance(this.config)
@@ -218,44 +155,15 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async deployToken(input) {
-    validateTokenDeployTransactionParams(input)
-    const { wallet, fee, params, protocol, feeCurrency, tokenType } = input
-    const tc = getTransactionControllerInstance(this.config)
-    const { info, networkFee } = await tc._getFeeInfo({
-      wallet,
-      type: `DEPLOY_${tokenType}`,
-      params,
-      fee,
-      protocol,
-      tokenType,
-    })
-
-    let signedTx
-    const transactionOptions = {
-      fromPrivateKey: wallet.privateKey,
-      nonce: info.nonce,
-      params,
-      fee: networkFee,
-      feeCurrency,
-      testnet: isTestnet(this.config.environment),
-      config: this.config,
-      tokenType,
-    }
-    if (protocol === Protocol.CELO) {
-      signedTx = await buildCeloSmartContractDeployTransaction(transactionOptions)
-    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
-      signedTx = await buildEthereumSmartContractDeployTransaction({ ...transactionOptions, protocol })
-    } else {
-      throw new InvalidException('Invalid protocol')
-    }
-    return await tc.sendTransaction(new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT }))
+    const tx = await this.buildDeployTokenTransaction(input)
+    return await getTransactionControllerInstance(this.config).sendTransaction(tx)
   }
   /**
    * Create call transaction to token/asset issue
    * @param {import('../entity').TokenDeployTransactionInput} input
    * @returns {Promise<import('../../transaction/entity').SignedTransaction>}
    */
-   async buildDeployTokenTransaction(input) {
+  async buildDeployTokenTransaction(input) {
     validateTokenDeployTransactionParams(input)
     const { wallet, fee, params, protocol, feeCurrency, tokenType } = input
     const tc = getTransactionControllerInstance(this.config)
