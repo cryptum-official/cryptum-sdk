@@ -34,7 +34,7 @@ module.exports.buildRippleTrustlineTransaction = async function ({
     memos: memo ? [{ type: 'test', format: 'text/plain', data: memo }] : undefined,
   }
   const prepared = await rippleAPI.prepareTrustline(fromAddress, trustline, {
-    fee: fee ? fromDrop(fee).toString() : '0.0001',
+    fee: fromDrop(fee).toString(),
     sequence,
     maxLedgerVersion,
   })
