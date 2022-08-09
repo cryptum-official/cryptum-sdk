@@ -1,6 +1,6 @@
 {
   "name": "cryptum-sdk",
-  "version": "0.0.30",
+  "version": "0.0.31",
   "description": "SDK to sync your application with Cryptum services",
   "main": "index.js",
   "repository": "https://github.com/blockforce-official/cryptum-sdk",
@@ -14,7 +14,8 @@
     "test": "mocha 'tests/**/*.js' --recursive --timeout 60000 --exit",
     "coverage": "istanbul cover _mocha -- ./tests/* --recursive",
     "lint": "eslint --fix --ext .js .",
-    "ts-compile": "tsc"
+    "ts-compile": "tsc",
+    "prepare": "rimraf dist && npm run ts-compile"
   },
   "dependencies": {
     "@celo-tools/celo-ethers-wrapper": "^0.0.5",
@@ -36,6 +37,7 @@
     "ed25519-hd-key": "^1.2.0",
     "ethereumjs-wallet": "^1.0.2",
     "hdkey": "^2.0.1",
+    "rimraf": "^3.0.2",
     "ripple-keypairs": "^1.0.3",
     "ripple-lib": "^1.10.0",
     "stellar-hd-wallet": "^0.0.10",
