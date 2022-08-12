@@ -1,3 +1,4 @@
+module.exports.getStakingControllerInstance = (config) => new StakingController(config)
 const CeloStakingController = require('./celo');
 const Interface = require('./interface');
 
@@ -8,4 +9,4 @@ class StakingController extends Interface {
 	}
 }
 
-module.exports = StakingController
+module.exports.StakingController = StakingController

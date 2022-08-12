@@ -62,7 +62,7 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async transfer(input) {
-    const { protocol, token, wallet, destination, amount, destinations, issuer, memo, feeCurrency } = input
+    const { protocol, token, wallet, destination, amount, destinations, issuer, memo, createAccount, feeCurrency } = input
     const tc = getTransactionControllerInstance(this.config)
     let tx;
     switch (protocol) {
@@ -99,7 +99,7 @@ class Controller extends Interface {
         tx = await tc.createCardanoTransferTransactionFromWallet({ wallet, outputs: destinations })
         break
       case Protocol.STELLAR:
-        tx = await tc.createStellarTransferTransaction({ wallet, assetSymbol: token, issuer, amount, destination, memo })
+        tx = await tc.createStellarTransferTransaction({ wallet, assetSymbol: token, issuer, amount, destination, createAccount, memo })
         break
       case Protocol.RIPPLE:
         tx = await tc.createRippleTransferTransaction({ wallet, assetSymbol: token, issuer, amount, destination, memo })

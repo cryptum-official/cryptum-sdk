@@ -1,3 +1,5 @@
+module.exports.getWalletControllerInstance = (config) => new Controller(config)
+
 const { generateMnemonic, validateMnemonic } = require('bip39')
 const { Wallet, WalletInfoResponse } = require('../entity')
 const { makeRequest } = require('../../../services')
@@ -351,4 +353,4 @@ class Controller extends Interface {
 
 }
 
-module.exports = Controller
+module.exports.WalletController = Controller

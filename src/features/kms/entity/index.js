@@ -18,91 +18,86 @@
  */
 
 /**
- * @typedef {Object} WalletTransaction
+ * @typedef {Object} Transaction
  * @property {string} id Wallet transaction id
  * @property {string=} walletId Wallet id
- * @property {Array<WalletInput> =} inputs Inputs for transactions
- * @property {string=} addressTo
- * @property {Array<WalletOutput> =} outputs
+ * @property {string=} destination
  * @property {string} amount
+ * @property {Array<WalletInput> =} inputs Inputs for transactions
+ * @property {Array<WalletOutput> =} destinations
  * @property {import('../../transaction/entity').TransactionType} transactionType
  * @property {string} status
  * @property {string} protocol
  * @property {string} createdAt
- * @property {string=} assetSymbol
+ * @property {string=} token
  * @property {string=} contractAddress
  * @property {string=} issuer
  * @property {string=} transactionHash
- * @property {string=} limit
+ * @property {any=} data
  */
 /**
- * @typedef {Object} WalletTransactionStellarTrustline
- * @property {string} walletId Wallet id
- * @property {string} assetSymbol
+ * @typedef {Object} SetTrustline
+ * @property {string} walletId
+ * @property {string} token
  * @property {string} issuer
  * @property {string} limit
  * @property {string=} memo
- * @property {string=} fee
  */
-/** @typedef {WalletTransactionStellarTrustline} WalletTransactionRippleTrustline */
 /**
- * @typedef {Object} WalletTransactionStellarTransfer
+ * @typedef {Object} StellarTransfer
  * @property {string} walletId
- * @property {string} assetSymbol
+ * @property {string} token
  * @property {string=} issuer
  * @property {boolean=} createAccount
  * @property {string} amount
  * @property {string} destination
  * @property {string=} memo
- * @property {string=} fee
  */
-/** @typedef {WalletTransactionStellarTransfer} WalletTransactionRippleTransfer */
+/** @typedef {StellarTransfer} RippleTransfer */
 /**
- * @typedef {Object} WalletTransactionBitcoinTransfer
+ * @typedef {Object} BitcoinTransfer
  * @property {string=} walletId
  * @property {any[]=} inputs
- * @property {any[]} outputs
+ * @property {any[]} destinations
  */
 /**
- * @typedef {Object} WalletTransactionCardanoTransfer
+ * @typedef {Object} CardanoTransfer
  * @property {string=} walletId
  * @property {any[]=} inputs
- * @property {any[]} outputs
+ * @property {any[]} destinations
  */
 /**
- * @typedef {Object} WalletTransactionHathorTransfer
+ * @typedef {Object} HathorTransfer
  * @property {string=} walletId
  * @property {any[]=} inputs
- * @property {any[]} outputs
+ * @property {any[]} destinations
  */
 /**
- * @typedef {Object} WalletTransactionEthereumTransfer
+ * @typedef {Object} EthereumTransfer
  * @property {string} walletId
- * @property {string=} tokenSymbol
- * @property {string=} contractAddress
+ * @property {string=} token
  * @property {string} amount
  * @property {string} destination
  * @property {{ gas: number, gasPrice: string }=} fee
  */
 /**
- * @typedef {Object} WalletTransactionCeloTransfer
+ * @typedef {Object} CeloTransfer
  * @property {string} walletId
- * @property {string=} tokenSymbol
- * @property {string=} contractAddress
+ * @property {string=} token
  * @property {string} amount
  * @property {string} destination
  * @property {string=} feeCurrency
  * @property {{ gas: number, gasPrice: string }=} fee
  */
 /**
- * @typedef {Object} WalletTransactionEthereumTokenDeploy
+ * @typedef {Object} EthereumTokenDeploy
  * @property {string} walletId
  * @property {"ERC20"|"ERC721"|"ERC1155"} tokenType
  * @property {string[]} params
  * @property {{ gas: number, gasPrice: string }=} fee
  */
 /**
- * @typedef {Object} WalletTransactionCeloTokenDeploy
+ * @typedef {Object} CeloTokenDeploy
  * @property {string} walletId
  * @property {"ERC20"|"ERC721"|"ERC1155"} tokenType
  * @property {string[]} params
@@ -110,7 +105,7 @@
  * @property {string=} feeCurrency
  */
 /**
- * @typedef {Object} WalletTransactionHathorTokenDeploy
+ * @typedef {Object} HathorTokenDeploy
  * @property {string=} walletId
  * @property {any[]=} inputs
  * @property {string} tokenName
@@ -120,7 +115,7 @@
  * @property {string=} meltAuthorityAddress
  */
 /**
- * @typedef {Object} WalletTransactionHathorTokenMint
+ * @typedef {Object} HathorTokenMint
  * @property {string=} walletId
  * @property {any[]=} inputs
  * @property {string} tokenUid
@@ -130,7 +125,7 @@
  * @property {string=} mintAuthorityAddress
  */
 /**
- * @typedef {Object} WalletTransactionHathorTokenMelt
+ * @typedef {Object} HathorTokenMelt
  * @property {string=} walletId
  * @property {any[]=} inputs
  * @property {string} tokenUid
@@ -140,7 +135,7 @@
  * @property {string=} meltAuthorityAddress
  */
 /**
- * @typedef {Object} WalletTransactionEthereumSmartContractDeploy
+ * @typedef {Object} EthereumSmartContractDeploy
  * @property {string} walletId
  * @property {string} contractName
  * @property {string} source
@@ -148,7 +143,7 @@
  * @property {{ gas: number, gasPrice: string }=} fee
  */
 /**
- * @typedef {Object} WalletTransactionCeloSmartContractDeploy
+ * @typedef {Object} CeloSmartContractDeploy
  * @property {string} walletId
  * @property {string} contractName
  * @property {string} source
@@ -157,7 +152,7 @@
  * @property {{ gas: number, gasPrice: string }=} fee
  */
 /**
- * @typedef {Object} WalletTransactionEthereumSmartContractSend
+ * @typedef {Object} EthereumSmartContractSend
  * @property {string} walletId
  * @property {string} contractAddress
  * @property {any[]} contractAbi
@@ -166,7 +161,7 @@
  * @property {{ gas: number, gasPrice: string }=} fee
  */
 /**
- * @typedef {Object} WalletTransactionCeloSmartContractSend
+ * @typedef {Object} CeloSmartContractSend
  * @property {string} walletId
  * @property {string} contractAddress
  * @property {any[]} contractAbi
