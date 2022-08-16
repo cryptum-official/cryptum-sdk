@@ -78,19 +78,35 @@ class Controller extends Interface {
         tx = await tc.createSolanaTransferTransaction({ wallet, destination, token, amount })
         break
       case Protocol.ETHEREUM:
-        tx = await tc.createEthereumTransferTransaction({ wallet, tokenSymbol: token, contractAddress: token, destination, amount })
+        tx = await tc.createEthereumTransferTransaction({
+          wallet, tokenSymbol: token === 'ETH' ? token : null, contractAddress: token !== 'ETH' ? token : null, destination, amount
+        })
         break
       case Protocol.CELO:
-        tx = await tc.createCeloTransferTransaction({ wallet, tokenSymbol: token, contractAddress: token, destination, amount, memo, feeCurrency })
+        tx = await tc.createCeloTransferTransaction({
+          wallet,
+          tokenSymbol: token === 'CELO' ? token : null,
+          contractAddress: token !== 'CELO' ? token : null,
+          destination,
+          amount,
+          memo,
+          feeCurrency
+        })
         break
       case Protocol.BSC:
-        tx = await tc.createBscTransferTransaction({ wallet, tokenSymbol: token, contractAddress: token, destination, amount })
+        tx = await tc.createBscTransferTransaction({
+          wallet, tokenSymbol: token === 'BNB' ? token : null, contractAddress: token !== 'BNB' ? token : null, destination, amount
+        })
         break
       case Protocol.POLYGON:
-        tx = await tc.createPolygonTransferTransaction({ wallet, tokenSymbol: token, contractAddress: token, destination, amount })
+        tx = await tc.createPolygonTransferTransaction({
+          wallet, tokenSymbol: token === 'MATIC' ? token : null, contractAddress: token !== 'MATIC' ? token : null, destination, amount
+        })
         break
       case Protocol.AVAXCCHAIN:
-        tx = await tc.createAvaxCChainTransferTransaction({ wallet, tokenSymbol: token, contractAddress: token, destination, amount })
+        tx = await tc.createAvaxCChainTransferTransaction({
+          wallet, tokenSymbol: token === 'AVAX' ? token : null, contractAddress: token !== 'AVAX' ? token : null, destination, amount
+        })
         break
       case Protocol.BITCOIN:
         tx = await tc.createBitcoinTransferTransaction({ wallet, outputs: destination ? [{ address: destination, amount }] : destinations })
