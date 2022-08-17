@@ -1,4 +1,4 @@
-const { CeloWallet, serializeCeloTransaction } = require('@celo-tools/celo-ethers-wrapper')
+const { LocalWallet } = require('@celo/wallet-local')
 const BigNumber = require('bignumber.js')
 const Web3 = require('web3')
 const {
@@ -25,14 +25,17 @@ module.exports.buildCeloTransferTransaction = async function ({
 }) {
   const network = testnet ? 'testnet' : 'mainnet'
   const { gas, gasPrice, chainId } = fee
+  const celoWallet = new LocalWallet()
+  celoWallet.addAccount(fromPrivateKey)
   const rawTransaction = {
+    from: celoWallet.getAccounts()[0],
     chainId,
     nonce: Web3.utils.toHex(nonce),
     gasPrice: feeCurrency ? Web3.utils.toHex(new BigNumber(gasPrice).plus(200000000)) : Web3.utils.toHex(gasPrice),
     to: '',
     value: undefined,
     data: undefined,
-    gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
+    gas: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
     feeCurrency
   }
   const value = toWei(amount, decimals)
@@ -57,9 +60,8 @@ module.exports.buildCeloTransferTransaction = async function ({
       : token.methods.transfer(destination, value).encodeABI()
   }
 
-  const celoWallet = new CeloWallet(fromPrivateKey)
-  const signature = celoWallet._signingKey().signDigest(Web3.utils.sha3(serializeCeloTransaction(rawTransaction)))
-  return serializeCeloTransaction(rawTransaction, signature)
+  const signedTx = await celoWallet.signTransaction(rawTransaction)
+  return signedTx.raw
 }
 
 module.exports.buildCeloSmartContractTransaction = async ({
@@ -76,14 +78,17 @@ module.exports.buildCeloSmartContractTransaction = async ({
 }) => {
   const network = testnet ? 'testnet' : 'mainnet'
   const { gas, gasPrice, chainId } = fee
+  const celoWallet = new LocalWallet()
+  celoWallet.addAccount(fromPrivateKey)
   const rawTransaction = {
+    from: celoWallet.getAccounts()[0],
     chainId,
     nonce: Web3.utils.toHex(nonce),
     gasPrice: Web3.utils.toHex(gasPrice),
     to: contractAddress,
     value: Web3.utils.toHex(value || 0),
     data: undefined,
-    gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
+    gas: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
     feeCurrency:
       feeCurrency === 'cUSD'
         ? CUSD_CONTRACT_ADDRESS[network]
@@ -95,9 +100,8 @@ module.exports.buildCeloSmartContractTransaction = async ({
   const contract = new web3.eth.Contract(contractAbi, contractAddress)
   rawTransaction.data = contract.methods[method](...params).encodeABI()
 
-  const celoWallet = new CeloWallet(fromPrivateKey)
-  const signature = celoWallet._signingKey().signDigest(Web3.utils.sha3(serializeCeloTransaction(rawTransaction)))
-  return serializeCeloTransaction(rawTransaction, signature)
+  const signedTx = await celoWallet.signTransaction(rawTransaction)
+  return signedTx.raw
 }
 
 module.exports.buildCeloSmartContractDeployTransaction = async ({
@@ -117,14 +121,17 @@ module.exports.buildCeloSmartContractDeployTransaction = async ({
   });
   const network = testnet ? 'testnet' : 'mainnet'
   const { gas, gasPrice, chainId } = fee
+  const celoWallet = new LocalWallet()
+  celoWallet.addAccount(fromPrivateKey)
   const rawTransaction = {
+    from: celoWallet.getAccounts()[0],
     chainId,
     nonce: Web3.utils.toHex(nonce),
     gasPrice: Web3.utils.toHex(gasPrice),
     to: null,
     value: null,
     data: bytecode,
-    gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
+    gas: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
     feeCurrency:
       feeCurrency === 'cUSD'
         ? CUSD_CONTRACT_ADDRESS[network]
@@ -133,7 +140,6 @@ module.exports.buildCeloSmartContractDeployTransaction = async ({
           : feeCurrency,
   }
 
-  const celoWallet = new CeloWallet(fromPrivateKey)
-  const signature = celoWallet._signingKey().signDigest(Web3.utils.sha3(serializeCeloTransaction(rawTransaction)))
-  return serializeCeloTransaction(rawTransaction, signature)
+  const signedTx = await celoWallet.signTransaction(rawTransaction)
+  return signedTx.raw
 }

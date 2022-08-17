@@ -1,6 +1,6 @@
 {
   "name": "cryptum-sdk",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "description": "SDK to sync your application with Cryptum services",
   "main": "index.js",
   "repository": "https://github.com/blockforce-official/cryptum-sdk",
@@ -18,7 +18,7 @@
     "prepare": "rimraf dist && npm run ts-compile"
   },
   "dependencies": {
-    "@celo-tools/celo-ethers-wrapper": "^0.0.5",
+    "@celo/wallet-local": "^2.1.0",
     "@emurgo/cardano-serialization-lib-nodejs": "^9.1.2",
     "@ethereumjs/tx": "^3.4.0",
     "@hathor/wallet-lib": "^0.33.1",
