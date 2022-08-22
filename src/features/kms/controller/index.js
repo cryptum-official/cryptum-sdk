@@ -8,7 +8,7 @@ class Controller extends Interface {
   /**
  * Get wallet transactions
  * @param {{ status?: string; limit?: number=; offset?: number=; }} input
- * @returns {Promise<import('../entity').[]>}
+ * @returns {Promise<import('../entity').Transaction[]>}
  */
   async getTransactions({ status, limit, offset } = {}) {
     const qs = [
@@ -21,7 +21,7 @@ class Controller extends Interface {
   /**
    * Get wallet transaction id
    * @param {string} id transaction id
-   * @returns {Promise<import('../entity').>}
+   * @returns {Promise<import('../entity').Transaction>}
    */
   async getTransactionById(id) {
     return makeRequest({ method: 'get', url: `/kms/transaction/${id}`, config: this.config })
