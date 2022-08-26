@@ -29,7 +29,7 @@ const {
   deploySolanaCollection,
 } = require('../../../services/blockchain/solana')
 const { buildBitcoinTransferTransaction } = require('../../../services/blockchain/bitcoin')
-const WalletController = require('../../wallet/controller')
+const { getWalletControllerInstance } = require('../../wallet/controller')
 const { GenericException, HathorException } = require('../../../errors')
 const { buildCeloTransferTransaction } = require('../../../services/blockchain/celo')
 const {
@@ -215,7 +215,7 @@ class Controller extends Interface {
     validateStellarTrustlineTransactionParams(input)
     const { wallet, assetSymbol, issuer, fee, limit, memo } = input
     const protocol = Protocol.STELLAR
-    const info = await new WalletController(this.config).getWalletInfo({
+    const info = await getWalletControllerInstance(this.config).getWalletInfo({
       address: wallet.publicKey,
       protocol,
     })
@@ -250,7 +250,7 @@ class Controller extends Interface {
     validateRippleTrustlineTransactionParams(input)
     const { wallet, assetSymbol, issuer, fee, limit, memo } = input
     const protocol = Protocol.RIPPLE
-    const info = await new WalletController(this.config).getWalletInfo({
+    const info = await getWalletControllerInstance(this.config).getWalletInfo({
       address: wallet.address,
       protocol,
     })
@@ -286,7 +286,7 @@ class Controller extends Interface {
     validateStellarTransferTransactionParams(input)
     const { wallet, assetSymbol, issuer, amount, destination, memo, fee, createAccount } = input
     const protocol = Protocol.STELLAR
-    const info = await new WalletController(this.config).getWalletInfo({
+    const info = await getWalletControllerInstance(this.config).getWalletInfo({
       address: wallet.publicKey,
       protocol,
     })
@@ -323,7 +323,7 @@ class Controller extends Interface {
     validateRippleTransferTransactionParams(input)
     const { wallet, assetSymbol, issuer, amount, destination, memo, fee } = input
     const protocol = Protocol.RIPPLE
-    const info = await new WalletController(this.config).getWalletInfo({
+    const info = await getWalletControllerInstance(this.config).getWalletInfo({
       address: wallet.address,
       protocol,
     })
@@ -635,7 +635,7 @@ class Controller extends Interface {
     tokenType,
   }) {
     const [info, networkFee] = await Promise.all([
-      new WalletController(this.config).getWalletInfo({
+      getWalletControllerInstance(this.config).getWalletInfo({
         address: wallet.address,
         protocol,
       }),

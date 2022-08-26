@@ -3,7 +3,7 @@ const faker = require('faker')
 const nock = require('nock')
 const AxiosApi = require('../../src/axios')
 const { InvalidTypeException, GenericException } = require('../../src/errors')
-const PricesController = require('../../src/features/prices/controller')
+const { PricesController } = require('../../src/features/prices/controller')
 const { pricesMock } = require('./mocks')
 
 describe.only('Prices Controller Tests', () => {
