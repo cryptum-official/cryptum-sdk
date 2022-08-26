@@ -470,7 +470,7 @@ class Controller extends Interface {
     const { wallet, tokenSymbol, amount, destination, fee, contractAddress } = input
     const protocol = Protocol.BSC
     let decimals
-    if (tokenSymbol !== 'ETH') {
+    if (tokenSymbol !== 'BNB') {
       ({ decimals } = await getTokenControllerInstance(this.config).getInfo({ tokenAddress: contractAddress, protocol }))
     }
     const { info, networkFee } = await this._getFeeInfo({
@@ -509,7 +509,7 @@ class Controller extends Interface {
     const { wallet, tokenSymbol, amount, destination, fee, contractAddress } = input
     const protocol = Protocol.POLYGON
     let decimals
-    if (tokenSymbol !== 'ETH') {
+    if (tokenSymbol !== 'MATIC') {
       ({ decimals } = await getTokenControllerInstance(this.config).getInfo({ tokenAddress: contractAddress, protocol }))
     }
     const { info, networkFee } = await this._getFeeInfo({
@@ -548,7 +548,7 @@ class Controller extends Interface {
     const { wallet, tokenSymbol, amount, destination, fee, contractAddress } = input
     const protocol = Protocol.AVAXCCHAIN
     let decimals
-    if (tokenSymbol !== 'ETH') {
+    if (tokenSymbol !== 'AVAX') {
       ({ decimals } = await getTokenControllerInstance(this.config).getInfo({ tokenAddress: contractAddress, protocol }))
     }
     const { info, networkFee } = await this._getFeeInfo({
