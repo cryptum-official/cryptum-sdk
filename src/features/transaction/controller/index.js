@@ -109,6 +109,8 @@ class Controller extends Interface {
     source = null,
     feeCurrency = null,
     tokenType = null,
+    numInputs = null,
+    numOutputs = null
   }) {
     try {
       const data = {}
@@ -124,6 +126,8 @@ class Controller extends Interface {
       if (source) data.source = source
       if (feeCurrency) data.feeCurrency = feeCurrency
       if (tokenType) data.tokenType = tokenType
+      if (numInputs) data.numInputs = numInputs
+      if (numOutputs) data.numOutputs = numOutputs
       const response = await makeRequest({ method: 'post', url: `/fee?protocol=${protocol}`, body: data, config: this.config })
       return new FeeResponse(response)
     } catch (error) {
@@ -584,14 +588,13 @@ class Controller extends Interface {
    */
   async createBitcoinTransferTransaction(input) {
     validateBitcoinTransferTransactionParams(input)
-    let { wallet, inputs, outputs } = input
+    let { wallet, inputs, outputs, fee } = input
     const protocol = Protocol.BITCOIN
     if (wallet) {
       const utxos = await this.getUTXOs({ address: wallet.address, protocol })
       inputs = []
       for (let i = 0; i < utxos.length; ++i) {
-        const tx = await this.getTransactionByHash({ hash: utxos[i].txHash, protocol })
-        inputs[i] = new Input({ ...utxos[i], privateKey: wallet.privateKey, hex: tx.hex, blockhash: tx.blockhash })
+        inputs[i] = new Input({ ...utxos[i], privateKey: wallet.privateKey })
       }
     } else if (inputs) {
       for (let i = 0; i < inputs.length; ++i) {
@@ -599,21 +602,19 @@ class Controller extends Interface {
         if (!tx.vout[inputs[i].index]) {
           throw new GenericException(`Invalid UTXO hash ${inputs[i].txHash}`, 'InvalidParams')
         }
+        inputs[i].value = tx.vout[inputs[i].index].value
         inputs[i].hex = tx.hex
         inputs[i].blockhash = tx.blockhash
       }
     }
 
-    const { estimateValue: networkFee } = await this.getFee({
-      type: TransactionType.TRANSFER,
-      protocol,
-    })
     const signedTx = await buildBitcoinTransferTransaction({
       wallet,
       inputs,
       outputs,
-      fee: networkFee,
+      fee,
       testnet: isTestnet(this.config.environment),
+      config: this.config
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }

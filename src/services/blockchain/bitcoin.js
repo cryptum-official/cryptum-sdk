@@ -1,61 +1,74 @@
 const { default: BigNumber } = require('bignumber.js')
-const bitcoin = require('bitcoinjs-lib')
-const { GenericException } = require('../../errors')
+const bitcore = require('bitcore-lib')
 const { toSatoshi } = require('./utils')
+const { Protocol } = require('./constants')
+const { TransactionType } = require('../../features/transaction/entity')
+const { getTransactionControllerInstance } = require('../../features/transaction/controller')
+const { BlockchainException } = require('../../errors/blockchainException')
+const { getWalletControllerInstance } = require('../../features/wallet/controller')
 
-/**
- * @param numInputs
- * @param numOutputs
- */
-function calculateTransactionSize(numInputs, numOutputs) {
-  return numInputs * 148 + numOutputs * 34 + 10
-}
-
-module.exports.buildBitcoinTransferTransaction = async function ({ wallet, inputs, outputs, fee, testnet }) {
-  const feePerByte = fee
-  const outputDatas = outputs.map(({ address, amount }) => ({ address, value: toSatoshi(amount).toNumber() }))
-
-  const outputSum = outputDatas
-    .map((output) => output.value)
-    .reduce((prev, cur) => new BigNumber(prev).plus(cur), new BigNumber(0))
-
-  const network = testnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin
-  const tx = new bitcoin.Psbt({ network })
-  tx.setMaximumFeeRate(new BigNumber(feePerByte).toNumber())
-  let availableSatoshi = new BigNumber(0)
-  let calcFee = new BigNumber(0), transactionSize = 0
-  for (let i = 0; i < inputs.length; ++i) {
-    const utxo = inputs[i]
-    if (!utxo.blockhash) {
-      throw new GenericException(`UTXO transaction ${utxo.txHash} is still pending`, 'InvalidTypeException')
-    }
-    tx.addInput({
-      hash: utxo.txHash,
-      index: utxo.index,
-      nonWitnessUtxo: Buffer.from(utxo.hex, 'hex'),
-    })
-    transactionSize = calculateTransactionSize(tx.inputCount, outputs.length)
-    calcFee = new BigNumber(feePerByte).times(transactionSize)
-    if (wallet) {
-      availableSatoshi = availableSatoshi.plus(utxo.value)
-      if (availableSatoshi.gte(outputSum.plus(calcFee))) {
-        break
+module.exports.buildBitcoinTransferTransaction = async function ({ wallet, inputs, outputs, fee, config }) {
+  const tc = getTransactionControllerInstance(config)
+  const outputDatas = outputs.map(({ address, amount }) => ({ address, satoshis: toSatoshi(amount).toNumber() }))
+  let outputSum = new BigNumber(outputDatas.reduce((prev, cur) => prev + cur.satoshis, 0))
+  if (wallet) {
+    inputs.sort((a, b) => b.value - a.value)
+    const selectedInputs = []
+    let inputSum = new BigNumber(0)
+    let change = new BigNumber(0)
+    for (let i = 0; i < inputs.length; ++i) {
+      inputSum = inputSum.plus(inputs[i].value)
+      selectedInputs.push({
+        txid: inputs[i].txHash,
+        address: wallet.address,
+        outputIndex: inputs[i].index,
+        script: bitcore.Script.buildPublicKeyHashOut(wallet.address).toString(),
+        satoshis: inputs[i].value
+      })
+      if (inputSum.gt(outputSum)) {
+        if (fee === undefined) {
+          ({ estimateValue: fee } = await tc.getFee({
+            type: TransactionType.TRANSFER,
+            protocol: Protocol.BITCOIN,
+            numInputs: selectedInputs.length,
+            numOutputs: outputs.length + change.gt(0) ? 1 : 0
+          }))
+        }
+        change = inputSum.minus(outputSum).minus(fee)
+        outputSum = outputSum.plus(fee)
+        if (inputSum.gt(outputSum)) {
+          break
+        }
       }
     }
-  }
-
-  tx.addOutputs(outputDatas)
-  if (!availableSatoshi.isEqualTo(outputSum) && wallet !== undefined) {
-    const fee = transactionSize + 100
-    const changeValue = availableSatoshi.minus(outputSum).minus(fee).toNumber()
-    tx.addOutput({ address: wallet.address, value: changeValue })
-  }
-  for (let i = 0; i < inputs.length; ++i) {
-    tx.signInput(i, bitcoin.ECPair.fromPrivateKey(Buffer.from(inputs[i].privateKey, 'hex'), { network }))
-    if (!tx.validateSignaturesOfInput(i)) {
-      throw new GenericException('Signature validation failed of input', 'InvalidTypeException')
+    if (inputSum.lt(outputSum)) {
+      throw new BlockchainException('Not enough balance')
     }
-  }
 
-  return tx.finalizeAllInputs().extractTransaction().toHex()
+    const tx = new bitcore.Transaction()
+    tx.fee(Number(fee))
+    tx.from(selectedInputs)
+    tx.to(outputDatas)
+    if (change.gt(0)) tx.change(wallet.address)
+    tx.sign(wallet.privateKey)
+    return tx.serialize()
+  } else {
+    const tx = new bitcore.Transaction()
+    for (let i = 0; i < inputs.length; ++i) {
+      const inputWallet = await getWalletControllerInstance(config).generateWalletFromPrivateKey({
+        privateKey: inputs[i].privateKey,
+        protocol: Protocol.BITCOIN
+      })
+      tx.from({
+        txid: inputs[i].txHash,
+        address: inputWallet.address,
+        outputIndex: inputs[i].index,
+        script: bitcore.Script.buildPublicKeyHashOut(inputWallet.address).toString(),
+        satoshis: toSatoshi(inputs[i].value).toNumber()
+      })
+    }
+    tx.to(outputDatas)
+    tx.sign(inputs.map(input => input.privateKey))
+    return tx.serialize()
+  }
 }

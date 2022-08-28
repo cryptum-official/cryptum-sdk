@@ -1,6 +1,5 @@
 const { hdkey } = require('ethereumjs-wallet')
 const Web3 = require('web3')
-const bitcoin = require('bitcoinjs-lib')
 const { mnemonicToSeed, mnemonicToEntropy } = require('bip39')
 const stellarHdWallet = require('stellar-hd-wallet')
 const rippleKeyPairs = require('ripple-keypairs')
@@ -8,7 +7,6 @@ const { Keypair } = require('stellar-sdk')
 const hathorSdk = require('@hathor/wallet-lib')
 const bitcore = require('bitcore-lib')
 const CardanoWasm = require("@emurgo/cardano-serialization-lib-nodejs");
-const Bip39 = require("bip39");
 const solanaWeb3 = require('@solana/web3.js');
 const ed25519 = require('ed25519-hd-key')
 const bs58 = require('bs58')
@@ -58,14 +56,8 @@ const getSolanaDerivationPath = ({ account = 0, address }) =>
  * @returns {string} address
  */
 module.exports.getBitcoinAddressFromPrivateKey = (privateKey, testnet = true) => {
-  const keypair = bitcoin.ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'), {
-    network: testnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin,
-  })
-  const { address } = bitcoin.payments.p2pkh({
-    pubkey: keypair.publicKey,
-    network: testnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin,
-  })
-  return address
+  const privkey = new bitcore.PrivateKey(privateKey, testnet ? bitcore.Networks.testnet : bitcore.Networks.mainnet)
+  return privkey.toAddress().toString()
 }
 /**
  * Derive bitcoin addresses from extended public key (xpub)
@@ -77,13 +69,8 @@ module.exports.getBitcoinAddressFromPrivateKey = (privateKey, testnet = true) =>
  * @returns
  */
 module.exports.deriveBitcoinAddressFromXpub = (xpub, testnet, { address = 0 } = {}) => {
-  const network = testnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin
-  const derivedPath = bitcoin.bip32.fromBase58(xpub, network).derive(address)
-  const { address: btcAddress } = bitcoin.payments.p2pkh({
-    pubkey: derivedPath.publicKey,
-    network,
-  })
-  return btcAddress
+  const hdPublicKey = new bitcore.HDPublicKey(xpub, testnet ? bitcore.Networks.testnet : bitcore.Networks.mainnet)
+  return hdPublicKey.deriveChild(address).publicKey.toAddress().toString()
 }
 /**
  * Derive bitcoin address, private key and public key
@@ -101,25 +88,22 @@ module.exports.deriveBitcoinWalletFromDerivationPath = async (
   testnet,
   { account = 0, change = 0, address } = {}
 ) => {
-  const network = testnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin
+  const network = testnet ? bitcore.Networks.testnet : bitcore.Networks.mainnet
+  const hdPrivateKey = bitcore.HDPrivateKey.fromSeed(await mnemonicToSeed(mnemonic), network)
   const accountIndex = account !== undefined ? account : 0
   const changeIndex = change !== undefined ? change : 0
   const addressIndex = address !== undefined ? address : 0
-  const derivedPath = bitcoin.bip32
-    .fromSeed(await mnemonicToSeed(mnemonic), network)
-    .derivePath(
-      testnet
-        ? getTestnetDerivationPath({ account: accountIndex, change: changeIndex })
-        : getBitcoinDerivationPath({ account: accountIndex, change: changeIndex })
-    )
-  const xpub = derivedPath.neutered().toBase58()
-  const btcAddress = this.deriveBitcoinAddressFromXpub(xpub, testnet, { address: addressIndex })
-  const privkeyDerived = derivedPath.derive(addressIndex)
-
+  const derivedPath = hdPrivateKey.deriveChild(
+    testnet
+      ? getTestnetDerivationPath({ account: accountIndex, change: changeIndex })
+      : getBitcoinDerivationPath({ account: accountIndex, change: changeIndex })
+  )
+  const xpub = derivedPath.hdPublicKey.toString()
+  const privateKey = derivedPath.deriveChild(addressIndex)
   return {
-    address: btcAddress,
-    privateKey: privkeyDerived.privateKey.toString('hex'),
-    publicKey: privkeyDerived.publicKey.toString('hex'),
+    address: privateKey.publicKey.toAddress().toString(),
+    privateKey: privateKey.privateKey.toString(),
+    publicKey: privateKey.publicKey.toString(),
     xpub,
   }
 }
@@ -311,7 +295,7 @@ module.exports.deriveCardanoWalletFromDerivationPath = async (mnemonic, testnet,
     return 0x80000000 + num;
   }
 
-  const entropy = Bip39.mnemonicToEntropy(mnemonic);
+  const entropy = mnemonicToEntropy(mnemonic);
   const accountKey = CardanoWasm.Bip32PrivateKey.from_bip39_entropy(
     Buffer.from(entropy, "hex"),
     Buffer.from("")

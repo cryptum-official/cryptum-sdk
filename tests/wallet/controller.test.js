@@ -172,7 +172,7 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       assert.strictEqual(wallet.protocol, Protocol.RIPPLE)
       assert.strictEqual(
         wallet.address,
-        'rGcqB7ciEfDQpz9znXZSYXgEozqB5Xxhm'
+        'r9yjyreZCXNm7cN1uNEmAqzs6zJYWJnUxr'
       )
     })
     it('generate stellar wallet', async () => {
