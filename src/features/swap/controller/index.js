@@ -1,3 +1,4 @@
+module.exports.getSwapControllerInstance = (config) => new Controller(config)
 const { getApiMethod, mountHeaders, handleRequestError } = require('../../../services')
 const Interface = require('./interface')
 const requests = require('./requests.json')
@@ -210,4 +211,4 @@ class Controller extends Interface {
   }
 }
 
-module.exports = Controller
+module.exports.SwapController = Controller

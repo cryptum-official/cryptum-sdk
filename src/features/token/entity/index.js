@@ -30,6 +30,7 @@
  * @property {string=} issuer issuer account of the token to transfer (only for stellar and ripple transactions)
  * @property {string=} memo text to be attached to transaction (for stellar and ripple only)
  * @property {string=} feeCurrency fee currency (for celo only)
+ * @property {string=} fee fee 
  */
 /**
  * @typedef {Object} SetTrustlineInput

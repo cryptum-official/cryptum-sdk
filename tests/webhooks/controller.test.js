@@ -1,7 +1,7 @@
 const assert = require('assert')
 const nock = require('nock')
 
-const WebhookCryptumController = require('../../src/features/webhooks/controller')
+const { WebhooksController } = require('../../src/features/webhooks/controller')
 
 describe.only('Test Suite of the Webhook (Controller)', function () {
   this.beforeAll(() => {
@@ -63,7 +63,7 @@ describe.only('Test Suite of the Webhook (Controller)', function () {
       id: '143c07af-cc73-4d46-9e0a-8d96624a082e',
     }
 
-    const controller = new WebhookCryptumController({
+    const controller = new WebhooksController({
       environment: 'development',
       apiKey: 'apikeyexamplecryptum',
     })
@@ -78,7 +78,7 @@ describe.only('Test Suite of the Webhook (Controller)', function () {
       protocol: 'BITCOIN',
     }
 
-    const controller = new WebhookCryptumController({
+    const controller = new WebhooksController({
       environment: 'development',
       apiKey: 'apikeyexamplecryptum',
     })
@@ -98,7 +98,7 @@ describe.only('Test Suite of the Webhook (Controller)', function () {
       },
     ]
 
-    const controller = new WebhookCryptumController({
+    const controller = new WebhooksController({
       environment: 'development',
       apiKey: 'apikeyexamplecryptum',
     })

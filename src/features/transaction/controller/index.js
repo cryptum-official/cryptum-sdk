@@ -29,7 +29,7 @@ const {
   deploySolanaCollection,
 } = require('../../../services/blockchain/solana')
 const { buildBitcoinTransferTransaction } = require('../../../services/blockchain/bitcoin')
-const WalletController = require('../../wallet/controller')
+const { getWalletControllerInstance } = require('../../wallet/controller')
 const { GenericException, HathorException } = require('../../../errors')
 const { buildCeloTransferTransaction } = require('../../../services/blockchain/celo')
 const {
@@ -109,6 +109,8 @@ class Controller extends Interface {
     source = null,
     feeCurrency = null,
     tokenType = null,
+    numInputs = null,
+    numOutputs = null
   }) {
     try {
       const data = {}
@@ -124,6 +126,8 @@ class Controller extends Interface {
       if (source) data.source = source
       if (feeCurrency) data.feeCurrency = feeCurrency
       if (tokenType) data.tokenType = tokenType
+      if (numInputs) data.numInputs = numInputs
+      if (numOutputs) data.numOutputs = numOutputs
       const response = await makeRequest({ method: 'post', url: `/fee?protocol=${protocol}`, body: data, config: this.config })
       return new FeeResponse(response)
     } catch (error) {
@@ -215,7 +219,7 @@ class Controller extends Interface {
     validateStellarTrustlineTransactionParams(input)
     const { wallet, assetSymbol, issuer, fee, limit, memo } = input
     const protocol = Protocol.STELLAR
-    const info = await new WalletController(this.config).getWalletInfo({
+    const info = await getWalletControllerInstance(this.config).getWalletInfo({
       address: wallet.publicKey,
       protocol,
     })
@@ -250,7 +254,7 @@ class Controller extends Interface {
     validateRippleTrustlineTransactionParams(input)
     const { wallet, assetSymbol, issuer, fee, limit, memo } = input
     const protocol = Protocol.RIPPLE
-    const info = await new WalletController(this.config).getWalletInfo({
+    const info = await getWalletControllerInstance(this.config).getWalletInfo({
       address: wallet.address,
       protocol,
     })
@@ -286,7 +290,7 @@ class Controller extends Interface {
     validateStellarTransferTransactionParams(input)
     const { wallet, assetSymbol, issuer, amount, destination, memo, fee, createAccount } = input
     const protocol = Protocol.STELLAR
-    const info = await new WalletController(this.config).getWalletInfo({
+    const info = await getWalletControllerInstance(this.config).getWalletInfo({
       address: wallet.publicKey,
       protocol,
     })
@@ -323,7 +327,7 @@ class Controller extends Interface {
     validateRippleTransferTransactionParams(input)
     const { wallet, assetSymbol, issuer, amount, destination, memo, fee } = input
     const protocol = Protocol.RIPPLE
-    const info = await new WalletController(this.config).getWalletInfo({
+    const info = await getWalletControllerInstance(this.config).getWalletInfo({
       address: wallet.address,
       protocol,
     })
@@ -470,7 +474,7 @@ class Controller extends Interface {
     const { wallet, tokenSymbol, amount, destination, fee, contractAddress } = input
     const protocol = Protocol.BSC
     let decimals
-    if (tokenSymbol !== 'ETH') {
+    if (tokenSymbol !== 'BNB') {
       ({ decimals } = await getTokenControllerInstance(this.config).getInfo({ tokenAddress: contractAddress, protocol }))
     }
     const { info, networkFee } = await this._getFeeInfo({
@@ -509,7 +513,7 @@ class Controller extends Interface {
     const { wallet, tokenSymbol, amount, destination, fee, contractAddress } = input
     const protocol = Protocol.POLYGON
     let decimals
-    if (tokenSymbol !== 'ETH') {
+    if (tokenSymbol !== 'MATIC') {
       ({ decimals } = await getTokenControllerInstance(this.config).getInfo({ tokenAddress: contractAddress, protocol }))
     }
     const { info, networkFee } = await this._getFeeInfo({
@@ -548,7 +552,7 @@ class Controller extends Interface {
     const { wallet, tokenSymbol, amount, destination, fee, contractAddress } = input
     const protocol = Protocol.AVAXCCHAIN
     let decimals
-    if (tokenSymbol !== 'ETH') {
+    if (tokenSymbol !== 'AVAX') {
       ({ decimals } = await getTokenControllerInstance(this.config).getInfo({ tokenAddress: contractAddress, protocol }))
     }
     const { info, networkFee } = await this._getFeeInfo({
@@ -584,14 +588,13 @@ class Controller extends Interface {
    */
   async createBitcoinTransferTransaction(input) {
     validateBitcoinTransferTransactionParams(input)
-    let { wallet, inputs, outputs } = input
+    let { wallet, inputs, outputs, fee } = input
     const protocol = Protocol.BITCOIN
     if (wallet) {
       const utxos = await this.getUTXOs({ address: wallet.address, protocol })
       inputs = []
       for (let i = 0; i < utxos.length; ++i) {
-        const tx = await this.getTransactionByHash({ hash: utxos[i].txHash, protocol })
-        inputs[i] = new Input({ ...utxos[i], privateKey: wallet.privateKey, hex: tx.hex, blockhash: tx.blockhash })
+        inputs[i] = new Input({ ...utxos[i], privateKey: wallet.privateKey })
       }
     } else if (inputs) {
       for (let i = 0; i < inputs.length; ++i) {
@@ -599,21 +602,19 @@ class Controller extends Interface {
         if (!tx.vout[inputs[i].index]) {
           throw new GenericException(`Invalid UTXO hash ${inputs[i].txHash}`, 'InvalidParams')
         }
+        inputs[i].value = tx.vout[inputs[i].index].value
         inputs[i].hex = tx.hex
         inputs[i].blockhash = tx.blockhash
       }
     }
 
-    const { estimateValue: networkFee } = await this.getFee({
-      type: TransactionType.TRANSFER,
-      protocol,
-    })
     const signedTx = await buildBitcoinTransferTransaction({
       wallet,
       inputs,
       outputs,
-      fee: networkFee,
+      fee,
       testnet: isTestnet(this.config.environment),
+      config: this.config
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
@@ -635,7 +636,7 @@ class Controller extends Interface {
     tokenType,
   }) {
     const [info, networkFee] = await Promise.all([
-      new WalletController(this.config).getWalletInfo({
+      getWalletControllerInstance(this.config).getWalletInfo({
         address: wallet.address,
         protocol,
       }),

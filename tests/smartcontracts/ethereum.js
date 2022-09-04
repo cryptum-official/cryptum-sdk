@@ -3,15 +3,15 @@ const chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 const assert = chai.assert
-const AxiosApi = require('../../../src/axios')
-const { TransactionController } = require('../../../src/features/transaction/controller')
-const { Protocol } = require('../../../src/services/blockchain/constants')
-const { getWallets, config } = require('../../wallet/constants')
-const { TransactionType } = require('../../../src/features/transaction/entity')
+const AxiosApi = require('../../src/axios')
+const { TransactionController } = require('../../src/features/transaction/controller')
+const { Protocol } = require('../../src/services/blockchain/constants')
+const { getWallets, config } = require('../wallet/constants')
+const { TransactionType } = require('../../src/features/transaction/entity')
 const txController = new TransactionController(config)
 const axiosApi = new AxiosApi(config)
 const baseUrl = axiosApi.getBaseUrl(config.environment)
-const contractAddress = '0x2B751008e680E1921161C5456a763e72788Db9Ca'
+const contractAddress = '0xF13BfC94263F915E1Fec3d341015661056DD49FA'
 const contractAbiUpdate = [
   {
     constant: false,
@@ -48,20 +48,20 @@ const contractAbiMessage = [
 ]
 let wallets = {}
 
-describe.only('Celo smart contract transactions', () => {
+describe.only('Ethereum smart contract transactions', () => {
   before(async () => {
     wallets = await getWallets()
 
     nock(baseUrl)
-      .get(`/wallet/${wallets.celo.address}/info`)
-      .query({ protocol: Protocol.CELO })
+      .get(`/wallet/${wallets.ethereum.address}/info`)
+      .query({ protocol: Protocol.ETHEREUM })
       .reply(200, {
         nonce: '2',
       })
       .persist()
-      .post(`/fee?protocol=${Protocol.CELO}`, {
+      .post(`/fee?protocol=${Protocol.ETHEREUM}`, {
         type: TransactionType.CALL_CONTRACT_METHOD,
-        from: '0xb8a29fa1876eb806e411f15d2d94c8e80fb72e23',
+        from: wallets.ethereum.address,
         contractAddress,
         contractAbi: contractAbiUpdate,
         method: 'update',
@@ -70,10 +70,10 @@ describe.only('Celo smart contract transactions', () => {
       .reply(200, {
         gas: 21000,
         gasPrice: '4000000',
-        chainId: 44787,
+        chainId: 4,
       })
       .persist()
-      .post(`/transaction/call-method?protocol=${Protocol.CELO}`, {
+      .post(`/transaction/call-method?protocol=${Protocol.ETHEREUM}`, {
         contractAddress,
         contractAbi: contractAbiMessage,
         method: 'message',
@@ -83,7 +83,7 @@ describe.only('Celo smart contract transactions', () => {
         result: 'hello',
       })
       .persist()
-      .post(`/transaction/contract/compile?protocol=${Protocol.CELO}`, {
+      .post(`/transaction/contract/compile?protocol=${Protocol.ETHEREUM}`, {
         contractName: 'Test',
         source: 'contract Test {}',
         params: ['new message'],
@@ -93,7 +93,7 @@ describe.only('Celo smart contract transactions', () => {
         abi: [],
       })
       .persist()
-      .post(`/transaction/contract/compile?protocol=${Protocol.CELO}`, {
+      .post(`/transaction/contract/compile?protocol=${Protocol.ETHEREUM}`, {
         tokenType: 'ERC20',
         params: ['new message'],
       })
@@ -102,9 +102,9 @@ describe.only('Celo smart contract transactions', () => {
         abi: [],
       })
       .persist()
-      .post(`/fee?protocol=${Protocol.CELO}`, {
+      .post(`/fee?protocol=${Protocol.ETHEREUM}`, {
         type: TransactionType.DEPLOY_CONTRACT,
-        from: '0xb8a29fa1876eb806e411f15d2d94c8e80fb72e23',
+        from: wallets.ethereum.address,
         contractName: 'Test',
         source: 'contract Test {}',
         params: ['new message'],
@@ -115,9 +115,9 @@ describe.only('Celo smart contract transactions', () => {
         chainId: 4,
       })
       .persist()
-      .post(`/fee?protocol=${Protocol.CELO}`, {
+      .post(`/fee?protocol=${Protocol.ETHEREUM}`, {
         type: TransactionType.DEPLOY_ERC20,
-        from: '0xb8a29fa1876eb806e411f15d2d94c8e80fb72e23',
+        from: wallets.ethereum.address,
         tokenType: 'ERC20',
         params: ['new message'],
       })
@@ -132,20 +132,20 @@ describe.only('Celo smart contract transactions', () => {
     nock.isDone()
   })
 
-  it('create smart contract call transaction', async () => {
+  it.skip('create smart contract call transaction', async () => {
     const transaction = await txController.createSmartContractTransaction({
-      wallet: wallets.celo,
+      wallet: wallets.ethereum,
       contractAddress,
       contractAbi: contractAbiUpdate,
       method: 'update',
       params: ['new message'],
-      protocol: Protocol.CELO,
+      protocol: Protocol.ETHEREUM,
       testnet: true,
     })
     assert.include(transaction.signedTx, '0x')
     // console.log(await txController.sendTransaction(transaction))
   })
-  it('create smart contract call transaction failed when wallet is invalid', async () => {
+  it.skip('create smart contract call transaction failed when wallet is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractTransaction({
         wallet: null,
@@ -153,159 +153,159 @@ describe.only('Celo smart contract transactions', () => {
         contractAbi: contractAbiUpdate,
         method: 'update',
         params: ['new message'],
-        protocol: Protocol.CELO,
+        protocol: Protocol.ETHEREUM,
         testnet: true,
       })
     )
   })
-  it('create smart contract call transaction failed when contract address is invalid', async () => {
+  it.skip('create smart contract call transaction failed when contract address is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractTransaction({
-        wallet: wallets.celo,
+        wallet: wallets.ethereum,
         contractAddress: undefined,
         contractAbi: contractAbiUpdate,
         method: 'update',
         params: ['new message'],
-        protocol: Protocol.CELO,
+        protocol: Protocol.ETHEREUM,
       })
     )
   })
-  it('create smart contract call transaction failed when contract abi is invalid', async () => {
+  it.skip('create smart contract call transaction failed when contract abi is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractTransaction({
-        wallet: wallets.celo,
+        wallet: wallets.ethereum,
         contractAddress,
         contractAbi: null,
         method: 'update',
         params: ['new message'],
-        protocol: Protocol.CELO,
+        protocol: Protocol.ETHEREUM,
       })
     )
   })
-  it('call smart contract method', async () => {
+  it.skip('call smart contract method', async () => {
     const response = await txController.callSmartContractMethod({
       contractAddress,
       contractAbi: contractAbiMessage,
       method: 'message',
       params: [],
-      protocol: Protocol.CELO,
+      protocol: Protocol.ETHEREUM,
       testnet: true,
     })
     assert.strictEqual(response.result, 'hello')
   })
-  it('call smart contract method failed when constract address missing', async () => {
+  it.skip('call smart contract method failed when constract address missing', async () => {
     assert.isRejected(
       txController.callSmartContractMethod({
         contractAbi: contractAbiMessage,
         method: 'message',
         params: [],
-        protocol: Protocol.CELO,
+        protocol: Protocol.ETHEREUM,
         testnet: true,
       })
     )
   })
-  it('call smart contract method failed when constract abi missing', async () => {
+  it.skip('call smart contract method failed when constract abi missing', async () => {
     assert.isRejected(
       txController.callSmartContractMethod({
         contractAddress,
         method: 'message',
         params: [],
-        protocol: Protocol.CELO,
+        protocol: Protocol.ETHEREUM,
         testnet: true,
       })
     )
   })
 
-  it('throws smart contract deploy transaction failed when wallet is invalid', async () => {
-    assert.isRejected(
-      txController.createSmartContractDeployTransaction({
-        params: ['new message'],
-        protocol: Protocol.CELO,
-        testnet: true,
-        contractName: 'Test',
-        source: 'contract Test {}',
-      })
-    )
-  })
-  it('throws smart contract deploy transaction failed when params is invalid', async () => {
-    assert.isRejected(
-      txController.createSmartContractDeployTransaction({
-        wallet: wallets.celo,
-        protocol: Protocol.CELO,
-        testnet: true,
-        contractName: 'Test',
-        source: 'contract Test {}',
-      })
-    )
-  })
-  it('throws smart contract deploy transaction failed when contract name is invalid', async () => {
-    assert.isRejected(
-      txController.createSmartContractDeployTransaction({
-        wallet: wallets.celo,
-        protocol: Protocol.CELO,
-        testnet: true,
-        source: 'contract Test {}',
-      })
-    )
-  })
-  it('throws smart contract deploy transaction failed when source is invalid', async () => {
-    assert.isRejected(
-      txController.createSmartContractDeployTransaction({
-        wallet: wallets.celo,
-        protocol: Protocol.CELO,
-        testnet: true,
-        contractName: 'Test',
-      })
-    )
-  })
-
-  it('create smart contract deploy transaction', async () => {
+  it.skip('create smart contract deploy transaction', async () => {
     const transaction = await txController.createSmartContractDeployTransaction({
-      wallet: wallets.celo,
-      params: ['new message'],
-      protocol: Protocol.CELO,
-      testnet: true,
+      wallet: wallets.ethereum,
       contractName: 'Test',
-      source: 'contract Test {}'
+      source: 'contract Test {}',
+      params: ['new message'],
+      protocol: Protocol.ETHEREUM,
+      testnet: true,
     })
     assert.include(transaction.signedTx, '0x')
     // console.log(await txController.sendTransaction(transaction))
   })
-  it('create smart contract token deploy transaction', async () => {
+  it.skip('create smart contract token deploy transaction', async () => {
     const transaction = await txController.createTokenDeployTransaction({
-      wallet: wallets.celo,
+      wallet: wallets.ethereum,
       params: ['new message'],
-      protocol: Protocol.CELO,
+      protocol: Protocol.ETHEREUM,
       testnet: true,
       tokenType: 'ERC20',
     })
     assert.include(transaction.signedTx, '0x')
+    // console.log(await txController.sendTransaction(transaction))
   })
-  it('throws smart contract token deploy transaction failed when wallet is invalid', async () => {
+  it.skip('throws smart contract deploy transaction failed when wallet is invalid', async () => {
+    assert.isRejected(
+      txController.createSmartContractDeployTransaction({
+        params: ['new message'],
+        protocol: Protocol.ETHEREUM,
+        testnet: true,
+        contractName: 'Test',
+        source: 'contract Test {}',
+      })
+    )
+  })
+  it.skip('throws smart contract deploy transaction failed when params is invalid', async () => {
+    assert.isRejected(
+      txController.createSmartContractDeployTransaction({
+        wallet: wallets.ethereum,
+        protocol: Protocol.ETHEREUM,
+        testnet: true,
+        contractName: 'Test',
+        source: 'contract Test {}',
+      })
+    )
+  })
+  it.skip('throws smart contract deploy transaction failed when contract name is invalid', async () => {
+    assert.isRejected(
+      txController.createSmartContractDeployTransaction({
+        wallet: wallets.ethereum,
+        protocol: Protocol.ETHEREUM,
+        testnet: true,
+        source: 'contract Test {}',
+      })
+    )
+  })
+  it.skip('throws smart contract deploy transaction failed when source is invalid', async () => {
+    assert.isRejected(
+      txController.createSmartContractDeployTransaction({
+        wallet: wallets.ethereum,
+        protocol: Protocol.ETHEREUM,
+        testnet: true,
+        contractName: 'Test',
+      })
+    )
+  })
+  it.skip('throws smart contract token deploy transaction failed when wallet is invalid', async () => {
     assert.isRejected(
       txController.createTokenDeployTransaction({
         params: ['new message'],
-        protocol: Protocol.CELO,
+        protocol: Protocol.ETHEREUM,
         testnet: true,
         tokenType: 'ERC20',
       })
     )
   })
-  it('throws smart contract token deploy transaction failed when params is invalid', async () => {
+  it.skip('throws smart contract token deploy transaction failed when params is invalid', async () => {
     assert.isRejected(
       txController.createTokenDeployTransaction({
-        wallet: wallets.celo,
-        protocol: Protocol.CELO,
+        wallet: wallets.ethereum,
+        protocol: Protocol.ETHEREUM,
         testnet: true,
         tokenType: 'ERC20',
       })
     )
   })
-  it('throws smart contract token deploy transaction failed when token type is invalid', async () => {
+  it.skip('throws smart contract token deploy transaction failed when token type is invalid', async () => {
     assert.isRejected(
       txController.createTokenDeployTransaction({
-        wallet: wallets.celo,
-        protocol: Protocol.CELO,
+        wallet: wallets.ethereum,
+        protocol: Protocol.ETHEREUM,
         testnet: true,
         params: ['new message'],
       })

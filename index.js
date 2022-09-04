@@ -1,14 +1,14 @@
-const WebhooksController = require('./src/features/webhooks/controller')
-const WalletController = require('./src/features/wallet/controller')
-const PricesController = require('./src/features/prices/controller')
-const { TransactionController } = require('./src/features/transaction/controller')
-const StakingController = require('./src/features/staking/controller')
-const SwapController = require('./src/features/swap/controller')
-const { TokenController } = require('./src/features/token/controller')
-const { NftController } = require('./src/features/nft/controller')
+const { getWebhooksControllerInstance } = require('./src/features/webhooks/controller')
+const { getWalletControllerInstance } = require('./src/features/wallet/controller')
+const { getPricesControllerInstance } = require('./src/features/prices/controller')
+const { getTransactionControllerInstance } = require('./src/features/transaction/controller')
+const { getStakingControllerInstance } = require('./src/features/staking/controller')
+const { getSwapControllerInstance } = require('./src/features/swap/controller')
+const { getTokenControllerInstance } = require('./src/features/token/controller')
+const { getNftControllerInstance } = require('./src/features/nft/controller')
+const { getContractControllerInstance } = require('./src/features/contract/controller')
 const { Protocol } = require('./src/services/blockchain/constants')
 const { GenericException } = require('./src/errors')
-const { ContractController } = require('./src/features/contract/controller')
 /**
  * @typedef {object} Config
  * @property {'testnet'|'mainnet'} environment
@@ -31,7 +31,7 @@ class CryptumSDK {
    */
   get webhook() { return this.getWebhooksController() }
   getWebhooksController() {
-    return new WebhooksController(this.config)
+    return getWebhooksControllerInstance(this.config)
   }
 
   /**
@@ -41,7 +41,7 @@ class CryptumSDK {
    */
   get wallet() { return this.getWalletController() }
   getWalletController() {
-    return new WalletController(this.config)
+    return getWalletControllerInstance(this.config)
   }
 
   /**
@@ -51,10 +51,10 @@ class CryptumSDK {
    */
   get transaction() { return this.getTransactionController() }
   getTransactionController() {
-    return new TransactionController(this.config)
+    return getTransactionControllerInstance(this.config)
   }
 
-  get staking() { return new StakingController(this.config) }
+  get staking() { return getStakingControllerInstance(this.config) }
   /**
    * Method to get a controller to manipulate transactions
    * @param {Object} args
@@ -62,7 +62,7 @@ class CryptumSDK {
    * @returns TransactionController instance
    */
   getStakingController({ protocol }) {
-    const controller = new StakingController(this.config)
+    const controller = getStakingControllerInstance(this.config)
     switch (protocol) {
       case Protocol.CELO:
         return controller.celo
@@ -78,7 +78,7 @@ class CryptumSDK {
    */
   get prices() { return this.getPricesController() }
   getPricesController() {
-    return new PricesController(this.config)
+    return getPricesControllerInstance(this.config)
   }
 
   /**
@@ -88,22 +88,22 @@ class CryptumSDK {
    */
   get swap() { return this.getSwapController() }
   getSwapController() {
-    return new SwapController(this.config)
+    return getSwapControllerInstance(this.config)
   }
 
   get token() { return this.getTokenController() }
   getTokenController() {
-    return new TokenController(this.config)
+    return getTokenControllerInstance(this.config)
   }
 
   get nft() { return this.getNftController() }
   getNftController() {
-    return new NftController(this.config)
+    return getNftControllerInstance(this.config)
   }
 
   get contract() { return this.getContractController() }
   getContractController() {
-    return new ContractController(this.config)
+    return getContractControllerInstance(this.config)
   }
 }
 
