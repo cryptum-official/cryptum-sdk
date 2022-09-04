@@ -1101,10 +1101,10 @@ class Controller extends Interface {
     validateSolanaCollectionInput(input)
     const { wallet, name, symbol, uri } = input
     const protocol = Protocol.SOLANA
-    const mintRent = (await this.getFee({ protocol, type: TransactionType.SOLANA_NFT_MINT })).mintRentExemption
-    const { blockhash: recentBlockhash } = await this.getBlock({ block: 'latest', protocol })
+    // const mintRent = (await this.getFee({ protocol, type: TransactionType.SOLANA_NFT_MINT })).mintRentExemption
+    const { blockhash } = await this.getBlock({ block: 'latest', protocol })
     const response = await deploySolanaCollection({
-      name, symbol, uri, mintRent, from: wallet, recentBlockhash, config: this.config
+      name, symbol, uri, from: wallet, latestBlock: blockhash, config: this.config
     })
     return {
       collection: response.collection,
@@ -1117,21 +1117,19 @@ class Controller extends Interface {
      */
   async createSolanaNFTTransaction(input) {
     validateSolanaNFTInput(input)
-    const { wallet, maxSupply, uri, name, symbol, amount, creators, royaltiesFee, collection } = input
+    const { wallet, maxSupply, uri, name, symbol, creators, royaltiesFee, collection } = input
     const protocol = Protocol.SOLANA
-    const mintRent = (await this.getFee({ protocol, type: TransactionType.SOLANA_NFT_MINT })).mintRentExemption
-
+    const { blockhash } = await this.getBlock({ block: 'latest', protocol })
     const response = await deploySolanaNFT({
       from: wallet,
       maxSupply,
-      amount,
       uri,
       name,
-      mintRent,
       symbol,
       creators,
       royaltiesFee,
       collection,
+      latestBlock: blockhash,
       config: this.config
     })
     return {
@@ -1146,11 +1144,16 @@ class Controller extends Interface {
    * @param {import('../entity').SolanaNFTEditionInput} input
    * @returns {Promise<TransactionResponse>} edition signature
    */
-  async createSolanaNFTEdition(input) {
+  async createSolanaNFTEditionTransaction(input) {
     validateSolanaDeployNFT(input)
     const { wallet, masterEdition } = input
-    const hash = await mintEdition({ masterEdition, from: wallet, config: this.config })
-    return new TransactionResponse({ hash })
+    const protocol = Protocol.SOLANA
+    const { blockhash } = await this.getBlock({ block: 'latest', protocol })
+    const response = await mintEdition({ masterEdition, from: wallet, latestBlock: blockhash, config: this.config })
+    return {
+      mint: response.mint,
+      transaction: new SignedTransaction({ signedTx: response.rawTransaction, protocol, type: TransactionType.SOLANA_NFT_MINT })
+    }
   }
   /**
    * Update Solana NFT Metadata
@@ -1160,9 +1163,24 @@ class Controller extends Interface {
    */
   async updateSolanaNFTMetadata(input) {
     validateSolanaDeployNFT(input)
-    const { wallet, token, uri } = input
-    const hash = await updateMetaplexMetadata({ from: wallet, token, uri, config: this.config })
-    return new TransactionResponse({ hash })
+    const { wallet, maxSupply, uri, isMutable, name, symbol, creators, royaltiesFee, collection, token } = input
+    const protocol = Protocol.SOLANA
+    const { blockhash } = await this.getBlock({ block: 'latest', protocol })
+    const response = await updateMetaplexMetadata({
+      from: wallet,
+      token,
+      isMutable,
+      maxSupply,
+      uri,
+      name,
+      symbol,
+      creators,
+      royaltiesFee,
+      collection,
+      latestBlock: blockhash,
+      config: this.config
+    })
+    return new SignedTransaction({ signedTx: response, protocol, type: TransactionType.SOLANA_UPDATE_METADATA })
   }
   /**
    * Create a Custom Solana Program Interaction

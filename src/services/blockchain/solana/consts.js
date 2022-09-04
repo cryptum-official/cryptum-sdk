@@ -1,4 +1,5 @@
-const metaplex = require('@metaplex/js');
+const metaplex = require('@metaplex-foundation/js');
+const oldMetaplex = require('@metaplex/js')
 const solanaWeb3 = require('@solana/web3.js');
 const BN = require('bn.js');
 const splToken = require("@solana/spl-token");
@@ -48,7 +49,7 @@ function toPublicKey(key) {
 async function metaplexConfirm(network, tx) {
   let confirmedTx = null
   for (let tries = 0; tries < MAX_RETRIES; tries++) {
-    confirmedTx = await new metaplex.Connection(network, "finalized").getTransaction(tx)
+    confirmedTx = await new oldMetaplex.Connection(network, "finalized").getTransaction(tx)
     if (confirmedTx) break
     await sleep(1000)
   }
@@ -180,7 +181,7 @@ const WHITELIST_CREATOR_SCHEMA = new Map([
   ]
 ])
 
-class CreateAssociatedTokenAccount extends metaplex.programs.core.Transaction {
+class CreateAssociatedTokenAccount extends solanaWeb3.Transaction {
   constructor(options, params) {
     const { feePayer } = options;
     const { associatedTokenAddress, walletAddress, splTokenMintAddress } = params;
@@ -228,7 +229,7 @@ class CreateAssociatedTokenAccount extends metaplex.programs.core.Transaction {
     }));
   }
 }
-class MintTo extends metaplex.programs.core.Transaction {
+class MintTo extends solanaWeb3.Transaction {
   constructor(options, params) {
     const { feePayer } = options;
     const { mint, dest, authority, amount } = params;
@@ -237,7 +238,7 @@ class MintTo extends metaplex.programs.core.Transaction {
   }
 }
 
-class CreateMint extends metaplex.programs.core.Transaction {
+class CreateMint extends solanaWeb3.Transaction {
   constructor(options, params) {
     const { feePayer } = options;
     const { newAccountPubkey, lamports, decimals, owner, freezeAuthority } = params;
