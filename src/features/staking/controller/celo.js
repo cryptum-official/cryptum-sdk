@@ -11,6 +11,7 @@ const { GenericException } = require('../../../errors')
 const { default: BigNumber } = require('bignumber.js')
 const { makeRequest } = require('../../../services')
 const { getContractControllerInstance } = require('../../contract/controller')
+const { isTestnet } = require('../../../services/utils')
 
 // Steps to stake:
 // 1. Register account
@@ -34,7 +35,7 @@ class CeloStakingController extends Interface {
    */
   async isRegisteredAccount({ address }) {
     validateEthAddress(address)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'isAccount'
     return await getContractControllerInstance(this.config).callMethod({
@@ -53,7 +54,7 @@ class CeloStakingController extends Interface {
    */
   async registerAccount({ wallet }) {
     validateEthAddress(wallet.address)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'createAccount'
     const txController = getContractControllerInstance(this.config)
@@ -79,7 +80,7 @@ class CeloStakingController extends Interface {
   async lock({ wallet, amount }) {
     validateEthAddress(wallet.address)
     validatePositiveAmount(amount)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'lock'
     const txController = getContractControllerInstance(this.config)
@@ -107,7 +108,7 @@ class CeloStakingController extends Interface {
     validateEthAddress(wallet.address)
     validateEthAddress(validator)
     validatePositiveAmount(amount)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'vote'
     const txController = getContractControllerInstance(this.config)
@@ -134,7 +135,7 @@ class CeloStakingController extends Interface {
    */
   async activate({ wallet, validator }) {
     validateEthAddress(wallet.address)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'activate'
     const txController = getContractControllerInstance(this.config)
@@ -162,7 +163,7 @@ class CeloStakingController extends Interface {
     validateEthAddress(wallet.address)
     validateEthAddress(validator)
     validatePositiveAmount(amount)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const { lesser, greater } = await this._findLesserGreater({ amount, validator, network })
     const { result: groups } = await this.getGroupsVotedForByAccount({ address: wallet.address, testnet })
@@ -193,7 +194,7 @@ class CeloStakingController extends Interface {
     validateEthAddress(wallet.address)
     validateEthAddress(validator)
     validatePositiveAmount(amount)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const { lesser, greater } = await this._findLesserGreater({ amount, validator, network })
     const txController = getContractControllerInstance(this.config)
@@ -222,7 +223,7 @@ class CeloStakingController extends Interface {
   async unlock({ wallet, amount }) {
     validateEthAddress(wallet.address)
     validatePositiveAmount(amount)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'unlock'
     const txController = getContractControllerInstance(this.config)
@@ -250,7 +251,7 @@ class CeloStakingController extends Interface {
     validateEthAddress(wallet.address)
     validatePositiveAmount(amount)
     validatePositive(index)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'relock'
     const txController = getContractControllerInstance(this.config)
@@ -275,7 +276,7 @@ class CeloStakingController extends Interface {
    */
   async withdraw({ wallet, index }) {
     validateEthAddress(wallet.address)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'withdraw'
     const txController = getContractControllerInstance(this.config)
@@ -298,7 +299,7 @@ class CeloStakingController extends Interface {
    * @returns {Promise<import('../../transaction/entity').SmartContractCallResponse>}
    */
   async getTotalPendingWithdrawals({ address }) {
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'getTotalPendingWithdrawals'
     const txController = getContractControllerInstance(this.config)
@@ -319,7 +320,7 @@ class CeloStakingController extends Interface {
    * @returns {Promise<{amount, timestamp}[]>}
    */
   async getPendingWithdrawals({ address }) {
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'getPendingWithdrawals'
     const txController = getContractControllerInstance(this.config)
@@ -348,7 +349,7 @@ class CeloStakingController extends Interface {
    * @returns {Promise<import('../../transaction/entity').SmartContractCallResponse>}
    */
   async getGroupsVotedForByAccount({ address }) {
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'getGroupsVotedForByAccount'
     const txController = getContractControllerInstance(this.config)
@@ -370,7 +371,7 @@ class CeloStakingController extends Interface {
    * @returns {Promise<{pending, active}>}
    */
   async getVotesForGroupByAccount({ address, group }) {
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const txController = getContractControllerInstance(this.config)
     const [pending, active] = await Promise.all([
@@ -405,7 +406,7 @@ class CeloStakingController extends Interface {
    */
   async getAccountSummary({ address }) {
     validateEthAddress(address)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const txController = getContractControllerInstance(this.config)
 
