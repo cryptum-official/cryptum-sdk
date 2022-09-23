@@ -22,6 +22,7 @@
     "@emurgo/cardano-serialization-lib-nodejs": "^9.1.2",
     "@ethereumjs/tx": "^3.4.0",
     "@hathor/wallet-lib": "^0.33.1",
+    "@metaplex-foundation/js": "^0.15.0",
     "@metaplex-foundation/mpl-core": "^0.0.2",
     "@metaplex-foundation/mpl-token-metadata": "^2.2.1",
     "@metaplex/js": "^4.12.0",

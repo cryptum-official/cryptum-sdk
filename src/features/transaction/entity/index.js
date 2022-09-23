@@ -17,7 +17,8 @@ const TransactionType = {
   SOLANA_TOKEN_MINT: 'SOLANA_TOKEN_MINT',
   SOLANA_TOKEN_BURN: 'SOLANA_TOKEN_BURN',
   SOLANA_COLLECTION_MINT: 'SOLANA_COLLECTION_MINT',
-  SOLANA_NFT_MINT:'SOLANA_NFT_MINT'
+  SOLANA_NFT_MINT: 'SOLANA_NFT_MINT',
+  SOLANA_UPDATE_METADATA: 'SOLANA_UPDATE_METADATA'
 }
 /**
  * @typedef {object | string} Fee
@@ -107,7 +108,7 @@ class CardanoOutput extends Output {
    * @param {string} output.amount
    * @param {{ policy:string; asset:string; amount:string }=} output.token
    */
-   constructor(output) {
+  constructor(output) {
     super(output)
   }
 }
@@ -315,7 +316,7 @@ class SolanaTokenDeployInput {
    * @param {number} args.decimals
    * @param {string} args.amount
    */
-  constructor({ wallet,  fixedSupply, decimals, amount, name, symbol }) {
+  constructor({ wallet, fixedSupply, decimals, amount, name, symbol }) {
     this.wallet = wallet
     this.fixedSupply = fixedSupply
     this.symbol = symbol
@@ -359,7 +360,7 @@ class SolanaNFTEditionInput {
 
 class SolanaUpdateMetadataInput {
   /**
-   * Creates an instance of SolanaNFTEdition.
+   * Updates a Solana NFT or SFT Metadata
    *
    * @param {object} args
    * @param {import('../../wallet/entity').Wallet} args.from
@@ -548,6 +549,17 @@ class CardanoTransferTransactionInput extends TransferTransactionInput {
  * @property {SolanaCreator[]=} creators
  * @property {number=} royaltiesFee
  * @property {string=} collection
+ * 
+ * @typedef {Object} SolanaUpdateMetadataInput
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} name
+ * @property {string} symbol
+ * @property {string} uri
+ * @property {string} amount
+ * @property {string} maxSupply
+ * @property {SolanaCreator[]=} creators
+ * @property {number=} royaltiesFee
+ * @property {string=} collection
  */
 
 module.exports = {
@@ -570,8 +582,8 @@ module.exports = {
   SolanaTokenDeployInput,
   SolanaNFTInput,
   SolanaNFTEditionInput,
-  SolanaUpdateMetadataInput,
   SolanaCustomProgramInput,
+  SolanaUpdateMetadataInput,
   SmartContractCallResponse,
   SmartContractDeployTransactionInput,
   TokenDeployTransactionInput,
