@@ -26,9 +26,6 @@ class Controller extends Interface {
     if (!royaltyRecipient) {
       data.royaltyRecipient = wallet.address
     }
-    if (!trustedForwarders) {
-      data.trustedForwarders = [wallet.address]
-    }
     if (!royaltyBps) {
       data.royaltyBps = 1000
     }
@@ -119,6 +116,7 @@ class Controller extends Interface {
     } = input
     const data = { contents, from: wallet.address, lootBoxFactoryAddress, lootBoxURI, openStartTimestamp, recipient, amountDistributedPerOpen, rewardUnits }
     if (!data.rewardUnits) {
+      //quantas transações serão feitas de uma vez
       data.rewardUnits = Array(contents.length).fill('1')
     }
     if (!data.amountDistributedPerOpen) {

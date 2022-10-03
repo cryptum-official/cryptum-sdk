@@ -7,6 +7,8 @@ const { GenericException } = require('../../errors')
 const { compileContract } = require('../../services/blockchain/contract')
 const { TRANSFER_METHOD_ABI } = require('./contract/abis')
 const { toWei } = require('./utils')
+const { isTestnet } = require('../../services/utils')
+
 
 module.exports.buildEthereumTransferTransaction = async function ({
   fromPrivateKey,
@@ -201,13 +203,13 @@ module.exports.buildEthereumSmartContractDeployTransaction = async ({
     data: bytecode,
     gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
   }
-
   return signEthereumTx(rawTransaction, protocol, fromPrivateKey, network)
 }
 
 
 const signEthereumTx = (rawTransaction, protocol, fromPrivateKey, network) => {
-  console.log(rawTransaction, protocol, fromPrivateKey, network)
+  network = isTestnet(network) ? "testnet" : "mainnet"
+
   if (protocol === Protocol.ETHEREUM) {
     common = new EthereumCommon({ chain: rawTransaction.chainId })
   } else if (protocol === Protocol.BSC) {
