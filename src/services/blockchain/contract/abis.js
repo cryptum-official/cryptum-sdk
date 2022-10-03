@@ -199,3 +199,35 @@ module.exports.LOOTBOX_CONTENT_ABI = [
     type: 'function',
   },
 ]
+
+module.exports.ERC20_APPROVE_METHOD_ABI = [
+  {
+    constant: false,
+    inputs: [{ name: "_spender", type: "address" }, { name: "_value", type: "uint256" }],
+    name: "approve",
+    outputs: [{ name: "", type: "bool" }],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function"
+  }
+]
+
+module.exports.ERC721_APPROVE_METHOD_ABI = [
+  {
+    inputs: [{ internalType: "address", name: "to", type: "address" }, { internalType: "uint256", name: "tokenId", type: "uint256" }],
+    name: "approve",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function"
+  }
+]
+
+module.exports.ERC1155_APPROVE_METHOD_ABI = [
+  {
+    inputs: [{ internalType: "address", name: "operator", type: "address" }, { internalType: "bool", name: "approved", type: "bool" }],
+    name: "setApprovalForAll",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function"
+  }
+]

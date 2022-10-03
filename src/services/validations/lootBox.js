@@ -112,6 +112,38 @@ module.exports.validateLootBoxOpening = ({
   }
 }
 
+module.exports.validateApproveContent = ({
+  protocol,
+  wallet,
+  lootboxAddress,
+  tokenAddress,
+  tokenId,
+  tokenType,
+  amount
+}) => {
+  if (!wallet) {
+    throw new InvalidException('Invalid wallet')
+  }
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+    throw new InvalidException('Invalid protocol')
+  }
+  if (!lootboxAddress || typeof lootboxAddress !== 'string') {
+    throw new InvalidException('Invalid lootboxAddress')
+  }
+  if (!tokenAddress || typeof tokenAddress !== 'string') {
+    throw new InvalidException('Invalid tokenAddress')
+  }
+  if(!tokenType){
+    throw new InvalidException('Invalid tokenType')
+  }
+  if ((tokenType==='ERC20') && (!amount || typeof amount !== 'string')) {
+    throw new InvalidException('Invalid amount')
+  }
+  if ((tokenType==='ERC721') && (!tokenId || typeof tokenId !== 'string')) {
+    throw new InvalidException('Invalid tokenId')
+  }
+}
+
 module.exports.validateLootBoxGetContent = ({
   protocol,
   lootBoxId,
