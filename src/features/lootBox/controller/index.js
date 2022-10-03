@@ -7,7 +7,7 @@ const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { TransactionResponse, SignedTransaction, TransactionType } = require('../../transaction/entity')
 const { signCeloTx } = require('../../../services/blockchain/celo')
-const { validateLootBoxDeploy, validateLootBoxCreation, validateLootBoxGetContent } = require('../../../services/validations/lootBox')
+const { validateLootBoxDeploy, validateLootBoxCreation, validateLootBoxGetContent, validateLootBoxOpening } = require('../../../services/validations/lootBox')
 const { getContractControllerInstance } = require('../../contract/controller')
 const { LOOTBOX_CONTENT_ABI } = require("../../../services/blockchain/contract/abis")
 
@@ -74,7 +74,7 @@ class Controller extends Interface {
       {
         method: 'post', url: `/lootBox/${lootBoxFactoryAddress}/open/${lootBoxId}?protocol=${protocol}`,
         config: this.config,
-        body: { amount, from: wallet.address }
+        body: { amount: amount ? amount : 1, from: wallet.address }
       }
     )
 

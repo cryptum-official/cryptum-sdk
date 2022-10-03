@@ -1,4 +1,6 @@
-const { GenericException, InvalidException } = require("../../errors")
+const { GenericException } = require("../../errors")
+const InvalidException = require("../../errors/InvalidException")
+const BigNumber = require('bignumber.js')
 const { Protocol } = require("../blockchain/constants")
 
 
@@ -7,14 +9,13 @@ module.exports.validateLootBoxDeploy = ({
   wallet,
   name,
   symbol,
-  contractURI,
   royaltyRecipient,
   trustedForwarders,
   royaltyBps
 }) => {
 
   const _royaltyBps = new BigNumber(royaltyBps)
-  if (!royaltyBps || typeof royaltyBps !== 'number' || _royaltyBps.isNaN() || _royaltyBps.lte(0)) {
+  if (royaltyBps && (typeof royaltyBps !== 'royaltyBps' || _royaltyBps.isNaN() || _royaltyBps.lte(0))) {
     throw new GenericException('Invalid amount', 'InvalidTypeException')
   }
   if (!wallet) {
@@ -26,10 +27,10 @@ module.exports.validateLootBoxDeploy = ({
   if (!symbol || typeof symbol !== 'string') {
     throw new InvalidException('Invalid symbol')
   }
-  if (!royaltyRecipient || typeof royaltyRecipient !== 'string') {
+  if (royaltyRecipient && typeof royaltyRecipient !== 'string') {
     throw new InvalidException('Invalid royaltyRecipient')
   }
-  if (trustedForwarders && !Array.isArray(trustedForwarders) || !trustedForwarders.length) {
+  if (trustedForwarders && (!Array.isArray(trustedForwarders) || !trustedForwarders.length)) {
     throw new GenericException(
       'Invalid parameter trustedForwarders, it should be an array with length larger than 0',
       'InvalidTypeException'
@@ -75,7 +76,7 @@ module.exports.validateLootBoxCreation = ({
   if (!recipient || typeof recipient !== 'string') {
     throw new InvalidException('Invalid recipient')
   }
-  if (!amountDistributedPerOpen || typeof amountDistributedPerOpen !== 'string') {
+  if (amountDistributedPerOpen && typeof amountDistributedPerOpen !== 'string') {
     throw new InvalidException('Invalid amountDistributedPerOpen')
   }
   if (rewardUnits && (!Array.isArray(rewardUnits) || !contents.length)) {
@@ -103,7 +104,7 @@ module.exports.validateLootBoxOpening = ({
     throw new InvalidException('Invalid lootBoxId')
   }
   const _amount = new BigNumber(amount)
-  if (!amount || typeof amount !== 'string' || _amount.isNaN() || _amount.lte(0)) {
+  if (amount && (!amount || typeof amount !== 'string' || _amount.isNaN() || _amount.lte(0))) {
     throw new GenericException('Invalid amount', 'InvalidTypeException')
   }
   if (!lootBoxFactoryAddress || typeof lootBoxFactoryAddress !== 'string') {

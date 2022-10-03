@@ -196,6 +196,20 @@ class Controller extends Interface {
     }
   }
   /**
+ * Get proxy address by hash (tx id)
+ *
+ * @param {object} input
+ * @param {string} input.hash transaction hash
+ * @param {Protocol} input.protocol blockchain protocol
+ */
+  async getProxyAddressByHash({ hash, protocol }) {
+    try {
+      return await makeRequest({ method: 'get', url: `/transaction/${hash}/proxy?protocol=${protocol}`, config: this.config })
+    } catch (error) {
+      handleRequestError(error)
+    }
+  }
+  /**
    * Get block info
    *
    * @param {object} input
