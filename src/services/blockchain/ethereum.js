@@ -2,7 +2,7 @@ const { Transaction: EthereumTransaction } = require('@ethereumjs/tx')
 const { default: EthereumCommon } = require('@ethereumjs/common')
 const BigNumber = require('bignumber.js')
 const Web3 = require('web3')
-const { BSC_COMMON_CHAIN, POLYGON_COMMON_CHAIN, Protocol, AVAXCCHAIN_COMMON_CHAIN } = require('./constants')
+const { BSC_COMMON_CHAIN, POLYGON_COMMON_CHAIN, Protocol, AVAXCCHAIN_COMMON_CHAIN, ETHEREUM_COMMON_CHAIN } = require('./constants')
 const { GenericException } = require('../../errors')
 const { compileContract } = require('../../services/blockchain/contract')
 const { TRANSFER_METHOD_ABI } = require('./contract/abis')
@@ -38,11 +38,7 @@ module.exports.buildEthereumTransferTransaction = async function ({
     const token = new web3.eth.Contract(TRANSFER_METHOD_ABI, rawTransaction.to)
     rawTransaction.data = token.methods.transfer(destination, value).encodeABI()
   }
-  const tx = new EthereumTransaction(rawTransaction, {
-    common: new EthereumCommon({ chain: chainId }),
-  })
-  const signedTx = tx.sign(Buffer.from(fromPrivateKey.substring(2), 'hex'))
-  return `0x${signedTx.serialize().toString('hex')}`
+  return signEthereumTx(rawTransaction, Protocol.ETHEREUM, fromPrivateKey, null)
 }
 
 module.exports.buildAvaxCChainTransferTransaction = async function ({
@@ -77,11 +73,7 @@ module.exports.buildAvaxCChainTransferTransaction = async function ({
     rawTransaction.data = token.methods.transfer(destination, value).encodeABI()
   }
   const network = testnet ? 'testnet' : 'mainnet'
-  const tx = new EthereumTransaction(rawTransaction, {
-    common: EthereumCommon.forCustomChain(AVAXCCHAIN_COMMON_CHAIN[network].base, AVAXCCHAIN_COMMON_CHAIN[network].chain),
-  })
-  const signedTx = tx.sign(Buffer.from(fromPrivateKey.substring(2), 'hex'))
-  return `0x${signedTx.serialize().toString('hex')}`
+  return signEthereumTx(rawTransaction, Protocol.AVAXCCHAIN, fromPrivateKey, network)
 }
 
 module.exports.buildPolygonTransferTransaction = async function ({
@@ -116,12 +108,7 @@ module.exports.buildPolygonTransferTransaction = async function ({
     rawTransaction.data = token.methods.transfer(destination, value).encodeABI()
   }
   const network = testnet ? 'testnet' : 'mainnet'
-  const tx = new EthereumTransaction(rawTransaction, {
-    common: EthereumCommon.forCustomChain(POLYGON_COMMON_CHAIN[network].base, POLYGON_COMMON_CHAIN[network].chain),
-  })
-
-  const signedTx = tx.sign(Buffer.from(fromPrivateKey.substring(2), 'hex'))
-  return `0x${signedTx.serialize().toString('hex')}`
+  return signEthereumTx(rawTransaction, Protocol.POLYGON, fromPrivateKey, network)
 }
 
 module.exports.buildBscTransferTransaction = async function ({
@@ -156,12 +143,7 @@ module.exports.buildBscTransferTransaction = async function ({
     rawTransaction.data = token.methods.transfer(destination, value).encodeABI()
   }
   const network = testnet ? 'testnet' : 'mainnet'
-  const tx = new EthereumTransaction(rawTransaction, {
-    common: EthereumCommon.forCustomChain(BSC_COMMON_CHAIN[network].base, BSC_COMMON_CHAIN[network].chain),
-  })
-
-  const signedTx = tx.sign(Buffer.from(fromPrivateKey.substring(2), 'hex'))
-  return `0x${signedTx.serialize().toString('hex')}`
+  return signEthereumTx(rawTransaction, Protocol.BSC, fromPrivateKey, network)
 }
 
 module.exports.buildEthereumSmartContractTransaction = async ({
@@ -190,23 +172,7 @@ module.exports.buildEthereumSmartContractTransaction = async ({
   const web3 = new Web3()
   const contract = new web3.eth.Contract(contractAbi, contractAddress)
   rawTransaction.data = contract.methods[method](...params).encodeABI()
-
-  let common = null
-  if (protocol === Protocol.ETHEREUM) {
-    common = new EthereumCommon({ chain: chainId })
-  } else if (protocol === Protocol.BSC) {
-    common = EthereumCommon.forCustomChain(BSC_COMMON_CHAIN[network].base, BSC_COMMON_CHAIN[network].chain)
-  } else if (protocol === Protocol.AVAXCCHAIN) {
-    common = EthereumCommon.forCustomChain(AVAXCCHAIN_COMMON_CHAIN[network].base, AVAXCCHAIN_COMMON_CHAIN[network].chain)
-  } else if (protocol === Protocol.POLYGON) {
-    common = EthereumCommon.forCustomChain(POLYGON_COMMON_CHAIN[network].base, POLYGON_COMMON_CHAIN[network].chain)
-  }
-  else {
-    throw new GenericException('Invalid protocol', 'InvalidTypeException')
-  }
-  const tx = new EthereumTransaction(rawTransaction, { common })
-  const signedTx = tx.sign(Buffer.from(fromPrivateKey.substring(2), 'hex'))
-  return `0x${signedTx.serialize().toString('hex')}`
+  return signEthereumTx(rawTransaction, protocol, fromPrivateKey, network)
 }
 
 module.exports.buildEthereumSmartContractDeployTransaction = async ({
@@ -236,9 +202,14 @@ module.exports.buildEthereumSmartContractDeployTransaction = async ({
     gasLimit: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
   }
 
-  let common = null
+  return signEthereumTx(rawTransaction, protocol, fromPrivateKey, network)
+}
+
+
+const signEthereumTx = (rawTransaction, protocol, fromPrivateKey, network) => {
+  console.log(rawTransaction, protocol, fromPrivateKey, network)
   if (protocol === Protocol.ETHEREUM) {
-    common = new EthereumCommon({ chain: chainId })
+    common = new EthereumCommon({ chain: rawTransaction.chainId })
   } else if (protocol === Protocol.BSC) {
     common = EthereumCommon.forCustomChain(BSC_COMMON_CHAIN[network].base, BSC_COMMON_CHAIN[network].chain)
   } else if (protocol === Protocol.AVAXCCHAIN) {
@@ -252,3 +223,5 @@ module.exports.buildEthereumSmartContractDeployTransaction = async ({
   const signedTx = tx.sign(Buffer.from(fromPrivateKey.substring(2), 'hex'))
   return `0x${signedTx.serialize().toString('hex')}`
 }
+
+exports.signEthereumTx = signEthereumTx

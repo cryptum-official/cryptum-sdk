@@ -182,3 +182,20 @@ module.exports.SUPPORTS_INTERFACE_ABI = [
     type: 'function',
   },
 ]
+
+module.exports.LOOTBOX_CONTENT_ABI = [
+  {
+    inputs: [{ internalType: 'uint256', name: '_lootBoxId', type: 'uint256' }],
+    name: 'getLootBoxContents',
+    outputs: [{
+      components: [{ internalType: 'address', name: 'tokenAddress', type: 'address', },
+      { internalType: 'enum TokenBundle.TokenType', name: 'tokenType', type: 'uint8', },
+      { internalType: 'uint256', name: 'tokenId', type: 'uint256' },
+      { internalType: 'uint256', name: 'amount', type: 'uint256' }],
+      internalType: 'struct TokenBundle.Token[]', name: 'contents', type: 'tuple[]',
+    },
+    { internalType: 'uint256[]', name: 'perUnitAmounts', type: 'uint256[]' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+]
