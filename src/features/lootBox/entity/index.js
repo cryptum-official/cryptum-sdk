@@ -15,6 +15,15 @@
   
  * @typedef {tokenAddress:string; tokenId:string; tokenType: "ERC721" | "ERC1155" | "ERC20"; amount: string } Contents
 
+ * @typedef {Object} ApproveContent
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} lootboxAddress loot box contract address
+ * @property {string} tokenAddress token contract address
+ * @property {"ERC721" | "ERC1155" | "ERC20"} tokenType type of the token
+ * @property {string} tokenId tokenId of the content (if content is an ERC-721 token)
+ * @property {string} amount amount of tokens to be approved (if content is an ERC20 token)
+ 
  * @typedef {Object} CreateLootBoxInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
  * @property {import('../../wallet/entity').Wallet} wallet

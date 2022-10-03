@@ -2,14 +2,17 @@ module.exports.getLootBoxControllerInstance = (config) => new Controller(config)
 const InvalidException = require('../../../errors/InvalidException')
 const { makeRequest } = require('../../../services')
 const { signEthereumTx } = require('../../../services/blockchain/ethereum')
+const { isTestnet } = require('../../../services/utils')
 const { Protocol } = require('../../../services/blockchain/constants')
 const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { TransactionResponse, SignedTransaction, TransactionType } = require('../../transaction/entity')
 const { signCeloTx } = require('../../../services/blockchain/celo')
-const { validateLootBoxDeploy, validateLootBoxCreation, validateLootBoxGetContent, validateLootBoxOpening } = require('../../../services/validations/lootBox')
+const { validateLootBoxDeploy, validateLootBoxCreation, validateLootBoxGetContent, validateLootBoxOpening, validateApproveContent } = require('../../../services/validations/lootBox')
 const { getContractControllerInstance } = require('../../contract/controller')
-const { LOOTBOX_CONTENT_ABI } = require("../../../services/blockchain/contract/abis")
+const { buildEthereumSmartContractTransaction } = require('../../../services/blockchain/ethereum')
+const { buildCeloSmartContractTransaction } = require('../../../services/blockchain/celo')
+const { LOOTBOX_CONTENT_ABI, ERC20_APPROVE_METHOD_ABI, ERC721_APPROVE_METHOD_ABI, ERC1155_APPROVE_METHOD_ABI } = require("../../../services/blockchain/contract/abis")
 
 class Controller extends Interface {
   /**
@@ -192,6 +195,74 @@ class Controller extends Interface {
       default:
         throw new InvalidException('Unsupported protocol')
     }
+  }
+
+  /**
+   * Approve Prizes
+   * @param {import('../entity').ApproveContent} input 
+   * @returns {Promise<TransactionResponse>}
+   */
+  async approve(input) {
+    validateApproveContent(input)
+    const { protocol, lootboxAddress, amount, tokenType, tokenAddress, tokenId, wallet } = input
+
+    const tc = getTransactionControllerInstance(this.config)
+    let contractAbi, method, params
+    switch (tokenType) {
+      case 'ERC20':
+        contractAbi = ERC20_APPROVE_METHOD_ABI
+        method = 'approve'
+        params = [lootboxAddress, amount]
+        break;
+      case 'ERC721':
+        contractAbi = ERC721_APPROVE_METHOD_ABI
+        method = 'approve'
+        params = [lootboxAddress, tokenId]
+        break;
+      case 'ERC1155':
+        contractAbi = ERC1155_APPROVE_METHOD_ABI
+        method = 'setApprovalForAll'
+        params = [lootboxAddress, tokenId]
+        break;
+    }
+
+    const { info, networkFee } = await tc._getFeeInfo({
+      wallet,
+      type: TransactionType.CALL_CONTRACT_METHOD,
+      contractAddress: tokenAddress,
+      contractAbi,
+      method,
+      params,
+      fee: undefined,
+      protocol,
+    })
+    let signedTx
+    const transactionOptions = {
+      fromPrivateKey: wallet.privateKey,
+      nonce: info.nonce,
+      value: undefined,
+      contractAddress: tokenAddress,
+      contractAbi,
+      method,
+      params,
+      fee: networkFee,
+      feeCurrency: undefined,
+      testnet: isTestnet(this.config.environment),
+    }
+
+    if (protocol === Protocol.CELO) {
+      signedTx = await buildCeloSmartContractTransaction(transactionOptions)
+    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+      signedTx = await buildEthereumSmartContractTransaction({ ...transactionOptions, protocol })
+    } else {
+      throw new InvalidException('Invalid protocol')
+    }
+
+
+    return await tc.sendTransaction(
+      new SignedTransaction({
+        signedTx, protocol, type: TransactionType.LOOTBOX_APPROVE
+      }))
   }
 }
 
