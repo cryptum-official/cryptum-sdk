@@ -42,7 +42,7 @@ class Controller extends Interface {
     let signedTx;
     switch (protocol) {
       case Protocol.CELO:
-        signedTx = await signCeloTx(rawTransaction, fromPrivateKey)
+        signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
         break;
       case Protocol.ETHEREUM:
       case Protocol.BSC:
@@ -68,7 +68,6 @@ class Controller extends Interface {
     validateLootBoxOpening(input)
     const tc = getTransactionControllerInstance(this.config)
     const { protocol, lootBoxId, amount, lootBoxFactoryAddress, wallet } = input
-    const fromPrivateKey = wallet.privateKey
 
     const rawTransaction = await makeRequest(
       {
@@ -81,7 +80,7 @@ class Controller extends Interface {
     let signedTx;
     switch (protocol) {
       case Protocol.CELO:
-        signedTx = await signCeloTx(rawTransaction, fromPrivateKey)
+        signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
         break;
       case Protocol.ETHEREUM:
       case Protocol.BSC:
