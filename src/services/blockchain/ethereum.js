@@ -2,7 +2,7 @@ const { Transaction: EthereumTransaction } = require('@ethereumjs/tx')
 const { default: EthereumCommon } = require('@ethereumjs/common')
 const BigNumber = require('bignumber.js')
 const Web3 = require('web3')
-const { BSC_COMMON_CHAIN, POLYGON_COMMON_CHAIN, Protocol, AVAXCCHAIN_COMMON_CHAIN, ETHEREUM_COMMON_CHAIN } = require('./constants')
+const { BSC_COMMON_CHAIN, POLYGON_COMMON_CHAIN, Protocol, AVAXCCHAIN_COMMON_CHAIN } = require('./constants')
 const { GenericException } = require('../../errors')
 const { compileContract } = require('../../services/blockchain/contract')
 const { TRANSFER_METHOD_ABI } = require('./contract/abis')
@@ -209,7 +209,7 @@ module.exports.buildEthereumSmartContractDeployTransaction = async ({
 
 const signEthereumTx = (rawTransaction, protocol, fromPrivateKey, network) => {
   network = isTestnet(network) ? "testnet" : "mainnet"
-
+  let common;
   if (protocol === Protocol.ETHEREUM) {
     common = new EthereumCommon({ chain: rawTransaction.chainId })
   } else if (protocol === Protocol.BSC) {
