@@ -35,7 +35,7 @@ class Controller extends Interface {
     const rawTransaction = await makeRequest(
       {
         method: 'post',
-        url: `/lootBox/deploy?protocol=${protocol}`,
+        url: `/contract/lootBox/deploy?protocol=${protocol}`,
         body: data, config: this.config
       })
 
@@ -71,7 +71,7 @@ class Controller extends Interface {
 
     const rawTransaction = await makeRequest(
       {
-        method: 'post', url: `/lootBox/${lootBoxFactoryAddress}/open/${lootBoxId}?protocol=${protocol}`,
+        method: 'post', url: `/contract/lootBox/${lootBoxFactoryAddress}/open/${lootBoxId}?protocol=${protocol}`,
         config: this.config,
         body: { amount: amount ? amount : 1, from: wallet.address }
       }
@@ -118,7 +118,6 @@ class Controller extends Interface {
     } = input
     const data = { contents, from: wallet.address, lootBoxFactoryAddress, lootBoxURI, openStartTimestamp, recipient, amountDistributedPerOpen, rewardUnits }
     if (!data.rewardUnits) {
-      //quantas transações serão feitas de uma vez
       data.rewardUnits = Array(contents.length).fill('1')
     }
     if (!data.amountDistributedPerOpen) {
@@ -142,7 +141,7 @@ class Controller extends Interface {
     const rawTransaction = await makeRequest(
       {
         method: 'post',
-        url: `/lootBox/${lootBoxFactoryAddress}/create?protocol=${protocol}`,
+        url: `/contract/lootBox/${lootBoxFactoryAddress}/create?protocol=${protocol}`,
         body: data,
         config: this.config
       })
