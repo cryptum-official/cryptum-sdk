@@ -15,7 +15,7 @@ module.exports.validateLootBoxDeploy = ({
 }) => {
 
   const _royaltyBps = new BigNumber(royaltyBps)
-  if (royaltyBps && (typeof royaltyBps !== 'royaltyBps' || _royaltyBps.isNaN() || _royaltyBps.lte(0))) {
+  if (royaltyBps && (typeof royaltyBps !== 'number' || _royaltyBps.isNaN() || _royaltyBps.lte(0))) {
     throw new GenericException('Invalid amount', 'InvalidTypeException')
   }
   if (!wallet) {
