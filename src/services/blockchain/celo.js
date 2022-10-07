@@ -60,8 +60,7 @@ module.exports.buildCeloTransferTransaction = async function ({
       : token.methods.transfer(destination, value).encodeABI()
   }
 
-  const signedTx = await celoWallet.signTransaction(rawTransaction)
-  return signedTx.raw
+  return await this.signCeloTx(rawTransaction, fromPrivateKey)
 }
 
 module.exports.buildCeloSmartContractTransaction = async ({
@@ -77,9 +76,9 @@ module.exports.buildCeloSmartContractTransaction = async ({
   testnet,
 }) => {
   const network = testnet ? 'testnet' : 'mainnet'
-  const { gas, gasPrice, chainId } = fee
   const celoWallet = new LocalWallet()
   celoWallet.addAccount(fromPrivateKey)
+  const { gas, gasPrice, chainId } = fee
   const rawTransaction = {
     from: celoWallet.getAccounts()[0],
     chainId,
@@ -100,8 +99,7 @@ module.exports.buildCeloSmartContractTransaction = async ({
   const contract = new web3.eth.Contract(contractAbi, contractAddress)
   rawTransaction.data = contract.methods[method](...params).encodeABI()
 
-  const signedTx = await celoWallet.signTransaction(rawTransaction)
-  return signedTx.raw
+  return await this.signCeloTx(rawTransaction, fromPrivateKey)
 }
 
 module.exports.buildCeloSmartContractDeployTransaction = async ({
@@ -119,10 +117,10 @@ module.exports.buildCeloSmartContractDeployTransaction = async ({
   const { bytecode } = await compileContract({
     source, contractName, config, tokenType, protocol: 'CELO', params,
   });
-  const network = testnet ? 'testnet' : 'mainnet'
-  const { gas, gasPrice, chainId } = fee
   const celoWallet = new LocalWallet()
   celoWallet.addAccount(fromPrivateKey)
+  const network = testnet ? 'testnet' : 'mainnet'
+  const { gas, gasPrice, chainId } = fee
   const rawTransaction = {
     from: celoWallet.getAccounts()[0],
     chainId,
@@ -140,6 +138,13 @@ module.exports.buildCeloSmartContractDeployTransaction = async ({
           : feeCurrency,
   }
 
+  return await this.signCeloTx(rawTransaction, fromPrivateKey)
+}
+
+module.exports.signCeloTx = async (rawTransaction, fromPrivateKey) => {
+  const celoWallet = new LocalWallet()
+  celoWallet.addAccount(fromPrivateKey)
   const signedTx = await celoWallet.signTransaction(rawTransaction)
+
   return signedTx.raw
 }

@@ -7,6 +7,7 @@ const { getSwapControllerInstance } = require('./src/features/swap/controller')
 const { getTokenControllerInstance } = require('./src/features/token/controller')
 const { getNftControllerInstance } = require('./src/features/nft/controller')
 const { getContractControllerInstance } = require('./src/features/contract/controller')
+const { getLootBoxControllerInstance } = require('./src/features/lootBox/controller')
 const { Protocol } = require('./src/services/blockchain/constants')
 const { GenericException } = require('./src/errors')
 /**
@@ -104,6 +105,11 @@ class CryptumSDK {
   get contract() { return this.getContractController() }
   getContractController() {
     return getContractControllerInstance(this.config)
+  }
+
+  get lootBox() { return this.getLootBoxController() }
+  getLootBoxController() {
+    return getLootBoxControllerInstance(this.config)
   }
 }
 

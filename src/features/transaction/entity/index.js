@@ -2,7 +2,7 @@
  * Transaction type
  * @enum {string}
  */
-const TransactionType = {
+ const TransactionType = {
   TRANSFER: 'TRANSFER',
   CALL_CONTRACT_METHOD: 'CALL_CONTRACT_METHOD',
   DEPLOY_CONTRACT: 'DEPLOY_CONTRACT',
@@ -18,7 +18,9 @@ const TransactionType = {
   SOLANA_TOKEN_BURN: 'SOLANA_TOKEN_BURN',
   SOLANA_COLLECTION_MINT: 'SOLANA_COLLECTION_MINT',
   SOLANA_NFT_MINT: 'SOLANA_NFT_MINT',
-  SOLANA_UPDATE_METADATA: 'SOLANA_UPDATE_METADATA'
+  LOOTBOX_DEPLOY: 'LOOTBOX_DEPLOY',
+  LOOTBOX_CREATE: 'LOOTBOX_CREATE',
+  LOOTBOX_APPROVE: 'LOOTBOX_APPROVE'
 }
 /**
  * @typedef {object | string} Fee
@@ -360,7 +362,7 @@ class SolanaNFTEditionInput {
 
 class SolanaUpdateMetadataInput {
   /**
-   * Updates a Solana NFT or SFT Metadata
+   * Creates an instance of SolanaNFTEdition.
    *
    * @param {object} args
    * @param {import('../../wallet/entity').Wallet} args.from
@@ -549,17 +551,6 @@ class CardanoTransferTransactionInput extends TransferTransactionInput {
  * @property {SolanaCreator[]=} creators
  * @property {number=} royaltiesFee
  * @property {string=} collection
- * 
- * @typedef {Object} SolanaUpdateMetadataInput
- * @property {import('../../wallet/entity').Wallet} wallet
- * @property {string} name
- * @property {string} symbol
- * @property {string} uri
- * @property {string} amount
- * @property {string} maxSupply
- * @property {SolanaCreator[]=} creators
- * @property {number=} royaltiesFee
- * @property {string=} collection
  */
 
 module.exports = {
@@ -582,8 +573,8 @@ module.exports = {
   SolanaTokenDeployInput,
   SolanaNFTInput,
   SolanaNFTEditionInput,
-  SolanaCustomProgramInput,
   SolanaUpdateMetadataInput,
+  SolanaCustomProgramInput,
   SmartContractCallResponse,
   SmartContractDeployTransactionInput,
   TokenDeployTransactionInput,
