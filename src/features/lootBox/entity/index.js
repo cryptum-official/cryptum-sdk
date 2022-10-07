@@ -24,12 +24,18 @@
  * @property {string} tokenId tokenId of the content (if content is an ERC-721 token)
  * @property {string} amount amount of tokens to be approved (if content is an ERC20 token)
  
+ * @typedef {Object} LootBoxContent
+ * @property {string} tokenAddress 
+ * @property {string} tokenId 
+ * @property {"ERC721" | "ERC1155" | "ERC20"} tokenType
+ * @property {string} amount 
+ 
  * @typedef {Object} CreateLootBoxInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
  * @property {import('../../wallet/entity').Wallet} wallet
- * @property {contents[]} contents lootbox tokens bounty
+ * @property {LootBoxContent[]} contents lootbox tokens bounty
  * @property {string=} rewardUnits number of reward units
- * @property {string} lootBoxURI loot box URI
+ * @property {string=} lootBoxURI loot box URI
  * @property {string} openStartTimestamp start time to loot box to be open
  * @property {string=} amountDistributedPerOpen
  * @property {string} recipient recipient

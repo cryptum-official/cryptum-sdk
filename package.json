@@ -7,7 +7,7 @@
   "author": "Blockforce",
   "license": "MIT",
   "engines": {
-    "node": ">=12"
+    "node": ">=14"
   },
   "types": "./dist/index.d.ts",
   "scripts": {

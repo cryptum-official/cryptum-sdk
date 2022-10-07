@@ -6,7 +6,7 @@ const { isTestnet } = require('../../../services/utils')
 const { Protocol } = require('../../../services/blockchain/constants')
 const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
-const { TransactionResponse, SignedTransaction, TransactionType } = require('../../transaction/entity')
+const { SignedTransaction, TransactionType } = require('../../transaction/entity')
 const { signCeloTx } = require('../../../services/blockchain/celo')
 const { validateLootBoxDeploy, validateLootBoxCreation, validateLootBoxGetContent, validateLootBoxOpening, validateApproveContent } = require('../../../services/validations/lootBox')
 const { getContractControllerInstance } = require('../../contract/controller')
@@ -18,7 +18,7 @@ class Controller extends Interface {
   /**
    * Deploy lootBox factory
    * @param {import('../entity').DeployLootBoxFactoryInput} input
-   * @returns {Promise<TransactionResponse>}
+   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async deploy(input) {
     const tc = getTransactionControllerInstance(this.config)
@@ -61,8 +61,8 @@ class Controller extends Interface {
 
   /**
    * Open lootBox
-   * @param {import('../entity').OpenLootBoxInput} input 
-   * @returns {Promise<TransactionResponse>}
+   * @param {import('../entity').OpenLootBoxInput} input
+   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async openLootBox(input) {
     validateLootBoxOpening(input)
@@ -99,8 +99,8 @@ class Controller extends Interface {
   }
   /**
  * Create lootBox
- * @param {import('../entity').CreateLootBoxInput} input 
- * @returns {Promise<TransactionResponse>}
+ * @param {import('../entity').CreateLootBoxInput} input
+ * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
  */
   async createLootBox(input) {
     const tc = getTransactionControllerInstance(this.config)
@@ -116,7 +116,16 @@ class Controller extends Interface {
       amountDistributedPerOpen,
       rewardUnits
     } = input
-    const data = { contents, from: wallet.address, lootBoxFactoryAddress, lootBoxURI, openStartTimestamp, recipient, amountDistributedPerOpen, rewardUnits }
+    const data = {
+      from: wallet.address,
+      contents,
+      lootBoxFactoryAddress,
+      lootBoxURI,
+      openStartTimestamp,
+      recipient,
+      amountDistributedPerOpen,
+      rewardUnits
+    }
     if (!data.rewardUnits) {
       data.rewardUnits = Array(contents.length).fill('1')
     }
@@ -167,8 +176,8 @@ class Controller extends Interface {
   }
   /**
  * Get lootBox content
- * @param {import('../entity').GetLootBoxContentInput} input 
- * @returns {Promise<TransactionResponse>}  
+ * @param {import('../entity').GetLootBoxContentInput} input
+ * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
  */
   async getLootBoxContent(input) {
     validateLootBoxGetContent(input)
@@ -195,8 +204,8 @@ class Controller extends Interface {
 
   /**
    * Approve Prizes
-   * @param {import('../entity').ApproveContent} input 
-   * @returns {Promise<TransactionResponse>}
+   * @param {import('../entity').ApproveContent} input
+   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async approve(input) {
     validateApproveContent(input)
@@ -218,7 +227,7 @@ class Controller extends Interface {
       case 'ERC1155':
         contractAbi = ERC1155_APPROVE_METHOD_ABI
         method = 'setApprovalForAll'
-        params = [lootboxAddress, tokenId]
+        params = [lootboxAddress, true]
         break;
     }
 

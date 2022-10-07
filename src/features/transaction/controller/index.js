@@ -201,6 +201,7 @@ class Controller extends Interface {
  * @param {object} input
  * @param {string} input.hash transaction hash
  * @param {Protocol} input.protocol blockchain protocol
+ * @returns {Promise<{ address:string }>}
  */
   async getProxyAddressByHash({ hash, protocol }) {
     try {
