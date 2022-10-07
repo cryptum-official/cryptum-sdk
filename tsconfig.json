@@ -12,7 +12,8 @@
     "types": ["node"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "skipLibCheck": true
   },
   "exclude": ["node_modules", "dist"]
 }
