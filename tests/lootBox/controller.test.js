@@ -24,7 +24,6 @@ describe.only('LootBox Controller Tests', () => {
     const { hash } = await lootBox.deploy({
       protocol: 'ETHEREUM',
       wallet: wallet1,
-      defaultAdmin: wallet1.address,
       name: 'Loot Box',
       symbol: 'LOOTBOX'
     })
@@ -37,7 +36,7 @@ describe.only('LootBox Controller Tests', () => {
       contents: [
         { tokenAddress: '0xbbbb', tokenId: '0', tokenType: 'ERC1155', amount: '10' }
       ],
-      lootBoxFactoryAddress: lootBoxAddress,
+      lootBoxAddress,
       openStartTimestamp: '0',
       protocol: 'ETHEREUM',
       recipient: wallet2.address
@@ -51,7 +50,7 @@ describe.only('LootBox Controller Tests', () => {
     const controller = new LootBoxController(config)
     const { hash } = await controller.openLootBox({
       wallet: wallet2,
-      lootBoxFactoryAddress: lootBoxAddress,
+      lootBoxAddress,
       lootBoxId: '0',
       protocol: 'ETHEREUM',
     })

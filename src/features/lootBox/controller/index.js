@@ -67,11 +67,11 @@ class Controller extends Interface {
   async openLootBox(input) {
     validateLootBoxOpening(input)
     const tc = getTransactionControllerInstance(this.config)
-    const { protocol, lootBoxId, amount, lootBoxFactoryAddress, wallet } = input
+    const { protocol, lootBoxId, amount, lootBoxAddress, wallet } = input
 
     const rawTransaction = await makeRequest(
       {
-        method: 'post', url: `/contract/lootBox/${lootBoxFactoryAddress}/open/${lootBoxId}?protocol=${protocol}`,
+        method: 'post', url: `/contract/lootBox/${lootBoxAddress}/open/${lootBoxId}?protocol=${protocol}`,
         config: this.config,
         body: { amount: amount ? amount : 1, from: wallet.address }
       }
@@ -109,7 +109,7 @@ class Controller extends Interface {
       protocol,
       contents,
       wallet,
-      lootBoxFactoryAddress,
+      lootBoxAddress,
       lootBoxURI,
       openStartTimestamp,
       recipient,
@@ -119,7 +119,7 @@ class Controller extends Interface {
     const data = {
       from: wallet.address,
       contents,
-      lootBoxFactoryAddress,
+      lootBoxFactoryAddress: lootBoxAddress,
       lootBoxURI,
       openStartTimestamp,
       recipient,
@@ -150,7 +150,7 @@ class Controller extends Interface {
     const rawTransaction = await makeRequest(
       {
         method: 'post',
-        url: `/contract/lootBox/${lootBoxFactoryAddress}/create?protocol=${protocol}`,
+        url: `/contract/lootBox/${lootBoxAddress}/create?protocol=${protocol}`,
         body: data,
         config: this.config
       })
@@ -181,7 +181,7 @@ class Controller extends Interface {
  */
   async getLootBoxContent(input) {
     validateLootBoxGetContent(input)
-    const { lootBoxFactoryAddress, lootBoxId, protocol } = input
+    const { lootBoxAddress, lootBoxId, protocol } = input
 
     const cc = getContractControllerInstance(this.config)
     switch (protocol) {
@@ -192,7 +192,7 @@ class Controller extends Interface {
       case Protocol.AVAXCCHAIN:
         return await cc.callMethod({
           contractAbi: LOOTBOX_CONTENT_ABI,
-          contractAddress: lootBoxFactoryAddress,
+          contractAddress: lootBoxAddress,
           method: "getLootBoxContents",
           params: [lootBoxId],
           protocol,
@@ -209,7 +209,7 @@ class Controller extends Interface {
    */
   async approve(input) {
     validateApproveContent(input)
-    const { protocol, lootboxAddress, amount, tokenType, tokenAddress, tokenId, wallet } = input
+    const { protocol, lootBoxAddress, amount, tokenType, tokenAddress, tokenId, wallet } = input
 
     const tc = getTransactionControllerInstance(this.config)
     let contractAbi, method, params
@@ -217,17 +217,17 @@ class Controller extends Interface {
       case 'ERC20':
         contractAbi = ERC20_APPROVE_METHOD_ABI
         method = 'approve'
-        params = [lootboxAddress, amount]
+        params = [lootBoxAddress, amount]
         break;
       case 'ERC721':
         contractAbi = ERC721_APPROVE_METHOD_ABI
         method = 'approve'
-        params = [lootboxAddress, tokenId]
+        params = [lootBoxAddress, tokenId]
         break;
       case 'ERC1155':
         contractAbi = ERC1155_APPROVE_METHOD_ABI
         method = 'setApprovalForAll'
-        params = [lootboxAddress, true]
+        params = [lootBoxAddress, true]
         break;
     }
 

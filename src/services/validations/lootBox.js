@@ -45,7 +45,7 @@ module.exports.validateLootBoxCreation = ({
   protocol,
   contents,
   wallet,
-  lootBoxFactoryAddress,
+  lootBoxAddress,
   lootBoxURI,
   openStartTimestamp,
   recipient,
@@ -64,8 +64,8 @@ module.exports.validateLootBoxCreation = ({
       'InvalidTypeException'
     )
   }
-  if (!lootBoxFactoryAddress || typeof lootBoxFactoryAddress !== 'string') {
-    throw new InvalidException('Invalid lootBoxFactoryAddress')
+  if (!lootBoxAddress || typeof lootBoxAddress !== 'string') {
+    throw new InvalidException('Invalid lootBoxAddress')
   }
   if (lootBoxURI && typeof lootBoxURI !== 'string') {
     throw new InvalidException('Invalid lootBoxURI')
@@ -92,7 +92,7 @@ module.exports.validateLootBoxOpening = ({
   wallet,
   lootBoxId,
   amount,
-  lootBoxFactoryAddress
+  lootBoxAddress
 }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
@@ -107,8 +107,8 @@ module.exports.validateLootBoxOpening = ({
   if (amount && (!amount || typeof amount !== 'string' || _amount.isNaN() || _amount.lte(0))) {
     throw new GenericException('Invalid amount', 'InvalidTypeException')
   }
-  if (!lootBoxFactoryAddress || typeof lootBoxFactoryAddress !== 'string') {
-    throw new InvalidException('Invalid lootBoxFactoryAddress')
+  if (!lootBoxAddress || typeof lootBoxAddress !== 'string') {
+    throw new InvalidException('Invalid lootBoxAddress')
   }
 }
 
@@ -147,7 +147,7 @@ module.exports.validateApproveContent = ({
 module.exports.validateLootBoxGetContent = ({
   protocol,
   lootBoxId,
-  lootBoxFactoryAddress
+  lootBoxAddress
 }) => {
   if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
@@ -155,7 +155,7 @@ module.exports.validateLootBoxGetContent = ({
   if (lootBoxId && isNaN(lootBoxId)) {
     throw new InvalidException('Invalid lootBoxId')
   }
-  if (!lootBoxFactoryAddress || typeof lootBoxFactoryAddress !== 'string') {
-    throw new InvalidException('Invalid lootBoxFactoryAddress')
+  if (!lootBoxAddress || typeof lootBoxAddress !== 'string') {
+    throw new InvalidException('Invalid lootBoxAddress')
   }
 }
