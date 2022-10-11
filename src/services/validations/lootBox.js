@@ -115,7 +115,7 @@ module.exports.validateLootBoxOpening = ({
 module.exports.validateApproveContent = ({
   protocol,
   wallet,
-  lootboxAddress,
+  lootBoxAddress,
   tokenAddress,
   tokenId,
   tokenType,
@@ -127,8 +127,8 @@ module.exports.validateApproveContent = ({
   if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
-  if (!lootboxAddress || typeof lootboxAddress !== 'string') {
-    throw new InvalidException('Invalid lootboxAddress')
+  if (!lootBoxAddress || typeof lootBoxAddress !== 'string') {
+    throw new InvalidException('Invalid lootBoxAddress')
   }
   if (!tokenAddress || typeof tokenAddress !== 'string') {
     throw new InvalidException('Invalid tokenAddress')
