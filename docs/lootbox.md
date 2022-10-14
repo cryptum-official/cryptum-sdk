@@ -19,7 +19,7 @@ Deploy a loot box smart contract
 * `opts.name` (string) (**required**) - name of the loot box token.
 * `opts.symbol` (string) (**required**) - symbol of the loot box token.
 * `opts.contractURI` (string) - URI pointing to the loot box token metadata (PS: it uses the same standard as ERC-1155).
-* `opts.trustedForwarders` (string[]) - array of addresses to be set as trusted forwarders.
+* `opts.trustedForwarders` (string[]) - array of addresses to be set as trusted forwarders (custom gasless trusted forwarder addresses).
 * `opts.royaltyRecipient` (string) - address to receive the royalties (if any).
 * `opts.royaltyBps` (string) - Royalty basis points (e.g: 250 equals 2.5% and 10000 means 100%).
 
