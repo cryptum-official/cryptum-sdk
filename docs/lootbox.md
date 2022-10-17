@@ -120,7 +120,6 @@ Gets the possible contents of a loot box.
 
 
 ```js
-// transfer BTC from wallet to 2 output addresses
 const contents = await sdk.lootBox.getLootBoxContent({
     lootBoxAddress:'0xa75b...15d8',
     protocol: 'BSC',
