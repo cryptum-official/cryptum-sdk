@@ -76,7 +76,7 @@ Creates the loot boxes
   * `LootBoxContent.tokenAddress` (string) - address of the token to be included as a prize
   * `LootBoxContent.tokenId` (string) - tokenId of the token to be included as a prize (if the prize is an NFT)
   * `LootBoxContent.tokenType` ("ERC721" | "ERC1155" | "ERC20") - type of the token that is being added as a prize.
-  * `LootBoxContent.amount` (string) - amount of tokens to be approved (if content is an ERC20 
+  * `LootBoxContent.amount` (string) - amount of tokens to be approved (if content is an ERC20 or ERC1155)
 
 Examples:
 ```js
