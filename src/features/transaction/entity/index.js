@@ -2,7 +2,7 @@
  * Transaction type
  * @enum {string}
  */
- const TransactionType = {
+const TransactionType = {
   TRANSFER: 'TRANSFER',
   CALL_CONTRACT_METHOD: 'CALL_CONTRACT_METHOD',
   DEPLOY_CONTRACT: 'DEPLOY_CONTRACT',
@@ -20,7 +20,8 @@
   SOLANA_NFT_MINT: 'SOLANA_NFT_MINT',
   LOOTBOX_DEPLOY: 'LOOTBOX_DEPLOY',
   LOOTBOX_CREATE: 'LOOTBOX_CREATE',
-  LOOTBOX_APPROVE: 'LOOTBOX_APPROVE'
+  LOOTBOX_APPROVE: 'LOOTBOX_APPROVE',
+  CREATE_POOL: 'CREATE_POOL',
 }
 /**
  * @typedef {object | string} Fee
@@ -67,6 +68,19 @@ class FeeResponse {
 class SmartContractCallResponse {
   constructor({ result }) {
     this.result = result
+  }
+}
+class CreatePoolResponse {
+  /**
+   * Creates an instance of TransactionResponse
+   *
+   * @param {object} response
+   * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
+   * @param {string} response.pool pool address
+   */
+  constructor({ transaction, pool }) {
+    this.transaction = transaction
+    this.pool = pool
   }
 }
 class UTXO {
@@ -558,6 +572,7 @@ module.exports = {
   SignedTransaction,
   TransactionResponse,
   FeeResponse,
+  CreatePoolResponse,
   UTXO,
   Input,
   Output,
