@@ -8,6 +8,7 @@ const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { SignedTransaction, TransactionType } = require('../../transaction/entity')
 const { signCeloTx } = require('../../../services/blockchain/celo')
+const { validateUniswapCreatePool } = require('../../../services/validations/uniswap')
 
 
 class Controller extends Interface {
@@ -19,9 +20,11 @@ class Controller extends Interface {
    * @description
    * If pool already existed prior to this call, no transaction will be made and the transaction property will be null
    */
-  async createPool(input) {
+  async  createPool(input) {
     // TO-DO
     // initial validation function call
+
+    validateUniswapCreatePool(input)
     const tc = getTransactionControllerInstance(this.config)
 
     const { protocol, wallet, fee, tokenA, tokenB, priceNumerator, priceDenominator } = input
