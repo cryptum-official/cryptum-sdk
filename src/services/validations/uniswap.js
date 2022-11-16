@@ -38,3 +38,21 @@ module.exports.validateUniswapCreatePool = ({
     }
 }
 
+
+module.exports.validateUniswapGetPools = ({ 
+    protocol, tokenA, tokenB, poolFee
+}) => {
+    if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+        throw new InvalidException('Invalid protocol')
+    }
+    if (!tokenA || typeof tokenA !== 'string') {
+        throw new InvalidException('Invalid tokenAddress')
+    }
+    if (!tokenB || typeof tokenB !== 'string') {
+        throw new InvalidException('Invalid tokenAddress')
+    }
+    const _fee = new BigNumber(poolFee)
+    if (poolFee && (typeof poolFee !== 'number' || _fee.isNaN() || _fee.lte(0))) {
+        throw new GenericException('Invalid fee amount, must be number equals 100 or 500 or 3000 or 10000', 'InvalidTypeException')
+    }
+}

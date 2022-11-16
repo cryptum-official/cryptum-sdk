@@ -22,6 +22,7 @@ const TransactionType = {
   LOOTBOX_CREATE: 'LOOTBOX_CREATE',
   LOOTBOX_APPROVE: 'LOOTBOX_APPROVE',
   CREATE_POOL: 'CREATE_POOL',
+  GET_POOL: 'GET_POOL',
 }
 /**
  * @typedef {object | string} Fee
@@ -81,6 +82,18 @@ class CreatePoolResponse {
   constructor({ transaction, pool }) {
     this.transaction = transaction
     this.pool = pool
+  }
+}
+class CreateGetPoolsResponse {
+  /**
+   * Creates an instance of CreateGetPoolsResponse
+   *
+   * @param {number} response.poolFee pool address
+   * @param {string} response.poolAddress pool address
+   */
+  constructor({ poolAddress, poolFee }) {
+    this.poolFee = poolFee
+    this.poolAddress = poolAddress
   }
 }
 class UTXO {
@@ -573,6 +586,7 @@ module.exports = {
   TransactionResponse,
   FeeResponse,
   CreatePoolResponse,
+  CreateGetPoolsResponse,
   UTXO,
   Input,
   Output,
