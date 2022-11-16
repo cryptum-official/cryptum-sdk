@@ -69,23 +69,20 @@ class Controller extends Interface {
    * @description
    * If no Pool Fee is specified, Poll addresses for all possible fee ranges will be returned
    */
-     async  getPools(input) {
-      validateUniswapGetPools(input)
-      const { protocol, tokenA, tokenB, poolFee } = input
-      const data = { tokenA, tokenB, poolFee }
-      const response = await makeRequest(
-        {
-          method: 'post',
-          url: `/contract/uniswap/getPools?protocol=${protocol}`,
-          body: data, config: this.config
-        })
-    
-      return {
-        response
-      }
+  async  getPools(input) {
+    validateUniswapGetPools(input)
+    const { protocol, tokenA, tokenB, poolFee } = input
+    const data = { tokenA, tokenB, poolFee }
+    const response = await makeRequest(
+      {
+        method: 'post',
+        url: `/contract/uniswap/getPools?protocol=${protocol}`,
+        body: data, config: this.config
+      })
+    return {
+      response
     }
-  
-
+  }
 }
 
 module.exports.UniswapController = Controller
