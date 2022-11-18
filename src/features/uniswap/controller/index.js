@@ -20,7 +20,7 @@ class Controller extends Interface {
    * @description
    * If pool already existed prior to this call, no transaction will be made and the transaction property will be null
    */
-  async  createPool(input) {
+  async createPool(input) {
     validateUniswapCreatePool(input)
     const tc = getTransactionControllerInstance(this.config)
 
@@ -67,9 +67,9 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').CreateGetPoolsResponse>}
    * 
    * @description
-   * If no Pool Fee is specified, Poll addresses for all possible fee ranges will be returned
+   * If no Pool Fee is specified, Pool addresses for all possible fee ranges will be returned
    */
-  async  getPools(input) {
+  async getPools(input) {
     validateUniswapGetPools(input)
     const { protocol, tokenA, tokenB, poolFee } = input
     const data = { tokenA, tokenB, poolFee }
@@ -77,6 +77,29 @@ class Controller extends Interface {
       {
         method: 'post',
         url: `/contract/uniswap/getPools?protocol=${protocol}`,
+        body: data, config: this.config
+      })
+    return {
+      response
+    }
+  }
+
+    /**
+   * Get a Swap Price Quotation using UniSwap Protocol
+   * @param {import('../entity').GetSwapQuotationInput} input
+   * @returns {Promise<import('../../transaction/entity').CreateGetSwapQuotation>}
+   * 
+   * @description
+   * Returns the quotation for a swap
+   */
+  async getSwapQuotation(input) {
+    // validateUniswapGetPools(input)
+    const { protocol, tokenIn, tokenOut, amount, tradeType } = input
+    const data = { tokenIn, tokenOut, amount, tradeType }
+    const response = await makeRequest(
+      {
+        method: 'post',
+        url: `/contract/uniswap/getSwapQuotation?protocol=${protocol}`,
         body: data, config: this.config
       })
     return {
