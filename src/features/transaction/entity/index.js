@@ -22,6 +22,8 @@ const TransactionType = {
   LOOTBOX_CREATE: 'LOOTBOX_CREATE',
   LOOTBOX_APPROVE: 'LOOTBOX_APPROVE',
   CREATE_POOL: 'CREATE_POOL',
+  MINT_POSITION: 'MINT_POSITION',
+  REMOVE_POSITION: 'REMOVE_POSITION',
 }
 /**
  * @typedef {object | string} Fee
@@ -83,6 +85,27 @@ class CreatePoolResponse {
     this.pool = pool
   }
 }
+class MintPositionResponse {
+  /**
+   * Creates an instance of TransactionResponse
+   *
+   * @param {object} response
+   * @param {TransactionResponse} response.transaction transaction response object
+   * @param {string} response.tokenId the ID of the token that represents the minted position
+   * @param {string} response.liquidity the amount of liquidity for this position
+   * @param {string} response.amountA the amount of tokenA that was used for this position
+   * @param {string} response.amountB the amount of tokenB that was used for this position
+   */
+  constructor({ transaction, tokenId, liquidity, amountA, amountB }) {
+    this.transaction = transaction
+    this.tokenId = tokenId
+    this.liquidity = liquidity
+    this.amountA = amountA
+    this.amountB = amountB
+  }
+}
+
+
 class UTXO {
   constructor({ value, txHash, index, height, token }) {
     this.value = value
@@ -573,6 +596,7 @@ module.exports = {
   TransactionResponse,
   FeeResponse,
   CreatePoolResponse,
+  MintPositionResponse,
   UTXO,
   Input,
   Output,

@@ -12,7 +12,7 @@ const { signCeloTx } = require('../../../services/blockchain/celo')
 
 class Controller extends Interface {
   /**
-   * Deploy lootBox factory
+   * Creates a uniswap V3 pool
    * @param {import('../entity').CreatePoolInput} input
    * @returns {Promise<import('../../transaction/entity').CreatePoolResponse>}
    * 
@@ -61,6 +61,83 @@ class Controller extends Interface {
     }
   }
 
+  /**
+   * Mints a position relative to a liquidity pool
+   * @param {import('../entity').MintPositionInput} input
+   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+   */
+  async mintPosition(input) {
+    // TO-DO
+    // initial validation function call
+    const tc = getTransactionControllerInstance(this.config)
+
+    const { protocol, wallet, amountTokenA, amountTokenB, slippage, pool, recipient, minPriceDelta, maxPriceDelta } = input
+    const data = { from: wallet.address, amountTokenA, amountTokenB, minPriceDelta, maxPriceDelta, slippage, pool, recipient: recipient ? recipient : wallet.address }
+    const { rawTransaction, amountA, amountB } = await makeRequest(
+      {
+        method: 'post',
+        url: `/contract/uniswap/mintPosition?protocol=${protocol}`,
+        body: data, config: this.config
+      })
+
+
+    let signedTx;
+    switch (protocol) {
+      case Protocol.CELO:
+        signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
+        break;
+      case Protocol.ETHEREUM:
+      case Protocol.POLYGON:
+        signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
+        break;
+      default:
+        throw new InvalidException('Unsupported protocol')
+    }
+    return await tc.sendTransaction(
+      new SignedTransaction({
+        signedTx, protocol, type: TransactionType.MINT_POSITION
+      })
+    )
+  }
+
+  /**
+   * Mints a position relative to a liquidity pool
+   * @param {import('../entity').RemovePositionInput} input
+   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+   */
+  async removePosition(input) {
+    // TO-DO
+    // initial validation function call
+    const tc = getTransactionControllerInstance(this.config)
+
+    const { protocol, wallet, slippage, pool, recipient, tokenId, percentageToRemove } = input
+    const data = { from: wallet.address, slippage, pool, tokenId, percentageToRemove, recipient: recipient ? recipient : wallet.address }
+    const { rawTransaction, amountA, amountB } = await makeRequest(
+      {
+        method: 'post',
+        url: `/contract/uniswap/removePosition?protocol=${protocol}`,
+        body: data, config: this.config
+      })
+
+
+    let signedTx;
+    switch (protocol) {
+      case Protocol.CELO:
+        signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
+        break;
+      case Protocol.ETHEREUM:
+      case Protocol.POLYGON:
+        signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
+        break;
+      default:
+        throw new InvalidException('Unsupported protocol')
+    }
+    return await tc.sendTransaction(
+      new SignedTransaction({
+        signedTx, protocol, type: TransactionType.REMOVE_POSITION
+      })
+    )
+  }
 }
 
 module.exports.UniswapController = Controller
