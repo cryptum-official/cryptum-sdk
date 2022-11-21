@@ -8,7 +8,6 @@
  * @property {string} priceNumerator used as the numerator for the initial swap ratio (price)
  * @property {string} priceDenominator used as the denominator for the initial swap ratio (price)
  */
-<<<<<<< HEAD
 /**
  * @typedef {Object} MintPositionInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
@@ -32,7 +31,6 @@
  * @property {string} recipient address that will receive the position's NFT
  */
  
-=======
 
 /**
  * @typedef {Object} GetPoolsInput
@@ -42,5 +40,4 @@
  * @property {number} poolFee fee collected upon every swap in the pool
  */
 
->>>>>>> d940b58f882818c6f26f00ef91c130293ec4efa8
 module.exports = {}
