@@ -8,7 +8,7 @@ const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { SignedTransaction, TransactionType } = require('../../transaction/entity')
 const { signCeloTx } = require('../../../services/blockchain/celo')
-const { validateUniswapCreatePool, validateUniswapGetPools } = require('../../../services/validations/uniswap')
+const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation } = require('../../../services/validations/uniswap')
 
 
 class Controller extends Interface {
@@ -93,7 +93,7 @@ class Controller extends Interface {
    * Returns the quotation for a swap
    */
   async getSwapQuotation(input) {
-    // validateUniswapGetPools(input)
+    validateUniswapGetSwapQuotation(input)
     const { protocol, tokenIn, tokenOut, amount, tradeType } = input
     const data = { tokenIn, tokenOut, amount, tradeType }
     const response = await makeRequest(
