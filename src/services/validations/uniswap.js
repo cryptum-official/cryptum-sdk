@@ -70,7 +70,7 @@ module.exports.validateUniswapGetSwapQuotation = ({
         throw new InvalidException('Invalid tokenAddress')
     }
     const _amount = new BigNumber(amount)
-    if (!amount || typeof amount !== 'string' || _amount.isNaN() || _amount.lte(0)) {
+    if (!amount || typeof amount !== 'number' || _amount.isNaN() || _amount.lte(0)) {
       throw new GenericException('Invalid amount', 'InvalidTypeException')
     }
     if (!tradeType || typeof tradeType !== 'string') {
