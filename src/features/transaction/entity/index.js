@@ -24,6 +24,7 @@ const TransactionType = {
   CREATE_POOL: 'CREATE_POOL',
   MINT_POSITION: 'MINT_POSITION',
   REMOVE_POSITION: 'REMOVE_POSITION',
+  GET_POOL: 'GET_POOL',
 }
 /**
  * @typedef {object | string} Fee
@@ -106,6 +107,18 @@ class MintPositionResponse {
 }
 
 
+class CreateGetPoolsResponse {
+  /**
+   * Creates an instance of CreateGetPoolsResponse
+   *
+   * @param {number} response.poolFee pool address
+   * @param {string} response.poolAddress pool address
+   */
+  constructor({ poolAddress, poolFee }) {
+    this.poolFee = poolFee
+    this.poolAddress = poolAddress
+  }
+}
 class UTXO {
   constructor({ value, txHash, index, height, token }) {
     this.value = value
@@ -597,6 +610,7 @@ module.exports = {
   FeeResponse,
   CreatePoolResponse,
   MintPositionResponse,
+  CreateGetPoolsResponse,
   UTXO,
   Input,
   Output,

@@ -8,11 +8,12 @@ const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { SignedTransaction, TransactionType } = require('../../transaction/entity')
 const { signCeloTx } = require('../../../services/blockchain/celo')
+const { validateUniswapCreatePool, validateUniswapGetPools } = require('../../../services/validations/uniswap')
 
 
 class Controller extends Interface {
   /**
-   * Creates a uniswap V3 pool
+   * Creates a Uniswap V3 pool
    * @param {import('../entity').CreatePoolInput} input
    * @returns {Promise<import('../../transaction/entity').CreatePoolResponse>}
    * 
@@ -20,8 +21,7 @@ class Controller extends Interface {
    * If pool already existed prior to this call, no transaction will be made and the transaction property will be null
    */
   async createPool(input) {
-    // TO-DO
-    // initial validation function call
+    validateUniswapCreatePool(input)
     const tc = getTransactionControllerInstance(this.config)
 
     const { protocol, wallet, fee, tokenA, tokenB, priceNumerator, priceDenominator } = input
@@ -137,6 +137,29 @@ class Controller extends Interface {
         signedTx, protocol, type: TransactionType.REMOVE_POSITION
       })
     )
+  }
+  
+  /**
+   * Get Uniswap Pool Addresses
+   * @param {import('../entity').GetPoolsInput} input
+   * @returns {Promise<import('../../transaction/entity').CreateGetPoolsResponse>}
+   *
+   * @description
+   * If no Pool Fee is specified, Poll addresses for all possible fee ranges will be returned
+   */
+  async getPools(input) {
+    validateUniswapGetPools(input)
+    const { protocol, tokenA, tokenB, poolFee } = input
+    const data = { tokenA, tokenB, poolFee }
+    const response = await makeRequest(
+      {
+        method: 'post',
+        url: `/contract/uniswap/getPools?protocol=${protocol}`,
+        body: data, config: this.config
+      })
+    return {
+      response
+    }
   }
 }
 
