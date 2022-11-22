@@ -119,6 +119,18 @@ class CreateGetPoolsResponse {
     this.poolAddress = poolAddress
   }
 }
+class CreateGetSwapQuotation {
+  /**
+   * Creates an instance of CreateGetSwapQuotation
+   *
+   * @param {number} response.tokenIn Token to be Swapped
+   * @param {number} response.tokenOut Swapped token
+   */
+  constructor({ tokenIn, tokenOut }) {
+    this.tokenIn = tokenIn
+    this.tokenOut = tokenOut
+  }
+}
 class UTXO {
   constructor({ value, txHash, index, height, token }) {
     this.value = value

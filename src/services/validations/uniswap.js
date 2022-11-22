@@ -56,3 +56,24 @@ module.exports.validateUniswapGetPools = ({
         throw new GenericException('Invalid fee amount, must be number equals 100 or 500 or 3000 or 10000', 'InvalidTypeException')
     }
 }
+
+module.exports.validateUniswapGetSwapQuotation = ({ 
+    protocol, tokenIn, tokenOut, amount, tradeType
+}) => {
+    if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+        throw new InvalidException('Invalid protocol')
+    }
+    if (!tokenIn || typeof tokenIn !== 'string') {
+        throw new InvalidException('Invalid tokenAddress')
+    }
+    if (!tokenOut || typeof tokenOut !== 'string') {
+        throw new InvalidException('Invalid tokenAddress')
+    }
+    const _amount = new BigNumber(amount)
+    if (!amount || typeof amount !== 'number' || _amount.isNaN() || _amount.lte(0)) {
+      throw new GenericException('Invalid amount', 'InvalidTypeException')
+    }
+    if (!tradeType || typeof tradeType !== 'string') {
+        throw new InvalidException('Invalid tradeType')
+    }
+}
