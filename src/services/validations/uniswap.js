@@ -38,6 +38,77 @@ module.exports.validateUniswapCreatePool = ({
     }
 }
 
+module.exports.validateUniswapMintPosition = ({ 
+    protocol,
+    wallet,
+    amountTokenA,
+    amountTokenB,
+    slippage,
+    pool,
+    recipient,
+    minPriceDelta,
+    maxPriceDelta
+}) => {
+    if (!wallet) {
+        throw new InvalidException('Invalid wallet')
+    }
+    if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+        throw new InvalidException('Invalid protocol')
+    }
+    if (!amountTokenA || typeof amountTokenA !== 'string') {
+    throw new InvalidException('Invalid amountTokenA')
+    }
+    if (!amountTokenB || typeof amountTokenB !== 'string') {
+    throw new InvalidException('Invalid amountTokenB')
+    }
+    if (!slippage || typeof slippage !== 'string') {
+        throw new InvalidException('Invalid slippage')
+    }
+    if (!pool || typeof pool !== 'string') {
+        throw new InvalidException('Invalid pool')
+    }
+    if (recipient !== undefined && typeof recipient !== 'string') {
+        throw new InvalidException('Invalid recipient')
+    }
+    if (!minPriceDelta || typeof minPriceDelta !== 'string') {
+        throw new InvalidException('Invalid minPriceDelta')
+    }
+    if (!maxPriceDelta || typeof maxPriceDelta !== 'string') {
+        throw new InvalidException('Invalid maxPriceDelta')
+    }
+}
+
+module.exports.validateUniswapRemovePosition = ({ 
+    protocol,
+    wallet,
+    slippage,
+    pool,
+    recipient,
+    tokenId,
+    percentageToRemove
+}) => {
+    if (!wallet) {
+        throw new InvalidException('Invalid wallet')
+    }
+    if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+        throw new InvalidException('Invalid protocol')
+    }
+    if (!slippage || typeof slippage !== 'string') {
+        throw new InvalidException('Invalid slippage')
+    }
+    if (!pool || typeof pool !== 'string') {
+        throw new InvalidException('Invalid pool')
+    }
+    if (recipient !== undefined && typeof recipient !== 'string') {
+        throw new InvalidException('Invalid recipient')
+    }
+    if (!tokenId || typeof minPriceDelta !== 'string') {
+        throw new InvalidException('Invalid minPriceDelta')
+    }
+    if (!percentageToRemove || typeof maxPriceDelta !== 'string') {
+        throw new InvalidException('Invalid maxPriceDelta')
+    }
+}
 
 module.exports.validateUniswapGetPools = ({ 
     protocol, tokenA, tokenB, poolFee

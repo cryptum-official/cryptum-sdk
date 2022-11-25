@@ -8,7 +8,7 @@ const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { SignedTransaction, TransactionType } = require('../../transaction/entity')
 const { signCeloTx } = require('../../../services/blockchain/celo')
-const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation } = require('../../../services/validations/uniswap')
+const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateUniswapRemovePosition } = require('../../../services/validations/uniswap')
 
 
 class Controller extends Interface {
@@ -62,13 +62,12 @@ class Controller extends Interface {
   }
 
   /**
-   * Mints a position relative to a liquidity pool
+   * Removes a position relative to a liquidity pool
    * @param {import('../entity').MintPositionInput} input
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async mintPosition(input) {
-    // TO-DO
-    // initial validation function call
+    validateUniswapMintPosition(input)
     const tc = getTransactionControllerInstance(this.config)
 
     const { protocol, wallet, amountTokenA, amountTokenB, slippage, pool, recipient, minPriceDelta, maxPriceDelta } = input
@@ -101,13 +100,12 @@ class Controller extends Interface {
   }
 
   /**
-   * Mints a position relative to a liquidity pool
+   * Removes a position relative to a liquidity pool
    * @param {import('../entity').RemovePositionInput} input
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async removePosition(input) {
-    // TO-DO
-    // initial validation function call
+    validateUniswapRemovePosition(input)
     const tc = getTransactionControllerInstance(this.config)
 
     const { protocol, wallet, slippage, pool, recipient, tokenId, percentageToRemove } = input
@@ -162,7 +160,7 @@ class Controller extends Interface {
     }
   }
 
-    /**
+  /**
    * Get a Swap Price Quotation using UniSwap Protocol
    * @param {import('../entity').GetSwapQuotationInput} input
    * @returns {Promise<import('../../transaction/entity').CreateGetSwapQuotation>}
@@ -184,6 +182,30 @@ class Controller extends Interface {
       response
     }
   }
+
+  /**
+   * Get tokenId from position by owner address (optional:filter by pool)
+   * @param {import('../entity').getTokenIds} input
+   * @returns {Promise<import('../../transaction/entity').CreategetTokenIds>}
+   * 
+   * @description
+   * Returns the positions and their token ids of owner address
+   */
+
+  async getTokenIds(input) {
+    const { protocol, ownerAddress, poolAddress} = input
+    const data = { protocol, ownerAddress, poolAddress}
+    const response = await makeRequest(
+      {
+        method: 'post',
+        url: `/contract/uniswap/getTokenIds?protocol=${protocol}`,
+        body: data, config: this.config
+      })
+    return {
+      response
+    }
+  }
+
 }
 
 module.exports.UniswapController = Controller
