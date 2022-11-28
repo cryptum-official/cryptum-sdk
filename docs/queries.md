@@ -17,7 +17,7 @@ Get wallet address information from blockchain.
 
 * `opts.address` (string)(**required**) - wallet address. 
 * `opts.protocol` (string)(**required**) - blockchain protocol.
-* `opts.tokenAddresses` (array)(**optional**) - array of token addresses. Only for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `BSC` and `SOLANA`.
+* `opts.tokenAddresses` (array)(**optional**) - array of token addresses. Only for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `BSC`, `POLYGON`, and `SOLANA`.
 
 ```js
 // For Hathor protocol
@@ -102,7 +102,7 @@ Get UTXOs from a wallet address.
 * `opts.protocol` (string)(**required**) - blockchain protocol. Only `BITCOIN`, `HATHOR` and `CARDANO`.
 
 ```js
-const tx = await sdk.transaction.getUTXOs({ address: 'WgzYfVxZiL7bCN37Wj8myVY9HKZ5GCACsh', protocol: 'HATHOR' })
+const utxos = await sdk.transaction.getUTXOs({ address: 'WgzYfVxZiL7bCN37Wj8myVY9HKZ5GCACsh', protocol: 'HATHOR' })
 // UTXOs [
 //     {
 //         "index": 0,
@@ -125,4 +125,48 @@ Get block information from blockchain.
 ```js
 const tx = await sdk.transaction.getBlock({ block: '111111', protocol: 'STELLAR' })
 // Raw block information returned from the Blockchain
+```
+
+## Get fees
+
+### `sdk.transaction.getFee(opts)`
+
+Get transaction fee information from blockchain.
+
+If you wish to get estimate fee information for a transfer of the native token like ether, the parameters type, from, destination and amount should be passed as follows:
+
+* `opts.type` (string)(**required**) - type of the transaction. It should be `TRANSFER` in this case.
+* `opts.from` (string)(**required**) - origin or signing address.
+* `opts.destination` (string)(**required**) - destination address.
+* `opts.protocol` (string)(**required**) - blockchain protocol.
+
+For smart contract method calls, just pass with the additional parameters:
+
+* `opts.type` (string)(**required**) - type of the transaction. It should be `CALL_CONTRACT_METHOD` in this case.
+* `opts.from` (string)(**required**) - origin or signing address.
+* `opts.contractAddress` (string)(**required**) - contract address.
+* `opts.contractAbi` (array)(**required**) - method ABI to be used.
+* `opts.method` (string)(**required**) - method name.
+* `opts.params` (array) - method parameters.
+* `opts.protocol` (string)(**required**) - blockchain protocol.
+
+And for smart contract deployments:
+
+* `opts.type` (string)(**required**) - type of the transaction. It should be `DEPLOY_CONTRACT` in this case.
+* `opts.from` (string)(**required**) - origin or signing address.
+* `opts.contractName` (string)(**required**) - contract name.
+* `opts.source` (string)(**required**) - contract source code.
+* `opts.params` (array) - contract constructor parameters.
+* `opts.protocol` (string)(**required**) - blockchain protocol.
+
+```js
+const fee = await sdk.transaction.getFee({ type: 'TRANSFER', from: '0xaaaaaa', destination: '0xbbbbbbbb', protocol: 'POLYGON' })
+// Fee information object
+// {
+//   "chainId": 137,
+//   "estimateValue": "0.000021",
+//   "unit": "wei",
+//   "gas": 21000,
+//   "gasPrice": "1000000000"
+// }
 ```
