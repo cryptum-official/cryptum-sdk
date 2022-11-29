@@ -105,8 +105,6 @@ class MintPositionResponse {
     this.amountB = amountB
   }
 }
-
-
 class CreateGetPoolsResponse {
   /**
    * Creates an instance of CreateGetPoolsResponse
@@ -149,6 +147,17 @@ class CreateReadPosition {
    */
   constructor({ response }) {
     this.response = response
+  }
+}
+class CollectFeesResponse {
+  /**
+   * Creates an instance of CreatePoolResponse
+   *
+   * @param {object} response
+   * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
+   */
+  constructor({ transaction, pool }) {
+    this.transaction = transaction
   }
 }
 class UTXO {
@@ -646,6 +655,7 @@ module.exports = {
   CreateGetSwapQuotation,
   CreateGetTokenIds,
   CreateReadPosition,
+  CollectFeesResponse,
   UTXO,
   Input,
   Output,

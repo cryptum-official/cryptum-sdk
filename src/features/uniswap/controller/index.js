@@ -206,7 +206,7 @@ class Controller extends Interface {
     }
   }
 
-    /**
+  /**
    * Reads a position from a tokenId 
    * @param {import('../entity').readPosition} input
    * @returns {Promise<import('../../transaction/entity').CreateReadPosition>}
@@ -227,6 +227,45 @@ class Controller extends Interface {
     return {
       response
     }
+  }
+
+  /**
+   * Reads a position from a tokenId 
+   * @param {import('../entity').collectFees} input
+   * @returns {Promise<import('../../transaction/entity').CollectFeesResponse>}
+   * 
+   * @description
+   * Collect the total amount of fees rewarded for a given position TokenID
+   */
+  async collectFees(input) {
+    // validateReadPosition(input)
+    const tc = getTransactionControllerInstance(this.config)
+    const { protocol, wallet, tokenId } = input
+    const data = { from: wallet.address, tokenId }
+    const { rawTransaction } = await makeRequest(
+      {
+        method: 'post',
+        url: `/contract/uniswap/collectFees?protocol=${protocol}`,
+        body: data, config: this.config
+      })
+
+    let signedTx;
+    switch (protocol) {
+      case Protocol.CELO:
+        signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
+        break;
+      case Protocol.ETHEREUM:
+      case Protocol.POLYGON:
+        signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
+        break;
+      default:
+        throw new InvalidException('Unsupported protocol')
+    }
+    return await tc.sendTransaction(
+      new SignedTransaction({
+        signedTx, protocol, type: TransactionType.MINT_POSITION
+      })
+    )
   }
 
 }

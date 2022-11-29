@@ -55,5 +55,11 @@
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
  * @property {string} tokenId tokenId of the position to be read
  */
+/**
+ * @typedef {Object} collectFees
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} tokenId id of the position to collect fees
+ */
 
 module.exports = {}
