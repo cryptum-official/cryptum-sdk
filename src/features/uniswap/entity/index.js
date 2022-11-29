@@ -50,5 +50,10 @@
  * @property {string} ownerAddress address of the token to be swapped
  * @property {string} poolAddress address of the token swapped
  */
+/**
+ * @typedef {Object} readPosition
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {string} tokenId tokenId of the position to be read
+ */
 
 module.exports = {}

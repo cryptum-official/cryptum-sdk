@@ -186,12 +186,11 @@ class Controller extends Interface {
   /**
    * Get tokenId from position by owner address (optional:filter by pool)
    * @param {import('../entity').getTokenIds} input
-   * @returns {Promise<import('../../transaction/entity').CreategetTokenIds>}
+   * @returns {Promise<import('../../transaction/entity').CreateGetTokenIds>}
    * 
    * @description
    * Returns the positions and their token ids of owner address
    */
-
   async getTokenIds(input) {
     validateGetTokenIds(input)
     const { protocol, ownerAddress, poolAddress} = input
@@ -207,6 +206,14 @@ class Controller extends Interface {
     }
   }
 
+    /**
+   * Reads a position from a tokenId 
+   * @param {import('../entity').readPosition} input
+   * @returns {Promise<import('../../transaction/entity').CreateReadPosition>}
+   * 
+   * @description
+   * Returns the position infos
+   */
   async readPosition(input) {
     validateReadPosition(input)
     const { protocol, tokenId } = input

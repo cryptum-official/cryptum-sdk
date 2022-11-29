@@ -131,15 +131,24 @@ class CreateGetSwapQuotation {
     this.tokenOut = tokenOut
   }
 }
-class CreategetTokenIds {
+class CreateGetTokenIds {
   /**
-   * Creates an instance of CreateGetSwapQuotation
+   * Creates an instance of CreategetTokenIds
    *
    * @param {string} response response
    */
   constructor({ response }) {
     this.response = response
-    // this.tokenOut = tokenOut
+  }
+}
+class CreateReadPosition {
+  /**
+   * Creates an instance of CreateGetPosition 
+   *
+   * @param {string} response response
+   */
+  constructor({ response }) {
+    this.response = response
   }
 }
 class UTXO {
@@ -635,7 +644,8 @@ module.exports = {
   MintPositionResponse,
   CreateGetPoolsResponse,
   CreateGetSwapQuotation,
-  CreategetTokenIds,
+  CreateGetTokenIds,
+  CreateReadPosition,
   UTXO,
   Input,
   Output,
