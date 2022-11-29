@@ -148,3 +148,28 @@ module.exports.validateUniswapGetSwapQuotation = ({
         throw new InvalidException('Invalid tradeType')
     }
 }
+
+module.exports.validateGetTokenIds = ({ 
+    protocol, ownerAddress, poolAddress
+}) => {
+    if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+        throw new InvalidException('Invalid protocol')
+    }
+    if (!ownerAddress || typeof ownerAddress !== 'string') {
+        throw new InvalidException('Invalid ownerAddress')
+    }
+    if (!poolAddress || typeof poolAddress !== 'string') {
+        throw new InvalidException('Invalid poolAddress')
+    }
+}
+
+module.exports.validateReadPosition = ({ 
+    protocol, tokenId
+}) => {
+    if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+        throw new InvalidException('Invalid protocol')
+    }
+    if (!tokenId || typeof tokenId !== 'string') {
+        throw new InvalidException('Invalid tokenId')
+    }
+}

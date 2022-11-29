@@ -8,7 +8,7 @@ const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { SignedTransaction, TransactionType } = require('../../transaction/entity')
 const { signCeloTx } = require('../../../services/blockchain/celo')
-const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateUniswapRemovePosition } = require('../../../services/validations/uniswap')
+const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateUniswapRemovePosition, validateGetTokenIds, validateReadPosition } = require('../../../services/validations/uniswap')
 
 
 class Controller extends Interface {
@@ -193,12 +193,28 @@ class Controller extends Interface {
    */
 
   async getTokenIds(input) {
+    validateGetTokenIds(input)
     const { protocol, ownerAddress, poolAddress} = input
     const data = { protocol, ownerAddress, poolAddress}
     const response = await makeRequest(
       {
         method: 'post',
         url: `/contract/uniswap/getTokenIds?protocol=${protocol}`,
+        body: data, config: this.config
+      })
+    return {
+      response
+    }
+  }
+
+  async readPosition(input) {
+    validateReadPosition(input)
+    const { protocol, tokenId } = input
+    const data = { protocol, tokenId}
+    const response = await makeRequest(
+      {
+        method: 'post',
+        url: `/contract/uniswap/readPosition?protocol=${protocol}`,
         body: data, config: this.config
       })
     return {
