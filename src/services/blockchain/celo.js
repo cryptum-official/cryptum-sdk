@@ -60,7 +60,7 @@ module.exports.buildCeloTransferTransaction = async function ({
       : token.methods.transfer(destination, value).encodeABI()
   }
 
-  return await this.signCeloTx(rawTransaction, fromPrivateKey)
+  return await exports.signCeloTx(rawTransaction, fromPrivateKey)
 }
 
 module.exports.buildCeloSmartContractTransaction = async ({
@@ -99,7 +99,7 @@ module.exports.buildCeloSmartContractTransaction = async ({
   const contract = new web3.eth.Contract(contractAbi, contractAddress)
   rawTransaction.data = contract.methods[method](...params).encodeABI()
 
-  return await this.signCeloTx(rawTransaction, fromPrivateKey)
+  return await exports.signCeloTx(rawTransaction, fromPrivateKey)
 }
 
 module.exports.buildCeloSmartContractDeployTransaction = async ({
@@ -138,7 +138,7 @@ module.exports.buildCeloSmartContractDeployTransaction = async ({
           : feeCurrency,
   }
 
-  return await this.signCeloTx(rawTransaction, fromPrivateKey)
+  return await exports.signCeloTx(rawTransaction, fromPrivateKey)
 }
 
 module.exports.signCeloTx = async (rawTransaction, fromPrivateKey) => {

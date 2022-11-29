@@ -117,3 +117,55 @@ const { hash } = await sdk.nft.burn({
   tokenId: 0,
 })
 ```
+
+## Approve ERC-721 NFTs
+
+### `sdk.nft.approve(opts)`
+
+Invoke method "approve" from ERC721-compatible smart contracts.
+
+**\*Obs: This method will only work for the NFTs compatible with ERC-721 standard.**
+
+- `opts.wallet` (Wallet) (**required**) - wallet signing transaction that owns the NFT.
+- `opts.token` (string) (**required**) - token address.
+- `opts.tokenId` (string) (**required**) - token id to be approved.
+- `opts.operator` (string) (**required**) - address to add to the set of authorized operators.
+- `opts.protocol` (string) (**required**) - [EVMs only](../protocols.md#ethereum-based-blockchains-evms).
+
+This function returns the hash of this transaction from the blockchain.
+
+```js
+const { hash } = await sdk.nft.approve({
+  wallet,
+  protocol: 'CELO',
+  token: '0x1b5e12ca...1b5e12ca',
+  tokenId: '100000',
+  operator: '0x9377888...3342232',
+})
+```
+
+## Set approval for all NFTs
+
+### `sdk.nft.setApprovalForAll(opts)`
+
+Invoke method "setApprovalForAll" from ERC721/ERC1155-compatible smart contracts.
+
+**\*Obs: This method will only work for the NFTs compatible with ERC-721/ERC-1155 standard.**
+
+- `opts.wallet` (Wallet) (**required**) - wallet signing transaction that owns the NFTs.
+- `opts.token` (string) (**required**) - token address.
+- `opts.isApproved` (boolean) (**required**) - true if the operator is approved, false to revoke approval.
+- `opts.operator` (string) (**required**) - address to add to the set of authorized operators.
+- `opts.protocol` (string) (**required**) - [EVMs only](../protocols.md#ethereum-based-blockchains-evms).
+
+This function returns the hash of this transaction from the blockchain.
+
+```js
+const { hash } = await sdk.nft.setApprovalForAll({
+  wallet,
+  protocol: 'CELO',
+  token: '0x1b5e12ca...1b5e12ca',
+  isApproved: true,
+  operator: '0x9377888...3342232',
+})
+```

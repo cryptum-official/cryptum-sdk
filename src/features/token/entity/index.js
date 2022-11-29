@@ -71,4 +71,13 @@
  * @property {string=} meltAuthorityAddress address responsible to burn more tokens (for hathor only)
  * @property {string=} feeCurrency fee currency (for celo only)
  */
+/**
+ * @typedef {Object} TokenApproveInput
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} token token address to invoke the approve method
+ * @property {string} amount amount to be transferred
+ * @property {string} spender address allowed to withdraw tokens from this wallet
+ * @property {string=} feeCurrency fee currency (for celo only)
+ */
 module.exports = {}
