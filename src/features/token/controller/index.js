@@ -293,7 +293,7 @@ class Controller extends Interface {
   }
   /**
    * Invoke "approve" method from ERC20-compatible smart contracts
-   * @param {import('../entity').TokenBurnInput} input
+   * @param {import('../entity').TokenApproveInput} input
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async approve(input) {
