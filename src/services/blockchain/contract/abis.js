@@ -231,12 +231,3 @@ module.exports.ERC1155_SETAPPROVALLFORALL_METHOD_ABI = [
     type: "function"
   }
 ]
-module.exports.ERC1155_ISAPPROVEDFORALL_METHOD_ABI = [
-  {
-    inputs: [{ internalType: "address", name: "owner", type: "address" }, { internalType: "address", name: "operator", type: "address" }],
-    name: "isApprovedForAll",
-    outputs: [{ type: 'bool', name: '' }],
-    stateMutability: "nonpayable",
-    type: "function"
-  }
-]
