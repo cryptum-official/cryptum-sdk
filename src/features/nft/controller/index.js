@@ -12,7 +12,10 @@ const {
   ERC721_BURN_METHOD_ABI,
   ERC1155_BURN_METHOD_ABI,
   ERC1155_MINT_WITH_URI_METHOD_ABI,
-  ERC1155_MINT_METHOD_ABI
+  ERC1155_MINT_METHOD_ABI,
+  ERC721_APPROVE_METHOD_ABI,
+  ERC1155_SETAPPROVALLFORALL_METHOD_ABI,
+  ERC1155_ISAPPROVEDFORALL_METHOD_ABI
 } = require('../../../services/blockchain/contract/abis')
 const {
   validateEvmNftTransfer,
@@ -324,6 +327,86 @@ class Controller extends Interface {
         throw new InvalidException('Unsupported protocol')
     }
     return await tc.sendTransaction(tx)
+  }
+  /**
+   * Invoke "approve" method from ERC721-compatible smart contracts
+   * @param {import('../entity').NftApproveInput} input
+   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+   */
+  async approve(input) {
+    const { protocol, token, wallet, tokenId, feeCurrency, operator } = input
+    switch (protocol) {
+      case Protocol.ETHEREUM:
+      case Protocol.CELO:
+      case Protocol.BSC:
+      case Protocol.POLYGON:
+      case Protocol.AVAXCCHAIN: {
+        return await getContractControllerInstance(this.config).callMethodTransaction({
+          wallet,
+          protocol,
+          contractAddress: token,
+          method: 'approve',
+          contractAbi: ERC721_APPROVE_METHOD_ABI,
+          params: [operator, tokenId],
+          feeCurrency
+        })
+      }
+      default:
+        throw new InvalidException('Unsupported protocol')
+    }
+  }
+  /**
+   * Invoke "setApprovalForAll" method from ERC721/ERC1155-compatible smart contracts
+   * @param {import('../entity').NftSetApprovalForAllInput} input
+   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+   */
+  async setApprovalForAll(input) {
+    const { protocol, token, wallet, isApproved, feeCurrency, operator } = input
+    switch (protocol) {
+      case Protocol.ETHEREUM:
+      case Protocol.CELO:
+      case Protocol.BSC:
+      case Protocol.POLYGON:
+      case Protocol.AVAXCCHAIN: {
+        return await getContractControllerInstance(this.config).callMethodTransaction({
+          wallet,
+          protocol,
+          contractAddress: token,
+          method: 'setApprovalForAll',
+          contractAbi: ERC1155_SETAPPROVALLFORALL_METHOD_ABI,
+          params: [operator, isApproved],
+          feeCurrency
+        })
+      }
+      default:
+        throw new InvalidException('Unsupported protocol')
+    }
+  }
+  /**
+   * Invoke "setApprovalForAll" method from ERC721/ERC1155-compatible smart contracts
+   * @param {import('../entity').NftSetApprovalForAllInput} input
+   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+   */
+  async isApprovedForAll(input) {
+    const { protocol, from, token, owner, operator } = input
+    switch (protocol) {
+      case Protocol.ETHEREUM:
+      case Protocol.CELO:
+      case Protocol.BSC:
+      case Protocol.POLYGON:
+      case Protocol.AVAXCCHAIN: {
+        return await getContractControllerInstance(this.config).callMethod({
+          protocol,
+          from,
+          contractAddress: token,
+          method: 'isApprovedForAll',
+          contractAbi: ERC1155_ISAPPROVEDFORALL_METHOD_ABI,
+          params: [owner, operator],
+        })
+      }
+      default:
+        throw new InvalidException('Unsupported protocol')
+    }
   }
 }
 

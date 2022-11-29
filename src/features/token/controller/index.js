@@ -2,7 +2,7 @@ module.exports.getTokenControllerInstance = (config) => new Controller(config)
 const InvalidException = require('../../../errors/InvalidException')
 const { makeRequest } = require('../../../services')
 const { Protocol } = require('../../../services/blockchain/constants')
-const { ERC20_MINT_METHOD_ABI, ERC20_BURN_METHOD_ABI } = require('../../../services/blockchain/contract/abis')
+const { ERC20_MINT_METHOD_ABI, ERC20_BURN_METHOD_ABI, ERC20_APPROVE_METHOD_ABI } = require('../../../services/blockchain/contract/abis')
 const { toWei, toLamports } = require('../../../services/blockchain/utils')
 const { validateEvmTokenMint, validateEvmTokenBurn } = require('../../../services/validations/evm')
 const { getContractControllerInstance } = require('../../contract/controller')
@@ -290,6 +290,34 @@ class Controller extends Interface {
         throw new InvalidException('Unsupported protocol')
     }
     return await tc.sendTransaction(tx)
+  }
+  /**
+   * Invoke "approve" method from ERC20-compatible smart contracts
+   * @param {import('../entity').TokenBurnInput} input
+   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+   */
+  async approve(input) {
+    const { protocol, token, wallet, spender, amount, feeCurrency } = input
+    switch (protocol) {
+      case Protocol.ETHEREUM:
+      case Protocol.CELO:
+      case Protocol.BSC:
+      case Protocol.POLYGON:
+      case Protocol.AVAXCCHAIN: {
+        const { decimals } = await this.getInfo({ protocol, tokenAddress: token })
+        return await getContractControllerInstance(this.config).callMethodTransaction({
+          wallet,
+          protocol,
+          contractAddress: token,
+          method: 'approve',
+          contractAbi: ERC20_APPROVE_METHOD_ABI,
+          params: [spender, toWei(amount, decimals).toString()],
+          feeCurrency
+        })
+      }
+      default:
+        throw new InvalidException('Unsupported protocol')
+    }
   }
 }
 module.exports.TokenController = Controller
