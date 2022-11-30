@@ -8,7 +8,7 @@ const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { SignedTransaction, TransactionType } = require('../../transaction/entity')
 const { signCeloTx } = require('../../../services/blockchain/celo')
-const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateUniswapRemovePosition, validateGetTokenIds, validateReadPosition } = require('../../../services/validations/uniswap')
+const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateUniswapRemovePosition, validateGetTokenIds, validateReadPosition, validateCollectFees, validateIncreaseLiquidity, validateDecreaseLiquidity } = require('../../../services/validations/uniswap')
 
 
 class Controller extends Interface {
@@ -230,15 +230,15 @@ class Controller extends Interface {
   }
 
   /**
-   * Reads a position from a tokenId 
+   * Collect fees earned by providing liquidity to a specific pool 
    * @param {import('../entity').collectFees} input
-   * @returns {Promise<import('../../transaction/entity').CollectFeesResponse>}
+   * @returns {Promise<import('../../transaction/entity').IncreaseLiquidityResponse>}
    * 
    * @description
    * Collect the total amount of fees rewarded for a given position TokenID
    */
   async collectFees(input) {
-    // validateReadPosition(input)
+    validateCollectFees(input)
     const tc = getTransactionControllerInstance(this.config)
     const { protocol, wallet, tokenId } = input
     const data = { from: wallet.address, tokenId }
@@ -246,6 +246,44 @@ class Controller extends Interface {
       {
         method: 'post',
         url: `/contract/uniswap/collectFees?protocol=${protocol}`,
+        body: data, config: this.config
+      })
+    let signedTx;
+    switch (protocol) {
+      case Protocol.CELO:
+        signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
+        break;
+      case Protocol.ETHEREUM:
+      case Protocol.POLYGON:
+        signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
+        break;
+      default:
+        throw new InvalidException('Unsupported protocol')
+    }
+    return await tc.sendTransaction(
+      new SignedTransaction({
+        signedTx, protocol, type: TransactionType.MINT_POSITION
+      })
+    )
+  }
+
+  /**
+   * Increase liquidity from pair tokens in a specific pool
+   * @param {import('../entity').increaseLiquidity} input
+   * @returns {Promise<import('../../transaction/entity').DecreaseLiquidityResponse>}
+   * 
+   * @description
+   * Increases liquidity for token0 and token1 given the position TokenID from pool
+   */
+  async increaseLiquidity(input) {
+    validateIncreaseLiquidity(input)
+    const tc = getTransactionControllerInstance(this.config)
+    const { protocol, wallet, tokenId, token0amount, token1amount } = input
+    const data = { from: wallet.address, tokenId, token0amount, token1amount }
+    const { rawTransaction } = await makeRequest(
+      {
+        method: 'post',
+        url: `/contract/uniswap/increaseLiquidity?protocol=${protocol}`,
         body: data, config: this.config
       })
 
@@ -268,6 +306,43 @@ class Controller extends Interface {
     )
   }
 
+  /**
+   * Decrease liquidity from pair tokens in a specific pool
+   * @param {import('../entity').decreaseLiquidity} input
+   * @returns {Promise<import('../../transaction/entity').DecreaseLiquidityResponse>}
+   * 
+   * @description
+   * Decreases a percentage of the token pair (token0, token1) liquidity from a specific position(tokenId)
+   */
+  async decreaseLiquidity(input) {
+    validateDecreaseLiquidity(input)
+    const tc = getTransactionControllerInstance(this.config)
+    const { protocol, wallet, tokenId, percentageToDecrease } = input
+    const data = { from: wallet.address, tokenId, percentageToDecrease }
+    const { rawTransaction } = await makeRequest(
+      {
+        method: 'post',
+        url: `/contract/uniswap/decreaseLiquidity?protocol=${protocol}`,
+        body: data, config: this.config
+      })
+    let signedTx;
+    switch (protocol) {
+      case Protocol.CELO:
+        signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
+        break;
+      case Protocol.ETHEREUM:
+      case Protocol.POLYGON:
+        signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
+        break;
+      default:
+        throw new InvalidException('Unsupported protocol')
+    }
+    return await tc.sendTransaction(
+      new SignedTransaction({
+        signedTx, protocol, type: TransactionType.MINT_POSITION
+      })
+    )
+  }
 }
 
 module.exports.UniswapController = Controller

@@ -173,3 +173,54 @@ module.exports.validateReadPosition = ({
         throw new InvalidException('Invalid tokenId')
     }
 }
+
+module.exports.validateCollectFees = ({ 
+    wallet, protocol, tokenId
+}) => {
+    if (!wallet) {
+        throw new InvalidException('Invalid wallet')
+    }
+    if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+        throw new InvalidException('Invalid protocol')
+    }
+    if (!tokenId || typeof tokenId !== 'string') {
+        throw new InvalidException('Invalid tokenId')
+    }
+}
+
+module.exports.validateIncreaseLiquidity = ({ 
+    wallet, protocol, tokenId, token0amount, token1amount 
+}) => {
+    if (!wallet) {
+        throw new InvalidException('Invalid wallet')
+    }
+    if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+        throw new InvalidException('Invalid protocol')
+    }
+    if (!tokenId || typeof tokenId !== 'string') {
+        throw new InvalidException('Invalid tokenId')
+    }
+    if (!token0amount || typeof token0amount !== 'string') {
+        throw new InvalidException('Invalid token0amount')
+    }
+    if (!token1amount || typeof token1amount !== 'string') {
+        throw new InvalidException('Invalid token1amount')
+    }
+}
+
+module.exports.validateDecreaseLiquidity = ({ 
+    wallet, protocol, tokenId, percentageToDecrease
+}) => {
+    if (!wallet) {
+        throw new InvalidException('Invalid wallet')
+    }
+    if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+        throw new InvalidException('Invalid protocol')
+    }
+    if (!tokenId || typeof tokenId !== 'string') {
+        throw new InvalidException('Invalid tokenId')
+    }
+    if (!percentageToDecrease || typeof percentageToDecrease !== 'string') {
+        throw new InvalidException('Invalid percentageToDecrease')
+    }
+}

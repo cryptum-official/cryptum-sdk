@@ -61,5 +61,19 @@
  * @property {import('../../wallet/entity').Wallet} wallet
  * @property {string} tokenId id of the position to collect fees
  */
-
+/**
+ * @typedef {Object} increaseLiquidity
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} tokenId id of the position to collect fees
+ * @property {string} token0amount amount of liqudity desired to be added from token0
+ * @property {string} token1amount amount of liqudity desired to be added from token1
+ */
+/**
+ * @typedef {Object} decreaseLiquidity
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} tokenId id of the position to collect fees
+ * @property {string} percentageToDecrease percentage from the total liquidity of the position to be decreased 
+ */
 module.exports = {}

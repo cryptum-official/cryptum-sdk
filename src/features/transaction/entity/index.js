@@ -160,6 +160,28 @@ class CollectFeesResponse {
     this.transaction = transaction
   }
 }
+class IncreaseLiquidityResponse {
+  /**
+   * Creates an instance of CreatePoolResponse
+   *
+   * @param {object} response
+   * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
+   */
+  constructor({ transaction, pool }) {
+    this.transaction = transaction
+  }
+}
+class DecreaseLiquidityResponse {
+  /**
+   * Creates an instance of CreatePoolResponse
+   *
+   * @param {object} response
+   * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
+   */
+  constructor({ transaction, pool }) {
+    this.transaction = transaction
+  }
+}
 class UTXO {
   constructor({ value, txHash, index, height, token }) {
     this.value = value
@@ -656,6 +678,8 @@ module.exports = {
   CreateGetTokenIds,
   CreateReadPosition,
   CollectFeesResponse,
+  IncreaseLiquidityResponse,
+  DecreaseLiquidityResponse,
   UTXO,
   Input,
   Output,
