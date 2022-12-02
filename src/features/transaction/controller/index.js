@@ -1,4 +1,5 @@
 module.exports.getTransactionControllerInstance = (config) => new Controller(config)
+const BigNumber = require('bignumber.js')
 const { handleRequestError, getApiMethod, mountHeaders, makeRequest } = require('../../../services')
 const requests = require('./requests.json')
 const Interface = require('./interface')
@@ -773,11 +774,18 @@ class Controller extends Interface {
       changeAddress,
       nftData,
     } = input
-    let inputSum = 0
-    const amountHTRUnit = toHTRUnit(amount).toNumber()
     const protocol = Protocol.HATHOR
+    let inputSum = 0
+    let amountHTRUnit;
+    if (nftData && type === TransactionType.HATHOR_TOKEN_CREATION) {
+      amountHTRUnit = Math.ceil(new BigNumber(amount).times(0.0001).plus(0.01).times(100).toNumber())
+    } else if (type === TransactionType.HATHOR_NFT_MINT || type === TransactionType.HATHOR_NFT_MELT) {
+      amountHTRUnit = Math.ceil(new BigNumber(amount).times(0.0001).times(100).toNumber())
+    } else {
+      amountHTRUnit = toHTRUnit(amount).toNumber()
+    }
     let utxos = await this.getUTXOs({ address: wallet.address, protocol })
-    if (type === TransactionType.HATHOR_TOKEN_MELT) {
+    if (type === TransactionType.HATHOR_TOKEN_MELT || type === TransactionType.HATHOR_NFT_MELT) {
       utxos = utxos.filter((utxo) => utxo.token === tokenUid)
     } else {
       utxos = utxos.filter((utxo) => utxo.token === '00' || utxo.token === tokenUid)
@@ -789,7 +797,7 @@ class Controller extends Interface {
     for (let i = 0; i < utxos.length; ++i) {
       const tx = await this.getTransactionByHash({ hash: utxos[i].txHash, protocol })
       const output = tx.tx.outputs[utxos[i].index]
-      if (type === TransactionType.HATHOR_TOKEN_MELT) {
+      if (type === TransactionType.HATHOR_TOKEN_MELT || type === TransactionType.HATHOR_NFT_MELT) {
         if (![0, 129].includes(output.token_data)) {
           if (inputSum < amountHTRUnit) {
             inputSum += output.value

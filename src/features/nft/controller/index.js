@@ -219,7 +219,7 @@ class Controller extends Interface {
     switch (protocol) {
       case Protocol.HATHOR:
         tx = await tc.createHathorTokenTransactionFromWallet({
-          type: TransactionType.HATHOR_TOKEN_MINT,
+          type: TransactionType.HATHOR_NFT_MINT,
           wallet,
           tokenUid: token,
           amount,
@@ -282,7 +282,7 @@ class Controller extends Interface {
     switch (protocol) {
       case Protocol.HATHOR:
         tx = await tc.createHathorTokenTransactionFromWallet({
-          type: TransactionType.HATHOR_TOKEN_MELT,
+          type: TransactionType.HATHOR_NFT_MELT,
           wallet,
           tokenUid: token,
           amount,
