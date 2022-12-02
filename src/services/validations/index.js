@@ -298,7 +298,9 @@ module.exports.validateHathorTokenTransactionFromWallet = ({
     ![
       TransactionType.HATHOR_TOKEN_CREATION,
       TransactionType.HATHOR_TOKEN_MELT,
+      TransactionType.HATHOR_NFT_MELT,
       TransactionType.HATHOR_TOKEN_MINT,
+      TransactionType.HATHOR_NFT_MINT,
     ].includes(type)
   ) {
     throw new HathorException('Invalid type')
