@@ -150,6 +150,16 @@ module.exports.validateUniswapGetSwapQuotation = ({
 }
 
 module.exports.validateGetTokenIds = ({ 
+    protocol, ownerAddress
+}) => {
+    if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+        throw new InvalidException('Invalid protocol')
+    }
+    if (!ownerAddress || typeof ownerAddress !== 'string') {
+        throw new InvalidException('Invalid ownerAddress')
+    }
+}
+module.exports.validateGetPositions = ({ 
     protocol, ownerAddress, poolAddress
 }) => {
     if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
@@ -158,12 +168,12 @@ module.exports.validateGetTokenIds = ({
     if (!ownerAddress || typeof ownerAddress !== 'string') {
         throw new InvalidException('Invalid ownerAddress')
     }
-    if (!poolAddress || typeof poolAddress !== 'string') {
+    if (poolAddress !== undefined && typeof poolAddress !== 'string') {
         throw new InvalidException('Invalid poolAddress')
     }
 }
 
-module.exports.validateReadPosition = ({ 
+module.exports.validateGetPosition = ({ 
     protocol, tokenId
 }) => {
     if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {

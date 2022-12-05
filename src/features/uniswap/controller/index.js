@@ -8,7 +8,7 @@ const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { SignedTransaction, TransactionType } = require('../../transaction/entity')
 const { signCeloTx } = require('../../../services/blockchain/celo')
-const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateUniswapRemovePosition, validateGetTokenIds, validateReadPosition, validateCollectFees, validateIncreaseLiquidity, validateDecreaseLiquidity } = require('../../../services/validations/uniswap')
+const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateUniswapRemovePosition, validateGetTokenIds, validategetPosition, validateCollectFees, validateIncreaseLiquidity, validateDecreaseLiquidity, validateGetPositions, validateGetPosition } = require('../../../services/validations/uniswap')
 
 
 class Controller extends Interface {
@@ -183,22 +183,45 @@ class Controller extends Interface {
     }
   }
 
-  /**
-   * Get tokenId from position by owner address (optional:filter by pool)
+    /**
+   * Get All Uniswap Token Ids By owner address
    * @param {import('../entity').getTokenIds} input
+   * @returns {Promise<import('../../transaction/entity').CreateGetTokenIds>}
+   * 
+   * @description
+   * Returns All the token ids owned by a wallet address
+   */
+     async getTokenIds(input) {
+      validateGetTokenIds(input)
+      const { protocol, ownerAddress} = input
+      const data = { protocol, ownerAddress}
+      const response = await makeRequest(
+        {
+          method: 'post',
+          url: `/contract/uniswap/getTokenIds?protocol=${protocol}`,
+          body: data, config: this.config
+        })
+      return {
+        response
+      }
+    }
+
+  /**
+   * Get Uniswap Pool Positions by owner address (optional:filter by pool)
+   * @param {import('../entity').getPositions} input
    * @returns {Promise<import('../../transaction/entity').CreateGetTokenIds>}
    * 
    * @description
    * Returns the positions and their token ids of owner address
    */
-  async getTokenIds(input) {
-    validateGetTokenIds(input)
+  async getPositions(input) {
+    validateGetPositions(input)
     const { protocol, ownerAddress, poolAddress} = input
     const data = { protocol, ownerAddress, poolAddress}
     const response = await makeRequest(
       {
         method: 'post',
-        url: `/contract/uniswap/getTokenIds?protocol=${protocol}`,
+        url: `/contract/uniswap/getPositions?protocol=${protocol}`,
         body: data, config: this.config
       })
     return {
@@ -208,20 +231,20 @@ class Controller extends Interface {
 
   /**
    * Reads a position from a tokenId 
-   * @param {import('../entity').readPosition} input
-   * @returns {Promise<import('../../transaction/entity').CreateReadPosition>}
+   * @param {import('../entity').getPosition} input
+   * @returns {Promise<import('../../transaction/entity').CreategetPosition>}
    * 
    * @description
    * Returns the position infos
    */
-  async readPosition(input) {
-    validateReadPosition(input)
+  async getPosition(input) {
+    validateGetPosition(input)
     const { protocol, tokenId } = input
     const data = { protocol, tokenId}
     const response = await makeRequest(
       {
         method: 'post',
-        url: `/contract/uniswap/readPosition?protocol=${protocol}`,
+        url: `/contract/uniswap/getPosition?protocol=${protocol}`,
         body: data, config: this.config
       })
     return {

@@ -47,11 +47,16 @@
 /**
  * @typedef {Object} getTokenIds
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
- * @property {string} ownerAddress address of the token to be swapped
- * @property {string} poolAddress address of the token swapped
+ * @property {string} ownerAddress address of the wallet owner
  */
 /**
- * @typedef {Object} readPosition
+ * @typedef {Object} getPositions
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {string} ownerAddress address of the wallet owner
+ * @property {string} poolAddress address of the pool
+ */
+/**
+ * @typedef {Object} getPosition
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
  * @property {string} tokenId tokenId of the position to be read
  */

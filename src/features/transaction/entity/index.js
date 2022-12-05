@@ -133,7 +133,7 @@ class CreateGetTokenIds {
   /**
    * Creates an instance of CreategetTokenIds
    *
-   * @param {string} response response
+   * @param {Array} response response
    */
   constructor({ response }) {
     this.response = response
@@ -156,7 +156,7 @@ class CollectFeesResponse {
    * @param {object} response
    * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
    */
-  constructor({ transaction, pool }) {
+  constructor({ transaction }) {
     this.transaction = transaction
   }
 }
@@ -167,7 +167,7 @@ class IncreaseLiquidityResponse {
    * @param {object} response
    * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
    */
-  constructor({ transaction, pool }) {
+  constructor({ transaction }) {
     this.transaction = transaction
   }
 }
@@ -178,7 +178,7 @@ class DecreaseLiquidityResponse {
    * @param {object} response
    * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
    */
-  constructor({ transaction, pool }) {
+  constructor({ transaction }) {
     this.transaction = transaction
   }
 }
