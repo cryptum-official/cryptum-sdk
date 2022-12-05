@@ -109,14 +109,25 @@ class CreateGetPoolsResponse {
   /**
    * Creates an instance of CreateGetPoolsResponse
    *
-   * @param {number} response.poolFee pool address
-   * @param {string} response.poolAddress pool address
+   * @param {Array<PoolFeeResponse>} response Array of PoolFee responses
    */
-  constructor({ poolAddress, poolFee }) {
+  constructor({ response }) {
+    this.response = response
+  }
+}
+
+class PoolFeeResponse {
+  /**
+   *
+   * @param {string} this.poolFee 
+   * @param {string} this.poolAddress
+   */
+  constructor({ poolFee, poolAddress }) {
     this.poolFee = poolFee
     this.poolAddress = poolAddress
   }
 }
+
 class CreateGetSwapQuotation {
   /**
    * Creates an instance of CreateGetSwapQuotation
