@@ -1,11 +1,7 @@
 const { LocalWallet } = require('@celo/wallet-local')
 const BigNumber = require('bignumber.js')
 const Web3 = require('web3')
-const {
-  CUSD_CONTRACT_ADDRESS,
-  CEUR_CONTRACT_ADDRESS,
-  CELO_CONTRACT_ADDRESS,
-} = require('./constants')
+const { CUSD_CONTRACT_ADDRESS, CEUR_CONTRACT_ADDRESS, CELO_CONTRACT_ADDRESS } = require('./constants')
 const { compileContract } = require('../../services/blockchain/contract')
 const { TRANSFER_METHOD_ABI, TRANSFER_COMMENT_METHOD_ABI } = require('./contract/abis')
 const { toWei } = require('./utils')
@@ -21,7 +17,7 @@ module.exports.buildCeloTransferTransaction = async function ({
   feeCurrency = null,
   memo = null,
   testnet = true,
-  decimals
+  decimals,
 }) {
   const network = testnet ? 'testnet' : 'mainnet'
   const { gas, gasPrice, chainId } = fee
@@ -36,7 +32,7 @@ module.exports.buildCeloTransferTransaction = async function ({
     value: undefined,
     data: undefined,
     gas: Web3.utils.toHex(new BigNumber(gas).plus(100000)),
-    feeCurrency
+    feeCurrency,
   }
   const value = toWei(amount, decimals)
   if (tokenSymbol === 'CELO' && !memo) {
@@ -92,8 +88,8 @@ module.exports.buildCeloSmartContractTransaction = async ({
       feeCurrency === 'cUSD'
         ? CUSD_CONTRACT_ADDRESS[network]
         : feeCurrency === 'cEUR'
-          ? CEUR_CONTRACT_ADDRESS[network]
-          : feeCurrency,
+        ? CEUR_CONTRACT_ADDRESS[network]
+        : feeCurrency,
   }
   const web3 = new Web3()
   const contract = new web3.eth.Contract(contractAbi, contractAddress)
@@ -115,8 +111,13 @@ module.exports.buildCeloSmartContractDeployTransaction = async ({
   params,
 }) => {
   const { bytecode } = await compileContract({
-    source, contractName, config, tokenType, protocol: 'CELO', params,
-  });
+    source,
+    contractName,
+    config,
+    tokenType,
+    protocol: 'CELO',
+    params,
+  })
   const celoWallet = new LocalWallet()
   celoWallet.addAccount(fromPrivateKey)
   const network = testnet ? 'testnet' : 'mainnet'
@@ -134,8 +135,8 @@ module.exports.buildCeloSmartContractDeployTransaction = async ({
       feeCurrency === 'cUSD'
         ? CUSD_CONTRACT_ADDRESS[network]
         : feeCurrency === 'cEUR'
-          ? CEUR_CONTRACT_ADDRESS[network]
-          : feeCurrency,
+        ? CEUR_CONTRACT_ADDRESS[network]
+        : feeCurrency,
   }
 
   return await signCeloTx(rawTransaction, fromPrivateKey)
