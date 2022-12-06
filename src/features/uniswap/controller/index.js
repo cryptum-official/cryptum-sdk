@@ -293,7 +293,7 @@ class Controller extends Interface {
   /**
    * Increase liquidity from pair tokens in a specific pool
    * @param {import('../entity').increaseLiquidity} input
-   * @returns {Promise<import('../../transaction/entity').DecreaseLiquidityResponse>}
+   * @returns {Promise<import('../../transaction/entity').IncreaseLiquidityResponse>}
    * 
    * @description
    * Increases liquidity for token0 and token1 given the position TokenID from pool
@@ -301,8 +301,8 @@ class Controller extends Interface {
   async increaseLiquidity(input) {
     validateIncreaseLiquidity(input)
     const tc = getTransactionControllerInstance(this.config)
-    const { protocol, wallet, tokenId, token0amount, token1amount } = input
-    const data = { from: wallet.address, tokenId, token0amount, token1amount }
+    const { protocol, wallet, tokenId, token0amount, token1amount, slippage } = input
+    const data = { from: wallet.address, tokenId, token0amount, token1amount, slippage }
     const { rawTransaction } = await makeRequest(
       {
         method: 'post',
@@ -340,8 +340,8 @@ class Controller extends Interface {
   async decreaseLiquidity(input) {
     validateDecreaseLiquidity(input)
     const tc = getTransactionControllerInstance(this.config)
-    const { protocol, wallet, tokenId, percentageToDecrease } = input
-    const data = { from: wallet.address, tokenId, percentageToDecrease }
+    const { protocol, wallet, tokenId, percentageToDecrease, recipient, slippage } = input
+    const data = { from: wallet.address, tokenId, percentageToDecrease, recipient: recipient ? recipient : wallet.address, slippage }
     const { rawTransaction } = await makeRequest(
       {
         method: 'post',

@@ -199,7 +199,7 @@ module.exports.validateCollectFees = ({
 }
 
 module.exports.validateIncreaseLiquidity = ({ 
-    wallet, protocol, tokenId, token0amount, token1amount 
+    wallet, protocol, tokenId, token0amount, token1amount, slippage 
 }) => {
     if (!wallet) {
         throw new InvalidException('Invalid wallet')
@@ -216,10 +216,13 @@ module.exports.validateIncreaseLiquidity = ({
     if (!token1amount || typeof token1amount !== 'string') {
         throw new InvalidException('Invalid token1amount')
     }
+    if (!slippage || typeof slippage !== 'string') {
+        throw new InvalidException('Invalid slippage')
+    }
 }
 
 module.exports.validateDecreaseLiquidity = ({ 
-    wallet, protocol, tokenId, percentageToDecrease
+    wallet, protocol, tokenId, percentageToDecrease, recipient, slippage
 }) => {
     if (!wallet) {
         throw new InvalidException('Invalid wallet')
@@ -232,5 +235,11 @@ module.exports.validateDecreaseLiquidity = ({
     }
     if (!percentageToDecrease || typeof percentageToDecrease !== 'string') {
         throw new InvalidException('Invalid percentageToDecrease')
+    }
+    if (recipient !== undefined && typeof recipient !== 'string') {
+        throw new InvalidException('Invalid recipient')
+    }
+    if (!slippage || typeof slippage !== 'string') {
+        throw new InvalidException('Invalid slippage')
     }
 }
