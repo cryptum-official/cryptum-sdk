@@ -263,7 +263,6 @@ class Controller extends Interface {
       throw new InvalidException('Invalid protocol')
     }
 
-
     return await tc.sendTransaction(
       new SignedTransaction({
         signedTx, protocol, type: TransactionType.LOOTBOX_APPROVE
