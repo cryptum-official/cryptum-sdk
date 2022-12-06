@@ -209,7 +209,7 @@ class Controller extends Interface {
   /**
    * Get Uniswap Pool Positions by owner address (optional:filter by pool)
    * @param {import('../entity').getPositions} input
-   * @returns {Promise<import('../../transaction/entity').CreateGetTokenIds>}
+   * @returns {Promise<import('../../transaction/entity').CreateGetPositions>}
    * 
    * @description
    * Returns the positions and their token ids of owner address
@@ -232,7 +232,7 @@ class Controller extends Interface {
   /**
    * Reads a position from a tokenId 
    * @param {import('../entity').getPosition} input
-   * @returns {Promise<import('../../transaction/entity').CreategetPosition>}
+   * @returns {Promise<import('../../transaction/entity').CreateGetPosition>}
    * 
    * @description
    * Returns the position infos

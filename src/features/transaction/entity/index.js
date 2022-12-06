@@ -150,9 +150,19 @@ class CreateGetTokenIds {
     this.response = response
   }
 }
-class CreateReadPosition {
+class CreateGetPosition {
   /**
    * Creates an instance of CreateGetPosition 
+   *
+   * @param {string} response response
+   */
+  constructor({ response }) {
+    this.response = response
+  }
+}
+class CreateGetPositions {
+  /**
+   * Creates an instance of CreateGetPositions 
    *
    * @param {string} response response
    */
@@ -687,7 +697,8 @@ module.exports = {
   CreateGetPoolsResponse,
   CreateGetSwapQuotation,
   CreateGetTokenIds,
-  CreateReadPosition,
+  CreateGetPosition,
+  CreateGetPositions,
   CollectFeesResponse,
   IncreaseLiquidityResponse,
   DecreaseLiquidityResponse,
