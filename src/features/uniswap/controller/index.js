@@ -62,7 +62,7 @@ class Controller extends Interface {
   }
 
   /**
-   * Removes a position relative to a liquidity pool
+   * Mints a position relative to a liquidity pool
    * @param {import('../entity').MintPositionInput} input
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
