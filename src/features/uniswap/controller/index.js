@@ -271,6 +271,9 @@ class Controller extends Interface {
         url: `/contract/uniswap/collectFees?protocol=${protocol}`,
         body: data, config: this.config
       })
+    if (rawTransaction === "Execution Reverted: The position dont have fees to be collected"){
+      return rawTransaction
+    }
     let signedTx;
     switch (protocol) {
       case Protocol.CELO:
