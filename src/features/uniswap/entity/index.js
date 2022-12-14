@@ -30,8 +30,6 @@
  * @property {string} percentageToRemove how much percent of the position's liquidity should be removed
  * @property {string} recipient address that will receive the position's NFT
  */
- 
-
 /**
  * @typedef {Object} GetPoolsInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
@@ -39,7 +37,6 @@
  * @property {string} tokenB address of the second token
  * @property {number} poolFee fee collected upon every swap in the pool
  */
-
 /**
  * @typedef {Object} GetSwapQuotationInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
@@ -47,6 +44,44 @@
  * @property {string} tokenOut address of the token swapped
  * @property {string} tradeType type of the trade, either "exact_input" or "exact_output"
  */
-
-
+/**
+ * @typedef {Object} getTokenIds
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {string} ownerAddress address of the wallet owner
+ */
+/**
+ * @typedef {Object} getPositions
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {string} ownerAddress address of the wallet owner
+ * @property {string} poolAddress address of the pool
+ */
+/**
+ * @typedef {Object} getPosition
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {string} tokenId tokenId of the position to be read
+ */
+/**
+ * @typedef {Object} collectFees
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} tokenId id of the position to collect fees
+ */
+/**
+ * @typedef {Object} increaseLiquidity
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} tokenId id of the position to collect fees
+ * @property {string} token0amount amount of liqudity desired to be added from token0
+ * @property {string} token1amount amount of liqudity desired to be added from token1
+ * @property {string} slippage allowed levels of slippage (in percentage points) 
+*/
+/**
+ * @typedef {Object} decreaseLiquidity
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} tokenId id of the position to collect fees
+ * @property {string} percentageToDecrease percentage from the total liquidity of the position to be decreased 
+ * @property {string} slippage allowed levels of slippage (in percentage points)
+ * @property {string} recipient address that will receive the decreased liquidity
+*/
 module.exports = {}

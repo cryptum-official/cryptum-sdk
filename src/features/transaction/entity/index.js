@@ -105,20 +105,29 @@ class MintPositionResponse {
     this.amountB = amountB
   }
 }
-
-
 class CreateGetPoolsResponse {
   /**
    * Creates an instance of CreateGetPoolsResponse
    *
-   * @param {number} response.poolFee pool address
-   * @param {string} response.poolAddress pool address
+   * @param {Array<PoolFeeResponse>} response Array of PoolFee responses
    */
-  constructor({ poolAddress, poolFee }) {
+  constructor({ response }) {
+    this.response = response
+  }
+}
+
+class PoolFeeResponse {
+  /**
+   *
+   * @param {string} this.poolFee 
+   * @param {string} this.poolAddress
+   */
+  constructor({ poolFee, poolAddress }) {
     this.poolFee = poolFee
     this.poolAddress = poolAddress
   }
 }
+
 class CreateGetSwapQuotation {
   /**
    * Creates an instance of CreateGetSwapQuotation
@@ -129,6 +138,69 @@ class CreateGetSwapQuotation {
   constructor({ tokenIn, tokenOut }) {
     this.tokenIn = tokenIn
     this.tokenOut = tokenOut
+  }
+}
+class CreateGetTokenIds {
+  /**
+   * Creates an instance of CreategetTokenIds
+   *
+   * @param {Array} response response
+   */
+  constructor({ response }) {
+    this.response = response
+  }
+}
+class CreateGetPosition {
+  /**
+   * Creates an instance of CreateGetPosition 
+   *
+   * @param {string} response response
+   */
+  constructor({ response }) {
+    this.response = response
+  }
+}
+class CreateGetPositions {
+  /**
+   * Creates an instance of CreateGetPositions 
+   *
+   * @param {string} response response
+   */
+  constructor({ response }) {
+    this.response = response
+  }
+}
+class CollectFeesResponse {
+  /**
+   * Creates an instance of CreatePoolResponse
+   *
+   * @param {object} response
+   * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
+   */
+  constructor({ transaction }) {
+    this.transaction = transaction
+  }
+}
+class IncreaseLiquidityResponse {
+  /**
+   * Creates an instance of CreatePoolResponse
+   *
+   * @param {object} response
+   * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
+   */
+  constructor({ transaction }) {
+    this.transaction = transaction
+  }
+}
+class DecreaseLiquidityResponse {
+  /**
+   * Creates an instance of CreatePoolResponse
+   *
+   * @param {object} response
+   * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
+   */
+  constructor({ transaction }) {
+    this.transaction = transaction
   }
 }
 class UTXO {
@@ -623,6 +695,13 @@ module.exports = {
   CreatePoolResponse,
   MintPositionResponse,
   CreateGetPoolsResponse,
+  CreateGetSwapQuotation,
+  CreateGetTokenIds,
+  CreateGetPosition,
+  CreateGetPositions,
+  CollectFeesResponse,
+  IncreaseLiquidityResponse,
+  DecreaseLiquidityResponse,
   UTXO,
   Input,
   Output,
