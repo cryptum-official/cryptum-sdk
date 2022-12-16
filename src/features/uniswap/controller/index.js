@@ -225,8 +225,8 @@ class Controller extends Interface {
   async collectFees(input) {
     validateCollectFees(input)
     const tc = getTransactionControllerInstance(this.config)
-    const { protocol, wallet, tokenId } = input
-    const data = { from: wallet.address, tokenId }
+    const { protocol, wallet, tokenId, wrapped } = input
+    const data = { from: wallet.address, tokenId, wrapped }
     const { rawTransaction } = await makeRequest(
       {
         method: 'post',
@@ -305,8 +305,8 @@ class Controller extends Interface {
   async decreaseLiquidity(input) {
     validateDecreaseLiquidity(input)
     const tc = getTransactionControllerInstance(this.config)
-    const { protocol, wallet, tokenId, percentageToDecrease, recipient, slippage, burnToken } = input
-    const data = { from: wallet.address, tokenId, percentageToDecrease, recipient: recipient ? recipient : wallet.address, slippage, burnToken: burnToken ? burnToken : false }
+    const { protocol, wallet, tokenId, percentageToDecrease, recipient, slippage, burnToken, wrapped } = input
+    const data = { from: wallet.address, tokenId, percentageToDecrease, recipient: recipient ? recipient : wallet.address, slippage, burnToken: burnToken ? burnToken : false, wrapped }
     const { rawTransaction } = await makeRequest(
       {
         method: 'post',

@@ -87,27 +87,27 @@ module.exports.validateUniswapRemovePosition = ({
   tokenId,
   percentageToRemove
 }) => {
-  if (!wallet) {
-    throw new InvalidException('Invalid wallet')
-  }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
-    throw new InvalidException('Invalid protocol')
-  }
-  if (!slippage || typeof slippage !== 'string') {
-    throw new InvalidException('Invalid slippage')
-  }
-  if (!pool || typeof pool !== 'string') {
-    throw new InvalidException('Invalid pool')
-  }
-  if (recipient !== undefined && typeof recipient !== 'string') {
-    throw new InvalidException('Invalid recipient')
-  }
-  if (!tokenId || typeof minPriceDelta !== 'string') {
-    throw new InvalidException('Invalid minPriceDelta')
-  }
-  if (!percentageToRemove || typeof maxPriceDelta !== 'string') {
-    throw new InvalidException('Invalid maxPriceDelta')
-  }
+    if (!wallet) {
+        throw new InvalidException('Invalid wallet')
+    }
+    if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+        throw new InvalidException('Invalid protocol')
+    }
+    if (!slippage || typeof slippage !== 'string') {
+        throw new InvalidException('Invalid slippage')
+    }
+    if (!pool || typeof pool !== 'string') {
+        throw new InvalidException('Invalid pool')
+    }
+    if (recipient !== undefined && typeof recipient !== 'string') {
+        throw new InvalidException('Invalid recipient')
+    }
+    if (!tokenId || typeof tokenId !== 'string') {
+        throw new InvalidException('Invalid tokenId')
+    }
+    if (!percentageToRemove || typeof percentageToRemove !== 'string') {
+        throw new InvalidException('Invalid percentageToRemove')
+    }
 }
 
 module.exports.validateUniswapGetPools = ({
