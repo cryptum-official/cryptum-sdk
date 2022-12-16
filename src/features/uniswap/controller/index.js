@@ -8,7 +8,7 @@ const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { SignedTransaction, TransactionType } = require('../../transaction/entity')
 const { signCeloTx } = require('../../../services/blockchain/celo')
-const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateUniswapRemovePosition, validateGetTokenIds, validategetPosition, validateCollectFees, validateIncreaseLiquidity, validateDecreaseLiquidity, validateGetPositions, validateGetPosition } = require('../../../services/validations/uniswap')
+const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateGetTokenIds, validategetPosition, validateCollectFees, validateIncreaseLiquidity, validateDecreaseLiquidity, validateGetPositions, validateGetPosition } = require('../../../services/validations/uniswap')
 
 
 class Controller extends Interface {
@@ -98,44 +98,6 @@ class Controller extends Interface {
       })
     )
   }
-
-  /**
-   * Removes a position relative to a liquidity pool
-   * @param {import('../entity').RemovePositionInput} input
-   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
-   */
-  async removePosition(input) {
-    validateUniswapRemovePosition(input)
-    const tc = getTransactionControllerInstance(this.config)
-
-    const { protocol, wallet, slippage, pool, recipient, tokenId, percentageToRemove } = input
-    const data = { from: wallet.address, slippage, pool, tokenId, percentageToRemove, recipient: recipient ? recipient : wallet.address }
-    const { rawTransaction, amountA, amountB } = await makeRequest(
-      {
-        method: 'post',
-        url: `/contract/uniswap/removePosition?protocol=${protocol}`,
-        body: data, config: this.config
-      })
-
-
-    let signedTx;
-    switch (protocol) {
-      case Protocol.CELO:
-        signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
-        break;
-      case Protocol.ETHEREUM:
-      case Protocol.POLYGON:
-        signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
-        break;
-      default:
-        throw new InvalidException('Unsupported protocol')
-    }
-    return await tc.sendTransaction(
-      new SignedTransaction({
-        signedTx, protocol, type: TransactionType.REMOVE_POSITION
-      })
-    )
-  }
   
   /**
    * Get Uniswap Pool Addresses
@@ -183,32 +145,32 @@ class Controller extends Interface {
     }
   }
 
-    /**
-   * Get All Uniswap Token Ids By owner address
-   * @param {import('../entity').getTokenIds} input
-   * @returns {Promise<import('../../transaction/entity').CreateGetTokenIds>}
-   * 
-   * @description
-   * Returns All the token ids owned by a wallet address
-   */
-     async getTokenIds(input) {
-      validateGetTokenIds(input)
-      const { protocol, ownerAddress} = input
-      const data = { protocol, ownerAddress}
-      const response = await makeRequest(
-        {
-          method: 'post',
-          url: `/contract/uniswap/getTokenIds?protocol=${protocol}`,
-          body: data, config: this.config
-        })
-      return {
-        response
-      }
+  /**
+ * Get All Uniswap Token Ids By owner address
+ * @param {import('../entity').GetTokenIdsInput} input
+ * @returns {Promise<import('../../transaction/entity').CreateGetTokenIds>}
+ * 
+ * @description
+ * Returns All the token ids owned by a wallet address
+ */
+  async getTokenIds(input) {
+    validateGetTokenIds(input)
+    const { protocol, ownerAddress } = input
+    const data = { protocol, ownerAddress }
+    const response = await makeRequest(
+      {
+        method: 'post',
+        url: `/contract/uniswap/getTokenIds?protocol=${protocol}`,
+        body: data, config: this.config
+      })
+    return {
+      response
     }
+  }
 
   /**
    * Get Uniswap Pool Positions by owner address (optional:filter by pool)
-   * @param {import('../entity').getPositions} input
+   * @param {import('../entity').GetPositionsInput} input
    * @returns {Promise<import('../../transaction/entity').CreateGetPositions>}
    * 
    * @description
@@ -216,8 +178,8 @@ class Controller extends Interface {
    */
   async getPositions(input) {
     validateGetPositions(input)
-    const { protocol, ownerAddress, poolAddress} = input
-    const data = { protocol, ownerAddress, poolAddress}
+    const { protocol, ownerAddress, poolAddress } = input
+    const data = { protocol, ownerAddress, poolAddress }
     const response = await makeRequest(
       {
         method: 'post',
@@ -231,7 +193,7 @@ class Controller extends Interface {
 
   /**
    * Reads a position from a tokenId 
-   * @param {import('../entity').getPosition} input
+   * @param {import('../entity').GetPositionInput} input
    * @returns {Promise<import('../../transaction/entity').CreateGetPosition>}
    * 
    * @description
@@ -240,7 +202,7 @@ class Controller extends Interface {
   async getPosition(input) {
     validateGetPosition(input)
     const { protocol, tokenId } = input
-    const data = { protocol, tokenId}
+    const data = { protocol, tokenId }
     const response = await makeRequest(
       {
         method: 'post',
@@ -254,7 +216,7 @@ class Controller extends Interface {
 
   /**
    * Collect fees earned by providing liquidity to a specific pool 
-   * @param {import('../entity').collectFees} input
+   * @param {import('../entity').CollectFeesInput} input
    * @returns {Promise<import('../../transaction/entity').IncreaseLiquidityResponse>}
    * 
    * @description
@@ -271,7 +233,7 @@ class Controller extends Interface {
         url: `/contract/uniswap/collectFees?protocol=${protocol}`,
         body: data, config: this.config
       })
-    if (rawTransaction === "Execution Reverted: The position dont have fees to be collected"){
+    if (rawTransaction === "Execution Reverted: The position dont have fees to be collected") {
       return rawTransaction
     }
     let signedTx;
@@ -295,7 +257,7 @@ class Controller extends Interface {
 
   /**
    * Increase liquidity from pair tokens in a specific pool
-   * @param {import('../entity').increaseLiquidity} input
+   * @param {import('../entity').IncreaseLiquidityInput} input
    * @returns {Promise<import('../../transaction/entity').IncreaseLiquidityResponse>}
    * 
    * @description
@@ -334,7 +296,7 @@ class Controller extends Interface {
 
   /**
    * Decrease liquidity from pair tokens in a specific pool
-   * @param {import('../entity').decreaseLiquidity} input
+   * @param {import('../entity').DecreaseLiquidityInput} input
    * @returns {Promise<import('../../transaction/entity').DecreaseLiquidityResponse>}
    * 
    * @description
@@ -343,8 +305,8 @@ class Controller extends Interface {
   async decreaseLiquidity(input) {
     validateDecreaseLiquidity(input)
     const tc = getTransactionControllerInstance(this.config)
-    const { protocol, wallet, tokenId, percentageToDecrease, recipient, slippage } = input
-    const data = { from: wallet.address, tokenId, percentageToDecrease, recipient: recipient ? recipient : wallet.address, slippage }
+    const { protocol, wallet, tokenId, percentageToDecrease, recipient, slippage, burnToken } = input
+    const data = { from: wallet.address, tokenId, percentageToDecrease, recipient: recipient ? recipient : wallet.address, slippage, burnToken: burnToken ? burnToken : false }
     const { rawTransaction } = await makeRequest(
       {
         method: 'post',
