@@ -45,6 +45,7 @@ function getTokenDataIndex(output, tokens) {
 }
 
 module.exports.buildHathorTransferTransaction = async function ({ inputs, outputs, tokens, changeAddress, testnet }) {
+  hathorLib.network.setNetwork(testnet ? 'testnet' : 'mainnet');
   let txData = {
     inputs: inputs.map((input) => ({ tx_id: input.txHash, index: input.index })),
     outputs: outputs.map((output) => ({
@@ -118,6 +119,7 @@ module.exports.buildHathorTokenTransaction = async function ({
   nftData,
   testnet,
 }) {
+  hathorLib.network.setNetwork(testnet ? 'testnet' : 'mainnet');
   let txData = {
     inputs: inputs.map((input) => ({ tx_id: input.txHash, index: input.index })),
     outputs: []
@@ -222,7 +224,6 @@ module.exports.buildHathorTokenTransaction = async function ({
   hathorLib.transaction.setWeightIfNeeded(_dataToken)
   const tx = hathorLib.helpersUtils.createTxFromData(_dataToken, network)
   const mineTx = new mineTransaction.default(tx)
-  console.log(_dataToken)
 
   return new Promise((resolve, reject) => {
     mineTx.on('error', (message) => {
