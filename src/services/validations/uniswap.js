@@ -21,7 +21,7 @@ module.exports.validateUniswapCreatePool = ({
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (!tokenA || typeof tokenA !== 'string') {
@@ -52,7 +52,7 @@ module.exports.validateUniswapMintPosition = ({
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (!amountTokenA || typeof amountTokenA !== 'string') {
@@ -90,7 +90,7 @@ module.exports.validateUniswapRemovePosition = ({
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (!slippage || typeof slippage !== 'string') {
@@ -113,7 +113,7 @@ module.exports.validateUniswapRemovePosition = ({
 module.exports.validateUniswapGetPools = ({
   protocol, tokenA, tokenB, poolFee
 }) => {
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (!tokenA || typeof tokenA !== 'string') {
@@ -131,7 +131,7 @@ module.exports.validateUniswapGetPools = ({
 module.exports.validateUniswapGetSwapQuotation = ({
   protocol, tokenIn, tokenOut, amount, tradeType
 }) => {
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (!tokenIn || typeof tokenIn !== 'string') {
@@ -152,7 +152,7 @@ module.exports.validateUniswapGetSwapQuotation = ({
 module.exports.validateGetTokenIds = ({
   protocol, ownerAddress
 }) => {
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (!ownerAddress || typeof ownerAddress !== 'string') {
@@ -162,7 +162,7 @@ module.exports.validateGetTokenIds = ({
 module.exports.validateGetPositions = ({
   protocol, ownerAddress, poolAddress
 }) => {
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (!ownerAddress || typeof ownerAddress !== 'string') {
@@ -176,7 +176,7 @@ module.exports.validateGetPositions = ({
 module.exports.validateGetPosition = ({
   protocol, tokenId
 }) => {
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (!tokenId || typeof tokenId !== 'string') {
@@ -190,7 +190,7 @@ module.exports.validateCollectFees = ({
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (!tokenId || typeof tokenId !== 'string') {
@@ -204,7 +204,7 @@ module.exports.validateIncreaseLiquidity = ({
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (!tokenId || typeof tokenId !== 'string') {
@@ -227,7 +227,7 @@ module.exports.validateDecreaseLiquidity = ({
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (!tokenId || typeof tokenId !== 'string') {
@@ -247,5 +247,31 @@ module.exports.validateDecreaseLiquidity = ({
   }
   if (burnToken && percentageToDecrease !== '10000') {
     throw new InvalidException('You may only burn the position\'s token if the entire liquidity is being removed (10000 bps for percentageToDecrease)')
+  }
+}
+
+module.exports.validateObservePool = ({
+  protocol, secondsAgoToCheck }) => {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
+    throw new InvalidException('Invalid protocol')
+  }
+  if (!secondsAgoToCheck || typeof secondsAgoToCheck !== 'object') {
+    throw new InvalidException('Invalid secondsAgoToCheck')
+  }
+}
+
+module.exports.validateIncreaseCardinality = ({
+  wallet, protocol, pool, cardinality }) => {
+  if (!wallet) {
+    throw new InvalidException('Invalid wallet')
+  }
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
+    throw new InvalidException('Invalid protocol')
+  }
+  if (!pool || typeof pool !== 'string') {
+    throw new InvalidException('Invalid pool')
+  }
+  if (!cardinality || typeof cardinality !== 'number') {
+    throw new InvalidException('Invalid cardinality')
   }
 }

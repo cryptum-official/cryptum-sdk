@@ -25,6 +25,7 @@ const TransactionType = {
   MINT_POSITION: 'MINT_POSITION',
   REMOVE_POSITION: 'REMOVE_POSITION',
   GET_POOL: 'GET_POOL',
+  INCREASE_CARDINALITY: 'INCREASE_CARDINALITY',
 }
 /**
  * @typedef {object | string} Fee
@@ -113,6 +114,18 @@ class CreateGetPoolsResponse {
    */
   constructor({ response }) {
     this.response = response
+  }
+}
+
+class ObservePoolResponse {
+  /**
+   * Creates an instance of ObservePoolResponse
+   *
+   * @param {object} response
+   * @param {string} response.observedPrices array of prices at specified times
+   */
+   constructor({ observedPrices }) {
+    this.observedPrices = observedPrices
   }
 }
 
@@ -702,6 +715,7 @@ module.exports = {
   CollectFeesResponse,
   IncreaseLiquidityResponse,
   DecreaseLiquidityResponse,
+  ObservePoolResponse,
   UTXO,
   Input,
   Output,

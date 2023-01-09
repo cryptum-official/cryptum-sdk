@@ -38,6 +38,12 @@
  * @property {number} poolFee fee collected upon every swap in the pool
  */
 /**
+ * @typedef {Object} ObservePoolInput
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {string} pool address of the pool
+ * @property {Array[number]} secondsAgoToCheck array of time points (in seconds previous to current time)
+ */
+/**
  * @typedef {Object} GetSwapQuotationInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
  * @property {string} tokeIn address of the token to be swapped
@@ -84,5 +90,12 @@
  * @property {string} slippage allowed levels of slippage (in percentage points)
  * @property {string} recipient address that will receive the tokens
  * @property {boolean} burnToken whether token should be burned once entire liquidity is removed (optional, defaults to false)
+*/
+/**
+ * @typedef {Object} IncreaseCardinalityInput
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} pool the address of the pool
+ * @property {number} cardinality the new amount of observations the pool will be able to hold
 */
 module.exports = {}

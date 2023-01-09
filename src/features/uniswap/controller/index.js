@@ -8,7 +8,7 @@ const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { SignedTransaction, TransactionType } = require('../../transaction/entity')
 const { signCeloTx } = require('../../../services/blockchain/celo')
-const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateGetTokenIds, validategetPosition, validateCollectFees, validateIncreaseLiquidity, validateDecreaseLiquidity, validateGetPositions, validateGetPosition } = require('../../../services/validations/uniswap')
+const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateGetTokenIds, validategetPosition, validateCollectFees, validateIncreaseLiquidity, validateDecreaseLiquidity, validateGetPositions, validateGetPosition, validateObservePool, validateIncreaseCardinality } = require('../../../services/validations/uniswap')
 
 
 class Controller extends Interface {
@@ -98,7 +98,7 @@ class Controller extends Interface {
       })
     )
   }
-  
+
   /**
    * Get Uniswap Pool Addresses
    * @param {import('../entity').GetPoolsInput} input
@@ -328,6 +328,66 @@ class Controller extends Interface {
     return await tc.sendTransaction(
       new SignedTransaction({
         signedTx, protocol, type: TransactionType.MINT_POSITION
+      })
+    )
+  }
+
+  /**
+   * Observe a Uniswap Pool Price
+   * @param {import('../entity').ObservePoolInput} input
+   * @returns {Promise<import('../../transaction/entity').ObservePoolResponse>}
+   *
+   * @description
+   * Returns the pool's price at specific points in time
+   */
+  async observePool(input) {
+    validateObservePool(input)
+    const { protocol, pool, secondsAgoToCheck } = input
+    const data = { pool, secondsAgoToCheck }
+    const response = await makeRequest(
+      {
+        method: 'post',
+        url: `/contract/uniswap/observePool?protocol=${protocol}`,
+        body: data, config: this.config
+      })
+    return { observedPrices: response }
+
+  }
+
+  /**
+   * Increases the amount of observations a pool can store
+   * @param {import('../entity').IncreaseCardinalityInput} input
+   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+   * 
+   * @description
+   * If amount specified is lower than current accepted cardinality no changes will be made to the pool
+   */
+  async increaseCardinality(input) {
+    validateIncreaseCardinality(input)
+    const tc = getTransactionControllerInstance(this.config)
+    const { wallet, pool, cardinality, protocol } = input
+    const data = { from: wallet.address, pool, cardinality }
+    const rawTransaction = await makeRequest(
+      {
+        method: 'post',
+        url: `/contract/uniswap/increaseCardinality?protocol=${protocol}`,
+        body: data, config: this.config
+      })
+    let signedTx;
+    switch (protocol) {
+      case Protocol.CELO:
+        signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
+        break;
+      case Protocol.ETHEREUM:
+      case Protocol.POLYGON:
+        signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
+        break;
+      default:
+        throw new InvalidException('Unsupported protocol')
+    }
+    return await tc.sendTransaction(
+      new SignedTransaction({
+        signedTx, protocol, type: TransactionType.INCREASE_CARDINALITY
       })
     )
   }
