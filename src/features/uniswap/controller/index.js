@@ -8,7 +8,7 @@ const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { SignedTransaction, TransactionType } = require('../../transaction/entity')
 const { signCeloTx } = require('../../../services/blockchain/celo')
-const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateGetTokenIds, validategetPosition, validateCollectFees, validateIncreaseLiquidity, validateDecreaseLiquidity, validateGetPositions, validateGetPosition } = require('../../../services/validations/uniswap')
+const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateGetTokenIds, validategetPosition, validateCollectFees, validateIncreaseLiquidity, validateDecreaseLiquidity, validateGetPositions, validateGetPosition, validateSwap } = require('../../../services/validations/uniswap')
 
 
 class Controller extends Interface {
@@ -24,8 +24,8 @@ class Controller extends Interface {
     validateUniswapCreatePool(input)
     const tc = getTransactionControllerInstance(this.config)
 
-    const { protocol, wallet, fee, tokenA, tokenB, priceNumerator, priceDenominator } = input
-    const data = { from: wallet.address, tokenA, tokenB, fee, priceNumerator, priceDenominator }
+    const { protocol, wallet, fee, tokenA, tokenB, price } = input
+    const data = { from: wallet.address, tokenA, tokenB, fee, price }
     const { rawTransaction, pool, initialized } = await makeRequest(
       {
         method: 'post',
@@ -65,20 +65,22 @@ class Controller extends Interface {
    * Mints a position relative to a liquidity pool
    * @param {import('../entity').MintPositionInput} input
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+   * 
+   * @description
+   * Mints a position relative to a liquidity pool
    */
   async mintPosition(input) {
     validateUniswapMintPosition(input)
     const tc = getTransactionControllerInstance(this.config)
 
-    const { protocol, wallet, amountTokenA, amountTokenB, slippage, pool, recipient, minPriceDelta, maxPriceDelta } = input
-    const data = { from: wallet.address, amountTokenA, amountTokenB, minPriceDelta, maxPriceDelta, slippage, pool, recipient: recipient ? recipient : wallet.address }
+    const { protocol, wallet, amountTokenA, amountTokenB, slippage, pool, recipient, minPriceDelta, maxPriceDelta, wrapped } = input
+    const data = { from: wallet.address, amountTokenA, amountTokenB, minPriceDelta, maxPriceDelta, slippage, pool, recipient: recipient ? recipient : wallet.address, wrapped}
     const { rawTransaction, amountA, amountB } = await makeRequest(
       {
         method: 'post',
         url: `/contract/uniswap/mintPosition?protocol=${protocol}`,
         body: data, config: this.config
       })
-
 
     let signedTx;
     switch (protocol) {
@@ -117,9 +119,7 @@ class Controller extends Interface {
         url: `/contract/uniswap/getPools?protocol=${protocol}`,
         body: data, config: this.config
       })
-    return {
-      response
-    }
+    return response
   }
 
   /**
@@ -132,17 +132,15 @@ class Controller extends Interface {
    */
   async getSwapQuotation(input) {
     validateUniswapGetSwapQuotation(input)
-    const { protocol, tokenIn, tokenOut, amount, tradeType } = input
-    const data = { tokenIn, tokenOut, amount, tradeType }
+    const { wallet, protocol, tokenIn, tokenOut, amountIn, amountOut, deadline, slippage, recipient } = input
+    const data = { tokenIn, tokenOut, amountIn, amountOut, slippage, deadline, recipient: recipient ? recipient : wallet.address }
     const response = await makeRequest(
       {
         method: 'post',
         url: `/contract/uniswap/getSwapQuotation?protocol=${protocol}`,
         body: data, config: this.config
       })
-    return {
-      response
-    }
+    return response
   }
 
   /**
@@ -163,9 +161,7 @@ class Controller extends Interface {
         url: `/contract/uniswap/getTokenIds?protocol=${protocol}`,
         body: data, config: this.config
       })
-    return {
-      response
-    }
+    return response
   }
 
   /**
@@ -174,7 +170,7 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').CreateGetPositions>}
    * 
    * @description
-   * Returns the positions and their token ids of owner address
+   * Returns pool positions and token ids from owner wallet address
    */
   async getPositions(input) {
     validateGetPositions(input)
@@ -186,9 +182,7 @@ class Controller extends Interface {
         url: `/contract/uniswap/getPositions?protocol=${protocol}`,
         body: data, config: this.config
       })
-    return {
-      response
-    }
+    return response
   }
 
   /**
@@ -209,15 +203,13 @@ class Controller extends Interface {
         url: `/contract/uniswap/getPosition?protocol=${protocol}`,
         body: data, config: this.config
       })
-    return {
-      response
-    }
+    return response
   }
 
   /**
    * Collect fees earned by providing liquidity to a specific pool 
    * @param {import('../entity').CollectFeesInput} input
-   * @returns {Promise<import('../../transaction/entity').IncreaseLiquidityResponse>}
+   * @returns {Promise<import('../../transaction/entity').CollectFeesResponse>}
    * 
    * @description
    * Collect the total amount of fees rewarded for a given position TokenID
@@ -236,6 +228,7 @@ class Controller extends Interface {
     if (rawTransaction === "Execution Reverted: The position dont have fees to be collected") {
       return rawTransaction
     }
+
     let signedTx;
     switch (protocol) {
       case Protocol.CELO:
@@ -266,8 +259,8 @@ class Controller extends Interface {
   async increaseLiquidity(input) {
     validateIncreaseLiquidity(input)
     const tc = getTransactionControllerInstance(this.config)
-    const { protocol, wallet, tokenId, token0amount, token1amount, slippage } = input
-    const data = { from: wallet.address, tokenId, token0amount, token1amount, slippage }
+    const { protocol, wallet, tokenId, token0amount, token1amount, slippage, wrapped } = input
+    const data = { from: wallet.address, tokenId, token0amount, token1amount, slippage, wrapped }
     const { rawTransaction } = await makeRequest(
       {
         method: 'post',
@@ -313,6 +306,65 @@ class Controller extends Interface {
         url: `/contract/uniswap/decreaseLiquidity?protocol=${protocol}`,
         body: data, config: this.config
       })
+
+    let signedTx;
+    switch (protocol) {
+      case Protocol.CELO:
+        signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
+        break;
+      case Protocol.ETHEREUM:
+      case Protocol.POLYGON:
+        signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
+        break;
+      default:
+        throw new InvalidException('Unsupported protocol')
+    }
+    return await tc.sendTransaction(
+      new SignedTransaction({
+        signedTx, protocol, type: TransactionType.MINT_POSITION
+      })
+    )
+  }
+
+    /**
+   * Exucutes a swap from a quotationObject
+   * @param {import('../entity').SwapInput} input
+   * @returns {Promise<import('../../transaction/entity').SwapResponse>}
+   * 
+   * @description
+   * Executes a swap 
+   */
+  async swap(input) {
+    const { transaction, wallet } = input
+    validateSwap(input)
+    const tc = getTransactionControllerInstance(this.config)
+    let protocol
+    let value
+    let calldata
+    let tokenIn
+    let tokenOut
+    let tokenInAmount 
+    let tokenOutAmount 
+
+    if (transaction.hasOwnProperty('swapTransaction') && transaction.hasOwnProperty('swapQuotation')) {
+      protocol = transaction.swapTransaction.protocol
+      value = transaction.swapTransaction.value
+      calldata = transaction.swapTransaction.calldata
+      tokenIn = transaction.swapTransaction.tokenIn
+      tokenOut = transaction.swapTransaction.tokenOut
+      tokenInAmount = transaction.swapQuotation.tokenIn
+      tokenOutAmount = transaction.swapQuotation.tokenOut
+    } else {
+      throw new InvalidException('Please assign the full getSwapQuotation Object to the "transaction" parameter of this function')
+    }
+    const data = { from: wallet.address, value, calldata, tokenIn, tokenInAmount, tokenOut, tokenOutAmount }
+    const { rawTransaction } = await makeRequest(
+      {
+        method: 'post',
+        url: `/contract/uniswap/swap?protocol=${protocol}`,
+        body: data, config: this.config
+      })
+
     let signedTx;
     switch (protocol) {
       case Protocol.CELO:

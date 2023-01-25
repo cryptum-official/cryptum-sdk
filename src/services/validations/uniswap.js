@@ -10,8 +10,7 @@ module.exports.validateUniswapCreatePool = ({
   fee,
   tokenA,
   tokenB,
-  priceNumerator,
-  priceDenominator
+  price,
 }) => {
 
   const _fee = new BigNumber(fee)
@@ -25,16 +24,13 @@ module.exports.validateUniswapCreatePool = ({
     throw new InvalidException('Invalid protocol')
   }
   if (!tokenA || typeof tokenA !== 'string') {
-    throw new InvalidException('Invalid tokenAddress')
+    throw new InvalidException('Invalid token Address')
   }
   if (!tokenB || typeof tokenB !== 'string') {
-    throw new InvalidException('Invalid tokenAddress')
+    throw new InvalidException('Invalid token Address')
   }
-  if (!priceNumerator || typeof priceNumerator !== 'string') {
-    throw new InvalidException('Invalid priceNumerator')
-  }
-  if (!priceDenominator || typeof priceDenominator !== 'string') {
-    throw new InvalidException('Invalid priceDenominator')
+  if (!price || typeof price !== 'string') {
+    throw new InvalidException('Invalid price')
   }
 }
 
@@ -61,7 +57,7 @@ module.exports.validateUniswapMintPosition = ({
   if (!amountTokenB || typeof amountTokenB !== 'string') {
     throw new InvalidException('Invalid amountTokenB')
   }
-  if (!slippage || typeof slippage !== 'string') {
+  if (slippage !== undefined && typeof slippage !== 'string') {
     throw new InvalidException('Invalid slippage')
   }
   if (!pool || typeof pool !== 'string') {
@@ -117,10 +113,10 @@ module.exports.validateUniswapGetPools = ({
     throw new InvalidException('Invalid protocol')
   }
   if (!tokenA || typeof tokenA !== 'string') {
-    throw new InvalidException('Invalid tokenAddress')
+    throw new InvalidException('Invalid token Address')
   }
   if (!tokenB || typeof tokenB !== 'string') {
-    throw new InvalidException('Invalid tokenAddress')
+    throw new InvalidException('Invalid token Address')
   }
   const _fee = new BigNumber(poolFee)
   if (poolFee && (typeof poolFee !== 'number' || _fee.isNaN() || _fee.lte(0))) {
@@ -129,23 +125,28 @@ module.exports.validateUniswapGetPools = ({
 }
 
 module.exports.validateUniswapGetSwapQuotation = ({
-  protocol, tokenIn, tokenOut, amount, tradeType
+  protocol, tokenIn, tokenOut, amountIn, amountOut
 }) => {
   if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (!tokenIn || typeof tokenIn !== 'string') {
-    throw new InvalidException('Invalid tokenAddress')
+    throw new InvalidException('Invalid token Address')
   }
   if (!tokenOut || typeof tokenOut !== 'string') {
-    throw new InvalidException('Invalid tokenAddress')
+    throw new InvalidException('Invalid token Address')
   }
-  const _amount = new BigNumber(amount)
-  if (!amount || typeof amount !== 'number' || _amount.isNaN() || _amount.lte(0)) {
-    throw new GenericException('Invalid amount', 'InvalidTypeException')
+  if (amountOut !== undefined && typeof amountOut !== 'string') {
+    throw new InvalidException('Invalid amountOut')
+  } 
+  if (amountIn !== undefined && typeof amountIn !== 'string') {
+    throw new InvalidException('Invalid amountIn')
   }
-  if (!tradeType || typeof tradeType !== 'string') {
-    throw new InvalidException('Invalid tradeType')
+  if (amountIn === undefined && amountOut === undefined ){
+    throw new InvalidException('You must provide amountIn or amountOut')
+  }
+  if (amountIn && amountOut ){
+    throw new InvalidException('You must provide either amountIn or amountOut, never both')
   }
 }
 
@@ -247,5 +248,16 @@ module.exports.validateDecreaseLiquidity = ({
   }
   if (burnToken && percentageToDecrease !== '10000') {
     throw new InvalidException('You may only burn the position\'s token if the entire liquidity is being removed (10000 bps for percentageToDecrease)')
+  }
+}
+
+module.exports.validateSwap = ({
+  transaction, wallet
+}) => {
+  if (!wallet) {
+    throw new InvalidException('Invalid wallet')
+  }
+  if (!transaction) {
+    throw new InvalidException('missing transaction argument')
   }
 }

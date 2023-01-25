@@ -85,4 +85,9 @@
  * @property {string} recipient address that will receive the tokens
  * @property {boolean} burnToken whether token should be burned once entire liquidity is removed (optional, defaults to false)
 */
+/**
+ * @typedef {Object} SwapInput
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {Object} transaction transaction quotation swap object
+*/
 module.exports = {}
