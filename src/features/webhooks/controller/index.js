@@ -1,5 +1,4 @@
 module.exports.getWebhooksControllerInstance = (config) => new Controller(config)
-
 const { handleRequestError } = require('../../../services')
 const { getApiMethod, mountHeaders } = require('../../../services')
 

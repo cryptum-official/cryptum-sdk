@@ -1,13 +1,13 @@
 {
   "name": "cryptum-sdk",
-  "version": "0.0.33",
+  "version": "0.0.44",
   "description": "SDK to sync your application with Cryptum services",
   "main": "index.js",
   "repository": "https://github.com/blockforce-official/cryptum-sdk",
   "author": "Blockforce",
   "license": "MIT",
   "engines": {
-    "node": ">=12"
+    "node": ">=14"
   },
   "types": "./dist/index.d.ts",
   "scripts": {
@@ -22,6 +22,7 @@
     "@emurgo/cardano-serialization-lib-nodejs": "^9.1.2",
     "@ethereumjs/tx": "^3.4.0",
     "@hathor/wallet-lib": "^0.33.1",
+    "@metaplex-foundation/js": "^0.15.0",
     "@metaplex-foundation/mpl-core": "^0.0.2",
     "@metaplex-foundation/mpl-token-metadata": "^2.2.1",
     "@metaplex/js": "^4.12.0",
@@ -31,7 +32,6 @@
     "axios": "^0.26.1",
     "bignumber.js": "^9.0.1",
     "bip39": "^3.0.4",
-    "bitcoinjs-lib": "^5.2.0",
     "bitcore-lib": "^8.25.10",
     "bs58": "^4.0.1",
     "ed25519-hd-key": "^1.2.0",
@@ -46,6 +46,7 @@
     "web3": "^1.7.1"
   },
   "devDependencies": {
+    "@types/bitcore-lib": "^0.15.3",
     "@types/node": "^16.11.7",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",

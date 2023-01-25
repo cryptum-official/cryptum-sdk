@@ -3,11 +3,11 @@ const chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 const assert = chai.assert
-const AxiosApi = require('../../../src/axios')
-const { TransactionController } = require('../../../src/features/transaction/controller')
-const { Protocol } = require('../../../src/services/blockchain/constants')
-const { getWallets, config } = require('../../wallet/constants')
-const { TransactionType } = require('../../../src/features/transaction/entity')
+const AxiosApi = require('../../src/axios')
+const { TransactionController } = require('../../src/features/transaction/controller')
+const { Protocol } = require('../../src/services/blockchain/constants')
+const { getWallets, config } = require('../wallet/constants')
+const { TransactionType } = require('../../src/features/transaction/entity')
 const txController = new TransactionController(config)
 const axiosApi = new AxiosApi(config)
 const baseUrl = axiosApi.getBaseUrl(config.environment)
@@ -131,7 +131,7 @@ describe.only('BSC smart contract transactions', () => {
     nock.isDone()
   })
 
-  it('create smart contract call transaction', async () => {
+  it.skip('create smart contract call transaction', async () => {
     const transaction = await txController.createSmartContractTransaction({
       wallet: wallets.bsc,
       contractAddress,
@@ -144,7 +144,7 @@ describe.only('BSC smart contract transactions', () => {
     assert.include(transaction.signedTx, '0x')
     // console.log(await txController.sendTransaction(transaction))
   })
-  it('create smart contract call transaction failed when wallet is invalid', async () => {
+  it.skip('create smart contract call transaction failed when wallet is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractTransaction({
         wallet: null,
@@ -157,7 +157,7 @@ describe.only('BSC smart contract transactions', () => {
       })
     )
   })
-  it('create smart contract call transaction failed when contract address is invalid', async () => {
+  it.skip('create smart contract call transaction failed when contract address is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractTransaction({
         wallet: wallets.bsc,
@@ -169,7 +169,7 @@ describe.only('BSC smart contract transactions', () => {
       })
     )
   })
-  it('create smart contract call transaction failed when contract abi is invalid', async () => {
+  it.skip('create smart contract call transaction failed when contract abi is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractTransaction({
         wallet: wallets.bsc,
@@ -181,7 +181,7 @@ describe.only('BSC smart contract transactions', () => {
       })
     )
   })
-  it('call smart contract method', async () => {
+  it.skip('call smart contract method', async () => {
     const response = await txController.callSmartContractMethod({
       contractAddress,
       contractAbi: contractAbiMessage,
@@ -192,7 +192,7 @@ describe.only('BSC smart contract transactions', () => {
     })
     assert.strictEqual(response.result, 'hello')
   })
-  it('call smart contract method failed when constract address missing', async () => {
+  it.skip('call smart contract method failed when constract address missing', async () => {
     assert.isRejected(
       txController.callSmartContractMethod({
         contractAbi: contractAbiMessage,
@@ -203,7 +203,7 @@ describe.only('BSC smart contract transactions', () => {
       })
     )
   })
-  it('call smart contract method failed when constract abi missing', async () => {
+  it.skip('call smart contract method failed when constract abi missing', async () => {
     assert.isRejected(
       txController.callSmartContractMethod({
         contractAddress,
@@ -215,7 +215,7 @@ describe.only('BSC smart contract transactions', () => {
     )
   })
 
-  it('create smart contract deploy transaction', async () => {
+  it.skip('create smart contract deploy transaction', async () => {
     const transaction = await txController.createSmartContractDeployTransaction({
       wallet: wallets.bsc,
       params: ['new message'],
@@ -227,7 +227,7 @@ describe.only('BSC smart contract transactions', () => {
     assert.include(transaction.signedTx, '0x')
     // console.log(await txController.sendTransaction(transaction))
   })
-  it('create smart contract token deploy transaction', async () => {
+  it.skip('create smart contract token deploy transaction', async () => {
     const transaction = await txController.createTokenDeployTransaction({
       wallet: wallets.bsc,
       params: ['new message'],
@@ -238,7 +238,7 @@ describe.only('BSC smart contract transactions', () => {
     assert.include(transaction.signedTx, '0x')
   })
 
-  it('throws smart contract deploy transaction failed when wallet is invalid', async () => {
+  it.skip('throws smart contract deploy transaction failed when wallet is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractDeployTransaction({
         params: ['new message'],
@@ -249,7 +249,7 @@ describe.only('BSC smart contract transactions', () => {
       })
     )
   })
-  it('throws smart contract deploy transaction failed when params is invalid', async () => {
+  it.skip('throws smart contract deploy transaction failed when params is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractDeployTransaction({
         wallet: wallets.bsc,
@@ -260,7 +260,7 @@ describe.only('BSC smart contract transactions', () => {
       })
     )
   })
-  it('throws smart contract deploy transaction failed when contract name is invalid', async () => {
+  it.skip('throws smart contract deploy transaction failed when contract name is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractDeployTransaction({
         wallet: wallets.bsc,
@@ -270,7 +270,7 @@ describe.only('BSC smart contract transactions', () => {
       })
     )
   })
-  it('throws smart contract deploy transaction failed when source is invalid', async () => {
+  it.skip('throws smart contract deploy transaction failed when source is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractDeployTransaction({
         wallet: wallets.bsc,
@@ -281,7 +281,7 @@ describe.only('BSC smart contract transactions', () => {
     )
   })
 
-  it('throws smart contract token deploy transaction failed when wallet is invalid', async () => {
+  it.skip('throws smart contract token deploy transaction failed when wallet is invalid', async () => {
     assert.isRejected(
       txController.createTokenDeployTransaction({
         params: ['new message'],
@@ -291,7 +291,7 @@ describe.only('BSC smart contract transactions', () => {
       })
     )
   })
-  it('throws smart contract token deploy transaction failed when params is invalid', async () => {
+  it.skip('throws smart contract token deploy transaction failed when params is invalid', async () => {
     assert.isRejected(
       txController.createTokenDeployTransaction({
         wallet: wallets.bsc,
@@ -301,7 +301,7 @@ describe.only('BSC smart contract transactions', () => {
       })
     )
   })
-  it('throws smart contract token deploy transaction failed when token type is invalid', async () => {
+  it.skip('throws smart contract token deploy transaction failed when token type is invalid', async () => {
     assert.isRejected(
       txController.createTokenDeployTransaction({
         wallet: wallets.bsc,

@@ -2,7 +2,7 @@
  * Transaction type
  * @enum {string}
  */
-const TransactionType = {
+ const TransactionType = {
   TRANSFER: 'TRANSFER',
   MINT: 'MINT',
   BURN: 'BURN',
@@ -17,14 +17,26 @@ const TransactionType = {
   DEPLOY_ERC721: 'DEPLOY_ERC721',
   DEPLOY_ERC1155: 'DEPLOY_ERC1155',
   CHANGE_TRUST: 'CHANGE_TRUST',
+  TOKEN_CREATION: 'TOKEN_CREATION',
+  MINT: 'MINT',
+  BURN: 'BURN',
+  NFT_CREATION: 'NFT_CREATION',
+  NFT_MINT: 'NFT_MINT',
+  NFT_BURN: 'NFT_BURN',
+  NFT_TRANSFER: 'NFT_TRANSFER',
   HATHOR_TOKEN_CREATION: 'HATHOR_TOKEN_CREATION',
   HATHOR_TOKEN_MINT: 'HATHOR_TOKEN_MINT',
   HATHOR_TOKEN_MELT: 'HATHOR_TOKEN_MELT',
+  HATHOR_NFT_MINT: 'HATHOR_NFT_MINT',
+  HATHOR_NFT_MELT: 'HATHOR_NFT_MELT',
   SOLANA_TOKEN_CREATION: 'SOLANA_TOKEN_CREATION',
   SOLANA_TOKEN_MINT: 'SOLANA_TOKEN_MINT',
   SOLANA_TOKEN_BURN: 'SOLANA_TOKEN_BURN',
   SOLANA_COLLECTION_MINT: 'SOLANA_COLLECTION_MINT',
-  SOLANA_NFT_MINT:'SOLANA_NFT_MINT'
+  SOLANA_NFT_MINT: 'SOLANA_NFT_MINT',
+  LOOTBOX_DEPLOY: 'LOOTBOX_DEPLOY',
+  LOOTBOX_CREATE: 'LOOTBOX_CREATE',
+  LOOTBOX_APPROVE: 'LOOTBOX_APPROVE'
 }
 /**
  * @typedef {object | string} Fee
@@ -114,7 +126,7 @@ class CardanoOutput extends Output {
    * @param {string} output.amount
    * @param {{ policy:string; asset:string; amount:string }=} output.token
    */
-   constructor(output) {
+  constructor(output) {
     super(output)
   }
 }
@@ -322,7 +334,7 @@ class SolanaTokenDeployInput {
    * @param {number} args.decimals
    * @param {string} args.amount
    */
-  constructor({ wallet,  fixedSupply, decimals, amount, name, symbol }) {
+  constructor({ wallet, fixedSupply, decimals, amount, name, symbol }) {
     this.wallet = wallet
     this.fixedSupply = fixedSupply
     this.symbol = symbol

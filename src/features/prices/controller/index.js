@@ -1,5 +1,4 @@
 module.exports.getPricesControllerInstance = (config) => new Controller(config)
-
 const { getApiMethod, mountHeaders, handleRequestError } = require('../../../services')
 const Interface = require('./interface')
 const Prices = require('../entity')

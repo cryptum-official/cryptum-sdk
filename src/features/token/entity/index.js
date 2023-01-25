@@ -31,6 +31,7 @@
  * @property {boolean=} createAccount true if this is a transfer to create an account in the blockchain (only for stellar transactions)
  * @property {string=} memo text to be attached to transaction (for stellar and ripple only)
  * @property {string=} feeCurrency fee currency (for celo only)
+ * @property {string=} fee fee 
  */
 /**
  * @typedef {Object} SetTrustlineInput
@@ -69,6 +70,15 @@
  * @property {string} token token name or address to transfer
  * @property {string} amount amount to be transferred
  * @property {string=} meltAuthorityAddress address responsible to burn more tokens (for hathor only)
+ * @property {string=} feeCurrency fee currency (for celo only)
+ */
+/**
+ * @typedef {Object} TokenApproveInput
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} token token address to invoke the approve method
+ * @property {string} amount amount to be transferred
+ * @property {string} spender address allowed to withdraw tokens from this wallet
  * @property {string=} feeCurrency fee currency (for celo only)
  */
 module.exports = {}

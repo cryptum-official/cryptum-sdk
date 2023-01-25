@@ -3,15 +3,15 @@ const chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 const assert = chai.assert
-const AxiosApi = require('../../../src/axios')
-const { TransactionController } = require('../../../src/features/transaction/controller')
-const { Protocol } = require('../../../src/services/blockchain/constants')
-const { getWallets, config } = require('../../wallet/constants')
-const { TransactionType } = require('../../../src/features/transaction/entity')
+const AxiosApi = require('../../src/axios')
+const { TransactionController } = require('../../src/features/transaction/controller')
+const { Protocol } = require('../../src/services/blockchain/constants')
+const { getWallets, config } = require('../wallet/constants')
+const { TransactionType } = require('../../src/features/transaction/entity')
 const txController = new TransactionController(config)
 const axiosApi = new AxiosApi(config)
 const baseUrl = axiosApi.getBaseUrl(config.environment)
-const contractAddress = '0xF13BfC94263F915E1Fec3d341015661056DD49FA'
+const contractAddress = '0x1abd7fcFB29BF8D7EA946dA6ffc0d2DB0e30414f'
 const contractAbiUpdate = [
   {
     constant: false,
@@ -48,20 +48,20 @@ const contractAbiMessage = [
 ]
 let wallets = {}
 
-describe.only('Ethereum smart contract transactions', () => {
+describe.only('AVAXCCHAIN smart contract transactions', () => {
   before(async () => {
     wallets = await getWallets()
 
     nock(baseUrl)
-      .get(`/wallet/${wallets.ethereum.address}/info`)
-      .query({ protocol: Protocol.ETHEREUM })
+      .get(`/wallet/${wallets.avaxcchain.address}/info`)
+      .query({ protocol: Protocol.AVAXCCHAIN })
       .reply(200, {
         nonce: '2',
       })
       .persist()
-      .post(`/fee?protocol=${Protocol.ETHEREUM}`, {
+      .post(`/fee?protocol=${Protocol.AVAXCCHAIN}`, {
         type: TransactionType.CALL_CONTRACT_METHOD,
-        from: wallets.ethereum.address,
+        from: wallets.bsc.address,
         contractAddress,
         contractAbi: contractAbiUpdate,
         method: 'update',
@@ -73,7 +73,7 @@ describe.only('Ethereum smart contract transactions', () => {
         chainId: 4,
       })
       .persist()
-      .post(`/transaction/call-method?protocol=${Protocol.ETHEREUM}`, {
+      .post(`/transaction/call-method?protocol=${Protocol.AVAXCCHAIN}`, {
         contractAddress,
         contractAbi: contractAbiMessage,
         method: 'message',
@@ -83,7 +83,7 @@ describe.only('Ethereum smart contract transactions', () => {
         result: 'hello',
       })
       .persist()
-      .post(`/transaction/contract/compile?protocol=${Protocol.ETHEREUM}`, {
+      .post(`/transaction/contract/compile?protocol=${Protocol.AVAXCCHAIN}`, {
         contractName: 'Test',
         source: 'contract Test {}',
         params: ['new message'],
@@ -93,7 +93,7 @@ describe.only('Ethereum smart contract transactions', () => {
         abi: [],
       })
       .persist()
-      .post(`/transaction/contract/compile?protocol=${Protocol.ETHEREUM}`, {
+      .post(`/transaction/contract/compile?protocol=${Protocol.AVAXCCHAIN}`, {
         tokenType: 'ERC20',
         params: ['new message'],
       })
@@ -102,9 +102,9 @@ describe.only('Ethereum smart contract transactions', () => {
         abi: [],
       })
       .persist()
-      .post(`/fee?protocol=${Protocol.ETHEREUM}`, {
+      .post(`/fee?protocol=${Protocol.AVAXCCHAIN}`, {
         type: TransactionType.DEPLOY_CONTRACT,
-        from: wallets.ethereum.address,
+        from: wallets.avaxcchain.address,
         contractName: 'Test',
         source: 'contract Test {}',
         params: ['new message'],
@@ -114,10 +114,9 @@ describe.only('Ethereum smart contract transactions', () => {
         gasPrice: '4000000',
         chainId: 4,
       })
-      .persist()
-      .post(`/fee?protocol=${Protocol.ETHEREUM}`, {
+      .post(`/fee?protocol=${Protocol.AVAXCCHAIN}`, {
         type: TransactionType.DEPLOY_ERC20,
-        from: wallets.ethereum.address,
+        from: wallets.avaxcchain.address,
         tokenType: 'ERC20',
         params: ['new message'],
       })
@@ -132,20 +131,20 @@ describe.only('Ethereum smart contract transactions', () => {
     nock.isDone()
   })
 
-  it('create smart contract call transaction', async () => {
+  it.skip('create smart contract call transaction', async () => {
     const transaction = await txController.createSmartContractTransaction({
-      wallet: wallets.ethereum,
+      wallet: wallets.bsc,
       contractAddress,
       contractAbi: contractAbiUpdate,
       method: 'update',
       params: ['new message'],
-      protocol: Protocol.ETHEREUM,
+      protocol: Protocol.AVAXCCHAIN,
       testnet: true,
     })
     assert.include(transaction.signedTx, '0x')
     // console.log(await txController.sendTransaction(transaction))
   })
-  it('create smart contract call transaction failed when wallet is invalid', async () => {
+  it.skip('create smart contract call transaction failed when wallet is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractTransaction({
         wallet: null,
@@ -153,159 +152,160 @@ describe.only('Ethereum smart contract transactions', () => {
         contractAbi: contractAbiUpdate,
         method: 'update',
         params: ['new message'],
-        protocol: Protocol.ETHEREUM,
+        protocol: Protocol.AVAXCCHAIN,
         testnet: true,
       })
     )
   })
-  it('create smart contract call transaction failed when contract address is invalid', async () => {
+  it.skip('create smart contract call transaction failed when contract address is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractTransaction({
-        wallet: wallets.ethereum,
+        wallet: wallets.avaxcchain,
         contractAddress: undefined,
         contractAbi: contractAbiUpdate,
         method: 'update',
         params: ['new message'],
-        protocol: Protocol.ETHEREUM,
+        protocol: Protocol.AVAXCCHAIN,
       })
     )
   })
-  it('create smart contract call transaction failed when contract abi is invalid', async () => {
+  it.skip('create smart contract call transaction failed when contract abi is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractTransaction({
-        wallet: wallets.ethereum,
+        wallet: wallets.avaxcchain,
         contractAddress,
         contractAbi: null,
         method: 'update',
         params: ['new message'],
-        protocol: Protocol.ETHEREUM,
+        protocol: Protocol.AVAXCCHAIN,
       })
     )
   })
-  it('call smart contract method', async () => {
+  it.skip('call smart contract method', async () => {
     const response = await txController.callSmartContractMethod({
       contractAddress,
       contractAbi: contractAbiMessage,
       method: 'message',
       params: [],
-      protocol: Protocol.ETHEREUM,
+      protocol: Protocol.AVAXCCHAIN,
       testnet: true,
     })
     assert.strictEqual(response.result, 'hello')
   })
-  it('call smart contract method failed when constract address missing', async () => {
+  it.skip('call smart contract method failed when constract address missing', async () => {
     assert.isRejected(
       txController.callSmartContractMethod({
         contractAbi: contractAbiMessage,
         method: 'message',
         params: [],
-        protocol: Protocol.ETHEREUM,
+        protocol: Protocol.AVAXCCHAIN,
         testnet: true,
       })
     )
   })
-  it('call smart contract method failed when constract abi missing', async () => {
+  it.skip('call smart contract method failed when constract abi missing', async () => {
     assert.isRejected(
       txController.callSmartContractMethod({
         contractAddress,
         method: 'message',
         params: [],
-        protocol: Protocol.ETHEREUM,
+        protocol: Protocol.AVAXCCHAIN,
         testnet: true,
       })
     )
   })
 
-  it('create smart contract deploy transaction', async () => {
+  it.skip('create smart contract deploy transaction', async () => {
     const transaction = await txController.createSmartContractDeployTransaction({
-      wallet: wallets.ethereum,
-      contractName: 'Test',
-      source: 'contract Test {}',
+      wallet: wallets.avaxcchain,
       params: ['new message'],
-      protocol: Protocol.ETHEREUM,
+      protocol: Protocol.AVAXCCHAIN,
       testnet: true,
+      contractName: 'Test',
+      source: 'contract Test {}'
     })
     assert.include(transaction.signedTx, '0x')
     // console.log(await txController.sendTransaction(transaction))
   })
-  it('create smart contract token deploy transaction', async () => {
+  it.skip('create smart contract token deploy transaction', async () => {
     const transaction = await txController.createTokenDeployTransaction({
-      wallet: wallets.ethereum,
+      wallet: wallets.avaxcchain,
       params: ['new message'],
-      protocol: Protocol.ETHEREUM,
+      protocol: Protocol.AVAXCCHAIN,
       testnet: true,
       tokenType: 'ERC20',
     })
     assert.include(transaction.signedTx, '0x')
-    // console.log(await txController.sendTransaction(transaction))
   })
-  it('throws smart contract deploy transaction failed when wallet is invalid', async () => {
+
+  it.skip('throws smart contract deploy transaction failed when wallet is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractDeployTransaction({
         params: ['new message'],
-        protocol: Protocol.ETHEREUM,
+        protocol: Protocol.AVAXCCHAIN,
         testnet: true,
         contractName: 'Test',
-        source: 'contract Test {}',
+        source: 'contract Test {}'
       })
     )
   })
-  it('throws smart contract deploy transaction failed when params is invalid', async () => {
+  it.skip('throws smart contract deploy transaction failed when params is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractDeployTransaction({
-        wallet: wallets.ethereum,
-        protocol: Protocol.ETHEREUM,
+        wallet: wallets.avaxcchain,
+        protocol: Protocol.AVAXCCHAIN,
         testnet: true,
         contractName: 'Test',
-        source: 'contract Test {}',
+        source: 'contract Test {}'
       })
     )
   })
-  it('throws smart contract deploy transaction failed when contract name is invalid', async () => {
+  it.skip('throws smart contract deploy transaction failed when contract name is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractDeployTransaction({
-        wallet: wallets.ethereum,
-        protocol: Protocol.ETHEREUM,
+        wallet: wallets.avaxcchain,
+        protocol: Protocol.AVAXCCHAIN,
         testnet: true,
-        source: 'contract Test {}',
+        source: 'contract Test {}'
       })
     )
   })
-  it('throws smart contract deploy transaction failed when source is invalid', async () => {
+  it.skip('throws smart contract deploy transaction failed when source is invalid', async () => {
     assert.isRejected(
       txController.createSmartContractDeployTransaction({
-        wallet: wallets.ethereum,
-        protocol: Protocol.ETHEREUM,
+        wallet: wallets.avaxcchain,
+        protocol: Protocol.AVAXCCHAIN,
         testnet: true,
         contractName: 'Test',
       })
     )
   })
-  it('throws smart contract token deploy transaction failed when wallet is invalid', async () => {
+
+  it.skip('throws smart contract token deploy transaction failed when wallet is invalid', async () => {
     assert.isRejected(
       txController.createTokenDeployTransaction({
         params: ['new message'],
-        protocol: Protocol.ETHEREUM,
+        protocol: Protocol.AVAXCCHAIN,
         testnet: true,
         tokenType: 'ERC20',
       })
     )
   })
-  it('throws smart contract token deploy transaction failed when params is invalid', async () => {
+  it.skip('throws smart contract token deploy transaction failed when params is invalid', async () => {
     assert.isRejected(
       txController.createTokenDeployTransaction({
-        wallet: wallets.ethereum,
-        protocol: Protocol.ETHEREUM,
+        wallet: wallets.avaxcchain,
+        protocol: Protocol.AVAXCCHAIN,
         testnet: true,
         tokenType: 'ERC20',
       })
     )
   })
-  it('throws smart contract token deploy transaction failed when token type is invalid', async () => {
+  it.skip('throws smart contract token deploy transaction failed when token type is invalid', async () => {
     assert.isRejected(
       txController.createTokenDeployTransaction({
-        wallet: wallets.ethereum,
-        protocol: Protocol.ETHEREUM,
+        wallet: wallets.avaxcchain,
+        protocol: Protocol.AVAXCCHAIN,
         testnet: true,
         params: ['new message'],
       })

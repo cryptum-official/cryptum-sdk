@@ -6,10 +6,10 @@ module.exports.getSolanaNetwork = (testnet = true) => {
 }
 
 module.exports.getSolanaConnectionUrl = (config) => {
-  const url = new AxiosApi().getBaseUrl(isTestnet(config.evironment) ? 'testnet' : 'mainnet')
+  const url = new AxiosApi().getBaseUrl(isTestnet(config.environment) ? 'testnet' : 'mainnet')
   return `${url}/rpc?protocol=SOLANA&apikey=${config.apiKey}`
 }
 module.exports.getSolanaWsConnectionUrl = (config) => {
-  const url = new AxiosApi().getBaseUrl(isTestnet(config.evironment) ? 'testnet' : 'mainnet')
+  const url = new AxiosApi().getBaseUrl(isTestnet(config.environment) ? 'testnet' : 'mainnet')
   return `${url.replace('http', 'ws')}/rpc?protocol=SOLANA&apikey=${config.apiKey}`
 }

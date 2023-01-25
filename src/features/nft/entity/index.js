@@ -48,7 +48,7 @@
  * @typedef {Object} NftMintInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
  * @property {import('../../wallet/entity').Wallet} wallet
- * @property {string} token token name or address to transfer
+ * @property {string} token token address to mint
  * @property {string} destination destination address
  * @property {string} amount amount to be minted
  * @property {string=} tokenId token id to be minted only for EVMs (ethereum, bsc, celo, polygon, avax)
@@ -59,10 +59,26 @@
  * @typedef {Object} NftBurnInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
  * @property {import('../../wallet/entity').Wallet} wallet
- * @property {string} token token name or address to burn
+ * @property {string} token token address to burn
  * @property {string} amount amount to be burnt
  * @property {string=} tokenId token id to be burnt only for EVMs (ethereum, bsc, celo, polygon, avax)
  * @property {string=} meltAuthorityAddress melt authority address for hathor only
+ * @property {string=} feeCurrency fee currency (for celo only)
+ *
+ * @typedef {Object} NftApproveInput
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} token token address to invoke the approve method
+ * @property {string} tokenId token id
+ * @property {string} operator address to add to the set of authorized operators
+ * @property {string=} feeCurrency fee currency (for celo only)
+ *
+ * @typedef {Object} NftSetApprovalForAllInput
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} token token address to invoke the approve method
+ * @property {string} operator address to add to the set of authorized operators
+ * @property {boolean} isApproved true if the operator is approved, false to revoke approval
  * @property {string=} feeCurrency fee currency (for celo only)
  */
 module.exports = {}

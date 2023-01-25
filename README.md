@@ -28,6 +28,8 @@
       - [Ethereum and other EVMs](docs/nfts/EVMs.md)
       - [Solana](docs/nfts/solana.md)
       - [Hathor](docs/nfts/hathor.md)
+    - Smart contracts
+      - [Loot boxes](docs/lootbox.md)
     - [Prices](docs/prices.md)
     - [Swap tokens](docs/swap.md)
     - [Webhooks](docs/webhooks.md)

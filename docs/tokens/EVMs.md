@@ -118,6 +118,32 @@ const { hash } = await sdk.token.burn({
   wallet,
   protocol: 'CELO',
   token: '0x1b5e12ca...1b5e12ca',
-  amount: '8',
+  amount: '8.23',
+})
+```
+
+## Approve tokens
+
+### `sdk.token.approve(opts)`
+
+Invoke method "approve" from ERC20-compatible smart contracts.
+
+**\*Obs: This method will only work for the tokens compatible with ERC-20 standard.**
+
+- `opts.wallet` (Wallet) (**required**) - wallet signing transaction that owns the tokens.
+- `opts.token` (string) (**required**) - token address.
+- `opts.amount` (string) (**required**) - token amount to be approved. (this is in largest unit ether considering the token decimal places)
+- `opts.spender` (string) (**required**) - address allowed to withdraw tokens from this wallet.
+- `opts.protocol` (string) (**required**) - [EVMs only](../protocols.md#ethereum-based-blockchains-evms).
+
+This function returns the hash of this burning transaction from the blockchain.
+
+```js
+const { hash } = await sdk.token.approve({
+  wallet,
+  protocol: 'CELO',
+  token: '0x1b5e12ca...1b5e12ca',
+  amount: '8.82',
+  spender: '0x9377888...3342232'
 })
 ```

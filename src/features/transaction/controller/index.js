@@ -1,4 +1,5 @@
 module.exports.getTransactionControllerInstance = (config) => new Controller(config)
+const BigNumber = require('bignumber.js')
 const { handleRequestError, getApiMethod, mountHeaders, makeRequest } = require('../../../services')
 const requests = require('./requests.json')
 const Interface = require('./interface')
@@ -109,6 +110,8 @@ class Controller extends Interface {
     source = null,
     feeCurrency = null,
     tokenType = null,
+    numInputs = null,
+    numOutputs = null
   }) {
     try {
       const data = {}
@@ -124,6 +127,8 @@ class Controller extends Interface {
       if (source) data.source = source
       if (feeCurrency) data.feeCurrency = feeCurrency
       if (tokenType) data.tokenType = tokenType
+      if (numInputs) data.numInputs = numInputs
+      if (numOutputs) data.numOutputs = numOutputs
       const response = await makeRequest({ method: 'post', url: `/fee?protocol=${protocol}`, body: data, config: this.config })
       return new FeeResponse(response)
     } catch (error) {
@@ -187,6 +192,21 @@ class Controller extends Interface {
   async getTransactionReceiptByHash({ hash, protocol }) {
     try {
       return await makeRequest({ method: 'get', url: `/transaction/${hash}/receipt?protocol=${protocol}`, config: this.config })
+    } catch (error) {
+      handleRequestError(error)
+    }
+  }
+  /**
+ * Get proxy address by hash (tx id)
+ *
+ * @param {object} input
+ * @param {string} input.hash transaction hash
+ * @param {Protocol} input.protocol blockchain protocol
+ * @returns {Promise<{ address:string }>}
+ */
+  async getProxyAddressByHash({ hash, protocol }) {
+    try {
+      return await makeRequest({ method: 'get', url: `/transaction/${hash}/proxy?protocol=${protocol}`, config: this.config })
     } catch (error) {
       handleRequestError(error)
     }
@@ -584,14 +604,13 @@ class Controller extends Interface {
    */
   async createBitcoinTransferTransaction(input) {
     validateBitcoinTransferTransactionParams(input)
-    let { wallet, inputs, outputs } = input
+    let { wallet, inputs, outputs, fee } = input
     const protocol = Protocol.BITCOIN
     if (wallet) {
       const utxos = await this.getUTXOs({ address: wallet.address, protocol })
       inputs = []
       for (let i = 0; i < utxos.length; ++i) {
-        const tx = await this.getTransactionByHash({ hash: utxos[i].txHash, protocol })
-        inputs[i] = new Input({ ...utxos[i], privateKey: wallet.privateKey, hex: tx.hex, blockhash: tx.blockhash })
+        inputs[i] = new Input({ ...utxos[i], privateKey: wallet.privateKey })
       }
     } else if (inputs) {
       for (let i = 0; i < inputs.length; ++i) {
@@ -599,21 +618,19 @@ class Controller extends Interface {
         if (!tx.vout[inputs[i].index]) {
           throw new GenericException(`Invalid UTXO hash ${inputs[i].txHash}`, 'InvalidParams')
         }
+        inputs[i].value = tx.vout[inputs[i].index].value
         inputs[i].hex = tx.hex
         inputs[i].blockhash = tx.blockhash
       }
     }
 
-    const { estimateValue: networkFee } = await this.getFee({
-      type: TransactionType.TRANSFER,
-      protocol,
-    })
     const signedTx = await buildBitcoinTransferTransaction({
       wallet,
       inputs,
       outputs,
-      fee: networkFee,
+      fee,
       testnet: isTestnet(this.config.environment),
+      config: this.config
     })
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
@@ -757,11 +774,18 @@ class Controller extends Interface {
       changeAddress,
       nftData,
     } = input
-    let inputSum = 0
-    const amountHTRUnit = toHTRUnit(amount).toNumber()
     const protocol = Protocol.HATHOR
+    let inputSum = 0
+    let amountHTRUnit;
+    if (nftData && type === TransactionType.HATHOR_TOKEN_CREATION) {
+      amountHTRUnit = Math.ceil(new BigNumber(amount).times(0.0001).plus(0.01).times(100).toNumber())
+    } else if (type === TransactionType.HATHOR_NFT_MINT || type === TransactionType.HATHOR_NFT_MELT) {
+      amountHTRUnit = Math.ceil(new BigNumber(amount).times(0.0001).times(100).toNumber())
+    } else {
+      amountHTRUnit = toHTRUnit(amount).toNumber()
+    }
     let utxos = await this.getUTXOs({ address: wallet.address, protocol })
-    if (type === TransactionType.HATHOR_TOKEN_MELT) {
+    if (type === TransactionType.HATHOR_TOKEN_MELT || type === TransactionType.HATHOR_NFT_MELT) {
       utxos = utxos.filter((utxo) => utxo.token === tokenUid)
     } else {
       utxos = utxos.filter((utxo) => utxo.token === '00' || utxo.token === tokenUid)
@@ -773,7 +797,7 @@ class Controller extends Interface {
     for (let i = 0; i < utxos.length; ++i) {
       const tx = await this.getTransactionByHash({ hash: utxos[i].txHash, protocol })
       const output = tx.tx.outputs[utxos[i].index]
-      if (type === TransactionType.HATHOR_TOKEN_MELT) {
+      if (type === TransactionType.HATHOR_TOKEN_MELT || type === TransactionType.HATHOR_NFT_MELT) {
         if (![0, 129].includes(output.token_data)) {
           if (inputSum < amountHTRUnit) {
             inputSum += output.value
@@ -1101,10 +1125,10 @@ class Controller extends Interface {
     validateSolanaCollectionInput(input)
     const { wallet, name, symbol, uri } = input
     const protocol = Protocol.SOLANA
-    const mintRent = (await this.getFee({ protocol, type: TransactionType.SOLANA_NFT_MINT })).mintRentExemption
-    const { blockhash: recentBlockhash } = await this.getBlock({ block: 'latest', protocol })
+    // const mintRent = (await this.getFee({ protocol, type: TransactionType.SOLANA_NFT_MINT })).mintRentExemption
+    const { blockhash } = await this.getBlock({ block: 'latest', protocol })
     const response = await deploySolanaCollection({
-      name, symbol, uri, mintRent, from: wallet, recentBlockhash, config: this.config
+      name, symbol, uri, from: wallet, latestBlock: blockhash, config: this.config
     })
     return {
       collection: response.collection,
@@ -1117,21 +1141,19 @@ class Controller extends Interface {
      */
   async createSolanaNFTTransaction(input) {
     validateSolanaNFTInput(input)
-    const { wallet, maxSupply, uri, name, symbol, amount, creators, royaltiesFee, collection } = input
+    const { wallet, maxSupply, uri, name, symbol, creators, royaltiesFee, collection } = input
     const protocol = Protocol.SOLANA
-    const mintRent = (await this.getFee({ protocol, type: TransactionType.SOLANA_NFT_MINT })).mintRentExemption
-
+    const { blockhash } = await this.getBlock({ block: 'latest', protocol })
     const response = await deploySolanaNFT({
       from: wallet,
       maxSupply,
-      amount,
       uri,
       name,
-      mintRent,
       symbol,
       creators,
       royaltiesFee,
       collection,
+      latestBlock: blockhash,
       config: this.config
     })
     return {
@@ -1146,11 +1168,16 @@ class Controller extends Interface {
    * @param {import('../entity').SolanaNFTEditionInput} input
    * @returns {Promise<TransactionResponse>} edition signature
    */
-  async createSolanaNFTEdition(input) {
+  async createSolanaNFTEditionTransaction(input) {
     validateSolanaDeployNFT(input)
     const { wallet, masterEdition } = input
-    const hash = await mintEdition({ masterEdition, from: wallet, config: this.config })
-    return new TransactionResponse({ hash })
+    const protocol = Protocol.SOLANA
+    const { blockhash } = await this.getBlock({ block: 'latest', protocol })
+    const response = await mintEdition({ masterEdition, from: wallet, latestBlock: blockhash, config: this.config })
+    return {
+      mint: response.mint,
+      transaction: new SignedTransaction({ signedTx: response.rawTransaction, protocol, type: TransactionType.SOLANA_NFT_MINT })
+    }
   }
   /**
    * Update Solana NFT Metadata
@@ -1160,9 +1187,24 @@ class Controller extends Interface {
    */
   async updateSolanaNFTMetadata(input) {
     validateSolanaDeployNFT(input)
-    const { wallet, token, uri } = input
-    const hash = await updateMetaplexMetadata({ from: wallet, token, uri, config: this.config })
-    return new TransactionResponse({ hash })
+    const { wallet, maxSupply, uri, isMutable, name, symbol, creators, royaltiesFee, collection, token } = input
+    const protocol = Protocol.SOLANA
+    const { blockhash } = await this.getBlock({ block: 'latest', protocol })
+    const response = await updateMetaplexMetadata({
+      from: wallet,
+      token,
+      isMutable,
+      maxSupply,
+      uri,
+      name,
+      symbol,
+      creators,
+      royaltiesFee,
+      collection,
+      latestBlock: blockhash,
+      config: this.config
+    })
+    return new SignedTransaction({ signedTx: response, protocol, type: TransactionType.SOLANA_UPDATE_METADATA })
   }
   /**
    * Create a Custom Solana Program Interaction

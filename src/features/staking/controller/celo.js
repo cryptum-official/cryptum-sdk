@@ -1,5 +1,4 @@
 const Interface = require('./interface')
-const { TransactionController } = require('../../transaction/controller')
 const {
   CELO_ACCOUNTS_ADDRESS,
   Protocol,
@@ -11,6 +10,8 @@ const { validateEthAddress, validatePositiveAmount, validatePositive } = require
 const { GenericException } = require('../../../errors')
 const { default: BigNumber } = require('bignumber.js')
 const { makeRequest } = require('../../../services')
+const { getContractControllerInstance } = require('../../contract/controller')
+const { isTestnet } = require('../../../services/utils')
 
 // Steps to stake:
 // 1. Register account
@@ -34,10 +35,10 @@ class CeloStakingController extends Interface {
    */
   async isRegisteredAccount({ address }) {
     validateEthAddress(address)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'isAccount'
-    return await new TransactionController(this.config).callSmartContractMethod({
+    return await getContractControllerInstance(this.config).callMethod({
       contractAddress: CELO_ACCOUNTS_ADDRESS[network],
       contractAbi: await this._getMethodAbi(CELO_ACCOUNTS_ADDRESS[network], method),
       method,
@@ -53,11 +54,11 @@ class CeloStakingController extends Interface {
    */
   async registerAccount({ wallet }) {
     validateEthAddress(wallet.address)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'createAccount'
-    const txController = new TransactionController(this.config)
-    const tx = await txController.createSmartContractTransaction({
+    const txController = getContractControllerInstance(this.config)
+    return await txController.callMethodTransaction({
       wallet,
       contractAddress: CELO_ACCOUNTS_ADDRESS[network],
       contractAbi: await this._getMethodAbi(CELO_ACCOUNTS_ADDRESS[network], method),
@@ -67,7 +68,6 @@ class CeloStakingController extends Interface {
       testnet,
       protocol: Protocol.CELO,
     })
-    return await txController.sendTransaction(tx)
   }
   /**
    * Lock amount
@@ -80,11 +80,11 @@ class CeloStakingController extends Interface {
   async lock({ wallet, amount }) {
     validateEthAddress(wallet.address)
     validatePositiveAmount(amount)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'lock'
-    const txController = new TransactionController(this.config)
-    const tx = await txController.createSmartContractTransaction({
+    const txController = getContractControllerInstance(this.config)
+    return await txController.callMethodTransaction({
       wallet,
       contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
       contractAbi: await this._getMethodAbi(CELO_LOCKEDGOLD_ADDRESS[network], method),
@@ -94,7 +94,6 @@ class CeloStakingController extends Interface {
       testnet,
       protocol: Protocol.CELO,
     })
-    return await txController.sendTransaction(tx)
   }
   /**
    * Vote for validator
@@ -109,14 +108,14 @@ class CeloStakingController extends Interface {
     validateEthAddress(wallet.address)
     validateEthAddress(validator)
     validatePositiveAmount(amount)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'vote'
-    const txController = new TransactionController(this.config)
+    const txController = getContractControllerInstance(this.config)
 
     const { lesser, greater } = await this._findLesserGreater({ amount, validator, network })
 
-    const tx = await txController.createSmartContractTransaction({
+    return await txController.callMethodTransaction({
       wallet,
       contractAddress: CELO_ELECTION_ADDRESS[network],
       contractAbi: await this._getMethodAbi(CELO_ELECTION_ADDRESS[network], method),
@@ -126,7 +125,6 @@ class CeloStakingController extends Interface {
       testnet,
       protocol: Protocol.CELO,
     })
-    return await txController.sendTransaction(tx)
   }
   /**
    * Activate all votes
@@ -137,11 +135,11 @@ class CeloStakingController extends Interface {
    */
   async activate({ wallet, validator }) {
     validateEthAddress(wallet.address)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'activate'
-    const txController = new TransactionController(this.config)
-    const tx = await txController.createSmartContractTransaction({
+    const txController = getContractControllerInstance(this.config)
+    return await txController.callMethodTransaction({
       wallet,
       contractAddress: CELO_ELECTION_ADDRESS[network],
       contractAbi: await this._getMethodAbi(CELO_ELECTION_ADDRESS[network], method),
@@ -151,7 +149,6 @@ class CeloStakingController extends Interface {
       testnet,
       protocol: Protocol.CELO,
     })
-    return await txController.sendTransaction(tx)
   }
   /**
    * Revoke active votes
@@ -166,14 +163,14 @@ class CeloStakingController extends Interface {
     validateEthAddress(wallet.address)
     validateEthAddress(validator)
     validatePositiveAmount(amount)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const { lesser, greater } = await this._findLesserGreater({ amount, validator, network })
     const { result: groups } = await this.getGroupsVotedForByAccount({ address: wallet.address, testnet })
     const index = groups.findIndex((group) => group.toLowerCase() === validator.toLowerCase())
-    const txController = new TransactionController(this.config)
+    const txController = getContractControllerInstance(this.config)
     const method = 'revokeActive'
-    const tx = await txController.createSmartContractTransaction({
+    return await txController.callMethodTransaction({
       wallet,
       contractAddress: CELO_ELECTION_ADDRESS[network],
       contractAbi: await this._getMethodAbi(CELO_ELECTION_ADDRESS[network], method),
@@ -183,7 +180,6 @@ class CeloStakingController extends Interface {
       testnet,
       protocol: Protocol.CELO,
     })
-    return await txController.sendTransaction(tx)
   }
   /**
    * Revoke pending votes
@@ -198,14 +194,14 @@ class CeloStakingController extends Interface {
     validateEthAddress(wallet.address)
     validateEthAddress(validator)
     validatePositiveAmount(amount)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const { lesser, greater } = await this._findLesserGreater({ amount, validator, network })
-    const txController = new TransactionController(this.config)
+    const txController = getContractControllerInstance(this.config)
     const { result: groups } = await this.getGroupsVotedForByAccount({ address: wallet.address, testnet })
     const index = groups.findIndex((group) => group.toLowerCase() === validator.toLowerCase())
     const method = 'revokePending'
-    const tx = await txController.createSmartContractTransaction({
+    return await txController.callMethodTransaction({
       wallet,
       contractAddress: CELO_ELECTION_ADDRESS[network],
       contractAbi: await this._getMethodAbi(CELO_ELECTION_ADDRESS[network], method),
@@ -215,7 +211,6 @@ class CeloStakingController extends Interface {
       testnet,
       protocol: Protocol.CELO,
     })
-    return await txController.sendTransaction(tx)
   }
   /**
    * Unlock amount
@@ -228,11 +223,11 @@ class CeloStakingController extends Interface {
   async unlock({ wallet, amount }) {
     validateEthAddress(wallet.address)
     validatePositiveAmount(amount)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'unlock'
-    const txController = new TransactionController(this.config)
-    const tx = await txController.createSmartContractTransaction({
+    const txController = getContractControllerInstance(this.config)
+    return await txController.callMethodTransaction({
       wallet,
       contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
       contractAbi: await this._getMethodAbi(CELO_LOCKEDGOLD_ADDRESS[network], method),
@@ -242,7 +237,6 @@ class CeloStakingController extends Interface {
       testnet,
       protocol: Protocol.CELO,
     })
-    return await txController.sendTransaction(tx)
   }
   /**
    * Relock amount that was unlocked
@@ -257,11 +251,11 @@ class CeloStakingController extends Interface {
     validateEthAddress(wallet.address)
     validatePositiveAmount(amount)
     validatePositive(index)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'relock'
-    const txController = new TransactionController(this.config)
-    const tx = await txController.createSmartContractTransaction({
+    const txController = getContractControllerInstance(this.config)
+    return await txController.callMethodTransaction({
       wallet,
       contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
       contractAbi: await this._getMethodAbi(CELO_LOCKEDGOLD_ADDRESS[network], method),
@@ -271,7 +265,6 @@ class CeloStakingController extends Interface {
       testnet,
       protocol: Protocol.CELO,
     })
-    return await txController.sendTransaction(tx)
   }
   /**
    * Withdraw amount
@@ -283,11 +276,11 @@ class CeloStakingController extends Interface {
    */
   async withdraw({ wallet, index }) {
     validateEthAddress(wallet.address)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'withdraw'
-    const txController = new TransactionController(this.config)
-    const tx = await txController.createSmartContractTransaction({
+    const txController = getContractControllerInstance(this.config)
+    return await txController.callMethodTransaction({
       wallet,
       contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
       contractAbi: await this._getMethodAbi(CELO_LOCKEDGOLD_ADDRESS[network], method),
@@ -297,7 +290,6 @@ class CeloStakingController extends Interface {
       testnet,
       protocol: Protocol.CELO,
     })
-    return await txController.sendTransaction(tx)
   }
   /**
    * Get Total Pending Withdrawals
@@ -307,11 +299,11 @@ class CeloStakingController extends Interface {
    * @returns {Promise<import('../../transaction/entity').SmartContractCallResponse>}
    */
   async getTotalPendingWithdrawals({ address }) {
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'getTotalPendingWithdrawals'
-    const txController = new TransactionController(this.config)
-    return await txController.callSmartContractMethod({
+    const txController = getContractControllerInstance(this.config)
+    return await txController.callMethod({
       contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
       contractAbi: await this._getMethodAbi(CELO_LOCKEDGOLD_ADDRESS[network], method),
       method,
@@ -328,11 +320,11 @@ class CeloStakingController extends Interface {
    * @returns {Promise<{amount, timestamp}[]>}
    */
   async getPendingWithdrawals({ address }) {
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'getPendingWithdrawals'
-    const txController = new TransactionController(this.config)
-    const { result } = await txController.callSmartContractMethod({
+    const txController = getContractControllerInstance(this.config)
+    const { result } = await txController.callMethod({
       contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
       contractAbi: await this._getMethodAbi(CELO_LOCKEDGOLD_ADDRESS[network], method),
       method,
@@ -357,11 +349,11 @@ class CeloStakingController extends Interface {
    * @returns {Promise<import('../../transaction/entity').SmartContractCallResponse>}
    */
   async getGroupsVotedForByAccount({ address }) {
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
     const method = 'getGroupsVotedForByAccount'
-    const txController = new TransactionController(this.config)
-    return await txController.callSmartContractMethod({
+    const txController = getContractControllerInstance(this.config)
+    return await txController.callMethod({
       contractAddress: CELO_ELECTION_ADDRESS[network],
       contractAbi: await this._getMethodAbi(CELO_ELECTION_ADDRESS[network], method),
       method,
@@ -379,11 +371,11 @@ class CeloStakingController extends Interface {
    * @returns {Promise<{pending, active}>}
    */
   async getVotesForGroupByAccount({ address, group }) {
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
-    const txController = new TransactionController(this.config)
+    const txController = getContractControllerInstance(this.config)
     const [pending, active] = await Promise.all([
-      txController.callSmartContractMethod({
+      txController.callMethod({
         contractAddress: CELO_ELECTION_ADDRESS[network],
         contractAbi: await this._getMethodAbi(CELO_ELECTION_ADDRESS[network], 'getPendingVotesForGroupByAccount'),
         method: 'getPendingVotesForGroupByAccount',
@@ -391,7 +383,7 @@ class CeloStakingController extends Interface {
         testnet,
         protocol: Protocol.CELO,
       }),
-      txController.callSmartContractMethod({
+      txController.callMethod({
         contractAddress: CELO_ELECTION_ADDRESS[network],
         contractAbi: await this._getMethodAbi(CELO_ELECTION_ADDRESS[network], 'getActiveVotesForGroupByAccount'),
         method: 'getActiveVotesForGroupByAccount',
@@ -414,12 +406,12 @@ class CeloStakingController extends Interface {
    */
   async getAccountSummary({ address }) {
     validateEthAddress(address)
-    const testnet = this.config.environment === 'development'
+    const testnet = isTestnet(this.config.environment)
     const network = testnet ? 'testnet' : 'mainnet'
-    const txController = new TransactionController(this.config)
+    const txController = getContractControllerInstance(this.config)
 
     const [nonvoting, total, pendingWithdrawals, groups] = await Promise.all([
-      txController.callSmartContractMethod({
+      txController.callMethod({
         contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
         contractAbi: await this._getMethodAbi(CELO_LOCKEDGOLD_ADDRESS[network], 'getAccountNonvotingLockedGold'),
         method: 'getAccountNonvotingLockedGold',
@@ -427,7 +419,7 @@ class CeloStakingController extends Interface {
         testnet,
         protocol: Protocol.CELO,
       }),
-      txController.callSmartContractMethod({
+      txController.callMethod({
         contractAddress: CELO_LOCKEDGOLD_ADDRESS[network],
         contractAbi: await this._getMethodAbi(CELO_LOCKEDGOLD_ADDRESS[network], 'getAccountTotalLockedGold'),
         method: 'getAccountTotalLockedGold',
@@ -462,9 +454,9 @@ class CeloStakingController extends Interface {
     return [abi.find((m) => m.name === method)]
   }
   async _findLesserGreater({ amount, validator, network }) {
-    const txController = new TransactionController(this.config)
+    const txController = getContractControllerInstance(this.config)
     /** @type {{ result:{ groups, values }}} */
-    const { result: currentVotes } = await txController.callSmartContractMethod({
+    const { result: currentVotes } = await txController.callMethod({
       contractAddress: CELO_ELECTION_ADDRESS[network],
       contractAbi: await this._getMethodAbi(CELO_ELECTION_ADDRESS[network], 'getTotalVotesForEligibleValidatorGroups'),
       method: 'getTotalVotesForEligibleValidatorGroups',

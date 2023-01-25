@@ -1,4 +1,4 @@
-const WalletController = require('../../src/features/wallet/controller')
+const { getWalletControllerInstance } = require('../../src/features/wallet/controller')
 const { Protocol } = require('../../src/services/blockchain/constants')
 
 const mnemonic =
@@ -23,7 +23,7 @@ exports.config = {
 }
 
 exports.getWallets = async () => {
-  const controller = new WalletController(exports.config)
+  const controller = getWalletControllerInstance(exports.config)
   wallets.ethereum = await controller.generateWallet({
     protocol: Protocol.ETHEREUM,
     mnemonic,
