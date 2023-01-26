@@ -81,7 +81,7 @@ class Controller extends Interface {
         url: `/contract/uniswap/mintPosition?protocol=${protocol}`,
         body: data, config: this.config
       })
-
+      console.log({rawTransaction})
     let signedTx;
     switch (protocol) {
       case Protocol.CELO:
