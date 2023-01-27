@@ -34,7 +34,7 @@ module.exports.validateUniswapCreatePool = ({
   }
 }
 
-module.exports.validateUniswapMintPosition = ({
+module.exports.validateUniswapGetMintPositionQuotation = ({
   protocol,
   wallet,
   amountTokenA,
@@ -51,11 +51,17 @@ module.exports.validateUniswapMintPosition = ({
   if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
-  if (!amountTokenA || typeof amountTokenA !== 'string') {
+  if (amountTokenA && typeof amountTokenA !== 'string') {
     throw new InvalidException('Invalid amountTokenA')
   }
-  if (!amountTokenB || typeof amountTokenB !== 'string') {
+  if (amountTokenB && typeof amountTokenB !== 'string') {
     throw new InvalidException('Invalid amountTokenB')
+  }
+  if(amountTokenA && amountTokenB) {
+    throw new InvalidException('Please provide either amountTokenA or amountTokenB, never both!')
+  }
+  if(!amountTokenA && !amountTokenB) {
+    throw new InvalidException('Please provide amountTokenA or amountTokenB!')
   }
   if (slippage !== undefined && typeof slippage !== 'string') {
     throw new InvalidException('Invalid slippage')

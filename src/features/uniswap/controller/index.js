@@ -8,7 +8,7 @@ const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { SignedTransaction, TransactionType } = require('../../transaction/entity')
 const { signCeloTx } = require('../../../services/blockchain/celo')
-const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateGetTokenIds, validategetPosition, validateCollectFees, validateIncreaseLiquidity, validateDecreaseLiquidity, validateGetPositions, validateGetPosition, validateSwap } = require('../../../services/validations/uniswap')
+const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateGetTokenIds, validategetPosition, validateCollectFees, validateIncreaseLiquidity, validateDecreaseLiquidity, validateGetPositions, validateGetPosition, validateSwap, validateUniswapGetMintPositionQuotation } = require('../../../services/validations/uniswap')
 
 
 class Controller extends Interface {
@@ -69,19 +69,50 @@ class Controller extends Interface {
    * @description
    * Mints a position relative to a liquidity pool
    */
-  async mintPosition(input) {
-    validateUniswapMintPosition(input)
-    const tc = getTransactionControllerInstance(this.config)
-
+  async getMintPositionQuotation(input) {
+    validateUniswapGetMintPositionQuotation(input)
     const { protocol, wallet, amountTokenA, amountTokenB, slippage, pool, recipient, minPriceDelta, maxPriceDelta, wrapped } = input
     const data = { from: wallet.address, amountTokenA, amountTokenB, minPriceDelta, maxPriceDelta, slippage, pool, recipient: recipient ? recipient : wallet.address, wrapped}
-    const { rawTransaction, amountA, amountB } = await makeRequest(
+    const response = await makeRequest(
+      {
+        method: 'post',
+        url: `/contract/uniswap/getMintPositionQuotation?protocol=${protocol}`,
+        body: data, config: this.config
+      })
+    return response
+  }
+
+  async mintPosition(input){
+    const { transaction, wallet } = input
+    // validateMintPosition(input)
+    const tc = getTransactionControllerInstance(this.config)
+    let protocol
+    let value
+    let calldata
+    let tokenA
+    let tokenB
+    let amountA 
+    let amountB 
+
+    if (transaction.hasOwnProperty('mintPositionTransaction') && transaction.hasOwnProperty('mintPositionQuotation')) {
+      protocol = transaction.mintPositionTransaction.protocol
+      value = transaction.mintPositionTransaction.value
+      calldata = transaction.mintPositionTransaction.calldata
+      tokenA = transaction.mintPositionTransaction.tokenA
+      amountA = transaction.mintPositionQuotation.amountA
+      tokenB = transaction.mintPositionTransaction.tokenB
+      amountB = transaction.mintPositionQuotation.amountB
+    } else {
+      throw new InvalidException('Please assign the full getSwapQuotation Object to the "transaction" parameter of this function')
+    }
+    const data = { from: wallet.address, value, calldata, tokenA, amountA, tokenB, amountB }
+    const { rawTransaction } = await makeRequest(
       {
         method: 'post',
         url: `/contract/uniswap/mintPosition?protocol=${protocol}`,
         body: data, config: this.config
       })
-      console.log({rawTransaction})
+
     let signedTx;
     switch (protocol) {
       case Protocol.CELO:
@@ -117,6 +148,27 @@ class Controller extends Interface {
       {
         method: 'post',
         url: `/contract/uniswap/getPools?protocol=${protocol}`,
+        body: data, config: this.config
+      })
+    return response
+  }
+  
+  /**
+   * Get Uniswap Pool Addresses
+   * @param {import('../entity').GetPoolsInput} input
+   * @returns {Promise<import('../../transaction/entity').CreateGetPoolsResponse>}
+   *
+   * @description
+   * If no Pool Fee is specified, Pool addresses for all possible fee ranges will be returned
+   */
+  async getPoolData(input) {
+    // validateUniswapGetPools(input)
+    const { protocol, poolAddress} = input
+    const data = { poolAddress }
+    const response = await makeRequest(
+      {
+        method: 'post',
+        url: `/contract/uniswap/getPoolData?protocol=${protocol}`,
         body: data, config: this.config
       })
     return response
