@@ -1,3 +1,5 @@
+const { boolean } = require('fp-ts')
+
 /**
  * Transaction type
  * @enum {string}
@@ -110,7 +112,18 @@ class CreateGetPoolsResponse {
   /**
    * Creates an instance of CreateGetPoolsResponse
    *
-   * @param {Array<PoolFeeResponse>} response Array of PoolFee responses
+   * @param {Object<PoolFeeResponse>} response Object of PoolFee responses
+   */
+  constructor({ response }) {
+    this.response = response
+  }
+}
+
+class CreateGetPoolDataResponse {
+  /**
+   * Creates an instance of CreateGetPoolsResponse
+   *
+   * @param {Object<PoolDataResponse>} response Object of pool data responses
    */
   constructor({ response }) {
     this.response = response
@@ -141,6 +154,46 @@ class PoolFeeResponse {
   }
 }
 
+class PoolDataResponse {
+  /**
+   *
+   * @param {string} this.poolAddress
+   * @param {string} this.fee 
+   * @param {string} this.token0 
+   * @param {string} this.token1 
+   * @param {string} this.liquidity 
+   * @param {string} this.liquidity 
+   * @param {string} this.tickSpacing 
+   * @param {Object<slot0>} this.liquidity 
+   */
+  constructor({ poolFee, poolAddress }) {
+    this.poolFee = fee
+    this.poolAddress = poolAddress
+  }
+}
+
+class slot0 {
+  /**
+   *
+   * @param {string} this.sqrtPriceX96 
+   * @param {string} this.tick
+   * @param {string} this.observationIndex
+   * @param {string} this.observationCardinality
+   * @param {string} this.observationCardinalityNext
+   * @param {string} this.feeProtocol
+   * @param {boolean} this.unlocked
+   */
+  constructor({ sqrtPriceX96, tick, observationIndex, observationCardinality, observationCardinalityNext, feeProtocol, unlocked}) {
+    this.sqrtPriceX96 = sqrtPriceX96
+    this.tick = tick
+    this.observationIndex = observationIndex
+    this.observationCardinality = observationCardinality
+    this.observationCardinalityNext = observationCardinalityNext
+    this.feeProtocol = feeProtocol
+    this.unlocked = unlocked
+  }
+}
+
 class CreateGetSwapQuotation {
   /**
    * Creates an instance of CreateGetSwapQuotation
@@ -157,7 +210,7 @@ class CreateGetTokenIds {
   /**
    * Creates an instance of CreategetTokenIds
    *
-   * @param {Array} response response
+   * @param {Object} response response
    */
   constructor({ response }) {
     this.response = response
@@ -185,9 +238,8 @@ class CreateGetPositions {
 }
 class CollectFeesResponse {
   /**
-   * Creates an instance of CreatePoolResponse
+   * Creates an instance of CollectFeesResponse
    *
-   * @param {object} response
    * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
    */
   constructor({ transaction }) {
@@ -196,9 +248,8 @@ class CollectFeesResponse {
 }
 class IncreaseLiquidityResponse {
   /**
-   * Creates an instance of CreatePoolResponse
+   * Creates an instance of IncreaseLiquidityResponse
    *
-   * @param {object} response
    * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
    */
   constructor({ transaction }) {
@@ -207,9 +258,18 @@ class IncreaseLiquidityResponse {
 }
 class DecreaseLiquidityResponse {
   /**
-   * Creates an instance of CreatePoolResponse
+   * Creates an instance of DecreaseLiquidityResponse
    *
-   * @param {object} response
+   * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
+   */
+  constructor({ transaction }) {
+    this.transaction = transaction
+  }
+}
+class SwapResponse {
+  /**
+   * Creates an instance of SwapResponse
+   *
    * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
    */
   constructor({ transaction }) {
@@ -708,6 +768,7 @@ module.exports = {
   CreatePoolResponse,
   MintPositionResponse,
   CreateGetPoolsResponse,
+  CreateGetPoolDataResponse,
   CreateGetSwapQuotation,
   CreateGetTokenIds,
   CreateGetPosition,
@@ -716,6 +777,7 @@ module.exports = {
   IncreaseLiquidityResponse,
   DecreaseLiquidityResponse,
   ObservePoolResponse,
+  SwapResponse,
   UTXO,
   Input,
   Output,

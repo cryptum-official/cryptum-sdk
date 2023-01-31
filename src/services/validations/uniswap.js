@@ -10,8 +10,7 @@ module.exports.validateUniswapCreatePool = ({
   fee,
   tokenA,
   tokenB,
-  priceNumerator,
-  priceDenominator
+  price,
 }) => {
 
   const _fee = new BigNumber(fee)
@@ -25,20 +24,17 @@ module.exports.validateUniswapCreatePool = ({
     throw new InvalidException('Invalid protocol')
   }
   if (!tokenA || typeof tokenA !== 'string') {
-    throw new InvalidException('Invalid tokenAddress')
+    throw new InvalidException('Invalid token Address')
   }
   if (!tokenB || typeof tokenB !== 'string') {
-    throw new InvalidException('Invalid tokenAddress')
+    throw new InvalidException('Invalid token Address')
   }
-  if (!priceNumerator || typeof priceNumerator !== 'string') {
-    throw new InvalidException('Invalid priceNumerator')
-  }
-  if (!priceDenominator || typeof priceDenominator !== 'string') {
-    throw new InvalidException('Invalid priceDenominator')
+  if (!price || typeof price !== 'string') {
+    throw new InvalidException('Invalid price')
   }
 }
 
-module.exports.validateUniswapMintPosition = ({
+module.exports.validateUniswapGetMintPositionQuotation = ({
   protocol,
   wallet,
   amountTokenA,
@@ -55,13 +51,19 @@ module.exports.validateUniswapMintPosition = ({
   if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
-  if (!amountTokenA || typeof amountTokenA !== 'string') {
+  if (amountTokenA && typeof amountTokenA !== 'string') {
     throw new InvalidException('Invalid amountTokenA')
   }
-  if (!amountTokenB || typeof amountTokenB !== 'string') {
+  if (amountTokenB && typeof amountTokenB !== 'string') {
     throw new InvalidException('Invalid amountTokenB')
   }
-  if (!slippage || typeof slippage !== 'string') {
+  if(amountTokenA && amountTokenB) {
+    throw new InvalidException('Please provide either amountTokenA or amountTokenB, never both!')
+  }
+  if(!amountTokenA && !amountTokenB) {
+    throw new InvalidException('Please provide amountTokenA or amountTokenB!')
+  }
+  if (slippage !== undefined && typeof slippage !== 'string') {
     throw new InvalidException('Invalid slippage')
   }
   if (!pool || typeof pool !== 'string') {
@@ -87,27 +89,27 @@ module.exports.validateUniswapRemovePosition = ({
   tokenId,
   percentageToRemove
 }) => {
-  if (!wallet) {
-    throw new InvalidException('Invalid wallet')
-  }
-  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
-    throw new InvalidException('Invalid protocol')
-  }
-  if (!slippage || typeof slippage !== 'string') {
-    throw new InvalidException('Invalid slippage')
-  }
-  if (!pool || typeof pool !== 'string') {
-    throw new InvalidException('Invalid pool')
-  }
-  if (recipient !== undefined && typeof recipient !== 'string') {
-    throw new InvalidException('Invalid recipient')
-  }
-  if (!tokenId || typeof minPriceDelta !== 'string') {
-    throw new InvalidException('Invalid minPriceDelta')
-  }
-  if (!percentageToRemove || typeof maxPriceDelta !== 'string') {
-    throw new InvalidException('Invalid maxPriceDelta')
-  }
+    if (!wallet) {
+        throw new InvalidException('Invalid wallet')
+    }
+    if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+        throw new InvalidException('Invalid protocol')
+    }
+    if (!slippage || typeof slippage !== 'string') {
+        throw new InvalidException('Invalid slippage')
+    }
+    if (!pool || typeof pool !== 'string') {
+        throw new InvalidException('Invalid pool')
+    }
+    if (recipient !== undefined && typeof recipient !== 'string') {
+        throw new InvalidException('Invalid recipient')
+    }
+    if (!tokenId || typeof tokenId !== 'string') {
+        throw new InvalidException('Invalid tokenId')
+    }
+    if (!percentageToRemove || typeof percentageToRemove !== 'string') {
+        throw new InvalidException('Invalid percentageToRemove')
+    }
 }
 
 module.exports.validateUniswapGetPools = ({
@@ -117,10 +119,10 @@ module.exports.validateUniswapGetPools = ({
     throw new InvalidException('Invalid protocol')
   }
   if (!tokenA || typeof tokenA !== 'string') {
-    throw new InvalidException('Invalid tokenAddress')
+    throw new InvalidException('Invalid token Address')
   }
   if (!tokenB || typeof tokenB !== 'string') {
-    throw new InvalidException('Invalid tokenAddress')
+    throw new InvalidException('Invalid token Address')
   }
   const _fee = new BigNumber(poolFee)
   if (poolFee && (typeof poolFee !== 'number' || _fee.isNaN() || _fee.lte(0))) {
@@ -128,24 +130,40 @@ module.exports.validateUniswapGetPools = ({
   }
 }
 
+module.exports.validateUniswapGetPoolData = ({
+  protocol, poolAddress
+}) => {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+    throw new InvalidException('Invalid protocol')
+  }
+  if (!poolAddress || typeof poolAddress !== 'string') {
+    throw new InvalidException('Invalid pool Address')
+  }
+}
+
 module.exports.validateUniswapGetSwapQuotation = ({
-  protocol, tokenIn, tokenOut, amount, tradeType
+  protocol, tokenIn, tokenOut, amountIn, amountOut
 }) => {
   if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (!tokenIn || typeof tokenIn !== 'string') {
-    throw new InvalidException('Invalid tokenAddress')
+    throw new InvalidException('Invalid token Address')
   }
   if (!tokenOut || typeof tokenOut !== 'string') {
-    throw new InvalidException('Invalid tokenAddress')
+    throw new InvalidException('Invalid token Address')
   }
-  const _amount = new BigNumber(amount)
-  if (!amount || typeof amount !== 'number' || _amount.isNaN() || _amount.lte(0)) {
-    throw new GenericException('Invalid amount', 'InvalidTypeException')
+  if (amountOut !== undefined && typeof amountOut !== 'string') {
+    throw new InvalidException('Invalid amountOut')
+  } 
+  if (amountIn !== undefined && typeof amountIn !== 'string') {
+    throw new InvalidException('Invalid amountIn')
   }
-  if (!tradeType || typeof tradeType !== 'string') {
-    throw new InvalidException('Invalid tradeType')
+  if (amountIn === undefined && amountOut === undefined ){
+    throw new InvalidException('You must provide amountIn or amountOut')
+  }
+  if (amountIn && amountOut ){
+    throw new InvalidException('You must provide either amountIn or amountOut, never both')
   }
 }
 
@@ -273,5 +291,15 @@ module.exports.validateIncreaseCardinality = ({
   }
   if (!cardinality || typeof cardinality !== 'number') {
     throw new InvalidException('Invalid cardinality')
+  }
+}
+
+module.exports.validateSwap = ({
+  transaction, wallet }) => {
+  if (!wallet) {
+    throw new InvalidException('Invalid wallet')
+  }
+  if (!transaction) {
+    throw new InvalidException('missing transaction argument')
   }
 }

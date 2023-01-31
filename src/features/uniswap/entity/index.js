@@ -44,6 +44,11 @@
  * @property {Array[number]} secondsAgoToCheck array of time points (in seconds previous to current time)
  */
 /**
+ * @typedef {Object} GetPoolDataInput
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {string} poolAddress address of the first token
+ */
+/**
  * @typedef {Object} GetSwapQuotationInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
  * @property {string} tokeIn address of the token to be swapped
@@ -98,4 +103,10 @@
  * @property {string} pool the address of the pool
  * @property {number} cardinality the new amount of observations the pool will be able to hold
 */
+/**
+ * @typedef {Object} SwapInput
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {Object} transaction transaction quotation swap object
+*/
+
 module.exports = {}
