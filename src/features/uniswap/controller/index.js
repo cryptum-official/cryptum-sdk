@@ -8,7 +8,7 @@ const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { SignedTransaction, TransactionType } = require('../../transaction/entity')
 const { signCeloTx } = require('../../../services/blockchain/celo')
-const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateGetTokenIds, validategetPosition, validateCollectFees, validateIncreaseLiquidity, validateDecreaseLiquidity, validateGetPositions, validateGetPosition, validateSwap, validateUniswapGetMintPositionQuotation } = require('../../../services/validations/uniswap')
+const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateGetTokenIds, validategetPosition, validateCollectFees, validateIncreaseLiquidity, validateDecreaseLiquidity, validateGetPositions, validateGetPosition, validateSwap, validateUniswapGetMintPositionQuotation, validateUniswapGetPoolData } = require('../../../services/validations/uniswap')
 
 
 class Controller extends Interface {
@@ -154,15 +154,15 @@ class Controller extends Interface {
   }
   
   /**
-   * Get Uniswap Pool Addresses
-   * @param {import('../entity').GetPoolsInput} input
-   * @returns {Promise<import('../../transaction/entity').CreateGetPoolsResponse>}
+   * Get Uniswap Pool Data
+   * @param {import('../entity').GetPoolDataInput} input
+   * @returns {Promise<import('../../transaction/entity').CreateGetPoolDataResponse>}
    *
    * @description
-   * If no Pool Fee is specified, Pool addresses for all possible fee ranges will be returned
+   * Return detailed information abot a uniswap pool 
    */
   async getPoolData(input) {
-    // validateUniswapGetPools(input)
+    validateUniswapGetPoolData(input)
     const { protocol, poolAddress} = input
     const data = { poolAddress }
     const response = await makeRequest(

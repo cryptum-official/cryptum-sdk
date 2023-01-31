@@ -1,3 +1,5 @@
+const { boolean } = require('fp-ts')
+
 /**
  * Transaction type
  * @enum {string}
@@ -109,7 +111,18 @@ class CreateGetPoolsResponse {
   /**
    * Creates an instance of CreateGetPoolsResponse
    *
-   * @param {Array<PoolFeeResponse>} response Array of PoolFee responses
+   * @param {Object<PoolFeeResponse>} response Object of PoolFee responses
+   */
+  constructor({ response }) {
+    this.response = response
+  }
+}
+
+class CreateGetPoolDataResponse {
+  /**
+   * Creates an instance of CreateGetPoolsResponse
+   *
+   * @param {Object<PoolDataResponse>} response Object of pool data responses
    */
   constructor({ response }) {
     this.response = response
@@ -125,6 +138,46 @@ class PoolFeeResponse {
   constructor({ poolFee, poolAddress }) {
     this.poolFee = poolFee
     this.poolAddress = poolAddress
+  }
+}
+
+class PoolDataResponse {
+  /**
+   *
+   * @param {string} this.poolAddress
+   * @param {string} this.fee 
+   * @param {string} this.token0 
+   * @param {string} this.token1 
+   * @param {string} this.liquidity 
+   * @param {string} this.liquidity 
+   * @param {string} this.tickSpacing 
+   * @param {Object<slot0>} this.liquidity 
+   */
+  constructor({ poolFee, poolAddress }) {
+    this.poolFee = fee
+    this.poolAddress = poolAddress
+  }
+}
+
+class slot0 {
+  /**
+   *
+   * @param {string} this.sqrtPriceX96 
+   * @param {string} this.tick
+   * @param {string} this.observationIndex
+   * @param {string} this.observationCardinality
+   * @param {string} this.observationCardinalityNext
+   * @param {string} this.feeProtocol
+   * @param {boolean} this.unlocked
+   */
+  constructor({ sqrtPriceX96, tick, observationIndex, observationCardinality, observationCardinalityNext, feeProtocol, unlocked}) {
+    this.sqrtPriceX96 = sqrtPriceX96
+    this.tick = tick
+    this.observationIndex = observationIndex
+    this.observationCardinality = observationCardinality
+    this.observationCardinalityNext = observationCardinalityNext
+    this.feeProtocol = feeProtocol
+    this.unlocked = unlocked
   }
 }
 
@@ -144,7 +197,7 @@ class CreateGetTokenIds {
   /**
    * Creates an instance of CreategetTokenIds
    *
-   * @param {Array} response response
+   * @param {Object} response response
    */
   constructor({ response }) {
     this.response = response
@@ -702,6 +755,7 @@ module.exports = {
   CreatePoolResponse,
   MintPositionResponse,
   CreateGetPoolsResponse,
+  CreateGetPoolDataResponse,
   CreateGetSwapQuotation,
   CreateGetTokenIds,
   CreateGetPosition,

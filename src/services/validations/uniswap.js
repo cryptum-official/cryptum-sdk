@@ -130,6 +130,17 @@ module.exports.validateUniswapGetPools = ({
   }
 }
 
+module.exports.validateUniswapGetPoolData = ({
+  protocol, poolAddress
+}) => {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+    throw new InvalidException('Invalid protocol')
+  }
+  if (!poolAddress || typeof poolAddress !== 'string') {
+    throw new InvalidException('Invalid pool Address')
+  }
+}
+
 module.exports.validateUniswapGetSwapQuotation = ({
   protocol, tokenIn, tokenOut, amountIn, amountOut
 }) => {

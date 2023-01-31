@@ -38,6 +38,11 @@
  * @property {number} poolFee fee collected upon every swap in the pool
  */
 /**
+ * @typedef {Object} GetPoolDataInput
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {string} poolAddress address of the first token
+ */
+/**
  * @typedef {Object} GetSwapQuotationInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
  * @property {string} tokeIn address of the token to be swapped
