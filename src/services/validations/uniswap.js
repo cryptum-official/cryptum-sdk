@@ -269,9 +269,12 @@ module.exports.validateDecreaseLiquidity = ({
 }
 
 module.exports.validateObservePool = ({
-  protocol, secondsAgoToCheck }) => {
+  protocol,pool, secondsAgoToCheck }) => {
   if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
+  }
+  if (!pool || typeof pool !== 'string') {
+    throw new InvalidException('Invalid pool')
   }
   if (!secondsAgoToCheck || typeof secondsAgoToCheck !== 'object') {
     throw new InvalidException('Invalid secondsAgoToCheck')
