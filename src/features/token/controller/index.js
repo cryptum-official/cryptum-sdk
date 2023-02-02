@@ -62,7 +62,7 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async transfer(input) {
-    const { protocol, token, wallet, destination, amount, destinations, issuer, memo, feeCurrency, fee } = input
+    const { protocol, token, wallet, destination, amount, destinations, issuer, memo, createAccount, feeCurrency, fee } = input
     const tc = getTransactionControllerInstance(this.config)
     let tx;
     switch (protocol) {
@@ -78,19 +78,35 @@ class Controller extends Interface {
         tx = await tc.createSolanaTransferTransaction({ wallet, destination, token, amount })
         break
       case Protocol.ETHEREUM:
-        tx = await tc.createEthereumTransferTransaction({ wallet, tokenSymbol: token, contractAddress: token, destination, amount })
+        tx = await tc.createEthereumTransferTransaction({
+          wallet, tokenSymbol: token === 'ETH' ? token : null, contractAddress: token !== 'ETH' ? token : null, destination, amount
+        })
         break
       case Protocol.CELO:
-        tx = await tc.createCeloTransferTransaction({ wallet, tokenSymbol: token, contractAddress: token, destination, amount, memo, feeCurrency })
+        tx = await tc.createCeloTransferTransaction({
+          wallet,
+          tokenSymbol: token === 'CELO' ? token : null,
+          contractAddress: token !== 'CELO' ? token : null,
+          destination,
+          amount,
+          memo,
+          feeCurrency
+        })
         break
       case Protocol.BSC:
-        tx = await tc.createBscTransferTransaction({ wallet, tokenSymbol: token, contractAddress: token, destination, amount })
+        tx = await tc.createBscTransferTransaction({
+          wallet, tokenSymbol: token === 'BNB' ? token : null, contractAddress: token !== 'BNB' ? token : null, destination, amount
+        })
         break
       case Protocol.POLYGON:
-        tx = await tc.createPolygonTransferTransaction({ wallet, tokenSymbol: token, contractAddress: token, destination, amount })
+        tx = await tc.createPolygonTransferTransaction({
+          wallet, tokenSymbol: token === 'MATIC' ? token : null, contractAddress: token !== 'MATIC' ? token : null, destination, amount
+        })
         break
       case Protocol.AVAXCCHAIN:
-        tx = await tc.createAvaxCChainTransferTransaction({ wallet, tokenSymbol: token, contractAddress: token, destination, amount })
+        tx = await tc.createAvaxCChainTransferTransaction({
+          wallet, tokenSymbol: token === 'AVAX' ? token : null, contractAddress: token !== 'AVAX' ? token : null, destination, amount
+        })
         break
       case Protocol.BITCOIN:
         tx = await tc.createBitcoinTransferTransaction({ wallet, outputs: destination ? [{ address: destination, amount }] : destinations, fee })
@@ -99,7 +115,7 @@ class Controller extends Interface {
         tx = await tc.createCardanoTransferTransactionFromWallet({ wallet, outputs: destinations })
         break
       case Protocol.STELLAR:
-        tx = await tc.createStellarTransferTransaction({ wallet, assetSymbol: token, issuer, amount, destination, memo })
+        tx = await tc.createStellarTransferTransaction({ wallet, assetSymbol: token, issuer, amount, destination, createAccount, memo })
         break
       case Protocol.RIPPLE:
         tx = await tc.createRippleTransferTransaction({ wallet, assetSymbol: token, issuer, amount, destination, memo })
