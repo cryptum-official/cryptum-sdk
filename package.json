@@ -1,6 +1,6 @@
 {
   "name": "cryptum-sdk",
-  "version": "0.0.44",
+  "version": "0.0.45",
   "description": "SDK to sync your application with Cryptum services",
   "main": "index.js",
   "repository": "https://github.com/blockforce-official/cryptum-sdk",
