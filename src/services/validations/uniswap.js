@@ -43,7 +43,8 @@ module.exports.validateUniswapGetMintPositionQuotation = ({
   pool,
   recipient,
   minPriceDelta,
-  maxPriceDelta
+  maxPriceDelta,
+  deadline
 }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
@@ -63,8 +64,12 @@ module.exports.validateUniswapGetMintPositionQuotation = ({
   if(!amountTokenA && !amountTokenB) {
     throw new InvalidException('Please provide amountTokenA or amountTokenB!')
   }
-  if (slippage !== undefined && typeof slippage !== 'string') {
+  if (slippage && typeof slippage !== 'string' ){
     throw new InvalidException('Invalid slippage')
+  } else if (slippage && +slippage > 50) {
+    throw new InvalidException('Slippage percentage must be lesser than 50 (50%)')
+  } else if ( slippage && +slippage < 0) {
+    throw new InvalidException('Slippage percentage must be a positive amount')
   }
   if (!pool || typeof pool !== 'string') {
     throw new InvalidException('Invalid pool')
@@ -77,6 +82,13 @@ module.exports.validateUniswapGetMintPositionQuotation = ({
   }
   if (!maxPriceDelta || typeof maxPriceDelta !== 'string') {
     throw new InvalidException('Invalid maxPriceDelta')
+  }
+  if (deadline && typeof deadline !== 'string' ){
+    throw new InvalidException('Invalid deadline')
+  } else if (deadline && +deadline > 4320) {
+    throw new InvalidException('Deadline minutes must be lesser than 4320 (72hours)')
+  } else if ( deadline && +deadline < 0) {
+    throw new InvalidException('Deadline minutes must be a positive amount')
   }
 }
 
@@ -95,8 +107,12 @@ module.exports.validateUniswapRemovePosition = ({
     if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
         throw new InvalidException('Invalid protocol')
     }
-    if (!slippage || typeof slippage !== 'string') {
-        throw new InvalidException('Invalid slippage')
+    if (slippage && typeof slippage !== 'string' ){
+      throw new InvalidException('Invalid slippage')
+    } else if (slippage && +slippage > 50) {
+      throw new InvalidException('Slippage percentage must be lesser than 50 (50%)')
+    } else if ( slippage && +slippage < 0) {
+      throw new InvalidException('Slippage percentage must be a positive amount')
     }
     if (!pool || typeof pool !== 'string') {
         throw new InvalidException('Invalid pool')
@@ -142,7 +158,7 @@ module.exports.validateUniswapGetPoolData = ({
 }
 
 module.exports.validateUniswapGetSwapQuotation = ({
-  protocol, tokenIn, tokenOut, amountIn, amountOut
+  protocol, tokenIn, tokenOut, amountIn, amountOut, slippage, deadline, recipient
 }) => {
   if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
@@ -164,6 +180,20 @@ module.exports.validateUniswapGetSwapQuotation = ({
   }
   if (amountIn && amountOut ){
     throw new InvalidException('You must provide either amountIn or amountOut, never both')
+  }
+  if (slippage && typeof slippage !== 'string' ){
+    throw new InvalidException('Invalid slippage')
+  } else if (slippage && +slippage > 50) {
+    throw new InvalidException('Slippage percentage must be lesser than 50 (50%)')
+  } else if ( slippage && +slippage < 0) {
+    throw new InvalidException('Slippage percentage must be a positive amount')
+  }
+  if (deadline && typeof deadline !== 'string' ){
+    throw new InvalidException('Invalid deadline')
+  } else if (deadline && +deadline > 4320) {
+    throw new InvalidException('Deadline minutes must be lesser than 4320 (72hours)')
+  } else if ( deadline && +deadline < 0) {
+    throw new InvalidException('Deadline minutes must be a positive amount')
   }
 }
 
@@ -217,7 +247,7 @@ module.exports.validateCollectFees = ({
 }
 
 module.exports.validateIncreaseLiquidity = ({
-  wallet, protocol, tokenId, token0amount, token1amount, slippage
+  wallet, protocol, tokenId, token0amount, token1amount, slippage, deadline
 }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
@@ -234,13 +264,24 @@ module.exports.validateIncreaseLiquidity = ({
   if (!token1amount || typeof token1amount !== 'string') {
     throw new InvalidException('Invalid token1amount')
   }
-  if (!slippage || typeof slippage !== 'string') {
+  if (slippage && typeof slippage !== 'string' ){
     throw new InvalidException('Invalid slippage')
+  } else if (slippage && +slippage > 50) {
+    throw new InvalidException('Slippage percentage must be lesser than 50 (50%)')
+  } else if ( slippage && +slippage < 0) {
+    throw new InvalidException('Slippage percentage must be a positive amount')
+  }
+  if (deadline && typeof deadline !== 'string' ){
+    throw new InvalidException('Invalid deadline')
+  } else if (deadline && +deadline > 4320) {
+    throw new InvalidException('Deadline minutes must be lesser than 4320 (72hours)')
+  } else if ( deadline && +deadline < 0) {
+    throw new InvalidException('Deadline minutes must be a positive amount')
   }
 }
 
 module.exports.validateDecreaseLiquidity = ({
-  wallet, protocol, tokenId, percentageToDecrease, recipient, slippage, burnToken
+  wallet, protocol, tokenId, percentageToDecrease, recipient, slippage, burnToken, deadline
 }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
@@ -257,14 +298,25 @@ module.exports.validateDecreaseLiquidity = ({
   if (recipient !== undefined && typeof recipient !== 'string') {
     throw new InvalidException('Invalid recipient')
   }
-  if (!slippage || typeof slippage !== 'string') {
+  if (slippage && typeof slippage !== 'string' ){
     throw new InvalidException('Invalid slippage')
+  } else if (slippage && +slippage > 50) {
+    throw new InvalidException('Slippage percentage must be lesser than 50 (50%)')
+  } else if ( slippage && +slippage < 0) {
+    throw new InvalidException('Slippage percentage must be a positive amount')
   }
   if (burnToken && typeof burnToken !== 'boolean') {
     throw new InvalidException('Invalid burnToken type. Should be boolean.')
   }
   if (burnToken && percentageToDecrease !== '10000') {
     throw new InvalidException('You may only burn the position\'s token if the entire liquidity is being removed (10000 bps for percentageToDecrease)')
+  }
+  if (deadline && typeof deadline !== 'string' ){
+    throw new InvalidException('Invalid deadline')
+  } else if (deadline && +deadline > 4320) {
+    throw new InvalidException('Deadline minutes must be lesser than 4320 (72hours)')
+  } else if ( deadline && +deadline < 0) {
+    throw new InvalidException('Deadline minutes must be a positive amount')
   }
 }
 

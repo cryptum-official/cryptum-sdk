@@ -8,7 +8,7 @@ const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { SignedTransaction, TransactionType } = require('../../transaction/entity')
 const { signCeloTx } = require('../../../services/blockchain/celo')
-const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateUniswapMintPosition, validateGetTokenIds, validategetPosition, validateCollectFees, validateIncreaseLiquidity, validateDecreaseLiquidity, validateGetPositions, validateGetPosition, validateSwap, validateUniswapGetMintPositionQuotation, validateUniswapGetPoolData, validateObservePool, validateIncreaseCardinality } = require('../../../services/validations/uniswap')
+const { validateUniswapCreatePool, validateUniswapGetPools, validateUniswapGetSwapQuotation, validateGetTokenIds, validateCollectFees, validateIncreaseLiquidity, validateDecreaseLiquidity, validateGetPositions, validateGetPosition, validateSwap, validateUniswapGetMintPositionQuotation, validateUniswapGetPoolData, validateObservePool, validateIncreaseCardinality } = require('../../../services/validations/uniswap')
 
 
 class Controller extends Interface {
@@ -71,8 +71,8 @@ class Controller extends Interface {
    */
   async getMintPositionQuotation(input) {
     validateUniswapGetMintPositionQuotation(input)
-    const { protocol, wallet, amountTokenA, amountTokenB, slippage, pool, recipient, minPriceDelta, maxPriceDelta, wrapped } = input
-    const data = { from: wallet.address, amountTokenA, amountTokenB, minPriceDelta, maxPriceDelta, slippage, pool, recipient: recipient ? recipient : wallet.address, wrapped}
+    const { protocol, wallet, amountTokenA, amountTokenB, slippage, pool, recipient, minPriceDelta, maxPriceDelta, wrapped, deadline} = input
+    const data = { from: wallet.address, amountTokenA, amountTokenB, minPriceDelta, maxPriceDelta, slippage, pool, recipient: recipient ? recipient : wallet.address, wrapped, deadline}
     const response = await makeRequest(
       {
         method: 'post',
@@ -113,23 +113,23 @@ class Controller extends Interface {
         body: data, config: this.config
       })
 
-    let signedTx;
-    switch (protocol) {
-      case Protocol.CELO:
-        signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
-        break;
-      case Protocol.ETHEREUM:
-      case Protocol.POLYGON:
-        signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
-        break;
-      default:
-        throw new InvalidException('Unsupported protocol')
-    }
-    return await tc.sendTransaction(
-      new SignedTransaction({
-        signedTx, protocol, type: TransactionType.MINT_POSITION
-      })
-    )
+    // let signedTx;
+    // switch (protocol) {
+    //   case Protocol.CELO:
+    //     signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
+    //     break;
+    //   case Protocol.ETHEREUM:
+    //   case Protocol.POLYGON:
+    //     signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
+    //     break;
+    //   default:
+    //     throw new InvalidException('Unsupported protocol')
+    // }
+    // return await tc.sendTransaction(
+    //   new SignedTransaction({
+    //     signedTx, protocol, type: TransactionType.MINT_POSITION
+    //   })
+    // )
   }
 
   /**
@@ -311,8 +311,8 @@ class Controller extends Interface {
   async increaseLiquidity(input) {
     validateIncreaseLiquidity(input)
     const tc = getTransactionControllerInstance(this.config)
-    const { protocol, wallet, tokenId, token0amount, token1amount, slippage, wrapped } = input
-    const data = { from: wallet.address, tokenId, token0amount, token1amount, slippage, wrapped }
+    const { protocol, wallet, tokenId, token0amount, token1amount, slippage, wrapped, deadline } = input
+    const data = { from: wallet.address, tokenId, token0amount, token1amount, slippage, wrapped, deadline }
     const { rawTransaction } = await makeRequest(
       {
         method: 'post',
@@ -350,8 +350,8 @@ class Controller extends Interface {
   async decreaseLiquidity(input) {
     validateDecreaseLiquidity(input)
     const tc = getTransactionControllerInstance(this.config)
-    const { protocol, wallet, tokenId, percentageToDecrease, recipient, slippage, burnToken, wrapped } = input
-    const data = { from: wallet.address, tokenId, percentageToDecrease, recipient: recipient ? recipient : wallet.address, slippage, burnToken: burnToken ? burnToken : false, wrapped }
+    const { protocol, wallet, tokenId, percentageToDecrease, recipient, slippage, burnToken, wrapped, deadline } = input
+    const data = { from: wallet.address, tokenId, percentageToDecrease, deadline, recipient: recipient ? recipient : wallet.address, slippage, burnToken: burnToken ? burnToken : false, wrapped }
     const { rawTransaction } = await makeRequest(
       {
         method: 'post',
@@ -417,23 +417,23 @@ class Controller extends Interface {
         body: data, config: this.config
       })
 
-    let signedTx;
-    switch (protocol) {
-      case Protocol.CELO:
-        signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
-        break;
-      case Protocol.ETHEREUM:
-      case Protocol.POLYGON:
-        signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
-        break;
-      default:
-        throw new InvalidException('Unsupported protocol')
-    }
-    return await tc.sendTransaction(
-      new SignedTransaction({
-        signedTx, protocol, type: TransactionType.MINT_POSITION
-      })
-    )
+    // let signedTx;
+    // switch (protocol) {
+    //   case Protocol.CELO:
+    //     signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
+    //     break;
+    //   case Protocol.ETHEREUM:
+    //   case Protocol.POLYGON:
+    //     signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
+    //     break;
+    //   default:
+    //     throw new InvalidException('Unsupported protocol')
+    // }
+    // return await tc.sendTransaction(
+    //   new SignedTransaction({
+    //     signedTx, protocol, type: TransactionType.MINT_POSITION
+    //   })
+    // )
   }
 
   /**
