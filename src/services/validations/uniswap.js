@@ -246,8 +246,8 @@ module.exports.validateCollectFees = ({
   }
 }
 
-module.exports.validateIncreaseLiquidity = ({
-  wallet, protocol, tokenId, token0amount, token1amount, slippage, deadline
+module.exports.validateGetIncreaseLiquidityQuotation = ({
+  wallet, protocol, tokenId, amountTokenA, amountTokenB, slippage, deadline
 }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
@@ -258,11 +258,17 @@ module.exports.validateIncreaseLiquidity = ({
   if (!tokenId || typeof tokenId !== 'string') {
     throw new InvalidException('Invalid tokenId')
   }
-  if (!token0amount || typeof token0amount !== 'string') {
-    throw new InvalidException('Invalid token0amount')
+  if (amountTokenA && typeof amountTokenA !== 'string') {
+    throw new InvalidException('Invalid amountTokenA')
   }
-  if (!token1amount || typeof token1amount !== 'string') {
-    throw new InvalidException('Invalid token1amount')
+  if (amountTokenB && typeof amountTokenB !== 'string') {
+    throw new InvalidException('Invalid amountTokenB')
+  }
+  if(amountTokenA && amountTokenB) {
+    throw new InvalidException('Please provide either amountTokenA or amountTokenB, never both!')
+  }
+  if(!amountTokenA && !amountTokenB) {
+    throw new InvalidException('Please provide amountTokenA or amountTokenB!')
   }
   if (slippage && typeof slippage !== 'string' ){
     throw new InvalidException('Invalid slippage')
