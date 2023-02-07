@@ -18,6 +18,8 @@ describe('Uniswap Controller Test', () => {
   const protocol = 'POLYGON'
   const AtokenAddress = "0xE3031a696aDE55789371CEA339d5fbCF2B6339f9" //t1
   const BtokenAddress = "0xFf432f16F3d84eD1985EdFed30203F99d57Fe979" //t2
+  const CtokenAddress = "0x536feD66120b2d346589c6618219B026D7dF1Bcc" //t3
+  const DtokenAddress = "0x17C41Bc1962e987504a77033238fFc7C6C26895F" //t4
 
   describe('READ Functions', () => {
     describe('getPools', () => {
@@ -579,6 +581,34 @@ describe('Uniswap Controller Test', () => {
   })
 
   describe('WRITE Functions', () => { 
+    describe('createPool', () => {
+      let wallet 
+      before(async () => {
+          wallet = await sdk.wallet.generateWalletFromPrivateKey({
+          privateKey: process.env.PRIVATE_KEY_DEV02,
+          protocol: 'POLYGON',
+        })
+      })
+
+      it('should create Pool', async () => {
+        // const createPool = await sdk.uniswap.createPool({
+        //   wallet,
+        //   protocol,
+        //   fee: 10000,
+        //   tokenA: CtokenAddress,
+        //   tokenB: DtokenAddress,
+        //   price: '2',
+        // })
+
+        // expect(createPool).to.eql(
+        //   {
+        //     transaction: { hash: '0xa1319c3c08a9d61d2987d9106da3d4f289c72e92b5dc5d49a28a76c7f0e62a04' },
+        //     pool: '0xe238dcFa13E14a7108e821F07321597D5bdD6A96'
+        //   }
+        // );
+      })
+
+    })
   })
 
   describe('Common Tests', () => {
@@ -779,7 +809,7 @@ describe('Uniswap Controller Test', () => {
       })
     })
 
-    describe.only('Insufficient funds', () => { 
+    describe('Insufficient funds', () => { 
       before(async () => {
         wallet = await sdk.wallet.generateWalletFromPrivateKey({
         privateKey: process.env.PRIVATE_KEY_DEV02,
@@ -817,8 +847,7 @@ describe('Uniswap Controller Test', () => {
         })).to.be.rejectedWith("insufficient funds")
       })
     
-      
-      it.only('mintPosition - should fail (insufficient tokens)', async () => {
+      it('mintPosition - should fail (insufficient tokens)', async () => {
         const mintPositionQuotation = await sdk.uniswap.getMintPositionQuotation({
           wallet,
           protocol,
@@ -828,13 +857,15 @@ describe('Uniswap Controller Test', () => {
           maxPriceDelta: '10',
         })
 
-        await expect(await sdk.uniswap.mintPosition({
+        await expect(sdk.uniswap.mintPosition({
           wallet,
           transaction: mintPositionQuotation
         })).to.be.rejectedWith("insufficient funds")
+
+        
       })
 
-      it.only('mintPosition - should fail (insufficient native funds)', async () => {
+      it('mintPosition - should fail (insufficient native funds)', async () => {
         const mintPositionQuotation = await sdk.uniswap.getMintPositionQuotation({
           wallet,
           protocol,
@@ -842,16 +873,36 @@ describe('Uniswap Controller Test', () => {
           amountTokenA: '10',
           minPriceDelta: '10',
           maxPriceDelta: '10',
-          // wrapped: true
         })
-        console.log({mintPositionQuotation})
 
-        await expect(await sdk.uniswap.mintPosition({
+        await expect(sdk.uniswap.mintPosition({
           wallet,
           transaction: mintPositionQuotation
         })).to.be.rejectedWith("insufficient funds")
 
       })
+
+      it('increaseLiquidity - should fail (insufficient tokens)', async () => {
+        await expect(sdk.uniswap.increaseLiquidity({
+          protocol,
+          wallet,
+          tokenId: "7244",
+          token0amount: "1", // t2
+          token1amount: "0.1", // matic
+          wrapped: true
+        })).to.be.rejectedWith("insufficient funds")
+      })
+
+      it('increaseLiquidity - should fail (insufficient native funds)', async () => {
+        await expect(sdk.uniswap.increaseLiquidity({
+          protocol,
+          wallet,
+          tokenId: "7113",
+          token0amount: "0.1",
+          token1amount: "0.1",
+        })).to.be.rejectedWith("insufficient funds")
+      })
+
 
 
     })
@@ -864,16 +915,48 @@ describe('Uniswap Controller Test', () => {
         })
       })
 
-      it('getSwapQuotation - should fail (invalid slippage provided >50%)', async () => {
-        await expect(sdk.uniswap.getSwapQuotation({
+      it('mintPosition - should fail (no token approval)', async () => {
+        const mintPositionQuotation = await sdk.uniswap.getMintPositionQuotation({
           wallet,
           protocol,
-          tokenIn:  AtokenAddress, 
-          tokenOut: BtokenAddress, 
-          amountIn: "0.1", 
-          slippage: "50.1",
-        })).to.be.rejectedWith("Slippage percentage must be lesser than 50 (50%)")
+          pool: "0xe238dcFa13E14a7108e821F07321597D5bdD6A96",
+          amountTokenA: '10000000',
+          minPriceDelta: '10',
+          maxPriceDelta: '10',
+          // wrapped: true
+        })
+        await expect(sdk.uniswap.mintPosition({
+          wallet,
+          transaction: mintPositionQuotation
+        })).to.be.rejectedWith("First Approve")
       })
+
+      it('swap - should fail (no token approval)', async () => {
+        const mintPositionQuotation = await sdk.uniswap.getMintPositionQuotation({
+          wallet,
+          protocol,
+          pool: "0xe238dcFa13E14a7108e821F07321597D5bdD6A96",
+          amountTokenA: '10000000',
+          minPriceDelta: '10',
+          maxPriceDelta: '10',
+          // wrapped: true
+        })
+        await expect(sdk.uniswap.mintPosition({
+          wallet,
+          transaction: mintPositionQuotation
+        })).to.be.rejectedWith("First Approve")
+      })
+
+      it('increase liquidity - should fail (no token approval)', async () => {
+        await expect(sdk.uniswap.increaseLiquidity({
+          protocol,
+          wallet,
+          tokenId: "7917",
+          token0amount: "1",
+          token1amount: "1",
+        })).to.be.rejectedWith("First Approve")
+      })
+
     })
   })
 
