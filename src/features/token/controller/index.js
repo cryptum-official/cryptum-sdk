@@ -104,13 +104,11 @@ class Controller extends Interface {
             url: `/tx/build/transfer-token?protocol=${protocol}`,
             body: { tokenSymbol: token, from: wallet.address, destination, amount, fee, contractAddress: token }, config: this.config
           })
-        console.log(builtTx)
         tx = new SignedTransaction({
           signedTx: signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment),
           protocol,
           type: TransactionType.TRANSFER
         })
-        console.log(tx)
         break;
       case Protocol.BITCOIN:
         tx = await tc.createBitcoinTransferTransaction({ wallet, outputs: destination ? [{ address: destination, amount }] : destinations, fee })
