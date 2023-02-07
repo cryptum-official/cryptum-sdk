@@ -5,10 +5,13 @@ const { Protocol } = require('../../../services/blockchain/constants')
 const { ERC20_MINT_METHOD_ABI, ERC20_BURN_METHOD_ABI, ERC20_APPROVE_METHOD_ABI } = require('../../../services/blockchain/contract/abis')
 const { toWei, toLamports } = require('../../../services/blockchain/utils')
 const { validateEvmTokenMint, validateEvmTokenBurn } = require('../../../services/validations/evm')
+const { validateTransferTransactionParams } = require("../../../services/validations")
 const { getContractControllerInstance } = require('../../contract/controller')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
-const { TransactionType, TransactionResponse } = require('../../transaction/entity')
+const { TransactionType, TransactionResponse, SignedTransaction } = require('../../transaction/entity')
 const Interface = require('./interface')
+const { signEthereumTx } = require('../../../services/blockchain/ethereum')
+const { signCeloTx } = require('../../../services/blockchain/celo')
 
 class Controller extends Interface {
   /**
@@ -62,9 +65,10 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async transfer(input) {
+    validateTransferTransactionParams(input)
     const { protocol, token, wallet, destination, amount, destinations, issuer, memo, feeCurrency, fee } = input
     const tc = getTransactionControllerInstance(this.config)
-    let tx;
+    let tx, builtTx;
     switch (protocol) {
       case Protocol.HATHOR:
         tx = await tc.createHathorTransferTransactionFromWallet({
@@ -77,21 +81,37 @@ class Controller extends Interface {
       case Protocol.SOLANA:
         tx = await tc.createSolanaTransferTransaction({ wallet, destination, token, amount })
         break
-      case Protocol.ETHEREUM:
-        tx = await tc.createEthereumTransferTransaction({ wallet, tokenSymbol: token, contractAddress: token, destination, amount })
-        break
       case Protocol.CELO:
-        tx = await tc.createCeloTransferTransaction({ wallet, tokenSymbol: token, contractAddress: token, destination, amount, memo, feeCurrency })
-        break
+        builtTx = await makeRequest(
+          {
+            method: 'post',
+            url: `/tx/build/transfer-token?protocol=${protocol}`,
+            body: { tokenSymbol: token, from: wallet.address, destination, amount, fee, contractAddress: token, feeCurrency, memo }, config: this.config
+          })
+        tx = new SignedTransaction({
+          signedTx: await signCeloTx(builtTx, wallet.privateKey),
+          protocol,
+          type: TransactionType.TRANSFER
+        })
+        break;
+      case Protocol.ETHEREUM:
       case Protocol.BSC:
-        tx = await tc.createBscTransferTransaction({ wallet, tokenSymbol: token, contractAddress: token, destination, amount })
-        break
       case Protocol.POLYGON:
-        tx = await tc.createPolygonTransferTransaction({ wallet, tokenSymbol: token, contractAddress: token, destination, amount })
-        break
       case Protocol.AVAXCCHAIN:
-        tx = await tc.createAvaxCChainTransferTransaction({ wallet, tokenSymbol: token, contractAddress: token, destination, amount })
-        break
+        builtTx = await makeRequest(
+          {
+            method: 'post',
+            url: `/tx/build/transfer-token?protocol=${protocol}`,
+            body: { tokenSymbol: token, from: wallet.address, destination, amount, fee, contractAddress: token }, config: this.config
+          })
+        console.log(builtTx)
+        tx = new SignedTransaction({
+          signedTx: signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment),
+          protocol,
+          type: TransactionType.TRANSFER
+        })
+        console.log(tx)
+        break;
       case Protocol.BITCOIN:
         tx = await tc.createBitcoinTransferTransaction({ wallet, outputs: destination ? [{ address: destination, amount }] : destinations, fee })
         break

@@ -610,3 +610,31 @@ module.exports.validateWalletNft = ({ address, protocol, tokenAddresses }) => {
     throw new InvalidTypeException('tokenAddresses', 'array of strings')
   }
 }
+
+module.exports.validateTransferTransactionParams = (input) => {
+  const protocol = input.protocol;
+
+  switch (protocol) {
+    case Protocol.ETHEREUM:
+    case Protocol.BSC:
+    case Protocol.POLYGON:
+    case Protocol.AVAXCCHAIN:
+      this.validateEthereumTransferTransactionParams(input)
+      break;
+    case Protocol.CELO:
+      this.validateCeloTransferTransactionParams(input)
+      break;
+    case Protocol.HATHOR:
+      this.validateHathorTransferTransactionFromWallet(input)
+      break;
+    case Protocol.BITCOIN:
+      this.validateBitcoinTransferTransactionParams(input)
+      break;
+    case Protocol.RIPPLE:
+      this.validateRippleTransferTransactionParams(input)
+      break;
+    case Protocol.STELLAR:
+      this.validateStellarTransferTransactionParams(input)
+      break;
+  }
+} 
