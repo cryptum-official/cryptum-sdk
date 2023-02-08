@@ -301,8 +301,8 @@ module.exports.validateDecreaseLiquidity = ({
   if (!percentageToDecrease || typeof percentageToDecrease !== 'string') {
     throw new InvalidException('Invalid percentageToDecrease')
   }
-  if (recipient !== undefined && typeof recipient !== 'string') {
-    throw new InvalidException('Invalid recipient')
+  if (+percentageToDecrease < 0 || percentageToDecrease > 100) {
+    throw new InvalidException('percentageToDecrease must be between 0% and 100%')
   }
   if (slippage && typeof slippage !== 'string' ){
     throw new InvalidException('Invalid slippage')

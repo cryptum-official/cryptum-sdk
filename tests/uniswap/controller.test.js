@@ -9,11 +9,6 @@ const sdk = new CryptumSdk({
   apiKey: apikey,
 })
 
-  // function sleep(ms) {
-  //   return new Promise(resolve => setTimeout(resolve, ms));
-  // }
-
-
 describe('Uniswap Controller Test', () => {
   const protocol = 'POLYGON'
   const AtokenAddress = "0xE3031a696aDE55789371CEA339d5fbCF2B6339f9" //t1
@@ -30,7 +25,7 @@ describe('Uniswap Controller Test', () => {
           tokenA: AtokenAddress,
           tokenB: BtokenAddress,
         })
-        // console.log({pools})
+
         expect(pools).to.eql([{
           poolAddress: "0x500e45883F2D25e62af5cb20c45187d5D06472df",
           poolFee: 100
@@ -55,7 +50,7 @@ describe('Uniswap Controller Test', () => {
           tokenA: AtokenAddress,
           tokenB: "0xd6666D2C4e00e5C0f96BC5956Fe514f0f1A4f0AB",
         })
-        // console.log({pools})
+
         expect(pools).to.eql([{
           poolAddress: null,
           poolFee: 100
@@ -83,7 +78,7 @@ describe('Uniswap Controller Test', () => {
           protocol,
           poolAddress: "0x500e45883F2D25e62af5cb20c45187d5D06472df"
         })
-        // console.log({poolData})
+
         expect(poolData).to.eql({
             poolAddress: '0x500e45883F2D25e62af5cb20c45187d5D06472df',
             fee: '100',
@@ -122,7 +117,7 @@ describe('Uniswap Controller Test', () => {
             protocol,
             ownerAddress: '0xb6A5DE345Ecb02460d8372Ea6bBB6127A14123Af',
         })
-        // console.log("getTokenIds", tokenIds)
+
         expect(tokenIds).to.eql([
           '6122', '6124',
           '6467', '6780',
@@ -148,7 +143,7 @@ describe('Uniswap Controller Test', () => {
             protocol,
             tokenId: "7051"
         })
-        // console.log("position", position)
+
         expect(position).to.eql({
           nonce: '0',
           operator: '0x0000000000000000000000000000000000000000',
@@ -183,7 +178,7 @@ describe('Uniswap Controller Test', () => {
             // ownerAddress: '0x43a51e57cC67012688568Ae4E9df164B2d5b093d',
             // poolAddress: '0xC9d335CB5D4859090f1F8f67643441B6d330de0C'
         })
-        // console.log("getPositions", positions)
+
         expect(positions).to.eql([
           {
             tokenId: '6122',
@@ -330,7 +325,7 @@ describe('Uniswap Controller Test', () => {
             poolAddress: '0xC9d335CB5D4859090f1F8f67643441B6d330de0C'
             // ownerAddress: '0x43a51e57cC67012688568Ae4E9df164B2d5b093d',
         })
-        // console.log("getPositions", positions)
+
         expect(positions).to.eql([
           {
             tokenId: '6780',
@@ -416,7 +411,6 @@ describe('Uniswap Controller Test', () => {
   })
 
   describe('Quotation Functions', () => {
-
     describe('getSwapQuotation', () => {
       let wallet 
 
@@ -581,33 +575,159 @@ describe('Uniswap Controller Test', () => {
   })
 
   describe('WRITE Functions', () => { 
+    let wallet 
+
+    before(async () => {
+      wallet = await sdk.wallet.generateWalletFromPrivateKey({
+      privateKey: process.env.PRIVATE_KEY_DEV02,
+      protocol: 'POLYGON',
+    })
+    })
+
     describe('createPool', () => {
-      let wallet 
-      before(async () => {
-          wallet = await sdk.wallet.generateWalletFromPrivateKey({
-          privateKey: process.env.PRIVATE_KEY_DEV02,
-          protocol: 'POLYGON',
-        })
-      })
-
       it('should create Pool', async () => {
-        // const createPool = await sdk.uniswap.createPool({
-        //   wallet,
-        //   protocol,
-        //   fee: 10000,
-        //   tokenA: CtokenAddress,
-        //   tokenB: DtokenAddress,
-        //   price: '2',
-        // })
-
-        // expect(createPool).to.eql(
-        //   {
-        //     transaction: { hash: '0xa1319c3c08a9d61d2987d9106da3d4f289c72e92b5dc5d49a28a76c7f0e62a04' },
-        //     pool: '0xe238dcFa13E14a7108e821F07321597D5bdD6A96'
-        //   }
-        // );
+        const createPool = await sdk.uniswap.createPool({
+          wallet,
+          protocol,
+          fee: 100, // 100x , 500x , 3000 , 10000
+          tokenA: AtokenAddress,
+          tokenB: DtokenAddress,
+          price: '2',
+        })
+        expect(createPool.pool).to.have.length(42)
+        expect(createPool.transaction.hash).to.have.length(66)
       })
 
+      it('should return Pool address if pool already exists', async () => {
+        const createPool = await sdk.uniswap.createPool({
+          wallet,
+          protocol,
+          fee: 10000,
+          tokenA: CtokenAddress,
+          tokenB: DtokenAddress,
+          price: '2',
+        })
+
+
+        expect(createPool).to.have.property('pool', '0xe238dcFa13E14a7108e821F07321597D5bdD6A96')
+        expect(createPool).to.have.property('transaction', null)
+        
+      })
+
+    })
+
+    describe('increaseCardinality', () => {
+      it('should increase cardinality', async () => {
+        const increaseCardinality = await sdk.uniswap.increaseCardinality({
+          protocol,
+          pool: '0x500e45883F2D25e62af5cb20c45187d5D06472df',
+          wallet,
+          cardinality: 2
+        })
+        expect(increaseCardinality.hash).to.have.length(66)
+      })
+
+    })
+
+    describe('decreaseLiqudity', () => {
+      it('should decrease Liquidity', async () => {
+        const createPool = await sdk.uniswap.sdk.uniswap.decreaseLiquidity({
+          protocol,
+          wallet,
+          tokenId: "7053",
+          percentageToDecrease: "1000",
+          slippage: '5',
+        })
+        expect(createPool.pool).to.have.length(42)
+        expect(createPool.transaction.hash).to.have.length(66)
+      })
+
+      it('should fail (invalid percentage to decrease)', async () => {
+        await expect(sdk.uniswap.decreaseLiquidity({
+          protocol,
+          wallet,
+          tokenId: "7053",
+          percentageToDecrease: "101",
+          slippage: '5',
+        })).to.be.rejectedWith('percentageToDecrease must be between 0% and 100%')
+      })
+
+    })
+
+    describe('collectFees', () => {
+      it('should collect Pool fees', async () => {
+        const collectFees = await sdk.uniswap.collectFees({
+          protocol,
+          wallet,
+          tokenId: "7053",
+        })
+        expect(collectFees.hash).to.have.length(66)
+      })
+
+      it('should fail (pool position dont have fee amounts to be collected)', async () => {
+        await expect(sdk.uniswap.collectFees({
+          protocol,
+          wallet,
+          tokenId: "7051",
+        })).to.be.rejectedWith('The position does not have fees to be collected')
+      })
+    })
+
+    describe('swap', () => {
+      it('should execute a swap transaction', async () => {
+        const swapQuotation = await sdk.uniswap.getSwapQuotation({
+          wallet,
+          protocol,
+          tokenIn:  AtokenAddress, 
+          tokenOut: BtokenAddress, 
+          amountIn: "0.01", 
+        })
+
+        const swap = await sdk.uniswap.swap({
+          wallet,
+          transaction: swapQuotation
+        })
+
+        expect(swap.hash).to.have.length(66)
+      })
+    })
+
+    describe('mintPosition', () => {
+      it('should execute a mintPosition transaction', async () => {
+        const mintPositionQuotation = await sdk.uniswap.getMintPositionQuotation({
+          wallet,
+          protocol,
+          pool: "0x500e45883F2D25e62af5cb20c45187d5D06472df",
+          amountTokenA: '0.1',
+          minPriceDelta: '10',
+          maxPriceDelta: '10',
+        })
+
+        const mintPositionTransaction = await sdk.uniswap.mintPosition({
+          wallet,
+          transaction: mintPositionQuotation
+        })
+
+        expect(mintPositionTransaction.hash).to.have.length(66)
+      })
+    })
+
+    describe('increaseLiquidity', () => {
+      it('should execute a increaseLiquidity transaction', async () => {
+        const increaseLiquidityQuotation = await sdk.uniswap.getIncreaseLiquidityQuotation({
+          protocol,
+          wallet,
+          tokenId: "7244",
+          amountTokenA: "0.01"
+        })
+
+        const increaseLiquidityTransaction = await sdk.uniswap.increaseLiquidity({
+          wallet,
+          transaction: increaseLiquidityQuotation
+        })
+
+        expect(increaseLiquidityTransaction.hash).to.have.length(66)
+      })
     })
   })
 
@@ -840,7 +960,7 @@ describe('Uniswap Controller Test', () => {
           tokenOut: BtokenAddress, 
           amountIn: "100", 
         })
-
+        
         await expect(sdk.uniswap.swap({
           wallet,
           transaction: swapQuote
@@ -883,27 +1003,34 @@ describe('Uniswap Controller Test', () => {
       })
 
       it('increaseLiquidity - should fail (insufficient tokens)', async () => {
-        await expect(sdk.uniswap.increaseLiquidity({
+        const increaseLiquidityQuotation = await sdk.uniswap.getIncreaseLiquidityQuotation({
           protocol,
           wallet,
-          tokenId: "7244",
-          token0amount: "1", // t2
-          token1amount: "0.1", // matic
-          wrapped: true
+          tokenId: "7053", // token-token
+          amountTokenA: "30",
+        })
+
+        await expect(sdk.uniswap.increaseLiquidity({
+          wallet,
+          transaction: increaseLiquidityQuotation
         })).to.be.rejectedWith("insufficient funds")
+
       })
 
       it('increaseLiquidity - should fail (insufficient native funds)', async () => {
-        await expect(sdk.uniswap.increaseLiquidity({
+        const increaseLiquidityQuotation = await sdk.uniswap.getIncreaseLiquidityQuotation({
           protocol,
           wallet,
-          tokenId: "7113",
-          token0amount: "0.1",
-          token1amount: "0.1",
+          tokenId: "7244", // matic - token
+          amountTokenA: "7",
+          wrapped: false
+        })
+
+        await expect(sdk.uniswap.increaseLiquidity({
+          wallet,
+          transaction: increaseLiquidityQuotation
         })).to.be.rejectedWith("insufficient funds")
       })
-
-
 
     })
 
@@ -948,12 +1075,17 @@ describe('Uniswap Controller Test', () => {
       })
 
       it('increase liquidity - should fail (no token approval)', async () => {
-        await expect(sdk.uniswap.increaseLiquidity({
+        const increaseLiquidityQuotation = await sdk.uniswap.getIncreaseLiquidityQuotation({
           protocol,
           wallet,
           tokenId: "7917",
-          token0amount: "1",
-          token1amount: "1",
+          amountTokenA: "0.1",
+          wrapped: true
+        })
+
+        await expect(sdk.uniswap.increaseLiquidity({
+          wallet,
+          transaction: increaseLiquidityQuotation
         })).to.be.rejectedWith("First Approve")
       })
 
@@ -961,148 +1093,3 @@ describe('Uniswap Controller Test', () => {
   })
 
 })
-
-// async function run() {
-//   // const protocol = 'POLYGON'
-//   // const wallet = await sdk.wallet.generateWalletFromPrivateKey({
-//   //   privateKey: process.env.PRIVATE_KEY_DEV02,
-//   //   protocol: 'POLYGON',
-//   // })
-//   // console.log(wallet.address)
-
-//   // const AtokenAddress = "0xE3031a696aDE55789371CEA339d5fbCF2B6339f9" //t1
-//   // const BtokenAddress = "0xFf432f16F3d84eD1985EdFed30203F99d57Fe979" //t2
-//   // const VD = "0xd6666D2C4e00e5C0f96BC5956Fe514f0f1A4f0AB" //VD
-//   // const TCO = "0xa4F1C1DA64A29D1A8D7F72700D48826B181f0441" //TC0
-
-//   // const createPool = await sdk.uniswap.createPool({
-//   //   wallet,
-//   //   protocol,
-//   //   fee: 10000,
-//   //   tokenA: AtokenAddress,
-//   //   tokenB: BtokenAddress,
-//   //   price: '999782',
-//   // })
-//   // console.log(createPool)
-
-//   // const mintPositionQuotation = await sdk.uniswap.getMintPositionQuotation({
-//   //   wallet,
-//   //   protocol,
-//   //   pool: "0x500e45883F2D25e62af5cb20c45187d5D06472df",
-//   //   // amountTokenA: '1',
-//   //   amountTokenB: '0.1',
-//   //   minPriceDelta: '10',
-//   //   maxPriceDelta: '10',
-//   //   // slippage: '0.5',
-//   //   // wrapped: true
-//   // })
-//   // console.log('position: ',mintPositionQuotation)
-
-//   // const mintPosition = await sdk.uniswap.mintPosition({
-//   //   wallet,
-//   //   transaction: mintPositionQuotation
-//   // })
-//   // console.log('position: ', mintPosition)
-
-
-//   // const pools = await sdk.uniswap.getPools({
-//   //   protocol,
-//   //   tokenA: AtokenAddress,
-//   //   tokenB: BtokenAddress,
-//   // })
-//   // console.log(pools)
-
-//   // const poolData = await sdk.uniswap.getPoolData({
-//   //   protocol,
-//   //   poolAddress: "0x500e45883F2D25e62af5cb20c45187d5D06472df"
-//   // })
-//   // console.log({poolData})
-
-//   // const swapQuotation = await sdk.uniswap.getSwapQuotation({
-//   //   wallet,
-//   //   protocol,
-//   //   tokenIn: 'matic', 
-//   //   tokenOut: BtokenAddress, 
-//   //   amountIn: "0.1", 
-//   //   // amountOut: "0.1", 
-//   //   // slippage: "0.5",
-//   //   // deadline: "30"
-//   // })
-//   // console.log("SwapQuotation - EXACT_INPUT", swapQuotation)
-
-
-//   // const txSwap = await sdk.uniswap.swap({
-//   //   wallet,
-//   //   transaction: swapQuotation
-//   // })
-//   // console.log("txSwap", txSwap)
-
-//   // const tx1 = await sdk.uniswap.getTokenIds({
-//   //     protocol,
-//   //     ownerAddress: '0xb6A5DE345Ecb02460d8372Ea6bBB6127A14123Af',
-//   //     // ownerAddress: '0x43a51e57cC67012688568Ae4E9df164B2d5b093d',
-//   // })
-//   // console.log("getTokenIds", tx1)
-
-//   // const tx2 = await sdk.uniswap.getPositions({
-//   //     protocol,
-//   //     ownerAddress: '0xb6A5DE345Ecb02460d8372Ea6bBB6127A14123Af',
-//   //     // ownerAddress: '0x43a51e57cC67012688568Ae4E9df164B2d5b093d',
-//   //     // poolAddress: '0xC9d335CB5D4859090f1F8f67643441B6d330de0C'
-//   // })
-//   // console.log("getPositions", tx2)
-
-//   // const tx3 = await sdk.uniswap.getPosition({
-//   //   protocol,
-//   //   tokenId: "7051"
-//   // })
-//   // console.log({tx3})
-
-//   // const tx4 = await sdk.uniswap.collectFees({
-//   //   protocol,
-//   //   wallet,
-//   //   tokenId: "7113",
-//   //   wrapped: true
-//   // })
-//   // console.log({tx4})
-
-//   // const tx4 = await sdk.uniswap.increaseLiquidity({
-//   //   protocol,
-//   //   wallet,
-//   //   tokenId: "7113",
-//   //   token0amount: "0.1",
-//   //   token1amount: "0.1",
-//   //   slippage: '0.5',
-//   //   wrapped: true
-//   // })
-//   // console.log({tx4})
-
-//   // const tx5 = await sdk.uniswap.decreaseLiquidity({
-//   //   protocol,
-//   //   wallet,
-//   //   tokenId: "7053",
-//   //   percentageToDecrease: "1000",
-//   //   slippage: '5',
-//   //   recipient: wallet.address,
-//   //   // burnToken: true
-//   //   wrapped: true
-//   // })
-//   // console.log({tx5})
-
-//   // const tx6 = await sdk.uniswap.observePool({
-//   //   protocol,
-//   //   pool: '0xC9d335CB5D4859090f1F8f67643441B6d330de0C',
-//   //   secondsAgoToCheck: [3600000, 0]
-//   // })
-//   // console.log({tx6})
-
-//   // const tx6 = await sdk.uniswap.increaseCardinality({
-//   //   protocol,
-//   //   pool: '0xC9d335CB5D4859090f1F8f67643441B6d330de0C',
-//   //   wallet,
-//   //   cardinality: 2
-//   // })
-//   // console.log({tx6})
-
-// }
-// run()
