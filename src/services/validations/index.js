@@ -669,11 +669,3 @@ module.exports = {
   validateSmartContractDeployTransactionParams,
   validateSmartContractCallParams
 }
-
-
-// exports.validateEthereumTransferTransactionParams = validateEthereumTransferTransactionParams
-// exports.validateCeloTransferTransactionParams = validateCeloTransferTransactionParams
-// exports.validateHathorTransferTransactionFromWallet = validateHathorTransferTransactionFromWallet
-// exports.validateBitcoinTransferTransactionParams = validateBitcoinTransferTransactionParams
-// exports.validateStellarTransferTransactionParams = validateStellarTransferTransactionParams
-// exports.validateRippleTransferTransactionParams = validateRippleTransferTransactionParams
