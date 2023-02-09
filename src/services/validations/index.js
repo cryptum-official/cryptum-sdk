@@ -625,18 +625,7 @@ const validateTransferTransactionParams = (input) => {
     case Protocol.CELO:
       validateCeloTransferTransactionParams(input)
       break;
-    case Protocol.HATHOR:
-      validateHathorTransferTransactionFromWallet(input)
-      break;
-    case Protocol.BITCOIN:
-      validateBitcoinTransferTransactionParams(input)
-      break;
-    case Protocol.RIPPLE:
-      validateRippleTransferTransactionParams(input)
-      break;
-    case Protocol.STELLAR:
-      validateStellarTransferTransactionParams(input)
-      break;
+
   }
 }
 
