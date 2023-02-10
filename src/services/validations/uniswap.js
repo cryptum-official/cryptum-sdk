@@ -1,18 +1,9 @@
-const { GenericException } = require("../../errors")
-const InvalidException = require("../../errors/InvalidException")
+const { GenericException } = require('../../errors')
+const InvalidException = require('../../errors/InvalidException')
 const BigNumber = require('bignumber.js')
-const { Protocol } = require("../blockchain/constants")
+const { Protocol } = require('../blockchain/constants')
 
-
-module.exports.validateUniswapCreatePool = ({
-  protocol,
-  wallet,
-  fee,
-  tokenA,
-  tokenB,
-  price,
-}) => {
-
+module.exports.validateUniswapCreatePool = ({ protocol, wallet, fee, tokenA, tokenB, price }) => {
   const _fee = new BigNumber(fee)
   if (fee && (typeof fee !== 'number' || _fee.isNaN() || _fee.lte(0))) {
     throw new GenericException('Invalid fee amount', 'InvalidTypeException')
@@ -44,7 +35,7 @@ module.exports.validateUniswapGetMintPositionQuotation = ({
   recipient,
   minPriceDelta,
   maxPriceDelta,
-  deadline
+  deadline,
 }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
@@ -58,17 +49,17 @@ module.exports.validateUniswapGetMintPositionQuotation = ({
   if (amountTokenB && typeof amountTokenB !== 'string') {
     throw new InvalidException('Invalid amountTokenB')
   }
-  if(amountTokenA && amountTokenB) {
+  if (amountTokenA && amountTokenB) {
     throw new InvalidException('Please provide either amountTokenA or amountTokenB, never both!')
   }
-  if(!amountTokenA && !amountTokenB) {
+  if (!amountTokenA && !amountTokenB) {
     throw new InvalidException('Please provide amountTokenA or amountTokenB!')
   }
-  if (slippage && typeof slippage !== 'string' ){
+  if (slippage && typeof slippage !== 'string') {
     throw new InvalidException('Invalid slippage')
   } else if (slippage && +slippage > 50) {
     throw new InvalidException('Slippage percentage must be lesser than 50 (50%)')
-  } else if ( slippage && +slippage < 0) {
+  } else if (slippage && +slippage < 0) {
     throw new InvalidException('Slippage percentage must be a positive amount')
   }
   if (!pool || typeof pool !== 'string') {
@@ -80,14 +71,20 @@ module.exports.validateUniswapGetMintPositionQuotation = ({
   if (!minPriceDelta || typeof minPriceDelta !== 'string') {
     throw new InvalidException('Invalid minPriceDelta')
   }
+  if (+minPriceDelta < 0 || +minPriceDelta >= 100) {
+    throw new InvalidException('minPriceDelta must be a value between 0 and 100%')
+  }
   if (!maxPriceDelta || typeof maxPriceDelta !== 'string') {
     throw new InvalidException('Invalid maxPriceDelta')
   }
-  if (deadline && typeof deadline !== 'string' ){
+  if (+maxPriceDelta < 0 || +maxPriceDelta > 170) {
+    throw new InvalidException('minPriceDelta must be a value between 0 and 170%')
+  }
+  if (deadline && typeof deadline !== 'string') {
     throw new InvalidException('Invalid deadline')
   } else if (deadline && +deadline > 4320) {
     throw new InvalidException('Deadline minutes must be lesser than 4320 (72hours)')
-  } else if ( deadline && +deadline < 0) {
+  } else if (deadline && +deadline < 0) {
     throw new InvalidException('Deadline minutes must be a positive amount')
   }
 }
@@ -99,38 +96,36 @@ module.exports.validateUniswapRemovePosition = ({
   pool,
   recipient,
   tokenId,
-  percentageToRemove
+  percentageToRemove,
 }) => {
-    if (!wallet) {
-        throw new InvalidException('Invalid wallet')
-    }
-    if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
-        throw new InvalidException('Invalid protocol')
-    }
-    if (slippage && typeof slippage !== 'string' ){
-      throw new InvalidException('Invalid slippage')
-    } else if (slippage && +slippage > 50) {
-      throw new InvalidException('Slippage percentage must be lesser than 50 (50%)')
-    } else if ( slippage && +slippage < 0) {
-      throw new InvalidException('Slippage percentage must be a positive amount')
-    }
-    if (!pool || typeof pool !== 'string') {
-        throw new InvalidException('Invalid pool')
-    }
-    if (recipient !== undefined && typeof recipient !== 'string') {
-        throw new InvalidException('Invalid recipient')
-    }
-    if (!tokenId || typeof tokenId !== 'string') {
-        throw new InvalidException('Invalid tokenId')
-    }
-    if (!percentageToRemove || typeof percentageToRemove !== 'string') {
-        throw new InvalidException('Invalid percentageToRemove')
-    }
+  if (!wallet) {
+    throw new InvalidException('Invalid wallet')
+  }
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+    throw new InvalidException('Invalid protocol')
+  }
+  if (slippage && typeof slippage !== 'string') {
+    throw new InvalidException('Invalid slippage')
+  } else if (slippage && +slippage > 50) {
+    throw new InvalidException('Slippage percentage must be lesser than 50 (50%)')
+  } else if (slippage && +slippage < 0) {
+    throw new InvalidException('Slippage percentage must be a positive amount')
+  }
+  if (!pool || typeof pool !== 'string') {
+    throw new InvalidException('Invalid pool')
+  }
+  if (recipient !== undefined && typeof recipient !== 'string') {
+    throw new InvalidException('Invalid recipient')
+  }
+  if (!tokenId || typeof tokenId !== 'string') {
+    throw new InvalidException('Invalid tokenId')
+  }
+  if (!percentageToRemove || typeof percentageToRemove !== 'string') {
+    throw new InvalidException('Invalid percentageToRemove')
+  }
 }
 
-module.exports.validateUniswapGetPools = ({
-  protocol, tokenA, tokenB, poolFee
-}) => {
+module.exports.validateUniswapGetPools = ({ protocol, tokenA, tokenB, poolFee }) => {
   if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
@@ -142,13 +137,14 @@ module.exports.validateUniswapGetPools = ({
   }
   const _fee = new BigNumber(poolFee)
   if (poolFee && (typeof poolFee !== 'number' || _fee.isNaN() || _fee.lte(0))) {
-    throw new GenericException('Invalid fee amount, must be number equals 100 or 500 or 3000 or 10000', 'InvalidTypeException')
+    throw new GenericException(
+      'Invalid fee amount, must be number equals 100 or 500 or 3000 or 10000',
+      'InvalidTypeException'
+    )
   }
 }
 
-module.exports.validateUniswapGetPoolData = ({
-  protocol, poolAddress
-}) => {
+module.exports.validateUniswapGetPoolData = ({ protocol, poolAddress }) => {
   if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
@@ -158,7 +154,14 @@ module.exports.validateUniswapGetPoolData = ({
 }
 
 module.exports.validateUniswapGetSwapQuotation = ({
-  protocol, tokenIn, tokenOut, amountIn, amountOut, slippage, deadline, recipient
+  protocol,
+  tokenIn,
+  tokenOut,
+  amountIn,
+  amountOut,
+  slippage,
+  deadline,
+  recipient,
 }) => {
   if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
@@ -171,35 +174,33 @@ module.exports.validateUniswapGetSwapQuotation = ({
   }
   if (amountOut !== undefined && typeof amountOut !== 'string') {
     throw new InvalidException('Invalid amountOut')
-  } 
+  }
   if (amountIn !== undefined && typeof amountIn !== 'string') {
     throw new InvalidException('Invalid amountIn')
   }
-  if (amountIn === undefined && amountOut === undefined ){
+  if (amountIn === undefined && amountOut === undefined) {
     throw new InvalidException('You must provide amountIn or amountOut')
   }
-  if (amountIn && amountOut ){
+  if (amountIn && amountOut) {
     throw new InvalidException('You must provide either amountIn or amountOut, never both')
   }
-  if (slippage && typeof slippage !== 'string' ){
+  if (slippage && typeof slippage !== 'string') {
     throw new InvalidException('Invalid slippage')
   } else if (slippage && +slippage > 50) {
     throw new InvalidException('Slippage percentage must be lesser than 50 (50%)')
-  } else if ( slippage && +slippage < 0) {
+  } else if (slippage && +slippage < 0) {
     throw new InvalidException('Slippage percentage must be a positive amount')
   }
-  if (deadline && typeof deadline !== 'string' ){
+  if (deadline && typeof deadline !== 'string') {
     throw new InvalidException('Invalid deadline')
   } else if (deadline && +deadline > 4320) {
     throw new InvalidException('Deadline minutes must be lesser than 4320 (72hours)')
-  } else if ( deadline && +deadline < 0) {
+  } else if (deadline && +deadline < 0) {
     throw new InvalidException('Deadline minutes must be a positive amount')
   }
 }
 
-module.exports.validateGetTokenIds = ({
-  protocol, ownerAddress
-}) => {
+module.exports.validateGetTokenIds = ({ protocol, ownerAddress }) => {
   if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
@@ -207,9 +208,7 @@ module.exports.validateGetTokenIds = ({
     throw new InvalidException('Invalid ownerAddress')
   }
 }
-module.exports.validateGetPositions = ({
-  protocol, ownerAddress, poolAddress
-}) => {
+module.exports.validateGetPositions = ({ protocol, ownerAddress, poolAddress }) => {
   if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
@@ -221,9 +220,7 @@ module.exports.validateGetPositions = ({
   }
 }
 
-module.exports.validateGetPosition = ({
-  protocol, tokenId
-}) => {
+module.exports.validateGetPosition = ({ protocol, tokenId }) => {
   if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
@@ -232,9 +229,7 @@ module.exports.validateGetPosition = ({
   }
 }
 
-module.exports.validateCollectFees = ({
-  wallet, protocol, tokenId
-}) => {
+module.exports.validateCollectFees = ({ wallet, protocol, tokenId }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
@@ -247,7 +242,13 @@ module.exports.validateCollectFees = ({
 }
 
 module.exports.validateGetIncreaseLiquidityQuotation = ({
-  wallet, protocol, tokenId, amountTokenA, amountTokenB, slippage, deadline
+  wallet,
+  protocol,
+  tokenId,
+  amountTokenA,
+  amountTokenB,
+  slippage,
+  deadline,
 }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
@@ -264,33 +265,43 @@ module.exports.validateGetIncreaseLiquidityQuotation = ({
   if (amountTokenB && typeof amountTokenB !== 'string') {
     throw new InvalidException('Invalid amountTokenB')
   }
-  if(amountTokenA && amountTokenB) {
+  if (amountTokenA && amountTokenB) {
     throw new InvalidException('Please provide either amountTokenA or amountTokenB, never both!')
   }
-  if(!amountTokenA && !amountTokenB) {
+  if (!amountTokenA && !amountTokenB) {
     throw new InvalidException('Please provide amountTokenA or amountTokenB!')
   }
-  if (slippage && typeof slippage !== 'string' ){
+  if (slippage && typeof slippage !== 'string') {
     throw new InvalidException('Invalid slippage')
   } else if (slippage && +slippage > 50) {
     throw new InvalidException('Slippage percentage must be lesser than 50 (50%)')
-  } else if ( slippage && +slippage < 0) {
+  } else if (slippage && +slippage < 0) {
     throw new InvalidException('Slippage percentage must be a positive amount')
   }
-  if (deadline && typeof deadline !== 'string' ){
+  if (deadline && typeof deadline !== 'string') {
     throw new InvalidException('Invalid deadline')
   } else if (deadline && +deadline > 4320) {
     throw new InvalidException('Deadline minutes must be lesser than 4320 (72hours)')
-  } else if ( deadline && +deadline < 0) {
+  } else if (deadline && +deadline < 0) {
     throw new InvalidException('Deadline minutes must be a positive amount')
   }
 }
 
 module.exports.validateDecreaseLiquidity = ({
-  wallet, protocol, tokenId, percentageToDecrease, recipient, slippage, burnToken, deadline
+  wallet,
+  protocol,
+  tokenId,
+  percentageToDecrease,
+  recipient,
+  slippage,
+  burnToken,
+  deadline,
 }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
+  }
+  if (recipient && typeof recipient !== 'string') {
+    throw new InvalidException('Invalid recipient')
   }
   if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
@@ -304,30 +315,31 @@ module.exports.validateDecreaseLiquidity = ({
   if (+percentageToDecrease < 0 || percentageToDecrease > 100) {
     throw new InvalidException('percentageToDecrease must be between 0% and 100%')
   }
-  if (slippage && typeof slippage !== 'string' ){
+  if (slippage && typeof slippage !== 'string') {
     throw new InvalidException('Invalid slippage')
   } else if (slippage && +slippage > 50) {
     throw new InvalidException('Slippage percentage must be lesser than 50 (50%)')
-  } else if ( slippage && +slippage < 0) {
+  } else if (slippage && +slippage < 0) {
     throw new InvalidException('Slippage percentage must be a positive amount')
   }
   if (burnToken && typeof burnToken !== 'boolean') {
     throw new InvalidException('Invalid burnToken type. Should be boolean.')
   }
-  if (burnToken && percentageToDecrease !== '10000') {
-    throw new InvalidException('You may only burn the position\'s token if the entire liquidity is being removed (10000 bps for percentageToDecrease)')
+  if (burnToken && percentageToDecrease !== '100') {
+    throw new InvalidException(
+      "You may only burn the position's token if the entire liquidity is being removed (10000 bps for percentageToDecrease)"
+    )
   }
-  if (deadline && typeof deadline !== 'string' ){
+  if (deadline && typeof deadline !== 'string') {
     throw new InvalidException('Invalid deadline')
   } else if (deadline && +deadline > 4320) {
     throw new InvalidException('Deadline minutes must be lesser than 4320 (72hours)')
-  } else if ( deadline && +deadline < 0) {
+  } else if (deadline && +deadline < 0) {
     throw new InvalidException('Deadline minutes must be a positive amount')
   }
 }
 
-module.exports.validateObservePool = ({
-  protocol,pool, secondsAgoToCheck }) => {
+module.exports.validateObservePool = ({ protocol, pool, secondsAgoToCheck }) => {
   if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
@@ -339,8 +351,7 @@ module.exports.validateObservePool = ({
   }
 }
 
-module.exports.validateIncreaseCardinality = ({
-  wallet, protocol, pool, cardinality }) => {
+module.exports.validateIncreaseCardinality = ({ wallet, protocol, pool, cardinality }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
@@ -355,8 +366,7 @@ module.exports.validateIncreaseCardinality = ({
   }
 }
 
-module.exports.validateSwap = ({
-  transaction, wallet }) => {
+module.exports.validateSwap = ({ transaction, wallet }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
