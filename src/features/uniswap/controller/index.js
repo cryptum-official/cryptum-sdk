@@ -23,6 +23,8 @@ const {
   validateObservePool,
   validateIncreaseCardinality,
   validateGetIncreaseLiquidityQuotation,
+  validateMintPosition,
+  validateIncreaseLiquidity,
 } = require('../../../services/validations/uniswap')
 
 class Controller extends Interface {
@@ -79,25 +81,25 @@ class Controller extends Interface {
   }
 
   /**
-   * Mints a position relative to a liquidity pool
-   * @param {import('../entity').MintPositionInput} input
-   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+   * Build a quotation object for minting a position relative to a liquidity pool
+   * @param {import('../entity').GetMintPositionQuotationInput} input
+   * @returns {Promise<import('../../transaction/entity').GetMintPositionQuotationResponse>}
    *
    * @description
-   * Mints a position relative to a liquidity pool
+   * Gets quotation amounts for tokenA and token B and builds the transaction code for Minting a position relative to a liquidity pool
    */
   async getMintPositionQuotation(input) {
     validateUniswapGetMintPositionQuotation(input)
     const {
       protocol,
       wallet,
+      pool,
       amountTokenA,
       amountTokenB,
-      slippage,
-      pool,
-      recipient,
       minPriceDelta,
       maxPriceDelta,
+      slippage,
+      recipient,
       wrapped,
       deadline,
     } = input
@@ -122,9 +124,17 @@ class Controller extends Interface {
     return response
   }
 
+  /**
+   * Executes a Mint Position Transaction
+   * @param {import('../entity').MintPositionInput} input
+   * @returns {Promise<import('../../transaction/entity').MintPositionResponse>}
+   *
+   * @description
+   * Sends a transaction to the blockchain for minting a position according to the mintPositionQuotation Object
+   */
   async mintPosition(input) {
     const { transaction, wallet } = input
-    // validateMintPosition(input)
+    validateMintPosition(input)
     const tc = getTransactionControllerInstance(this.config)
     let protocol
     let value
@@ -179,7 +189,7 @@ class Controller extends Interface {
   /**
    * Get Uniswap Pool Addresses
    * @param {import('../entity').GetPoolsInput} input
-   * @returns {Promise<import('../../transaction/entity').CreateGetPoolsResponse>}
+   * @returns {Promise<import('../../transaction/entity').GetPoolsResponse>}
    *
    * @description
    * If no Pool Fee is specified, Pool addresses for all possible fee ranges will be returned
@@ -221,7 +231,7 @@ class Controller extends Interface {
   /**
    * Get a Swap Price Quotation using UniSwap Protocol
    * @param {import('../entity').GetSwapQuotationInput} input
-   * @returns {Promise<import('../../transaction/entity').CreateGetSwapQuotation>}
+   * @returns {Promise<import('../../transaction/entity').GetSwapQuotationResponse>}
    *
    * @description
    * Returns the quotation for a swap
@@ -250,7 +260,7 @@ class Controller extends Interface {
   /**
    * Get All Uniswap Token Ids By owner address
    * @param {import('../entity').GetTokenIdsInput} input
-   * @returns {Promise<import('../../transaction/entity').CreateGetTokenIds>}
+   * @returns {Promise<import('../../transaction/entity').GetTokenIdsResponse>}
    *
    * @description
    * Returns All the token ids owned by a wallet address
@@ -271,7 +281,7 @@ class Controller extends Interface {
   /**
    * Get Uniswap Pool Positions by owner address (optional:filter by pool)
    * @param {import('../entity').GetPositionsInput} input
-   * @returns {Promise<import('../../transaction/entity').CreateGetPositions>}
+   * @returns {Promise<import('../../transaction/entity').GetPositionsResponse>}
    *
    * @description
    * Returns pool positions and token ids from owner wallet address
@@ -292,7 +302,7 @@ class Controller extends Interface {
   /**
    * Reads a position from a tokenId
    * @param {import('../entity').GetPositionInput} input
-   * @returns {Promise<import('../../transaction/entity').CreateGetPosition>}
+   * @returns {Promise<import('../../transaction/entity').GetPositionResponse>}
    *
    * @description
    * Returns the position infos
@@ -349,23 +359,22 @@ class Controller extends Interface {
       new SignedTransaction({
         signedTx,
         protocol,
-        type: TransactionType.MINT_POSITION,
+        type: TransactionType.COLLECT_FEES,
       })
     )
   }
 
   /**
    * Increase liquidity from pair tokens in a specific pool
-   * @param {import('../entity').IncreaseLiquidityInput} input
-   * @returns {Promise<import('../../transaction/entity').IncreaseLiquidityResponse>}
+   * @param {import('../entity').getIncreaseLiquidityQuotationInput} input
+   * @returns {Promise<import('../../transaction/entity').GetIncreaseLiquidityQuotationResponse>}
    *
    * @description
-   * Increases liquidity for token0 and token1 given the position TokenID from pool
+   * Increases liquidity for tokenA and tokenB given the position TokenID from pool
    */
   async getIncreaseLiquidityQuotation(input) {
     validateGetIncreaseLiquidityQuotation(input)
-    const tc = getTransactionControllerInstance(this.config)
-    const { protocol, wallet, tokenId, amountTokenA, amountTokenB, slippage, wrapped, deadline } = input
+    const { protocol, tokenId, amountTokenA, amountTokenB, slippage, wrapped, deadline } = input
     const data = { tokenId, amountTokenA, amountTokenB, slippage, wrapped, deadline }
     const response = await makeRequest({
       method: 'post',
@@ -378,16 +387,16 @@ class Controller extends Interface {
   }
 
   /**
-   *Executes a Increase Liquidity
-   * @param {import('../entity').SwapInput} input
-   * @returns {Promise<import('../../transaction/entity').SwapResponse>}
+   *Executes a Increase Liquidity transaction
+   * @param {import('../entity').IncreaseLiquidityInput} input
+   * @returns {Promise<import('../../transaction/entity').IncreaseLiquidityResponse>}
    *
    * @description
    * Increases liquidity in a position by proving a quotation Object
    */
   async increaseLiquidity(input) {
     const { transaction, wallet } = input
-    // validateMintPosition(input)
+    validateIncreaseLiquidity(input)
     const tc = getTransactionControllerInstance(this.config)
     let protocol
     let value
@@ -437,7 +446,7 @@ class Controller extends Interface {
       new SignedTransaction({
         signedTx,
         protocol,
-        type: TransactionType.MINT_POSITION,
+        type: TransactionType.INCREASE_LIQUIDITY,
       })
     )
   }
@@ -487,13 +496,13 @@ class Controller extends Interface {
       new SignedTransaction({
         signedTx,
         protocol,
-        type: TransactionType.MINT_POSITION,
+        type: TransactionType.DECREASE_LIQUIDITY,
       })
     )
   }
 
   /**
-   * Exucutes a swap from a quotationObject
+   * Exucutes a swap from a quotation Object
    * @param {import('../entity').SwapInput} input
    * @returns {Promise<import('../../transaction/entity').SwapResponse>}
    *
@@ -549,7 +558,7 @@ class Controller extends Interface {
       new SignedTransaction({
         signedTx,
         protocol,
-        type: TransactionType.MINT_POSITION,
+        type: TransactionType.SWAP,
       })
     )
   }

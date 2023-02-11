@@ -28,6 +28,10 @@ const TransactionType = {
   REMOVE_POSITION: 'REMOVE_POSITION',
   GET_POOL: 'GET_POOL',
   INCREASE_CARDINALITY: 'INCREASE_CARDINALITY',
+  INCREASE_LIQUIDITY: 'INCREASE_LIQUIDITY',
+  DECREASE_LIQUIDITY: 'INCREASE_LIQUIDITY',
+  COLLECT_FEES: 'COLLECT_FEES',
+  SWAP: 'SWAP',
 }
 /**
  * @typedef {object | string} Fee
@@ -89,44 +93,144 @@ class CreatePoolResponse {
     this.pool = pool
   }
 }
-class MintPositionResponse {
+class GetIncreaseLiquidityQuotationResponse {
   /**
-   * Creates an instance of TransactionResponse
+   * Creates an instance of GetIncreaseLiquidityQuotation
    *
    * @param {object} response
-   * @param {TransactionResponse} response.transaction transaction response object
-   * @param {string} response.tokenId the ID of the token that represents the minted position
-   * @param {string} response.liquidity the amount of liquidity for this position
-   * @param {string} response.amountA the amount of tokenA that was used for this position
-   * @param {string} response.amountB the amount of tokenB that was used for this position
+   * @param {object} response.increaseLiquidityQuotation Quotation amounts for tokenA and tokenB
+   * @param {string} response.increaseLiquidityQuotation.amountA amount of token A to be consumed by transaction
+   * @param {string} response.increaseLiquidityQuotation.amountB amount of token B to be consumed by transaction
+   * @param {object} response.increaseLiquidityTransaction The transaction data to be executed
+   * @param {string} response.increaseLiquidityTransaction.calldata  hex string of the current transaction
+   * @param {string} response.increaseLiquidityTransaction.value  amount of native token to be sent in this transaction
+   * @param {string} response.increaseLiquidityTransaction.protocol  protocol of transaction
+   * @param {string} response.increaseLiquidityTransaction.tokenA address of tokenA
+   * @param {string} response.increaseLiquidityTransaction.tokenB  address of tokenB
    */
-  constructor({ transaction, tokenId, liquidity, amountA, amountB }) {
-    this.transaction = transaction
-    this.tokenId = tokenId
-    this.liquidity = liquidity
-    this.amountA = amountA
-    this.amountB = amountB
+  constructor({
+    increaseLiquidityQuotation,
+    increaseLiquidityTransaction,
+    value,
+    protocol,
+    amountA,
+    amountB,
+    calldata,
+    tokenA,
+    tokenB,
+  }) {
+    this.increaseLiquidityQuotation = increaseLiquidityQuotation
+    this.increaseLiquidityQuotation.amountA = amountA
+    this.increaseLiquidityQuotation.amountB = amountB
+    this.increaseLiquidityTransaction = increaseLiquidityTransaction
+    this.increaseLiquidityTransaction.calldata = calldata
+    this.increaseLiquidityTransaction.value = value
+    this.increaseLiquidityTransaction.protocol = protocol
+    this.increaseLiquidityTransaction.tokenA = tokenA
+    this.increaseLiquidityTransaction.tokenB = tokenB
   }
 }
-class CreateGetPoolsResponse {
+class GetMintPositionQuotationResponse {
+  /**
+   * Creates an instance of GetMintPositionQuotation
+   *
+   * @param {object} response
+   * @param {object} response.mintPositionQuotation Quotation amounts for tokenA and tokenB
+   * @param {string} response.mintPositionQuotation.amountA amount of token A to be consumed by transaction
+   * @param {string} response.mintPositionQuotation.amountB amount of token B to be consumed by transaction
+   * @param {object} response.mintPositionTransaction The transaction data to be executed
+   * @param {string} response.mintPositionTransaction.calldata  hex string of the current transaction
+   * @param {string} response.mintPositionTransaction.value  amount of native token to be sent in this transaction
+   * @param {string} response.mintPositionTransaction.protocol  protocol of transaction
+   * @param {string} response.mintPositionTransaction.tokenA address of tokenA
+   * @param {string} response.mintPositionTransaction.tokenB  address of tokenB
+   */
+  constructor({
+    mintPositionQuotation,
+    mintPositionTransaction,
+    value,
+    protocol,
+    amountA,
+    amountB,
+    calldata,
+    tokenA,
+    tokenB,
+  }) {
+    this.mintPositionQuotation = mintPositionQuotation
+    this.mintPositionQuotation.amountA = amountA
+    this.mintPositionQuotation.amountB = amountB
+    this.mintPositionTransaction = mintPositionTransaction
+    this.mintPositionTransaction.calldata = calldata
+    this.mintPositionTransaction.value = value
+    this.mintPositionTransaction.protocol = protocol
+    this.mintPositionTransaction.tokenA = tokenA
+    this.mintPositionTransaction.tokenB = tokenB
+  }
+}
+class GetPoolsResponse {
   /**
    * Creates an instance of CreateGetPoolsResponse
    *
-   * @param {Object<PoolFeeResponse>} response Object of PoolFee responses
+   * @param {Array.<{poolFee: String, poolAddress: String}>} response
+   * @param {string} this.response[].poolFee
+   * @param {string} this.response[].poolAddress
    */
-  constructor({ response }) {
-    this.response = response
+  constructor({ poolFee, poolAddress }) {
+    this[0].poolFee = poolFee
+    this[0].poolAddress = poolAddress
   }
 }
 
-class CreateGetPoolDataResponse {
+class GetPoolDataResponse {
   /**
    * Creates an instance of CreateGetPoolsResponse
    *
-   * @param {Object<PoolDataResponse>} response Object of pool data responses
+   * @param {Object} response Object of pool data responses
+   * @param {string} response.poolAddress address of the pool
+   * @param {string} response.fee transactions fee for the pool
+   * @param {string} response.token0 token0 from the pool
+   * @param {string} response.token1 token1 from the pool
+   * @param {string} response.liquidity liquidity of the pool
+   * @param {string} response.tickSpacing tickspacing of the pool
+   * @param {Object} response.slot0 slot0 of the pool
+   * @param {string} response.slot0.sqrtPriceX96 sqrtPriceX96
+   * @param {string} response.slot0.tick tick
+   * @param {string} response.slot0.observationIndex observationIndex
+   * @param {string} response.slot0.observationCardinality observationCardinality
+   * @param {string} response.slot0.observationCardinalityNext observationCardinalityNext
+   * @param {string} response.slot0.feeProtocol feeProtocol
+   * @param {string} response.slot0.unlocked unlocked
    */
-  constructor({ response }) {
-    this.response = response
+  constructor({
+    poolAddress,
+    fee,
+    token0,
+    token1,
+    liquidity,
+    tickSpacing,
+    slot0,
+    sqrtPriceX96,
+    tick,
+    observationIndex,
+    observationCardinality,
+    observationCardinalityNext,
+    feeProtocol,
+    unlocked,
+  }) {
+    this.poolAddress = poolAddress
+    this.fee = fee
+    this.token0 = token0
+    this.token1 = token1
+    this.liquidity = liquidity
+    this.tickSpacing = tickSpacing
+    this.slot0 = slot0
+    this.slot0.sqrtPriceX96 = sqrtPriceX96
+    this.slot0.tick = tick
+    this.slot0.observationIndex = observationIndex
+    this.slot0.observationCardinality = observationCardinality
+    this.slot0.observationCardinalityNext = observationCardinalityNext
+    this.slot0.feeProtocol = feeProtocol
+    this.slot0.unlocked = unlocked
   }
 }
 
@@ -137,88 +241,51 @@ class ObservePoolResponse {
    * @param {object} response
    * @param {string} response.observedPrices array of prices at specified times
    */
-   constructor({ observedPrices }) {
+  constructor({ observedPrices }) {
     this.observedPrices = observedPrices
   }
 }
 
-class PoolFeeResponse {
-  /**
-   *
-   * @param {string} this.poolFee 
-   * @param {string} this.poolAddress
-   */
-  constructor({ poolFee, poolAddress }) {
-    this.poolFee = poolFee
-    this.poolAddress = poolAddress
-  }
-}
-
-class PoolDataResponse {
-  /**
-   *
-   * @param {string} this.poolAddress
-   * @param {string} this.fee 
-   * @param {string} this.token0 
-   * @param {string} this.token1 
-   * @param {string} this.liquidity 
-   * @param {string} this.liquidity 
-   * @param {string} this.tickSpacing 
-   * @param {Object<slot0>} this.liquidity 
-   */
-  constructor({ poolFee, poolAddress }) {
-    this.poolFee = fee
-    this.poolAddress = poolAddress
-  }
-}
-
-class slot0 {
-  /**
-   *
-   * @param {string} this.sqrtPriceX96 
-   * @param {string} this.tick
-   * @param {string} this.observationIndex
-   * @param {string} this.observationCardinality
-   * @param {string} this.observationCardinalityNext
-   * @param {string} this.feeProtocol
-   * @param {boolean} this.unlocked
-   */
-  constructor({ sqrtPriceX96, tick, observationIndex, observationCardinality, observationCardinalityNext, feeProtocol, unlocked}) {
-    this.sqrtPriceX96 = sqrtPriceX96
-    this.tick = tick
-    this.observationIndex = observationIndex
-    this.observationCardinality = observationCardinality
-    this.observationCardinalityNext = observationCardinalityNext
-    this.feeProtocol = feeProtocol
-    this.unlocked = unlocked
-  }
-}
-
-class CreateGetSwapQuotation {
+class GetSwapQuotationResponse {
   /**
    * Creates an instance of CreateGetSwapQuotation
    *
-   * @param {number} response.tokenIn Token to be Swapped
-   * @param {number} response.tokenOut Swapped token
+   * @param {object} response
+   * @param {object} response.swapQuotation Quotation amounts for tokenA and tokenB
+   * @param {string} response.swapQuotation.tokenIn amount of token In to be consumed by transaction
+   * @param {string} response.swapQuotation.tokenOut amount of token Out to be received from transaction
+   * @param {object} response.swapTransaction The transaction data to be executed
+   * @param {string} response.swapTransaction.calldata  hex string of the current transaction
+   * @param {string} response.swapTransaction.value  amount of native token to be sent in this transaction
+   * @param {string} response.swapTransaction.protocol  protocol for this transaction
+   * @param {string} response.swapTransaction.tokenIn  address of tokenIn
+   * @param {string} response.swapTransaction.tokenOut  address of tokenOut
    */
-  constructor({ tokenIn, tokenOut }) {
-    this.tokenIn = tokenIn
-    this.tokenOut = tokenOut
+  constructor({ swapQuotation, tokenIn, tokenOut, swapTransaction, calldata, value, protocol }) {
+    this.swapQuotation = swapQuotation
+    this.swapQuotation.tokenIn = tokenIn
+    this.swapQuotation.tokenOut = tokenOut
+    this.swapTransaction = swapTransaction
+    this.swapTransaction.calldata = calldata
+    this.swapTransaction.value = value
+    this.swapTransaction.protocol = protocol
+    this.swapTransaction.tokenIn = tokenIn
+    this.swapTransaction.tokenOut = tokenOut
   }
 }
-class CreateGetTokenIds {
+class GetTokenIdsResponse {
   /**
    * Creates an instance of CreategetTokenIds
    *
-   * @param {Object} response response
+   * @param {Array} response Array of token Ids
    */
   constructor({ response }) {
     this.response = response
   }
 }
-class CreateGetPosition {
+class GetPositionsResponse {
   /**
-   * Creates an instance of CreateGetPosition 
+   * Creates an instance of CreateGetPosition
    *
    * @param {string} response response
    */
@@ -226,14 +293,59 @@ class CreateGetPosition {
     this.response = response
   }
 }
-class CreateGetPositions {
+class GetPositionResponse {
   /**
-   * Creates an instance of CreateGetPositions 
+   * Creates an instance of CreateGetPositions
    *
-   * @param {string} response response
+    @param {Object} response An Array of Positions infos
+    @param {string} response.nonce xxx
+    @param {string} response.operator xxx
+    @param {string} response.token0 xxx
+    @param {string} response.token1 xxx
+    @param {string} response.fee xxx
+    @param {string} response.tickLower xxx
+    @param {string} response.tickUpper xxx
+    @param {string} response.liquidity: xxx
+    @param {string} response.feeGrowthInside0LastX128 xxx
+    @param {string} response.feeGrowthInside1LastX128 xxx
+    @param {string} response.tokensOwed0 xxx
+    @param {string} response.tokensOwed1: xxx
    */
-  constructor({ response }) {
-    this.response = response
+  constructor({
+    operator,
+    token0,
+    token1,
+    fee,
+    tickLower,
+    tickUpper,
+    liquidity,
+    feeGrowthInside0LastX128,
+    feeGrowthInside1LastX128,
+    tokensOwed0,
+    tokensOwed1,
+  }) {
+    this.nonce = nonce
+    this.operator = operator
+    this.token0 = token0
+    this.token1 = token1
+    this.fee = fee
+    this.tickLower = tickLower
+    this.tickUpper = tickUpper
+    this.liquidity = liquidity
+    this.feeGrowthInside0LastX128 = feeGrowthInside0LastX128
+    this.feeGrowthInside1LastX128 = feeGrowthInside1LastX128
+    this.tokensOwed0 = tokensOwed0
+    this.tokensOwed1 = tokensOwed1
+  }
+}
+class MintPositionResponse {
+  /**
+   * Creates an instance of MintPositionResponse
+   *
+   * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
+   */
+  constructor({ transaction }) {
+    this.transaction = transaction
   }
 }
 class CollectFeesResponse {
@@ -766,14 +878,16 @@ module.exports = {
   TransactionResponse,
   FeeResponse,
   CreatePoolResponse,
-  MintPositionResponse,
-  CreateGetPoolsResponse,
-  CreateGetPoolDataResponse,
-  CreateGetSwapQuotation,
-  CreateGetTokenIds,
-  CreateGetPosition,
-  CreateGetPositions,
+  GetMintPositionQuotationResponse,
+  GetIncreaseLiquidityQuotationResponse,
+  GetPoolsResponse,
+  GetPoolDataResponse,
+  GetSwapQuotationResponse,
+  GetTokenIdsResponse,
+  GetPositionResponse,
+  GetPositionsResponse,
   CollectFeesResponse,
+  MintPositionResponse,
   IncreaseLiquidityResponse,
   DecreaseLiquidityResponse,
   ObservePoolResponse,

@@ -36,6 +36,7 @@ module.exports.validateUniswapGetMintPositionQuotation = ({
   minPriceDelta,
   maxPriceDelta,
   deadline,
+  wrapped,
 }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
@@ -45,6 +46,9 @@ module.exports.validateUniswapGetMintPositionQuotation = ({
   }
   if (amountTokenA && typeof amountTokenA !== 'string') {
     throw new InvalidException('Invalid amountTokenA')
+  }
+  if (wrapped && typeof wrapped !== 'boolean') {
+    throw new InvalidException('Invalid wrapped value, must be true or false boolean')
   }
   if (amountTokenB && typeof amountTokenB !== 'string') {
     throw new InvalidException('Invalid amountTokenB')
@@ -198,6 +202,9 @@ module.exports.validateUniswapGetSwapQuotation = ({
   } else if (deadline && +deadline < 0) {
     throw new InvalidException('Deadline minutes must be a positive amount')
   }
+  if (recipient !== undefined && typeof recipient !== 'string') {
+    throw new InvalidException('Invalid recipient')
+  }
 }
 
 module.exports.validateGetTokenIds = ({ protocol, ownerAddress }) => {
@@ -286,7 +293,6 @@ module.exports.validateGetIncreaseLiquidityQuotation = ({
     throw new InvalidException('Deadline minutes must be a positive amount')
   }
 }
-
 module.exports.validateDecreaseLiquidity = ({
   wallet,
   protocol,
@@ -296,6 +302,7 @@ module.exports.validateDecreaseLiquidity = ({
   slippage,
   burnToken,
   deadline,
+  wrapped,
 }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
@@ -337,6 +344,9 @@ module.exports.validateDecreaseLiquidity = ({
   } else if (deadline && +deadline < 0) {
     throw new InvalidException('Deadline minutes must be a positive amount')
   }
+  if (wrapped && typeof wrapped !== 'boolean') {
+    throw new InvalidException('Invalid wrapped value, must be true or false boolean')
+  }
 }
 
 module.exports.validateObservePool = ({ protocol, pool, secondsAgoToCheck }) => {
@@ -367,6 +377,24 @@ module.exports.validateIncreaseCardinality = ({ wallet, protocol, pool, cardinal
 }
 
 module.exports.validateSwap = ({ transaction, wallet }) => {
+  if (!wallet) {
+    throw new InvalidException('Invalid wallet')
+  }
+  if (!transaction) {
+    throw new InvalidException('missing transaction argument')
+  }
+}
+
+module.exports.validateMintPosition = ({ transaction, wallet }) => {
+  if (!wallet) {
+    throw new InvalidException('Invalid wallet')
+  }
+  if (!transaction) {
+    throw new InvalidException('missing transaction argument')
+  }
+}
+
+module.exports.validateIncreaseLiquidity = ({ transaction, wallet }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
