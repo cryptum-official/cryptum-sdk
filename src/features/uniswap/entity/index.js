@@ -62,8 +62,8 @@
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
  * @property {string} tokeIn address of the input token to be sent
  * @property {string} tokenOut address of output token to be received
- * @property {string} AmountIn amount of input token to send
- * @property {string} AmountOut amount of result token to get
+ * @property {string} amountIn amount of input token to send
+ * @property {string} amountOut amount of result token to get
  * @property {string} slippage allowed levels of slippage (in percentage points)
  * @property {string} deadline your transaction will revert if it is pending for more than this period of time (in minutes)
  * @property {string} recipient the recipient address that will receive the swap funds

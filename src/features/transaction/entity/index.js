@@ -287,7 +287,7 @@ class GetPositionsResponse {
   /**
    * Creates an instance of CreateGetPosition
    *
-   * @param {string} response response
+   * @param {Array} response Array of positions
    */
   constructor({ response }) {
     this.response = response
@@ -298,18 +298,18 @@ class GetPositionResponse {
    * Creates an instance of CreateGetPositions
    *
     @param {Object} response An Array of Positions infos
-    @param {string} response.nonce xxx
-    @param {string} response.operator xxx
-    @param {string} response.token0 xxx
-    @param {string} response.token1 xxx
-    @param {string} response.fee xxx
-    @param {string} response.tickLower xxx
-    @param {string} response.tickUpper xxx
-    @param {string} response.liquidity: xxx
-    @param {string} response.feeGrowthInside0LastX128 xxx
-    @param {string} response.feeGrowthInside1LastX128 xxx
-    @param {string} response.tokensOwed0 xxx
-    @param {string} response.tokensOwed1: xxx
+    @param {string} response.nonce nonce
+    @param {string} response.operator operator
+    @param {string} response.token0 token0
+    @param {string} response.token1 token1
+    @param {string} response.fee pool transaction fee
+    @param {string} response.tickLower tickLower 
+    @param {string} response.tickUpper tickUpper
+    @param {string} response.liquidity: liquidity
+    @param {string} response.feeGrowthInside0LastX128 feeGrowthInside0LastX128
+    @param {string} response.feeGrowthInside1LastX128 feeGrowthInside1LastX128
+    @param {string} response.tokensOwed0 tokensOwed0
+    @param {string} response.tokensOwed1: tokensOwed1
    */
   constructor({
     operator,

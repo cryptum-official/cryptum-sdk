@@ -187,184 +187,6 @@ class Controller extends Interface {
   }
 
   /**
-   * Get Uniswap Pool Addresses
-   * @param {import('../entity').GetPoolsInput} input
-   * @returns {Promise<import('../../transaction/entity').GetPoolsResponse>}
-   *
-   * @description
-   * If no Pool Fee is specified, Pool addresses for all possible fee ranges will be returned
-   */
-  async getPools(input) {
-    validateUniswapGetPools(input)
-    const { protocol, tokenA, tokenB, poolFee } = input
-    const data = { tokenA, tokenB, poolFee }
-    const response = await makeRequest({
-      method: 'post',
-      url: `/contract/uniswap/getPools?protocol=${protocol}`,
-      body: data,
-      config: this.config,
-    })
-    return response
-  }
-
-  /**
-   * Get Uniswap Pool Data
-   * @param {import('../entity').GetPoolDataInput} input
-   * @returns {Promise<import('../../transaction/entity').CreateGetPoolDataResponse>}
-   *
-   * @description
-   * Return detailed information abot a uniswap pool
-   */
-  async getPoolData(input) {
-    validateUniswapGetPoolData(input)
-    const { protocol, poolAddress } = input
-    const data = { poolAddress }
-    const response = await makeRequest({
-      method: 'post',
-      url: `/contract/uniswap/getPoolData?protocol=${protocol}`,
-      body: data,
-      config: this.config,
-    })
-    return response
-  }
-
-  /**
-   * Get a Swap Price Quotation using UniSwap Protocol
-   * @param {import('../entity').GetSwapQuotationInput} input
-   * @returns {Promise<import('../../transaction/entity').GetSwapQuotationResponse>}
-   *
-   * @description
-   * Returns the quotation for a swap
-   */
-  async getSwapQuotation(input) {
-    validateUniswapGetSwapQuotation(input)
-    const { wallet, protocol, tokenIn, tokenOut, amountIn, amountOut, deadline, slippage, recipient } = input
-    const data = {
-      tokenIn,
-      tokenOut,
-      amountIn,
-      amountOut,
-      slippage,
-      deadline,
-      recipient: recipient ? recipient : wallet.address,
-    }
-    const response = await makeRequest({
-      method: 'post',
-      url: `/contract/uniswap/getSwapQuotation?protocol=${protocol}`,
-      body: data,
-      config: this.config,
-    })
-    return response
-  }
-
-  /**
-   * Get All Uniswap Token Ids By owner address
-   * @param {import('../entity').GetTokenIdsInput} input
-   * @returns {Promise<import('../../transaction/entity').GetTokenIdsResponse>}
-   *
-   * @description
-   * Returns All the token ids owned by a wallet address
-   */
-  async getTokenIds(input) {
-    validateGetTokenIds(input)
-    const { protocol, ownerAddress } = input
-    const data = { protocol, ownerAddress }
-    const response = await makeRequest({
-      method: 'post',
-      url: `/contract/uniswap/getTokenIds?protocol=${protocol}`,
-      body: data,
-      config: this.config,
-    })
-    return response
-  }
-
-  /**
-   * Get Uniswap Pool Positions by owner address (optional:filter by pool)
-   * @param {import('../entity').GetPositionsInput} input
-   * @returns {Promise<import('../../transaction/entity').GetPositionsResponse>}
-   *
-   * @description
-   * Returns pool positions and token ids from owner wallet address
-   */
-  async getPositions(input) {
-    validateGetPositions(input)
-    const { protocol, ownerAddress, poolAddress } = input
-    const data = { protocol, ownerAddress, poolAddress }
-    const response = await makeRequest({
-      method: 'post',
-      url: `/contract/uniswap/getPositions?protocol=${protocol}`,
-      body: data,
-      config: this.config,
-    })
-    return response
-  }
-
-  /**
-   * Reads a position from a tokenId
-   * @param {import('../entity').GetPositionInput} input
-   * @returns {Promise<import('../../transaction/entity').GetPositionResponse>}
-   *
-   * @description
-   * Returns the position infos
-   */
-  async getPosition(input) {
-    validateGetPosition(input)
-    const { protocol, tokenId } = input
-    const data = { protocol, tokenId }
-    const response = await makeRequest({
-      method: 'post',
-      url: `/contract/uniswap/getPosition?protocol=${protocol}`,
-      body: data,
-      config: this.config,
-    })
-    return response
-  }
-
-  /**
-   * Collect fees earned by providing liquidity to a specific pool
-   * @param {import('../entity').CollectFeesInput} input
-   * @returns {Promise<import('../../transaction/entity').CollectFeesResponse>}
-   *
-   * @description
-   * Collect the total amount of fees rewarded for a given position TokenID
-   */
-  async collectFees(input) {
-    validateCollectFees(input)
-    const tc = getTransactionControllerInstance(this.config)
-    const { protocol, wallet, tokenId, wrapped } = input
-    const data = { from: wallet.address, tokenId, wrapped }
-    const { rawTransaction } = await makeRequest({
-      method: 'post',
-      url: `/contract/uniswap/collectFees?protocol=${protocol}`,
-      body: data,
-      config: this.config,
-    })
-    if (rawTransaction === 'Execution Reverted: The position dont have fees to be collected') {
-      return rawTransaction
-    }
-
-    let signedTx
-    switch (protocol) {
-      case Protocol.CELO:
-        signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
-        break
-      case Protocol.ETHEREUM:
-      case Protocol.POLYGON:
-        signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
-        break
-      default:
-        throw new InvalidException('Unsupported protocol')
-    }
-    return await tc.sendTransaction(
-      new SignedTransaction({
-        signedTx,
-        protocol,
-        type: TransactionType.COLLECT_FEES,
-      })
-    )
-  }
-
-  /**
    * Increase liquidity from pair tokens in a specific pool
    * @param {import('../entity').getIncreaseLiquidityQuotationInput} input
    * @returns {Promise<import('../../transaction/entity').GetIncreaseLiquidityQuotationResponse>}
@@ -502,6 +324,35 @@ class Controller extends Interface {
   }
 
   /**
+   * Get a Swap Price Quotation using UniSwap Protocol
+   * @param {import('../entity').GetSwapQuotationInput} input
+   * @returns {Promise<import('../../transaction/entity').GetSwapQuotationResponse>}
+   *
+   * @description
+   * Returns the quotation for a swap
+   */
+  async getSwapQuotation(input) {
+    validateUniswapGetSwapQuotation(input)
+    const { wallet, protocol, tokenIn, tokenOut, amountIn, amountOut, deadline, slippage, recipient } = input
+    const data = {
+      tokenIn,
+      tokenOut,
+      amountIn,
+      amountOut,
+      slippage,
+      deadline,
+      recipient: recipient ? recipient : wallet.address,
+    }
+    const response = await makeRequest({
+      method: 'post',
+      url: `/contract/uniswap/getSwapQuotation?protocol=${protocol}`,
+      body: data,
+      config: this.config,
+    })
+    return response
+  }
+
+  /**
    * Exucutes a swap from a quotation Object
    * @param {import('../entity').SwapInput} input
    * @returns {Promise<import('../../transaction/entity').SwapResponse>}
@@ -561,6 +412,155 @@ class Controller extends Interface {
         type: TransactionType.SWAP,
       })
     )
+  }
+
+  /**
+   * Collect fees earned by providing liquidity to a specific pool
+   * @param {import('../entity').CollectFeesInput} input
+   * @returns {Promise<import('../../transaction/entity').CollectFeesResponse>}
+   *
+   * @description
+   * Collect the total amount of fees rewarded for a given position TokenID
+   */
+  async collectFees(input) {
+    validateCollectFees(input)
+    const tc = getTransactionControllerInstance(this.config)
+    const { protocol, wallet, tokenId, wrapped } = input
+    const data = { from: wallet.address, tokenId, wrapped }
+    const { rawTransaction } = await makeRequest({
+      method: 'post',
+      url: `/contract/uniswap/collectFees?protocol=${protocol}`,
+      body: data,
+      config: this.config,
+    })
+    if (rawTransaction === 'Execution Reverted: The position dont have fees to be collected') {
+      return rawTransaction
+    }
+
+    let signedTx
+    switch (protocol) {
+      case Protocol.CELO:
+        signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
+        break
+      case Protocol.ETHEREUM:
+      case Protocol.POLYGON:
+        signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
+        break
+      default:
+        throw new InvalidException('Unsupported protocol')
+    }
+    return await tc.sendTransaction(
+      new SignedTransaction({
+        signedTx,
+        protocol,
+        type: TransactionType.COLLECT_FEES,
+      })
+    )
+  }
+
+  /**
+   * Get Uniswap Pool Addresses
+   * @param {import('../entity').GetPoolsInput} input
+   * @returns {Promise<import('../../transaction/entity').GetPoolsResponse>}
+   *
+   * @description
+   * If no Pool Fee is specified, Pool addresses for all possible fee ranges will be returned
+   */
+  async getPools(input) {
+    validateUniswapGetPools(input)
+    const { protocol, tokenA, tokenB, poolFee } = input
+    const data = { tokenA, tokenB, poolFee }
+    const response = await makeRequest({
+      method: 'post',
+      url: `/contract/uniswap/getPools?protocol=${protocol}`,
+      body: data,
+      config: this.config,
+    })
+    return response
+  }
+
+  /**
+   * Get Uniswap Pool Data
+   * @param {import('../entity').GetPoolDataInput} input
+   * @returns {Promise<import('../../transaction/entity').GetPoolDataResponse>}
+   *
+   * @description
+   * Return detailed information abot a uniswap pool
+   */
+  async getPoolData(input) {
+    validateUniswapGetPoolData(input)
+    const { protocol, poolAddress } = input
+    const data = { poolAddress }
+    const response = await makeRequest({
+      method: 'post',
+      url: `/contract/uniswap/getPoolData?protocol=${protocol}`,
+      body: data,
+      config: this.config,
+    })
+    return response
+  }
+
+  /**
+   * Get All Uniswap Token Ids By owner address
+   * @param {import('../entity').GetTokenIdsInput} input
+   * @returns {Promise<import('../../transaction/entity').GetTokenIdsResponse>}
+   *
+   * @description
+   * Returns All the token ids owned by a wallet address
+   */
+  async getTokenIds(input) {
+    validateGetTokenIds(input)
+    const { protocol, ownerAddress } = input
+    const data = { protocol, ownerAddress }
+    const response = await makeRequest({
+      method: 'post',
+      url: `/contract/uniswap/getTokenIds?protocol=${protocol}`,
+      body: data,
+      config: this.config,
+    })
+    return response
+  }
+
+  /**
+   * Get Uniswap Pool Positions by owner address (optional:filter by pool)
+   * @param {import('../entity').GetPositionsInput} input
+   * @returns {Promise<import('../../transaction/entity').GetPositionsResponse>}
+   *
+   * @description
+   * Returns pool positions and token ids from owner wallet address
+   */
+  async getPositions(input) {
+    validateGetPositions(input)
+    const { protocol, ownerAddress, poolAddress } = input
+    const data = { protocol, ownerAddress, poolAddress }
+    const response = await makeRequest({
+      method: 'post',
+      url: `/contract/uniswap/getPositions?protocol=${protocol}`,
+      body: data,
+      config: this.config,
+    })
+    return response
+  }
+
+  /**
+   * Reads a position from a tokenId
+   * @param {import('../entity').GetPositionInput} input
+   * @returns {Promise<import('../../transaction/entity').GetPositionResponse>}
+   *
+   * @description
+   * Returns the position infos
+   */
+  async getPosition(input) {
+    validateGetPosition(input)
+    const { protocol, tokenId } = input
+    const data = { protocol, tokenId }
+    const response = await makeRequest({
+      method: 'post',
+      url: `/contract/uniswap/getPosition?protocol=${protocol}`,
+      body: data,
+      config: this.config,
+    })
+    return response
   }
 
   /**

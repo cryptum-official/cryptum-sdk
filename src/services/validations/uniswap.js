@@ -158,6 +158,7 @@ module.exports.validateUniswapGetPoolData = ({ protocol, poolAddress }) => {
 }
 
 module.exports.validateUniswapGetSwapQuotation = ({
+  wallet,
   protocol,
   tokenIn,
   tokenOut,
@@ -167,6 +168,9 @@ module.exports.validateUniswapGetSwapQuotation = ({
   deadline,
   recipient,
 }) => {
+  if (!wallet) {
+    throw new InvalidException('Invalid wallet')
+  }
   if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
@@ -236,7 +240,7 @@ module.exports.validateGetPosition = ({ protocol, tokenId }) => {
   }
 }
 
-module.exports.validateCollectFees = ({ wallet, protocol, tokenId }) => {
+module.exports.validateCollectFees = ({ wallet, protocol, tokenId, wrapped }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
@@ -245,6 +249,9 @@ module.exports.validateCollectFees = ({ wallet, protocol, tokenId }) => {
   }
   if (!tokenId || typeof tokenId !== 'string') {
     throw new InvalidException('Invalid tokenId')
+  }
+  if (wrapped && typeof wrapped !== 'boolean') {
+    throw new InvalidException('Invalid wrapped value, must be true or false boolean')
   }
 }
 
@@ -256,6 +263,7 @@ module.exports.validateGetIncreaseLiquidityQuotation = ({
   amountTokenB,
   slippage,
   deadline,
+  wrapped,
 }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
@@ -292,10 +300,13 @@ module.exports.validateGetIncreaseLiquidityQuotation = ({
   } else if (deadline && +deadline < 0) {
     throw new InvalidException('Deadline minutes must be a positive amount')
   }
+  if (wrapped && typeof wrapped !== 'boolean') {
+    throw new InvalidException('Invalid wrapped value, must be true or false boolean')
+  }
 }
 module.exports.validateDecreaseLiquidity = ({
-  wallet,
   protocol,
+  wallet,
   tokenId,
   percentageToDecrease,
   recipient,
