@@ -93,70 +93,6 @@ module.exports.validateUniswapGetMintPositionQuotation = ({
   }
 }
 
-module.exports.validateUniswapRemovePosition = ({
-  protocol,
-  wallet,
-  slippage,
-  pool,
-  recipient,
-  tokenId,
-  percentageToRemove,
-}) => {
-  if (!wallet) {
-    throw new InvalidException('Invalid wallet')
-  }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
-    throw new InvalidException('Invalid protocol')
-  }
-  if (slippage && typeof slippage !== 'string') {
-    throw new InvalidException('Invalid slippage')
-  } else if (slippage && +slippage > 50) {
-    throw new InvalidException('Slippage percentage must be lesser than 50 (50%)')
-  } else if (slippage && +slippage < 0) {
-    throw new InvalidException('Slippage percentage must be a positive amount')
-  }
-  if (!pool || typeof pool !== 'string') {
-    throw new InvalidException('Invalid pool')
-  }
-  if (recipient !== undefined && typeof recipient !== 'string') {
-    throw new InvalidException('Invalid recipient')
-  }
-  if (!tokenId || typeof tokenId !== 'string') {
-    throw new InvalidException('Invalid tokenId')
-  }
-  if (!percentageToRemove || typeof percentageToRemove !== 'string') {
-    throw new InvalidException('Invalid percentageToRemove')
-  }
-}
-
-module.exports.validateUniswapGetPools = ({ protocol, tokenA, tokenB, poolFee }) => {
-  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
-    throw new InvalidException('Invalid protocol')
-  }
-  if (!tokenA || typeof tokenA !== 'string') {
-    throw new InvalidException('Invalid token Address')
-  }
-  if (!tokenB || typeof tokenB !== 'string') {
-    throw new InvalidException('Invalid token Address')
-  }
-  const _fee = new BigNumber(poolFee)
-  if (poolFee && (typeof poolFee !== 'number' || _fee.isNaN() || _fee.lte(0))) {
-    throw new GenericException(
-      'Invalid fee amount, must be number equals 100 or 500 or 3000 or 10000',
-      'InvalidTypeException'
-    )
-  }
-}
-
-module.exports.validateUniswapGetPoolData = ({ protocol, poolAddress }) => {
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
-    throw new InvalidException('Invalid protocol')
-  }
-  if (!poolAddress || typeof poolAddress !== 'string') {
-    throw new InvalidException('Invalid pool Address')
-  }
-}
-
 module.exports.validateUniswapGetSwapQuotation = ({
   wallet,
   protocol,
@@ -211,50 +147,6 @@ module.exports.validateUniswapGetSwapQuotation = ({
   }
 }
 
-module.exports.validateGetTokenIds = ({ protocol, ownerAddress }) => {
-  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
-    throw new InvalidException('Invalid protocol')
-  }
-  if (!ownerAddress || typeof ownerAddress !== 'string') {
-    throw new InvalidException('Invalid ownerAddress')
-  }
-}
-module.exports.validateGetPositions = ({ protocol, ownerAddress, poolAddress }) => {
-  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
-    throw new InvalidException('Invalid protocol')
-  }
-  if (!ownerAddress || typeof ownerAddress !== 'string') {
-    throw new InvalidException('Invalid ownerAddress')
-  }
-  if (poolAddress !== undefined && typeof poolAddress !== 'string') {
-    throw new InvalidException('Invalid poolAddress')
-  }
-}
-
-module.exports.validateGetPosition = ({ protocol, tokenId }) => {
-  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
-    throw new InvalidException('Invalid protocol')
-  }
-  if (!tokenId || typeof tokenId !== 'string') {
-    throw new InvalidException('Invalid tokenId')
-  }
-}
-
-module.exports.validateCollectFees = ({ wallet, protocol, tokenId, wrapped }) => {
-  if (!wallet) {
-    throw new InvalidException('Invalid wallet')
-  }
-  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
-    throw new InvalidException('Invalid protocol')
-  }
-  if (!tokenId || typeof tokenId !== 'string') {
-    throw new InvalidException('Invalid tokenId')
-  }
-  if (wrapped && typeof wrapped !== 'boolean') {
-    throw new InvalidException('Invalid wrapped value, must be true or false boolean')
-  }
-}
-
 module.exports.validateGetIncreaseLiquidityQuotation = ({
   wallet,
   protocol,
@@ -304,6 +196,119 @@ module.exports.validateGetIncreaseLiquidityQuotation = ({
     throw new InvalidException('Invalid wrapped value, must be true or false boolean')
   }
 }
+
+module.exports.validateUniswapGetPools = ({ protocol, tokenA, tokenB, poolFee }) => {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
+    throw new InvalidException('Invalid protocol')
+  }
+  if (!tokenA || typeof tokenA !== 'string') {
+    throw new InvalidException('Invalid token Address')
+  }
+  if (!tokenB || typeof tokenB !== 'string') {
+    throw new InvalidException('Invalid token Address')
+  }
+  const _fee = new BigNumber(poolFee)
+  if (poolFee && (typeof poolFee !== 'number' || _fee.isNaN() || _fee.lte(0))) {
+    throw new GenericException(
+      'Invalid fee amount, must be number equals 100 or 500 or 3000 or 10000',
+      'InvalidTypeException'
+    )
+  }
+}
+
+module.exports.validateUniswapGetPoolData = ({ protocol, poolAddress }) => {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+    throw new InvalidException('Invalid protocol')
+  }
+  if (!poolAddress || typeof poolAddress !== 'string') {
+    throw new InvalidException('Invalid pool Address')
+  }
+}
+
+module.exports.validateGetTokenIds = ({ protocol, ownerAddress }) => {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
+    throw new InvalidException('Invalid protocol')
+  }
+  if (!ownerAddress || typeof ownerAddress !== 'string') {
+    throw new InvalidException('Invalid ownerAddress')
+  }
+}
+
+module.exports.validateGetPositions = ({ protocol, ownerAddress, poolAddress }) => {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
+    throw new InvalidException('Invalid protocol')
+  }
+  if (!ownerAddress || typeof ownerAddress !== 'string') {
+    throw new InvalidException('Invalid ownerAddress')
+  }
+  if (poolAddress !== undefined && typeof poolAddress !== 'string') {
+    throw new InvalidException('Invalid poolAddress')
+  }
+}
+
+module.exports.validateGetPosition = ({ protocol, tokenId }) => {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
+    throw new InvalidException('Invalid protocol')
+  }
+  if (!tokenId || typeof tokenId !== 'string') {
+    throw new InvalidException('Invalid tokenId')
+  }
+}
+
+module.exports.validateCollectFees = ({ wallet, protocol, tokenId, wrapped }) => {
+  if (!wallet) {
+    throw new InvalidException('Invalid wallet')
+  }
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
+    throw new InvalidException('Invalid protocol')
+  }
+  if (!tokenId || typeof tokenId !== 'string') {
+    throw new InvalidException('Invalid tokenId')
+  }
+  if (wrapped && typeof wrapped !== 'boolean') {
+    throw new InvalidException('Invalid wrapped value, must be true or false boolean')
+  }
+}
+
+module.exports.validateObservePool = ({ protocol, pool, secondsAgoToCheck }) => {
+  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
+    throw new InvalidException('Invalid protocol')
+  }
+  if (!pool || typeof pool !== 'string') {
+    throw new InvalidException('Invalid pool')
+  }
+  if (!secondsAgoToCheck || typeof secondsAgoToCheck !== 'object') {
+    throw new InvalidException('Invalid secondsAgoToCheck')
+  }
+}
+
+module.exports.validateSwap = ({ transaction, wallet }) => {
+  if (!wallet) {
+    throw new InvalidException('Invalid wallet')
+  }
+  if (!transaction) {
+    throw new InvalidException('missing transaction argument')
+  }
+}
+
+module.exports.validateMintPosition = ({ transaction, wallet }) => {
+  if (!wallet) {
+    throw new InvalidException('Invalid wallet')
+  }
+  if (!transaction) {
+    throw new InvalidException('missing transaction argument')
+  }
+}
+
+module.exports.validateIncreaseLiquidity = ({ transaction, wallet }) => {
+  if (!wallet) {
+    throw new InvalidException('Invalid wallet')
+  }
+  if (!transaction) {
+    throw new InvalidException('missing transaction argument')
+  }
+}
+
 module.exports.validateDecreaseLiquidity = ({
   protocol,
   wallet,
@@ -360,18 +365,6 @@ module.exports.validateDecreaseLiquidity = ({
   }
 }
 
-module.exports.validateObservePool = ({ protocol, pool, secondsAgoToCheck }) => {
-  if (![Protocol.CELO, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
-    throw new InvalidException('Invalid protocol')
-  }
-  if (!pool || typeof pool !== 'string') {
-    throw new InvalidException('Invalid pool')
-  }
-  if (!secondsAgoToCheck || typeof secondsAgoToCheck !== 'object') {
-    throw new InvalidException('Invalid secondsAgoToCheck')
-  }
-}
-
 module.exports.validateIncreaseCardinality = ({ wallet, protocol, pool, cardinality }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
@@ -384,32 +377,5 @@ module.exports.validateIncreaseCardinality = ({ wallet, protocol, pool, cardinal
   }
   if (!cardinality || typeof cardinality !== 'number') {
     throw new InvalidException('Invalid cardinality')
-  }
-}
-
-module.exports.validateSwap = ({ transaction, wallet }) => {
-  if (!wallet) {
-    throw new InvalidException('Invalid wallet')
-  }
-  if (!transaction) {
-    throw new InvalidException('missing transaction argument')
-  }
-}
-
-module.exports.validateMintPosition = ({ transaction, wallet }) => {
-  if (!wallet) {
-    throw new InvalidException('Invalid wallet')
-  }
-  if (!transaction) {
-    throw new InvalidException('missing transaction argument')
-  }
-}
-
-module.exports.validateIncreaseLiquidity = ({ transaction, wallet }) => {
-  if (!wallet) {
-    throw new InvalidException('Invalid wallet')
-  }
-  if (!transaction) {
-    throw new InvalidException('missing transaction argument')
   }
 }

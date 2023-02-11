@@ -167,6 +167,33 @@ class GetMintPositionQuotationResponse {
     this.mintPositionTransaction.tokenB = tokenB
   }
 }
+class GetSwapQuotationResponse {
+  /**
+   * Creates an instance of CreateGetSwapQuotation
+   *
+   * @param {object} response
+   * @param {object} response.swapQuotation Quotation amounts for tokenA and tokenB
+   * @param {string} response.swapQuotation.tokenIn amount of token In to be consumed by transaction
+   * @param {string} response.swapQuotation.tokenOut amount of token Out to be received from transaction
+   * @param {object} response.swapTransaction The transaction data to be executed
+   * @param {string} response.swapTransaction.calldata  hex string of the current transaction
+   * @param {string} response.swapTransaction.value  amount of native token to be sent in this transaction
+   * @param {string} response.swapTransaction.protocol  protocol for this transaction
+   * @param {string} response.swapTransaction.tokenIn  address of tokenIn
+   * @param {string} response.swapTransaction.tokenOut  address of tokenOut
+   */
+  constructor({ swapQuotation, tokenIn, tokenOut, swapTransaction, calldata, value, protocol }) {
+    this.swapQuotation = swapQuotation
+    this.swapQuotation.tokenIn = tokenIn
+    this.swapQuotation.tokenOut = tokenOut
+    this.swapTransaction = swapTransaction
+    this.swapTransaction.calldata = calldata
+    this.swapTransaction.value = value
+    this.swapTransaction.protocol = protocol
+    this.swapTransaction.tokenIn = tokenIn
+    this.swapTransaction.tokenOut = tokenOut
+  }
+}
 class GetPoolsResponse {
   /**
    * Creates an instance of CreateGetPoolsResponse
@@ -180,7 +207,6 @@ class GetPoolsResponse {
     this[0].poolAddress = poolAddress
   }
 }
-
 class GetPoolDataResponse {
   /**
    * Creates an instance of CreateGetPoolsResponse
@@ -231,46 +257,6 @@ class GetPoolDataResponse {
     this.slot0.observationCardinalityNext = observationCardinalityNext
     this.slot0.feeProtocol = feeProtocol
     this.slot0.unlocked = unlocked
-  }
-}
-
-class ObservePoolResponse {
-  /**
-   * Creates an instance of ObservePoolResponse
-   *
-   * @param {object} response
-   * @param {string} response.observedPrices array of prices at specified times
-   */
-  constructor({ observedPrices }) {
-    this.observedPrices = observedPrices
-  }
-}
-
-class GetSwapQuotationResponse {
-  /**
-   * Creates an instance of CreateGetSwapQuotation
-   *
-   * @param {object} response
-   * @param {object} response.swapQuotation Quotation amounts for tokenA and tokenB
-   * @param {string} response.swapQuotation.tokenIn amount of token In to be consumed by transaction
-   * @param {string} response.swapQuotation.tokenOut amount of token Out to be received from transaction
-   * @param {object} response.swapTransaction The transaction data to be executed
-   * @param {string} response.swapTransaction.calldata  hex string of the current transaction
-   * @param {string} response.swapTransaction.value  amount of native token to be sent in this transaction
-   * @param {string} response.swapTransaction.protocol  protocol for this transaction
-   * @param {string} response.swapTransaction.tokenIn  address of tokenIn
-   * @param {string} response.swapTransaction.tokenOut  address of tokenOut
-   */
-  constructor({ swapQuotation, tokenIn, tokenOut, swapTransaction, calldata, value, protocol }) {
-    this.swapQuotation = swapQuotation
-    this.swapQuotation.tokenIn = tokenIn
-    this.swapQuotation.tokenOut = tokenOut
-    this.swapTransaction = swapTransaction
-    this.swapTransaction.calldata = calldata
-    this.swapTransaction.value = value
-    this.swapTransaction.protocol = protocol
-    this.swapTransaction.tokenIn = tokenIn
-    this.swapTransaction.tokenOut = tokenOut
   }
 }
 class GetTokenIdsResponse {
@@ -348,16 +334,6 @@ class MintPositionResponse {
     this.transaction = transaction
   }
 }
-class CollectFeesResponse {
-  /**
-   * Creates an instance of CollectFeesResponse
-   *
-   * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
-   */
-  constructor({ transaction }) {
-    this.transaction = transaction
-  }
-}
 class IncreaseLiquidityResponse {
   /**
    * Creates an instance of IncreaseLiquidityResponse
@@ -386,6 +362,27 @@ class SwapResponse {
    */
   constructor({ transaction }) {
     this.transaction = transaction
+  }
+}
+class CollectFeesResponse {
+  /**
+   * Creates an instance of CollectFeesResponse
+   *
+   * @param {TransactionResponse | null} response.transaction transaction response object (if there is one) or null (if no transaction was made)
+   */
+  constructor({ transaction }) {
+    this.transaction = transaction
+  }
+}
+class ObservePoolResponse {
+  /**
+   * Creates an instance of ObservePoolResponse
+   *
+   * @param {object} response
+   * @param {string} response.observedPrices array of prices at specified times
+   */
+  constructor({ observedPrices }) {
+    this.observedPrices = observedPrices
   }
 }
 class UTXO {
