@@ -1,4 +1,4 @@
-const CryptumSdk = require('c:/Users/Victor Collasanta/Desktop/Blockchain Local/Blockforce-Cryptum/Cryptum/uniswap-sdk/cryptum-sdk/index')
+const CryptumSdk = require('../../../cryptum-sdk/index')
 const { expect } = require('chai')
 const nock = require('nock')
 require('dotenv').config()
