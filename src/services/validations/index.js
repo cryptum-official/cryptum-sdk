@@ -324,7 +324,7 @@ const validateHathorTokenTransactionFromWallet = ({
       throw new InvalidTypeException('tokenUid', 'string')
     }
   }
-  this.validatePositiveAmount(amount)
+  validatePositiveAmount(amount)
   if (address && typeof address !== 'string') {
     throw new InvalidTypeException('address', 'string')
   }
@@ -380,7 +380,7 @@ const validateHathorTokenTransactionFromUTXO = ({
       throw new InvalidTypeException('tokenUid', 'string')
     }
   }
-  this.validatePositiveAmount(amount)
+  validatePositiveAmount(amount)
   if (address && typeof address !== 'string') {
     throw new InvalidTypeException('address', 'string')
   }
