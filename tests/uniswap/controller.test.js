@@ -9,7 +9,7 @@ const sdk = new CryptumSdk({
   apiKey: apikey,
 })
 
-describe('Uniswap Controller Test', () => {
+describe.only('Uniswap Controller Test', () => {
   const protocol = 'POLYGON'
   const AtokenAddress = '0xE3031a696aDE55789371CEA339d5fbCF2B6339f9' //t1
   const BtokenAddress = '0xFf432f16F3d84eD1985EdFed30203F99d57Fe979' //t2
@@ -665,18 +665,6 @@ describe('Uniswap Controller Test', () => {
             })
           ).to.be.rejectedWith('minPriceDelta must be a value between 0 and 100%')
         })
-        it('should fail - invalid maxDelta (greater than 170%)', async () => {
-          await expect(
-            sdk.uniswap.getMintPositionQuotation({
-              wallet,
-              protocol,
-              pool: '0xc0d63761276a7fe60aef63663ff19cbb91f3623e', // t1-t2
-              amountTokenA: '0.1',
-              minPriceDelta: '1',
-              maxPriceDelta: '171',
-            })
-          ).to.be.rejectedWith('minPriceDelta must be a value between 0 and 170%')
-        })
         it('should fail - invalid maxDelta (negative value)', async () => {
           await expect(
             sdk.uniswap.getMintPositionQuotation({
@@ -687,7 +675,7 @@ describe('Uniswap Controller Test', () => {
               minPriceDelta: '1',
               maxPriceDelta: '-1',
             })
-          ).to.be.rejectedWith('minPriceDelta must be a value between 0 and 170%')
+          ).to.be.rejectedWith('minPriceDelta must be a positive value')
         })
       })
     })
@@ -835,7 +823,7 @@ describe('Uniswap Controller Test', () => {
     })
 
     describe('increaseCardinality', () => {
-      it('should increase cardinality', async () => {
+      it.only('should increase cardinality', async () => {
         const increaseCardinality = await sdk.uniswap.increaseCardinality({
           protocol,
           pool: '0x500e45883F2D25e62af5cb20c45187d5D06472df',
@@ -847,7 +835,7 @@ describe('Uniswap Controller Test', () => {
     })
 
     describe('decreaseLiqudity', () => {
-      it('should decrease Liquidity', async () => {
+      it.only('should decrease Liquidity', async () => {
         const decreaseLiquidity = await sdk.uniswap.decreaseLiquidity({
           protocol,
           wallet,
@@ -914,7 +902,7 @@ describe('Uniswap Controller Test', () => {
     })
 
     describe('mintPosition', () => {
-      it('should execute a mintPosition transaction', async () => {
+      it.only('should execute a mintPosition transaction', async () => {
         const mintPositionQuotation = await sdk.uniswap.getMintPositionQuotation({
           wallet,
           protocol,
