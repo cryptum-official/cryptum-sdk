@@ -656,5 +656,7 @@ module.exports = {
   validateTokenDeployTransactionParams,
   validateSmartContractTransactionParams,
   validateSmartContractDeployTransactionParams,
-  validateSmartContractCallParams
+  validateSmartContractCallParams,
+  validateRippleTransferTransactionParams,
+  validateStellarTransferTransactionParams
 }
