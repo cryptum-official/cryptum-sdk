@@ -24,7 +24,9 @@ const {
 } = require('../../../services/validations/evm')
 const { getContractControllerInstance } = require('../../contract/controller')
 const { ERC721_INTERFACE_ID } = require('../../../services/blockchain/contract/constants')
-const { TransactionType, TransactionResponse } = require('../../transaction/entity')
+const { TransactionType, TransactionResponse, SignedTransaction } = require('../../transaction/entity')
+const { signEthereumTx } = require('../../../services/blockchain/ethereum')
+const { signCeloTx } = require('../../../services/blockchain/celo')
 
 class Controller extends Interface {
   /**
@@ -141,13 +143,24 @@ class Controller extends Interface {
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN: {
         validateEvmTokenCreation(input)
-        return await getContractControllerInstance(this.config).deployToken({
-          wallet,
+        const builtTx = await makeRequest(
+          {
+            method: 'post',
+            url: `/tx/build/deploy-token?protocol=${protocol}`,
+            body: { protocol, from: wallet.address, symbol, name, type, feeCurrency, uri }, config: this.config
+          })
+        let signedTx;
+        if (protocol === Protocol.CELO) {
+          signedTx = await signCeloTx(builtTx, wallet.privateKey)
+        } else {
+          signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
+        }
+        tx = new SignedTransaction({
+          signedTx,
           protocol,
-          tokenType: type,
-          params: [name, symbol, uri || ''],
-          feeCurrency
+          type: TransactionType.DEPLOY_CONTRACT
         })
+        break;
       }
       default:
         throw new InvalidException('Unsupported protocol')
@@ -160,7 +173,7 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async transfer(input) {
-    const { protocol, token, wallet, destination, tokenId, amount, destinations } = input
+    const { protocol, token, wallet, destination, tokenId, amount, destinations, feeCurrency } = input
     const tc = getTransactionControllerInstance(this.config)
     let tx;
     switch (protocol) {
@@ -181,26 +194,24 @@ class Controller extends Interface {
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN: {
         validateEvmNftTransfer(input)
-        const cc = getContractControllerInstance(this.config)
-        let params, contractAbi
-        if (await cc.supportsInterfaceId({ protocol, contractAddress: token, interfaceId: ERC721_INTERFACE_ID })) {
-          params = [wallet.address, destination, tokenId]
-          contractAbi = ERC721_SAFE_TRANSFER_METHOD_ABI
+        const builtTx = await makeRequest(
+          {
+            method: 'post',
+            url: `/tx/build/transfer-nft?protocol=${protocol}`,
+            body: { token, from: wallet.address, destination, tokenId, amount, feeCurrency }, config: this.config
+          })
+        let signedTx;
+        if (protocol === Protocol.CELO) {
+          signedTx = await signCeloTx(builtTx, wallet.privateKey)
         } else {
-          if (!amount || isNaN(amount) || Number(amount) < 0) {
-            throw new InvalidException('Invalid amount')
-          }
-          params = [wallet.address, destination, tokenId, amount, []]
-          contractAbi = ERC1155_SAFE_TRANSFER_METHOD_ABI
+          signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
         }
-        return await cc.callMethodTransaction({
-          wallet,
+        tx = new SignedTransaction({
+          signedTx,
           protocol,
-          contractAddress: token,
-          method: 'safeTransferFrom',
-          contractAbi,
-          params
+          type: TransactionType.DEPLOY_CONTRACT
         })
+        break;
       }
       default:
         throw new InvalidException('Unsupported protocol')
@@ -242,28 +253,24 @@ class Controller extends Interface {
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN: {
         validateEvmNftMint(input)
-        const cc = getContractControllerInstance(this.config)
-        let params, contractAbi, _tokenId
-        _tokenId = tokenId !== undefined ? tokenId : Math.round(Math.random() * Number.MAX_SAFE_INTEGER)
-        if (await cc.supportsInterfaceId({ protocol, contractAddress: token, interfaceId: ERC721_INTERFACE_ID })) {
-          params = [destination, _tokenId, uri || '']
-          contractAbi = ERC721_MINT_METHOD_ABI
+        const builtTx = await makeRequest(
+          {
+            method: 'post',
+            url: `/tx/build/mint-nft?protocol=${protocol}`,
+            body: { protocol, from: wallet.address, amount, feeCurrency, uri, tokenId, destination, feeCurrency, token }, config: this.config
+          })
+        let signedTx;
+        if (protocol === Protocol.CELO) {
+          signedTx = await signCeloTx(builtTx, wallet.privateKey)
         } else {
-          if (!amount || isNaN(amount) || Number(amount) < 0) {
-            throw new InvalidException('Invalid amount')
-          }
-          params = uri !== undefined ? [destination, _tokenId, amount, uri, []] : [destination, _tokenId, amount, []]
-          contractAbi = uri !== undefined ? ERC1155_MINT_WITH_URI_METHOD_ABI : ERC1155_MINT_METHOD_ABI
+          signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
         }
-        return await getContractControllerInstance(this.config).callMethodTransaction({
-          wallet,
+        tx = new SignedTransaction({
+          signedTx,
           protocol,
-          contractAddress: token,
-          method: 'mint',
-          contractAbi,
-          params,
-          feeCurrency
+          type: TransactionType.DEPLOY_CONTRACT
         })
+        break;
       }
       default:
         throw new InvalidException('Unsupported protocol')
@@ -300,27 +307,24 @@ class Controller extends Interface {
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN: {
         validateEvmNftBurn(input)
-        const cc = getContractControllerInstance(this.config)
-        let params, contractAbi
-        if (await cc.supportsInterfaceId({ protocol, contractAddress: token, interfaceId: ERC721_INTERFACE_ID })) {
-          params = [tokenId]
-          contractAbi = ERC721_BURN_METHOD_ABI
+        const builtTx = await makeRequest(
+          {
+            method: 'post',
+            url: `/tx/build/burn-nft?protocol=${protocol}`,
+            body: { protocol, from: wallet.address, amount, feeCurrency, tokenId, feeCurrency, token }, config: this.config
+          })
+        let signedTx;
+        if (protocol === Protocol.CELO) {
+          signedTx = await signCeloTx(builtTx, wallet.privateKey)
         } else {
-          if (!amount || isNaN(amount) || Number(amount) < 0) {
-            throw new InvalidException('Invalid amount')
-          }
-          params = [wallet.address, tokenId, amount]
-          contractAbi = ERC1155_BURN_METHOD_ABI
+          signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
         }
-        return await getContractControllerInstance(this.config).callMethodTransaction({
-          wallet,
+        tx = new SignedTransaction({
+          signedTx,
           protocol,
-          contractAddress: token,
-          method: 'burn',
-          contractAbi,
-          params,
-          feeCurrency
+          type: TransactionType.DEPLOY_CONTRACT
         })
+        break;
       }
       default:
         throw new InvalidException('Unsupported protocol')
