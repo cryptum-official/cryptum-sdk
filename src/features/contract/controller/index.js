@@ -1,12 +1,10 @@
 module.exports.getContractControllerInstance = (config) => new Controller(config)
 
-const InvalidException = require('../../../errors/InvalidException')
 const { makeRequest } = require('../../../services')
-const { buildCeloSmartContractTransaction, buildCeloSmartContractDeployTransaction } = require('../../../services/blockchain/celo')
+const { signCeloTx } = require('../../../services/blockchain/celo')
 const { Protocol } = require('../../../services/blockchain/constants')
 const { SUPPORTS_INTERFACE_ABI } = require('../../../services/blockchain/contract/abis')
-const { buildEthereumSmartContractTransaction, buildEthereumSmartContractDeployTransaction } = require('../../../services/blockchain/ethereum')
-const { isTestnet } = require('../../../services/utils')
+const { signEthereumTx } = require('../../../services/blockchain/ethereum')
 const { validateSmartContractCallParams,
   validateSmartContractTransactionParams,
   validateTokenDeployTransactionParams,
@@ -67,37 +65,19 @@ class Controller extends Interface {
   async buildMethodTransaction(input) {
     validateSmartContractTransactionParams(input)
     const { wallet, fee, value, contractAddress, contractAbi, method, params, protocol, feeCurrency } = input
-    const tc = getTransactionControllerInstance(this.config)
-    const { info, networkFee } = await tc._getFeeInfo({
-      wallet,
-      type: TransactionType.CALL_CONTRACT_METHOD,
-      contractAddress,
-      contractAbi,
-      method,
-      params,
-      fee,
-      protocol,
-    })
-    let signedTx
-    const transactionOptions = {
-      fromPrivateKey: wallet.privateKey,
-      nonce: info.nonce,
-      value,
-      contractAddress,
-      contractAbi,
-      method,
-      params,
-      fee: networkFee,
-      feeCurrency,
-      testnet: isTestnet(this.config.environment),
-    }
+    const builtTx = await makeRequest(
+      {
+        method: 'post',
+        url: `/tx/build/method-transaction?protocol=${protocol}`,
+        body: { protocol, from: wallet.address, fee, value, contractAddress, contractAbi, method, params, feeCurrency }, config: this.config
+      })
+    let signedTx;
     if (protocol === Protocol.CELO) {
-      signedTx = await buildCeloSmartContractTransaction(transactionOptions)
-    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
-      signedTx = await buildEthereumSmartContractTransaction({ ...transactionOptions, protocol })
+      signedTx = await signCeloTx(builtTx, wallet.privateKey)
     } else {
-      throw new InvalidException('Invalid protocol')
+      signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
     }
+
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.CALL_CONTRACT_METHOD })
   }
   /**
@@ -117,35 +97,17 @@ class Controller extends Interface {
   async buildDeployTransaction(input) {
     validateSmartContractDeployTransactionParams(input)
     const { wallet, fee, params, protocol, feeCurrency, source, contractName } = input
-    const tc = getTransactionControllerInstance(this.config)
-    const { info, networkFee } = await tc._getFeeInfo({
-      wallet,
-      type: TransactionType.DEPLOY_CONTRACT,
-      params,
-      fee,
-      protocol,
-      source,
-      contractName,
-    })
-
-    let signedTx
-    const transactionOptions = {
-      source,
-      contractName,
-      fromPrivateKey: wallet.privateKey,
-      nonce: info.nonce,
-      params,
-      fee: networkFee,
-      feeCurrency,
-      testnet: isTestnet(this.config.environment),
-      config: this.config,
-    }
+    const builtTx = await makeRequest(
+      {
+        method: 'post',
+        url: `/tx/build/deploy-contract?protocol=${protocol}`,
+        body: { from: wallet.address, fee, params, protocol, feeCurrency, source, contractName }, config: this.config
+      })
+    let signedTx;
     if (protocol === Protocol.CELO) {
-      signedTx = await buildCeloSmartContractDeployTransaction(transactionOptions)
-    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
-      signedTx = await buildEthereumSmartContractDeployTransaction({ ...transactionOptions, protocol })
+      signedTx = await signCeloTx(builtTx, wallet.privateKey)
     } else {
-      throw new InvalidException('Invalid protocol')
+      signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
     }
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT })
   }
@@ -166,34 +128,19 @@ class Controller extends Interface {
   async buildDeployTokenTransaction(input) {
     validateTokenDeployTransactionParams(input)
     const { wallet, fee, params, protocol, feeCurrency, tokenType } = input
-    const tc = getTransactionControllerInstance(this.config)
-    const { info, networkFee } = await tc._getFeeInfo({
-      wallet,
-      type: `DEPLOY_${tokenType}`,
-      params,
-      fee,
-      protocol,
-      tokenType,
-    })
-
-    let signedTx
-    const transactionOptions = {
-      fromPrivateKey: wallet.privateKey,
-      nonce: info.nonce,
-      params,
-      fee: networkFee,
-      feeCurrency,
-      testnet: isTestnet(this.config.environment),
-      config: this.config,
-      tokenType,
-    }
+    const builtTx = await makeRequest(
+      {
+        method: 'post',
+        url: `/tx/build/deploy-token?protocol=${protocol}`,
+        body: { from: wallet.address, fee, params, protocol, feeCurrency, type: tokenType }, config: this.config
+      })
+    let signedTx;
     if (protocol === Protocol.CELO) {
-      signedTx = await buildCeloSmartContractDeployTransaction(transactionOptions)
-    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
-      signedTx = await buildEthereumSmartContractDeployTransaction({ ...transactionOptions, protocol })
+      signedTx = await signCeloTx(builtTx, wallet.privateKey)
     } else {
-      throw new InvalidException('Invalid protocol')
+      signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
     }
+
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT })
   }
 }

@@ -6,13 +6,6 @@ const { Protocol } = require('../../../services/blockchain/constants')
 const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const {
-  ERC721_SAFE_TRANSFER_METHOD_ABI,
-  ERC1155_SAFE_TRANSFER_METHOD_ABI,
-  ERC721_MINT_METHOD_ABI,
-  ERC721_BURN_METHOD_ABI,
-  ERC1155_BURN_METHOD_ABI,
-  ERC1155_MINT_WITH_URI_METHOD_ABI,
-  ERC1155_MINT_METHOD_ABI,
   ERC721_APPROVE_METHOD_ABI,
   ERC1155_SETAPPROVALLFORALL_METHOD_ABI,
 } = require('../../../services/blockchain/contract/abis')
@@ -23,7 +16,6 @@ const {
   validateEvmNftBurn
 } = require('../../../services/validations/evm')
 const { getContractControllerInstance } = require('../../contract/controller')
-const { ERC721_INTERFACE_ID } = require('../../../services/blockchain/contract/constants')
 const { TransactionType, TransactionResponse, SignedTransaction } = require('../../transaction/entity')
 const { signEthereumTx } = require('../../../services/blockchain/ethereum')
 const { signCeloTx } = require('../../../services/blockchain/celo')
@@ -257,7 +249,7 @@ class Controller extends Interface {
           {
             method: 'post',
             url: `/tx/build/mint-nft?protocol=${protocol}`,
-            body: { protocol, from: wallet.address, amount, feeCurrency, uri, tokenId, destination, feeCurrency, token }, config: this.config
+            body: { protocol, from: wallet.address, amount, feeCurrency, uri, tokenId, destination, token }, config: this.config
           })
         let signedTx;
         if (protocol === Protocol.CELO) {
@@ -311,7 +303,7 @@ class Controller extends Interface {
           {
             method: 'post',
             url: `/tx/build/burn-nft?protocol=${protocol}`,
-            body: { protocol, from: wallet.address, amount, feeCurrency, tokenId, feeCurrency, token }, config: this.config
+            body: { protocol, from: wallet.address, amount, feeCurrency, tokenId, token }, config: this.config
           })
         let signedTx;
         if (protocol === Protocol.CELO) {
