@@ -134,7 +134,7 @@ class Controller extends Interface {
    */
   async create(input) {
     const {
-      protocol, wallet, symbol, name, amount, mintAuthorityAddress, meltAuthorityAddress, fixedSupply, decimals, feeCurrency
+      protocol, wallet, symbol, name, amount, mintAuthorityAddress, meltAuthorityAddress, fixedSupply, decimals, feeCurrency, fee
     } = input
     const tc = getTransactionControllerInstance(this.config)
     let tx, mint
@@ -172,7 +172,7 @@ class Controller extends Interface {
           {
             method: 'post',
             url: `/tx/build/deploy-token?protocol=${protocol}`,
-            body: { protocol, from: wallet.address, symbol, name, amount, type: "ERC20", decimals: decimalPlaces, feeCurrency }, config: this.config
+            body: { protocol, from: wallet.address, symbol, name, amount, type: "ERC20", decimals: decimalPlaces, feeCurrency, fee }, config: this.config
           })
         let signedTx;
         if (protocol === Protocol.CELO) {
@@ -229,7 +229,7 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async mint(input) {
-    const { protocol, token, wallet, destination, amount, mintAuthorityAddress, feeCurrency } = input
+    const { protocol, token, wallet, destination, amount, mintAuthorityAddress, feeCurrency, fee } = input
     const tc = getTransactionControllerInstance(this.config)
     let tx;
     switch (protocol) {
@@ -259,7 +259,7 @@ class Controller extends Interface {
           {
             method: 'post',
             url: `/tx/build/mint-token?protocol=${protocol}`,
-            body: { protocol, token, from: wallet.address, destination, amount, feeCurrency }, config: this.config
+            body: { protocol, token, from: wallet.address, destination, amount, feeCurrency, fee }, config: this.config
           })
         let signedTx;
         if (protocol === Protocol.CELO) {
@@ -285,7 +285,7 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async burn(input) {
-    const { protocol, token, wallet, amount, meltAuthorityAddress, feeCurrency } = input
+    const { protocol, token, wallet, amount, meltAuthorityAddress, feeCurrency, fee } = input
     const tc = getTransactionControllerInstance(this.config)
     let tx;
     switch (protocol) {
@@ -317,7 +317,7 @@ class Controller extends Interface {
           {
             method: 'post',
             url: `/tx/build/burn-token?protocol=${protocol}`,
-            body: { protocol, token, from: wallet.address, amount, feeCurrency }, config: this.config
+            body: { protocol, token, from: wallet.address, amount, feeCurrency, fee }, config: this.config
           })
         let signedTx;
         if (protocol === Protocol.CELO) {
@@ -343,7 +343,7 @@ class Controller extends Interface {
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
   async approve(input) {
-    const { protocol, token, wallet, spender, amount, feeCurrency } = input
+    const { protocol, token, wallet, spender, amount, feeCurrency, fee } = input
     switch (protocol) {
       case Protocol.ETHEREUM:
       case Protocol.CELO:
@@ -358,7 +358,8 @@ class Controller extends Interface {
           method: 'approve',
           contractAbi: ERC20_APPROVE_METHOD_ABI,
           params: [spender, toWei(amount, decimals).toString()],
-          feeCurrency
+          feeCurrency,
+          fee
         })
       }
       default:
