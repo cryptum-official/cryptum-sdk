@@ -2,7 +2,6 @@ module.exports.getLootBoxControllerInstance = (config) => new Controller(config)
 const InvalidException = require('../../../errors/InvalidException')
 const { makeRequest } = require('../../../services')
 const { signEthereumTx } = require('../../../services/blockchain/ethereum')
-const { isTestnet } = require('../../../services/utils')
 const { Protocol } = require('../../../services/blockchain/constants')
 const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
@@ -10,9 +9,9 @@ const { SignedTransaction, TransactionType } = require('../../transaction/entity
 const { signCeloTx } = require('../../../services/blockchain/celo')
 const { validateLootBoxDeploy, validateLootBoxCreation, validateLootBoxGetContent, validateLootBoxOpening, validateApproveContent } = require('../../../services/validations/lootBox')
 const { getContractControllerInstance } = require('../../contract/controller')
-const { buildEthereumSmartContractTransaction } = require('../../../services/blockchain/ethereum')
-const { buildCeloSmartContractTransaction } = require('../../../services/blockchain/celo')
-const { LOOTBOX_CONTENT_ABI, ERC20_APPROVE_METHOD_ABI, ERC721_APPROVE_METHOD_ABI, ERC1155_APPROVE_METHOD_ABI } = require("../../../services/blockchain/contract/abis")
+const { LOOTBOX_CONTENT_ABI } = require("../../../services/blockchain/contract/abis")
+const { getTokenControllerInstance } = require('../../../../dist/src/features/token/controller')
+const { getNftControllerInstance } = require('../../../../dist/src/features/nft/controller')
 
 class Controller extends Interface {
   /**
@@ -211,63 +210,16 @@ class Controller extends Interface {
     validateApproveContent(input)
     const { protocol, lootBoxAddress, amount, tokenType, tokenAddress, tokenId, wallet } = input
 
-    const tc = getTransactionControllerInstance(this.config)
-    let contractAbi, method, params
+    const tokenController = getTokenControllerInstance(this.config)
+    const nftController = getNftControllerInstance(this.config)
     switch (tokenType) {
       case 'ERC20':
-        contractAbi = ERC20_APPROVE_METHOD_ABI
-        method = 'approve'
-        params = [lootBoxAddress, amount]
-        break;
+        return await tokenController.approve({ amount, protocol, spender: lootBoxAddress, token: tokenAddress, wallet })
       case 'ERC721':
-        contractAbi = ERC721_APPROVE_METHOD_ABI
-        method = 'approve'
-        params = [lootBoxAddress, tokenId]
-        break;
+        return await nftController.approve({ protocol, token: tokenAddress, tokenId, wallet, operator: lootBoxAddress })
       case 'ERC1155':
-        contractAbi = ERC1155_APPROVE_METHOD_ABI
-        method = 'setApprovalForAll'
-        params = [lootBoxAddress, true]
-        break;
+        return await nftController.setApprovalForAll({ protocol, isApproved: "true", operator: lootBoxAddress, token: tokenAddress, wallet })
     }
-
-    const { info, networkFee } = await tc._getFeeInfo({
-      wallet,
-      type: TransactionType.CALL_CONTRACT_METHOD,
-      contractAddress: tokenAddress,
-      contractAbi,
-      method,
-      params,
-      fee: undefined,
-      protocol,
-    })
-    let signedTx
-    const transactionOptions = {
-      fromPrivateKey: wallet.privateKey,
-      nonce: info.nonce,
-      value: undefined,
-      contractAddress: tokenAddress,
-      contractAbi,
-      method,
-      params,
-      fee: networkFee,
-      feeCurrency: undefined,
-      testnet: isTestnet(this.config.environment),
-    }
-
-    if (protocol === Protocol.CELO) {
-      signedTx = await buildCeloSmartContractTransaction(transactionOptions)
-    } else if ([Protocol.ETHEREUM, Protocol.BSC, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
-      signedTx = await buildEthereumSmartContractTransaction({ ...transactionOptions, protocol })
-    } else {
-      throw new InvalidException('Invalid protocol')
-    }
-
-
-    return await tc.sendTransaction(
-      new SignedTransaction({
-        signedTx, protocol, type: TransactionType.LOOTBOX_APPROVE
-      }))
   }
 }
 

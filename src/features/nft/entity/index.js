@@ -32,6 +32,7 @@
  * @property {string=} mintAuthorityAddress address responsible to mint more tokens (for hathor only)
  * @property {string=} meltAuthorityAddress address responsible to burn more tokens (for hathor only)
  * @property {string=} feeCurrency fee currency (for celo only)
+ * @property {import("../../transaction/entity").Fee} fee fee
  * @property {import('../../transaction/entity').SolanaCreator[]=} creators true if this token has fixed supply (for solana only)
  * @property {number=} royaltiesFee (for solana only)
  * @property {string=} collection (for solana only)
@@ -44,6 +45,8 @@
  * @property {string | number} amount amount to be transferred
  * @property {string=} tokenId token id to be transferred only for EVMs (ethereum, bsc, celo, polygon, avax)
  * @property {string=} feeCurrency fee currency (for celo only)
+ * @property {import("../../transaction/entity").Fee} fee fee
+
  * 
  * @typedef {Object} NftMintInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
@@ -55,6 +58,7 @@
  * @property {string=} uri metadata URI string for EVMs this will be the base URI
  * @property {string=} mintAuthorityAddress mint authority address for hathor only
  * @property {string=} feeCurrency fee currency (for celo only)
+ * @property {import("../../transaction/entity").Fee} fee fee
  * 
  * @typedef {Object} NftBurnInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
@@ -64,6 +68,8 @@
  * @property {string=} tokenId token id to be burnt only for EVMs (ethereum, bsc, celo, polygon, avax)
  * @property {string=} meltAuthorityAddress melt authority address for hathor only
  * @property {string=} feeCurrency fee currency (for celo only)
+ * @property {import("../../transaction/entity").Fee} fee fee
+
  *
  * @typedef {Object} NftApproveInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
@@ -72,6 +78,7 @@
  * @property {string} tokenId token id
  * @property {string} operator address to add to the set of authorized operators
  * @property {string=} feeCurrency fee currency (for celo only)
+ * @property {import("../../transaction/entity").Fee} fee fee
  *
  * @typedef {Object} NftSetApprovalForAllInput
  * @property {import('../../../services/blockchain/constants').Protocol} protocol
@@ -80,5 +87,7 @@
  * @property {string} operator address to add to the set of authorized operators
  * @property {boolean} isApproved true if the operator is approved, false to revoke approval
  * @property {string=} feeCurrency fee currency (for celo only)
+* @property {import("../../transaction/entity").Fee} fee fee
+
  */
 module.exports = {}
