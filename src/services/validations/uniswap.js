@@ -75,14 +75,11 @@ module.exports.validateUniswapGetMintPositionQuotation = ({
   if (!minPriceDelta || typeof minPriceDelta !== 'string') {
     throw new InvalidException('Invalid minPriceDelta')
   }
-  if (+minPriceDelta < 0 || +minPriceDelta >= 100) {
-    throw new InvalidException('minPriceDelta must be a value between 0 and 100%')
+  if (+minPriceDelta >= 100) {
+    throw new InvalidException('minPriceDelta must be lesser than 100%')
   }
   if (!maxPriceDelta || typeof maxPriceDelta !== 'string') {
     throw new InvalidException('Invalid maxPriceDelta')
-  }
-  if (+maxPriceDelta < 0) {
-    throw new InvalidException('minPriceDelta must be a positive value')
   }
   if (deadline && typeof deadline !== 'string') {
     throw new InvalidException('Invalid deadline')
