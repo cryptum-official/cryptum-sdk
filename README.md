@@ -1,6 +1,6 @@
 <br />
 <p align="center">
-  <a href="https://blockforce.in/"><img alt="Cryptum" src="./docs/images/cryptum.jpeg"></a>
+  <a href="https://cryptum.io" target="_blank"><img alt="Cryptum" src="./docs/images/cryptum.jpeg"></a>
 </p>
 
 <!-- TABLE OF CONTENTS -->
@@ -41,7 +41,7 @@
 
 ## About The Project
 
-This project provides a handy way to integrage your JavaScript code with Cryptum's backend through simple function calls that do all the heavy lifting for you. Learn more about Cryptum [here](https://blockforce.in/).
+This project provides a handy way to integrage your JavaScript code with Cryptum's backend through simple function calls that do all the heavy lifting for you. Learn more about Cryptum <a href="https://cryptum.io" target="_blank">here</a>.
 
 ## First Steps
 
@@ -85,7 +85,7 @@ const sdk = new CryptumSDK({
 
 <br>
 
-For more in-depth examples check the docs/ folder and our guides [here](https://blockforce.in/).
+For more in-depth examples check the docs/ folder and our guides <a href="https://docs.cryptum.io" target="_blank">here</a>.
 
 ## Contributing
 
