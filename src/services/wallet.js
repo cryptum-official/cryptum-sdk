@@ -6,8 +6,8 @@ const rippleKeyPairs = require('ripple-keypairs')
 const { Keypair } = require('stellar-sdk')
 const hathorSdk = require('@hathor/wallet-lib')
 const bitcore = require('bitcore-lib')
-const CardanoWasm = require("@emurgo/cardano-serialization-lib-nodejs");
-const solanaWeb3 = require('@solana/web3.js');
+const CardanoWasm = require('@emurgo/cardano-serialization-lib-nodejs')
+const solanaWeb3 = require('@solana/web3.js')
 const ed25519 = require('ed25519-hd-key')
 const bs58 = require('bs58')
 
@@ -44,9 +44,10 @@ const getCardanoDerivationPath = ({ account = 0, address }) =>
   getDerivationPath({ purpose: 1852, coin: 1815, account, address })
 const getAvalancheDerivationPath = ({ account = 0, address }) =>
   getDerivationPath({ purpose: 44, coin: 9000, account, address })
+const getChilizDerivationPath = ({ account = 0, address }) =>
+  getDerivationPath({ purpose: 44, coin: 9000, account, address })
 const getSolanaDerivationPath = ({ account = 0, address }) =>
   getDerivationPath({ purpose: 44, coin: 501, account, address })
-
 
 /**
  * Get Bitcoin address from private key
@@ -292,51 +293,45 @@ module.exports.deriveHathorAddressFromXpub = (xpub, testnet, { address = 0 } = {
  */
 module.exports.deriveCardanoWalletFromDerivationPath = async (mnemonic, testnet, { account = 0, address = 0 } = {}) => {
   function harden(num) {
-    return 0x80000000 + num;
+    return 0x80000000 + num
   }
 
-  const entropy = mnemonicToEntropy(mnemonic);
-  const accountKey = CardanoWasm.Bip32PrivateKey.from_bip39_entropy(
-    Buffer.from(entropy, "hex"),
-    Buffer.from("")
-  )
+  const entropy = mnemonicToEntropy(mnemonic)
+  const accountKey = CardanoWasm.Bip32PrivateKey.from_bip39_entropy(Buffer.from(entropy, 'hex'), Buffer.from(''))
     .derive(harden(1852))
     .derive(harden(1815))
-    .derive(harden(account));
+    .derive(harden(account))
 
-  const privateKey = accountKey
-    .derive(0)
-    .derive(address);
+  const privateKey = accountKey.derive(0).derive(address)
 
-  const stakingKey = accountKey
-    .derive(2)
-    .derive(address)
+  const stakingKey = accountKey.derive(2).derive(address)
 
-  const utxoPubKey = privateKey
-    .to_public();
+  const utxoPubKey = privateKey.to_public()
 
-  const stakingPubKey = stakingKey
-    .to_public();
+  const stakingPubKey = stakingKey.to_public()
 
-  const pubKeyAsHex = Buffer.from(utxoPubKey.to_raw_key().as_bytes()).toString("hex");
-  const stakePubKeyAsHex = Buffer.from(stakingPubKey.to_raw_key().as_bytes()).toString("hex");
+  const pubKeyAsHex = Buffer.from(utxoPubKey.to_raw_key().as_bytes()).toString('hex')
+  const stakePubKeyAsHex = Buffer.from(stakingPubKey.to_raw_key().as_bytes()).toString('hex')
 
   const baseAddr = CardanoWasm.BaseAddress.new(
     testnet ? 0 : 1,
     CardanoWasm.StakeCredential.from_keyhash(utxoPubKey.to_raw_key().hash()),
-    CardanoWasm.StakeCredential.from_keyhash(stakingPubKey.to_raw_key().hash()),
-  ).to_address().to_bech32()
+    CardanoWasm.StakeCredential.from_keyhash(stakingPubKey.to_raw_key().hash())
+  )
+    .to_address()
+    .to_bech32()
 
   return {
-    address: baseAddr, xpub: pubKeyAsHex + stakePubKeyAsHex,
+    address: baseAddr,
+    xpub: pubKeyAsHex + stakePubKeyAsHex,
     publicKey: {
       spendingPublicKey: pubKeyAsHex,
       stakingPublicKey: stakePubKeyAsHex,
     },
     privateKey: {
       spendingPrivateKey: Buffer.from(privateKey.to_128_xprv()).toString('hex'),
-      stakingPrivateKey: Buffer.from(stakingKey.to_128_xprv()).toString('hex')
-    }
+      stakingPrivateKey: Buffer.from(stakingKey.to_128_xprv()).toString('hex'),
+    },
   }
 }
 
@@ -349,40 +344,54 @@ module.exports.deriveCardanoWalletFromDerivationPath = async (mnemonic, testnet,
  * @returns
  */
 module.exports.deriveCardanoAddressFromXpub = async (xpub, testnet) => {
-  let utxo = new Uint8Array(xpub.substr(0, 64).match(/.{1,2}/g).map(byte => parseInt(byte, 16)))
-  let stake = new Uint8Array(xpub.substr(64, 64).match(/.{1,2}/g).map(byte => parseInt(byte, 16)))
+  let utxo = new Uint8Array(
+    xpub
+      .substr(0, 64)
+      .match(/.{1,2}/g)
+      .map((byte) => parseInt(byte, 16))
+  )
+  let stake = new Uint8Array(
+    xpub
+      .substr(64, 64)
+      .match(/.{1,2}/g)
+      .map((byte) => parseInt(byte, 16))
+  )
   utxo = CardanoWasm.PublicKey.from_bytes(utxo)
   stake = CardanoWasm.PublicKey.from_bytes(stake)
 
   const baseAddr = CardanoWasm.BaseAddress.new(
     testnet ? 0 : 1,
     CardanoWasm.StakeCredential.from_keyhash(utxo.hash()),
-    CardanoWasm.StakeCredential.from_keyhash(stake.hash()),
-  ).to_address().to_bech32()
+    CardanoWasm.StakeCredential.from_keyhash(stake.hash())
+  )
+    .to_address()
+    .to_bech32()
 
   return baseAddr
 }
 
 module.exports.getCardanoAddressFromPrivateKey = (privateKey, testnet = true) => {
+  let spendingPrivateKey = new Uint8Array(
+    privateKey.spendingPrivateKey.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
+  )
+  let stakingPrivateKey = new Uint8Array(
+    privateKey.stakingPrivateKey.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
+  )
 
-  let spendingPrivateKey = new Uint8Array(privateKey.spendingPrivateKey.match(/.{1,2}/g).map(byte => parseInt(byte, 16)))
-  let stakingPrivateKey = new Uint8Array(privateKey.stakingPrivateKey.match(/.{1,2}/g).map(byte => parseInt(byte, 16)))
+  const spendingPublicKey = CardanoWasm.Bip32PrivateKey.from_128_xprv(spendingPrivateKey).to_public()
 
-  const spendingPublicKey = CardanoWasm.Bip32PrivateKey.from_128_xprv(spendingPrivateKey)
-    .to_public();
-
-  const stakingPubKey = CardanoWasm.Bip32PrivateKey.from_128_xprv(stakingPrivateKey)
-    .to_public();
+  const stakingPubKey = CardanoWasm.Bip32PrivateKey.from_128_xprv(stakingPrivateKey).to_public()
 
   const baseAddr = CardanoWasm.BaseAddress.new(
     testnet ? 0 : 1,
     CardanoWasm.StakeCredential.from_keyhash(spendingPublicKey.to_raw_key().hash()),
-    CardanoWasm.StakeCredential.from_keyhash(stakingPubKey.to_raw_key().hash()),
-  ).to_address().to_bech32()
+    CardanoWasm.StakeCredential.from_keyhash(stakingPubKey.to_raw_key().hash())
+  )
+    .to_address()
+    .to_bech32()
 
   return baseAddr
 }
-
 
 /**
  * Get Avalanche address from private key
@@ -408,6 +417,32 @@ module.exports.getAvalancheAddressFromPrivateKey = (privateKey) => {
  */
 
 module.exports.deriveAvalancheAddressFromXpub = async (xpub, { address = 0 } = {}) =>
+  this.deriveEthereumAddressFromXpub(xpub, { address })
+
+/**
+ * Get Chiliz address from private key
+ *
+ * @param {string} privateKey private key code58/hex string
+ * @returns {object} address
+ */
+
+module.exports.getChilizAddressFromPrivateKey = (privateKey) => {
+  const { address } = this.privateKeyToEthAccount(privateKey)
+  return address.toLowerCase()
+}
+
+/**
+ * Derive chiliz address, private key and public key
+ *
+ * @param {string} mnemonic mnemonic seed string
+ * @param {object=} derivationPath derivation path object
+ * @param {number} derivationPath.account derivation path account index
+ * @param {number} derivationPath.change derivation path change index
+ * @param {number} derivationPath.address derivation path address index
+ * @returns
+ */
+
+module.exports.deriveChilizAddressFromXpub = async (xpub, { address = 0 } = {}) =>
   this.deriveEthereumAddressFromXpub(xpub, { address })
 
 /**
@@ -446,10 +481,13 @@ module.exports.derivePolygonAddressFromXpub = async (xpub, { address = 0 } = {})
  * @param {number} derivationPath.address derivation path address index
  * @returns
  */
-module.exports.deriveSolanaWalletFromDerivationPath = async (mnemonic, { account = 0, change = 0, address = 0 } = {}) => {
+module.exports.deriveSolanaWalletFromDerivationPath = async (
+  mnemonic,
+  { account = 0, change = 0, address = 0 } = {}
+) => {
   const seed = Buffer.from(await mnemonicToSeed(mnemonic)).toString('hex')
   const path = getSolanaDerivationPath({ account, address }).slice(0, 13)
-  const { key } = ed25519.derivePath(path, Buffer.from(seed, "hex"))
+  const { key } = ed25519.derivePath(path, Buffer.from(seed, 'hex'))
   const keypair = solanaWeb3.Keypair.fromSeed(key)
   return {
     address: keypair.publicKey.toString(),

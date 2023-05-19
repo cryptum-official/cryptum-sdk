@@ -31,9 +31,16 @@ const {
   deriveAvalancheAddressFromXpub,
   derivePolygonAddressFromXpub,
   deriveSolanaWalletFromDerivationPath,
+  getChilizAddressFromPrivateKey,
+  deriveChilizAddressFromXpub,
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
-const { validateWalletInfo, validatePrivateKey, validateCardanoPrivateKey, validateWalletNft } = require('../../../services/validations')
+const {
+  validateWalletInfo,
+  validatePrivateKey,
+  validateCardanoPrivateKey,
+  validateWalletNft,
+} = require('../../../services/validations')
 const InvalidException = require('../../../errors/InvalidException')
 const { isTestnet } = require('../../../services/utils')
 
@@ -84,6 +91,8 @@ class Controller extends Interface {
         return await this.generateCardanoWallet({ mnemonic, derivation, testnet })
       case Protocol.AVAXCCHAIN:
         return await this.generateAvalancheWallet({ mnemonic, derivation, testnet })
+      case Protocol.CHILIZ:
+        return await this.generateChilizWallet({ mnemonic, derivation, testnet })
       case Protocol.POLYGON:
         return await this.generatePolygonWallet({ mnemonic, derivation, testnet })
       case Protocol.SOLANA:
@@ -136,6 +145,9 @@ class Controller extends Interface {
       case Protocol.AVAXCCHAIN:
         walletData.address = getAvalancheAddressFromPrivateKey(privateKey)
         break
+      case Protocol.CHILIZ:
+        walletData.address = getChilizAddressFromPrivateKey(privateKey)
+        break
       case Protocol.POLYGON:
         walletData.address = getPolygonAddressFromPrivateKey(privateKey)
         break
@@ -178,6 +190,9 @@ class Controller extends Interface {
         break
       case Protocol.AVAXCCHAIN:
         walletAddress = deriveAvalancheAddressFromXpub(xpub, { address })
+        break
+      case Protocol.CHILIZ:
+        walletAddress = deriveChilizAddressFromXpub(xpub, {address})
         break
       case Protocol.POLYGON:
         walletAddress = derivePolygonAddressFromXpub(xpub, { address })
@@ -293,6 +308,12 @@ class Controller extends Interface {
     return wallet
   }
 
+  async generateChilizWallet({ mnemonic, derivation, testnet }) {
+    const wallet = await this.generateEthereumWallet({ mnemonic, derivation, testnet })
+    wallet.protocol = Protocol.CHILIZ
+    return wallet
+  }
+
   async generatePolygonWallet({ mnemonic, derivation, testnet }) {
     const wallet = await this.generateEthereumWallet({ mnemonic, derivation, testnet })
     wallet.protocol = Protocol.POLYGON
@@ -349,7 +370,6 @@ class Controller extends Interface {
       await makeRequest({ method: 'get', url: `/wallet/${address}/nft?${qs.join('&')}`, config: this.config })
     )
   }
-
 }
 
 module.exports.WalletController = Controller

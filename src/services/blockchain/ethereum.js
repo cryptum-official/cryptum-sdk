@@ -1,19 +1,29 @@
 const { Transaction: EthereumTransaction } = require('@ethereumjs/tx')
 const { default: EthereumCommon } = require('@ethereumjs/common')
-const { BSC_COMMON_CHAIN, POLYGON_COMMON_CHAIN, Protocol, AVAXCCHAIN_COMMON_CHAIN } = require('./constants')
+const {
+  BSC_COMMON_CHAIN,
+  POLYGON_COMMON_CHAIN,
+  Protocol,
+  AVAXCCHAIN_COMMON_CHAIN,
+  CHLIZ_COMMON_CHAIN,
+} = require('./constants')
 const { GenericException } = require('../../errors')
 const { isTestnet } = require('../../services/utils')
 
-
 const signEthereumTx = (rawTransaction, protocol, fromPrivateKey, network) => {
-  network = isTestnet(network) ? "testnet" : "mainnet"
-  let common;
+  network = isTestnet(network) ? 'testnet' : 'mainnet'
+  let common
   if (protocol === Protocol.ETHEREUM) {
     common = new EthereumCommon({ chain: rawTransaction.chainId })
   } else if (protocol === Protocol.BSC) {
     common = EthereumCommon.forCustomChain(BSC_COMMON_CHAIN[network].base, BSC_COMMON_CHAIN[network].chain)
   } else if (protocol === Protocol.AVAXCCHAIN) {
-    common = EthereumCommon.forCustomChain(AVAXCCHAIN_COMMON_CHAIN[network].base, AVAXCCHAIN_COMMON_CHAIN[network].chain)
+    common = EthereumCommon.forCustomChain(
+      AVAXCCHAIN_COMMON_CHAIN[network].base,
+      AVAXCCHAIN_COMMON_CHAIN[network].chain
+    )
+  } else if (protocol === Protocol.CHILIZ) {
+    common = EthereumCommon.forCustomChain(CHLIZ_COMMON_CHAIN[network].base, CHLIZ_COMMON_CHAIN[network].chain)
   } else if (protocol === Protocol.POLYGON) {
     common = EthereumCommon.forCustomChain(POLYGON_COMMON_CHAIN[network].base, POLYGON_COMMON_CHAIN[network].chain)
   } else {
