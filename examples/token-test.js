@@ -7,21 +7,12 @@ const sdk = new CryptumSdk({
 
 const wallet = {
   protocol: 'CHILIZ',
-  privateKey: '0x975eda7e45334b31c6d3ace5c1d7ece69bf613a9ad1e5ed87da1fa671af036e5',
+  privateKey: '0xe99703f1214daea47d144f9bc59e8b427b0de1dbdc7ab2e68af86b867db27a40',
   publicKey:
-    '0x0dc8966f81a0e1e74d02d2a4f7b57ae8734bd045e32c60c265fbae20be88b436b1328c7c44564ab61eaa2ecb1607dbf24055000f9cbd53851b12528a388e8eaf',
-  address: '0x41b75df18e8b416386e1abba674a08cd55b10f9b',
-  xpub: 'xpub6E1bfW2Fecmm7XnDFvESQntFijA42ufkkY84YxA4vKnvJXud6r1WKhbENGgmBrehVXynVDDtEo6pR24mKZZTwYKXuqBN6Ymu5vGTQ82e7tA',
+    '0xe968c99792820f9ea888faf64d78f511c859d061dbb9a943a905f4a795dc198fd84faa936e05596d28fb3cb6e612cfa124a3c481724e21af001ad7fe306aede9',
+  address: '0x84e1B47babDd087E3B046c2c6d1606FFAB8Ddef2',
+  xpub: 'xpub6EJ5C4XvWTexbxtW2YEjdSWZM455sztsUnr2wwMvYD9g2zQmuCDwrB6N1nESvZfqDEas2dgijWn3nTtVHBB5FnKfep8sMNSAxTHZfWXF6YQ',
   testnet: undefined,
-}
-
-const walletTwo = {
-  protocol: 'CHILIZ',
-  privateKey: '0xabb220c719bd47275343f83c1a6036639c4b999f27b83c2831b167ca44b3d427',
-  publicKey: null,
-  address: '0x0c8bf2deb94d77a2c509d900dbdf77fe98397cec',
-  xpub: undefined,
-  testnet: true,
 }
 
 const getTokenInfo = async () => {
@@ -35,8 +26,8 @@ const getTokenBalance = async () => {
   console.log(
     await sdk.token.getBalance({
       protocol: 'CHILIZ',
-      address: '0x840ff03c4d5881c6340b3b89fd1c83c7476efc27',
-      tokenAddress: '0x840ff03C4D5881c6340B3B89FD1C83c7476eFc27',
+      address: '0x43cE2726F10169d40b9F97E7ca906aecb6403581',
+      tokenAddress: '0x43cE2726F10169d40b9F97E7ca906aecb6403581',
     })
   )
 }
@@ -48,8 +39,8 @@ const transferToken = async () => {
       wallet: wallet,
       protocol: 'CHILIZ',
       token: 'CHZ',
-      amount: '0.0000001',
-      destination: '0x0c8bf2deb94d77a2c509d900dbdf77fe98397cec',
+      amount: '1',
+      destination: '0x43cE2726F10169d40b9F97E7ca906aecb6403581',
     })
   )
 }
@@ -66,7 +57,7 @@ const createToken = async () => {
       protocol: 'CHILIZ',
       fee: {
         gas: 7.5,
-        gasPrice: 400000
+        gasPrice: 400000,
       },
     })
   )
@@ -86,8 +77,14 @@ const mintToken = async () => {
 }
 // mintToken() só com createToken funcionando
 
-// const burnToken = async () => {
-//   console.log( await sdk.token.burn({
-
-//   }))
-// }
+const burnToken = async () => {
+  console.log(
+    await sdk.token.burn({
+      protocol: 'CHILIZ',
+      amount: '1',
+      token: '0x840ff03C4D5881c6340B3B89FD1C83c7476eFc27',
+      wallet: wallet,
+    })
+  )
+}
+// burnToken()
