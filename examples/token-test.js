@@ -25,7 +25,7 @@ const getInfo = async () => {
 }
 // getInfo()
 
-const getTokenBalance = async () => {
+const getBalance = async () => {
   console.log(
     await sdk.token.getBalance({
       protocol: 'CHILIZ',
@@ -34,7 +34,7 @@ const getTokenBalance = async () => {
     })
   )
 }
-// getTokenBalance()
+// getBalance()
 
 const transferToken = async () => {
   console.log(
@@ -99,3 +99,4 @@ const approveToken = async () => {
 }
 
 // approveToken()
+

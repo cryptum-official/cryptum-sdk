@@ -33,10 +33,11 @@ class AxiosApi {
   getInstance(url) {
     if (this.api) return this.api
     let baseURL = ''
-    if (url.startsWith('/token')) baseURL = 'http://localhost:8080'    
+    if (url.startsWith('/token')) baseURL = 'http://localhost:8080'
     // if (url.startsWith("/wallet")) baseURL = "http://localhost:8090"
-    if (url.startsWith('/tx') || url.startsWith('/transaction')) baseURL = 'http://localhost:9000'
-  
+    if (url.startsWith('/tx') || url.startsWith('/transaction') || url.startsWith('/block'))
+      baseURL = 'http://localhost:9000'
+
     //const baseURL = this.getBaseUrl(this.config.environment)
     this.api = axios.create({ baseURL })
     return this.api
