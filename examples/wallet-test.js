@@ -17,13 +17,13 @@ const wallet = {
 
 
 
-const getWalletInfo = async () => {
+const getWallet = async () => {
   console.log(
     await sdk.wallet.getWalletInfo({
-      address: '0x84e1B47babDd087E3B046c2c6d1606FFAB8Ddef2',
-      protocol: 'CHILIZ',
+      address: '0xfD1A88E2138Ac4dC1C7Edf59dbaddd599E7803bD',
+      protocol: 'CHILIZ'      
     })
   )
 }
 
-// getWalletInfo()
+getWallet()

@@ -15,12 +15,15 @@ const wallet = {
   testnet: undefined,
 }
 
-const getTokenInfo = async () => {
+const getInfo = async () => {
   console.log(
-    await sdk.token.getInfo({ protocol: 'CHILIZ', tokenAddress: '0x840ff03C4D5881c6340B3B89FD1C83c7476eFc27' })
+    await sdk.token.getInfo({ 
+      protocol: 'CHILIZ', 
+      tokenAddress: '0x840ff03C4D5881c6340B3B89FD1C83c7476eFc27' 
+    })
   )
 }
-// getTokenInfo()
+// getInfo()
 
 const getTokenBalance = async () => {
   console.log(
@@ -38,9 +41,9 @@ const transferToken = async () => {
     await sdk.token.transfer({
       wallet: wallet,
       protocol: 'CHILIZ',
-      token: 'CHZ',
+      token: '0x840ff03C4D5881c6340B3B89FD1C83c7476eFc27',
       amount: '1',
-      destination: '0x43cE2726F10169d40b9F97E7ca906aecb6403581',
+      destination: '0xfD1A88E2138Ac4dC1C7Edf59dbaddd599E7803bD',
     })
   )
 }
@@ -55,10 +58,6 @@ const createToken = async () => {
       decimals: 18,
       amount: '0',
       protocol: 'CHILIZ',
-      fee: {
-        gas: 7.5,
-        gasPrice: 400000,
-      },
     })
   )
 }
@@ -87,4 +86,16 @@ const burnToken = async () => {
     })
   )
 }
-// burnToken()
+// burnToken() só com createToken funcionando
+
+const approveToken = async () => {
+  console.log(
+    await sdk.token.approve({
+      token: '0x840ff03C4D5881c6340B3B89FD1C83c7476eFc27',
+      protocol: 'CHILIZ',
+      wallet: wallet,
+    })
+  )
+}
+
+// approveToken()
