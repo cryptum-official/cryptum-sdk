@@ -68,13 +68,13 @@ const getWalletInfo = async () => {
     })
   )
 }
-// getWalletInfo() arrumar wallet infra
+// getWalletInfo()
 
 const getWalletNft = async () => {
   console.log(await sdk.wallet.getWalletNft({
-    address:'0x84e1B47babDd087E3B046c2c6d1606FFAB8Ddef2',
+    address:'0xfD1A88E2138Ac4dC1C7Edf59dbaddd599E7803bD',
     protocol: 'CHILIZ'
   }))
 }
-// getWalletNft() arrumar wallet infra
+// getWalletNft()  arrumar unsupported protocol
 
