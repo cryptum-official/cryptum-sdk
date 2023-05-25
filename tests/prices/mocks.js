@@ -15,5 +15,6 @@ module.exports = {
     HTR: faker.datatype.number(),
     ADA: faker.datatype.number(),
     AVAX: faker.datatype.number(),
+    CHZ: faker.datatype.number(),
   }
 };

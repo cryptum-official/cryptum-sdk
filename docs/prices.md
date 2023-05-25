@@ -2,7 +2,7 @@
 
 List currency price quotations in realtime.
 
-Possible tokens are: XLM, XRP, BTC, ETH, CELO, BNB, MDA, HTR, ADA, AVAX, SOL, MATIC, BRL, USD.
+Possible tokens are: XLM, XRP, BTC, ETH, CELO, BNB, MDA, HTR, ADA, AVAX, CHZ, SOL, MATIC, BRL, USD.
 
 ```js
 const sdk = new CryptumSdk({

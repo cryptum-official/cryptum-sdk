@@ -7,19 +7,18 @@ const sdk = new CryptumSdk({
 
 const wallet = {
   protocol: 'CHILIZ',
-  privateKey: '0xe99703f1214daea47d144f9bc59e8b427b0de1dbdc7ab2e68af86b867db27a40',
-  publicKey:
-    '0xe968c99792820f9ea888faf64d78f511c859d061dbb9a943a905f4a795dc198fd84faa936e05596d28fb3cb6e612cfa124a3c481724e21af001ad7fe306aede9',
-  address: '0x84e1B47babDd087E3B046c2c6d1606FFAB8Ddef2',
-  xpub: 'xpub6EJ5C4XvWTexbxtW2YEjdSWZM455sztsUnr2wwMvYD9g2zQmuCDwrB6N1nESvZfqDEas2dgijWn3nTtVHBB5FnKfep8sMNSAxTHZfWXF6YQ',
-  testnet: undefined,
+  privateKey: '0x2bf8ee73ce9f273c95c92f8cd2d0c01484322c96a41176d58c9528a94422f8ce',
+  publicKey: null,
+  address: '0xfd1a88e2138ac4dc1c7edf59dbaddd599e7803bd',
+  xpub: undefined,
+  testnet: true,
 }
 
 const getInfo = async () => {
   console.log(
-    await sdk.token.getInfo({ 
-      protocol: 'CHILIZ', 
-      tokenAddress: '0x840ff03C4D5881c6340B3B89FD1C83c7476eFc27' 
+    await sdk.token.getInfo({
+      protocol: 'CHILIZ',
+      tokenAddress: '0x840ff03C4D5881c6340B3B89FD1C83c7476eFc27',
     })
   )
 }
@@ -29,8 +28,8 @@ const getBalance = async () => {
   console.log(
     await sdk.token.getBalance({
       protocol: 'CHILIZ',
-      address: '0x43cE2726F10169d40b9F97E7ca906aecb6403581',
-      tokenAddress: '0x43cE2726F10169d40b9F97E7ca906aecb6403581',
+      address: '0xfD1A88E2138Ac4dC1C7Edf59dbaddd599E7803bD',
+      tokenAddress: '0x840ff03C4D5881c6340B3B89FD1C83c7476eFc27',
     })
   )
 }
@@ -41,8 +40,8 @@ const transferToken = async () => {
     await sdk.token.transfer({
       wallet: wallet,
       protocol: 'CHILIZ',
-      token: '0x840ff03C4D5881c6340B3B89FD1C83c7476eFc27',
-      amount: '1',
+      token: 'CHZ',
+      amount: '2',
       destination: '0xfD1A88E2138Ac4dC1C7Edf59dbaddd599E7803bD',
     })
   )
@@ -54,7 +53,7 @@ const createToken = async () => {
     await sdk.token.create({
       wallet: wallet,
       name: 'renataTEST',
-      symbol: 'RTEST',
+      symbol: 'RNT',
       decimals: 18,
       amount: '0',
       protocol: 'CHILIZ',
@@ -68,35 +67,34 @@ const mintToken = async () => {
     await sdk.token.mint({
       protocol: 'CHILIZ',
       wallet: wallet,
-      tokenAddress: '0x840ff03C4D5881c6340B3B89FD1C83c7476eFc27',
-      token: '',
-      amount: '',
+      token: '0xc070Bcd22e88615d4092c70BEF104d80a4c213aC',
+      amount: '9',
+      destination: '0xfd1a88e2138ac4dc1c7edf59dbaddd599e7803bd',
     })
   )
 }
-// mintToken() só com createToken funcionando
+// mintToken()
 
 const burnToken = async () => {
   console.log(
     await sdk.token.burn({
       protocol: 'CHILIZ',
       amount: '1',
-      token: '0x840ff03C4D5881c6340B3B89FD1C83c7476eFc27',
+      token: '0xc070Bcd22e88615d4092c70BEF104d80a4c213aC',
       wallet: wallet,
     })
   )
 }
-// burnToken() só com createToken funcionando
+// burnToken() 
 
 const approveToken = async () => {
   console.log(
     await sdk.token.approve({
-      token: '0x840ff03C4D5881c6340B3B89FD1C83c7476eFc27',
+      token: '0xc070Bcd22e88615d4092c70BEF104d80a4c213aC',
       protocol: 'CHILIZ',
       wallet: wallet,
     })
   )
 }
 
-// approveToken()
-
+// approveToken() arrumar (Unsupported protocol)

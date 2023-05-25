@@ -34,9 +34,9 @@ class AxiosApi {
     if (this.api) return this.api
     let baseURL = ''
     if (url.startsWith('/prices')) baseURL = 'http://localhost:5000'
-    if (url.startsWith('/token')) baseURL = 'http://localhost:8080'
+    if (url.startsWith('/token') ||url.startsWith('/nft') ) baseURL = 'http://localhost:8080'
     if (url.startsWith("/wallet")) baseURL = "http://localhost:8090"
-    if (url.startsWith('/tx') || url.startsWith('/transaction') || url.startsWith('/block'))
+    if (url.startsWith('/tx') || url.startsWith('/transaction') || url.startsWith('/block') || url.startsWith('/fee'))
       baseURL = 'http://localhost:9000'
 
     //const baseURL = this.getBaseUrl(this.config.environment)

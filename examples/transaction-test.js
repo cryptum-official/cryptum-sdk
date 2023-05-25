@@ -24,19 +24,19 @@ const sendTransaction = async () => {
 // sendTransaction() arrumar
 
 const getTransactionByHash = async () => {
-  console.log(
+  console.log('getTransactionByHash',
     await sdk.transaction.getTransactionByHash({
-      hash: '0x5082300acf0f27a559a3eba0c5f3a88e625bcba86767ba66afa0967dc06b7ea4',
+      hash: '0xdd1defa2acb0b58beb40ba864b24e80d42b5ee1ea2fab6bb83712da393656ea9',
       protocol: 'CHILIZ',
     })
   )
 }
-// getTransactionByHash()
+getTransactionByHash()
 
 const getTransactionReceiptByHash = async () => {
-  console.log(
+  console.log('getTransactionReceiptByHash',
     await sdk.transaction.getTransactionReceiptByHash({
-      hash: '0x5082300acf0f27a559a3eba0c5f3a88e625bcba86767ba66afa0967dc06b7ea4',
+      hash: '0x85c6a88cdaa399126a1e8f1bb94a229d52edf46e00e93842cd12870787de6058',
       protocol: 'CHILIZ',
     })
   )
@@ -44,19 +44,19 @@ const getTransactionReceiptByHash = async () => {
 // getTransactionReceiptByHash()
 
 const getProxyAddressByHash = async () => {
-  console.log(
+  console.log('getProxyAddressByHash',
     await sdk.transaction.getProxyAddressByHash({
-      hash: '',
-      protocol: 'CHILIZ',
+      protocol: 'CHILIZ',      
+      hash: '0x8c278b7f3d1d950778885410efd647f7b487138ad538ab7c5ef5ed1122f13c76',
     })
   )
 }
-// getProxyAddressByHash() arrumar quando criar token
+// getProxyAddressByHash() arrumar (Invalid hash)
 
 const getBlock = async () => {
   console.log(
     await sdk.transaction.getBlock({
-      block: '1000',
+      block: '3848407',
       protocol: 'CHILIZ',
     })
   )
@@ -66,25 +66,24 @@ const getBlock = async () => {
 const createChilizTransferTransaction = async () => {
   console.log(
     await sdk.transaction.createChilizTransferTransaction({
-      amount: '1',
-      protocol: 'CHILIZ',
-      token: '0x840ff03C4D5881c6340B3B89FD1C83c7476eFc27',
       wallet: wallet,
+      protocol: 'CHILIZ',
+      contractAddress: '0xc070Bcd22e88615d4092c70BEF104d80a4c213aC',
+      amount: '1',
       destination: '0x672861244519573bf14c567F3E978E5DB8609ad1',      
     })
   )
 }
-// createChilizTransferTransaction() arrumar contract address
+// createChilizTransferTransaction()
 
 const getFeeInfo = async () => {
   console.log(await sdk.transaction._getFeeInfo({
-    amount:'1',
     protocol: 'CHILIZ',
-    destination:'0x672861244519573bf14c567F3E978E5DB8609ad1',
-    wallet: wallet
+    wallet: wallet.address,
+    
   }))
 }
-// getFeeInfo() arrumar wallet infra
+// getFeeInfo() arrumar (The "address" parameter must be of the "string" type)
 
 
 

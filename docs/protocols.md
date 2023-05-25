@@ -11,6 +11,7 @@
 - RIPPLE (mainnet, testnet)
 - POLYGON (mainnet, testnet)
 - AVAXCCHAIN (mainnet, fuji)
+- CHILIZ (mainnet, testnet)
 - SOLANA (mainnet, devnet)
 - HATHOR (mainnet, testnet)
 
@@ -21,3 +22,4 @@
 - POLYGON
 - BSC
 - AVAXCCHAIN
+- CHILIZ

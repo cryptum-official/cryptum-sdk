@@ -33,25 +33,25 @@ const generateWallet = async () => {
 }
 // generateWallet()
 
-const getChilizAddressFromPrivateKey = async () => {
+const generateWalletFromPrivateKey = async () => {
   console.log(
     await sdk.wallet.generateWalletFromPrivateKey({
-      privateKey: '0xd87a53e2e84732429bc73a36b52a911db3b3dcadd317729c8fb6b135adeba9e9',
+      privateKey: '0x2bf8ee73ce9f273c95c92f8cd2d0c01484322c96a41176d58c9528a94422f8ce',
       protocol: 'CHILIZ',
     })
   )
 }
-// getChilizAddressFromPrivateKey()
+// generateWalletFromPrivateKey()
 
 const generateWalletAddressFromXpub = async () => {
   console.log(
     sdk.wallet.generateWalletAddressFromXpub({
       protocol: 'CHILIZ',
-      xpub: 'xpub6EJ5C4XvWTexbxtW2YEjdSWZM455sztsUnr2wwMvYD9g2zQmuCDwrB6N1nESvZfqDEas2dgijWn3nTtVHBB5FnKfep8sMNSAxTHZfWXF6YQ',
+      xpub: 'xpub6EXGf8jsdCML3GUK1udbrH5kFj4pGfaAx8XTNk5x9iyE9tkGZmqhUC2pPD2YZbzoA3ZDNkiMh2kyviwAouq22kEwyUdLxWXMi7vaAAFq9uQ',
     })
   )
 }
-// generateWalletAddressFromXpub() arrumar pending
+// generateWalletAddressFromXpub() arrumar (Pending) 
 
 const generateChilizWallet = async () => {
   console.log(await sdk.wallet.generateChilizWallet({
