@@ -79,8 +79,17 @@ const mintNft = async () => {
 // mintNft()
 
 const burnNft = async () => {
-  console.log(await sdk.nft.burn({}))
+  console.log(
+    await sdk.nft.burn({
+      protocol: 'CHILIZ',
+      token: '0x9f7296082dAf0615a48FEdA17Dddd2e6d0d5262F',
+      wallet: wallet,
+      tokenId: 0,
+      amount: '1'
+    })
+  )
 }
+// burnNft()
 
 const approveNft = async () => {
   console.log(
@@ -101,8 +110,8 @@ const setApprovalForAll = async () => {
       token: '0x9f7296082dAf0615a48FEdA17Dddd2e6d0d5262F',
       wallet: wallet,
       operator: '',
-      isApproved:''
+      isApproved: '',
     })
   )
 }
-// setApprovalForAll() arrumar 
+// setApprovalForAll() arrumar
