@@ -19,62 +19,75 @@ const wallet = {
 }
 
 const generateRandomMnemonic = async () => {
-  console.log(await sdk.wallet.generateRandomMnemonic())
+  console.log('------generateRandomMnemonic------: ', await sdk.wallet.generateRandomMnemonic())
 }
-// generateRandomMnemonic()
 
 const generateWallet = async () => {
   console.log(
+    '------generateWallet------: ',
     await sdk.wallet.generateWallet({
       protocol: 'CHILIZ',
       mnemonic: randomMnemonic,
     })
   )
 }
-// generateWallet()
 
 const generateWalletFromPrivateKey = async () => {
   console.log(
+    '------generateWalletFromPrivateKey------: ',
     await sdk.wallet.generateWalletFromPrivateKey({
       privateKey: '0x2bf8ee73ce9f273c95c92f8cd2d0c01484322c96a41176d58c9528a94422f8ce',
       protocol: 'CHILIZ',
     })
   )
 }
-// generateWalletFromPrivateKey()
 
 const generateWalletAddressFromXpub = async () => {
   console.log(
-    sdk.wallet.generateWalletAddressFromXpub({
+    '------generateWalletAddressFromXpub------: ',
+    await sdk.wallet.generateWalletAddressFromXpub({
       protocol: 'CHILIZ',
       xpub: 'xpub6EXGf8jsdCML3GUK1udbrH5kFj4pGfaAx8XTNk5x9iyE9tkGZmqhUC2pPD2YZbzoA3ZDNkiMh2kyviwAouq22kEwyUdLxWXMi7vaAAFq9uQ',
     })
   )
 }
-// generateWalletAddressFromXpub() arrumar (Pending) 
 
 const generateChilizWallet = async () => {
-  console.log(await sdk.wallet.generateChilizWallet({
-    mnemonic: randomMnemonic
-  }))
+  console.log(
+    '------generateChilizWallet------: ',
+    await sdk.wallet.generateChilizWallet({
+      mnemonic: randomMnemonic,
+    })
+  )
 }
-// generateChilizWallet()
 
 const getWalletInfo = async () => {
   console.log(
+    '------getWalletInfo------: ',
     await sdk.wallet.getWalletInfo({
       address: '0xf1f2c62767518668874a02360c3f9f52cdfa196a',
       protocol: 'CHILIZ',
     })
   )
 }
-// getWalletInfo()
 
 const getWalletNft = async () => {
-  console.log(await sdk.wallet.getWalletNft({
-    address:'0xfD1A88E2138Ac4dC1C7Edf59dbaddd599E7803bD',
-    protocol: 'CHILIZ'
-  }))
+  console.log(
+    '------getWalletNft------: ',
+    await sdk.wallet.getWalletNft({
+      address: '0xfD1A88E2138Ac4dC1C7Edf59dbaddd599E7803bD',
+      protocol: 'CHILIZ',
+    })
+  )
 }
-// getWalletNft()  arrumar unsupported protocol
 
+async function run() {
+  await generateRandomMnemonic()
+  await generateWallet()
+  await generateWalletFromPrivateKey()
+  await generateWalletAddressFromXpub()
+  await generateChilizWallet()
+  await getWalletInfo()
+  //await getWalletNft() usa serviço de terceiros e irá mudar
+}
+run()

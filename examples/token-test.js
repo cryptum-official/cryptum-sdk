@@ -16,16 +16,17 @@ const wallet = {
 
 const getInfo = async () => {
   console.log(
+    '------getInfo------: ',
     await sdk.token.getInfo({
       protocol: 'CHILIZ',
       tokenAddress: '0x840ff03C4D5881c6340B3B89FD1C83c7476eFc27',
     })
   )
 }
-// getInfo()
 
 const getBalance = async () => {
   console.log(
+    '------getBalance------: ',
     await sdk.token.getBalance({
       protocol: 'CHILIZ',
       address: '0xfD1A88E2138Ac4dC1C7Edf59dbaddd599E7803bD',
@@ -33,10 +34,10 @@ const getBalance = async () => {
     })
   )
 }
-// getBalance()
 
 const transferToken = async () => {
   console.log(
+    '------transferToken------: ',
     await sdk.token.transfer({
       wallet: wallet,
       protocol: 'CHILIZ',
@@ -46,10 +47,10 @@ const transferToken = async () => {
     })
   )
 }
-// transferToken()
 
 const createToken = async () => {
   console.log(
+    '------createToken------: ',
     await sdk.token.create({
       wallet: wallet,
       name: 'renataTEST',
@@ -60,10 +61,10 @@ const createToken = async () => {
     })
   )
 }
-// createToken()
 
 const mintToken = async () => {
   console.log(
+    '------mintToken------: ',
     await sdk.token.mint({
       protocol: 'CHILIZ',
       wallet: wallet,
@@ -73,10 +74,10 @@ const mintToken = async () => {
     })
   )
 }
-// mintToken()
 
 const burnToken = async () => {
   console.log(
+    '------burnToken------: ',
     await sdk.token.burn({
       protocol: 'CHILIZ',
       amount: '1',
@@ -85,16 +86,27 @@ const burnToken = async () => {
     })
   )
 }
-// burnToken() 
 
 const approveToken = async () => {
   console.log(
+    '------approveToken------: ',
     await sdk.token.approve({
       token: '0xc070Bcd22e88615d4092c70BEF104d80a4c213aC',
       protocol: 'CHILIZ',
       wallet: wallet,
+      spender: '0x672861244519573bf14c567F3E978E5DB8609ad1',
+      amount: '1',
     })
   )
 }
 
-// approveToken() arrumar (Unsupported protocol)
+async function run() {
+  await getInfo()
+  await getBalance()
+  await transferToken()
+  await createToken()
+  await mintToken()
+  await burnToken()
+  await approveToken()
+}
+run()

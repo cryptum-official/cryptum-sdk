@@ -7,7 +7,7 @@ const sdk = new CryptumSdk({
 
 const getPrices = async () => {
   console.log(await sdk.prices.getPrices({
-    asset:'AVAX'
+    asset:'CHILIZ'
   }))
 }
-getPrices()
+// getPrices()
