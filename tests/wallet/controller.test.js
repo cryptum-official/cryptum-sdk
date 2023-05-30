@@ -65,6 +65,14 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       })
       assert.strictEqual(wallet.address, '0xcf61eaf64d895c3c71a8812e9eedc4c179b4ed60')
     })
+    it('chiliz', async () => {
+      const controller = getWalletControllerInstance(config)
+      const wallet = await controller.generateWalletFromPrivateKey({
+        protocol: Protocol.CHILIZ,
+        privateKey: 'c8500a98d1093e8809855411f8b996f01b4de8618ab4d1e12e29d637a986d4d8'
+      })
+      assert.strictEqual(wallet.address, '0xcf61eaf64d895c3c71a8812e9eedc4c179b4ed60')
+    })
     it('celo', async () => {
       const controller = getWalletControllerInstance(config)
       const wallet = await controller.generateWalletFromPrivateKey({
@@ -122,6 +130,18 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         mnemonic,
       })
       assert.strictEqual(wallet.protocol, Protocol.AVAXCCHAIN)
+      assert.strictEqual(
+        wallet.address,
+        '0xcf61eaf64d895c3c71a8812e9eedc4c179b4ed60'
+      )
+    })
+    it('generate chiliz wallet', async () => {
+      const controller = getWalletControllerInstance(config)
+      const wallet = await controller.generateWallet({
+        protocol: Protocol.CHILIZ,
+        mnemonic,
+      })
+      assert.strictEqual(wallet.protocol, Protocol.CHILIZ)
       assert.strictEqual(
         wallet.address,
         '0xcf61eaf64d895c3c71a8812e9eedc4c179b4ed60'
@@ -248,6 +268,15 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const controller = getWalletControllerInstance(config)
       const walletAddress = await controller.generateWalletAddressFromXpub({
         protocol: Protocol.AVAXCCHAIN,
+        xpub: 'xpub6Bxt5wwQHqGvkwtq44FMFB7SaJ1jrqfaKwNtymniWUi4bB6Sfn7V9iTw3P4TGkgDaht7yyiyzg3ZBbWP5GMmUBS1fSQAtLUdGYmDt9A1dWa',
+        address: 0
+      })
+      assert.strictEqual(walletAddress, '0xb67dce3b8272340d517ec6231e435319813a749b')
+    })
+    it('chiliz', async () => {
+      const controller = getWalletControllerInstance(config)
+      const walletAddress = await controller.generateWalletAddressFromXpub({
+        protocol: Protocol.CHILIZ,
         xpub: 'xpub6Bxt5wwQHqGvkwtq44FMFB7SaJ1jrqfaKwNtymniWUi4bB6Sfn7V9iTw3P4TGkgDaht7yyiyzg3ZBbWP5GMmUBS1fSQAtLUdGYmDt9A1dWa',
         address: 0
       })
