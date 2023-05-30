@@ -42,10 +42,6 @@ const getHathorDerivationPath = ({ account = 0, address }) =>
   getDerivationPath({ purpose: 44, coin: 280, account, address })
 const getCardanoDerivationPath = ({ account = 0, address }) =>
   getDerivationPath({ purpose: 1852, coin: 1815, account, address })
-const getAvalancheDerivationPath = ({ account = 0, address }) =>
-  getDerivationPath({ purpose: 44, coin: 9000, account, address })
-const getChilizDerivationPath = ({ account = 0, address }) =>
-  getDerivationPath({ purpose: 44, coin: 9000, account, address })
 const getSolanaDerivationPath = ({ account = 0, address }) =>
   getDerivationPath({ purpose: 44, coin: 501, account, address })
 
