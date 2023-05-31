@@ -35,7 +35,7 @@ module.exports.validateLootBoxDeploy = ({
     )
   }
   if (
-    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(
+    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(
       protocol
     )
   ) {
@@ -58,7 +58,7 @@ module.exports.validateLootBoxCreation = ({
     throw new InvalidException('Invalid wallet')
   }
   if (
-    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(
+    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(
       protocol
     )
   ) {
@@ -98,7 +98,7 @@ module.exports.validateLootBoxOpening = ({ protocol, wallet, lootBoxId, amount, 
     throw new InvalidException('Invalid wallet')
   }
   if (
-    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(
+    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(
       protocol
     )
   ) {
@@ -129,7 +129,7 @@ module.exports.validateApproveContent = ({
     throw new InvalidException('Invalid wallet')
   }
   if (
-    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(
+    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(
       protocol
     )
   ) {
@@ -154,7 +154,7 @@ module.exports.validateApproveContent = ({
 
 module.exports.validateLootBoxGetContent = ({ protocol, lootBoxId, lootBoxAddress }) => {
   if (
-    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(
+    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(
       protocol
     )
   ) {

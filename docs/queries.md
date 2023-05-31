@@ -202,8 +202,8 @@ const metadata = await sdk.nft.getMetadata({
 Get NFT balance.
 
 - `opts.address` (string)(**required**) - wallet address.
-- `opts.tokenAddress` (string) - token address only for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `BSC`, `POLYGON`, and `SOLANA`.
-- `opts.tokenId` (string) - token id for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `BSC`, `POLYGON`, and `SOLANA`.
+- `opts.tokenAddress` (string) - token address only for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `CHILIZ`, `BSC`, `POLYGON`, and `SOLANA`.
+- `opts.tokenId` (string) - token id for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `CHILIZ`, `BSC`, `POLYGON`, and `SOLANA`.
 - `opts.tokenUid` (string) - token UID for HATHOR.
 - `opts.protocol` (string)(**required**) - blockchain protocol. Only for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `CHILIZ`, `BSC`, `POLYGON`, and `SOLANA` and `HATHOR`.
 
