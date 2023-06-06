@@ -52,7 +52,7 @@
  * @property {string=} feeCurrency fee currency (for celo only)
  * @property {boolean=} fixedSupply true if this token has fixed supply (for solana only)
  * @property {number=} decimals (for solana only)
- * @property {import("../../transaction/entity").Fee} fee fee
+ * @property {import("../../transaction/entity").Fee=} fee fee
 
  */
 /**
@@ -64,7 +64,7 @@
  * @property {string} amount amount to be transferred
  * @property {string=} mintAuthorityAddress address responsible to mint more tokens (for hathor only)
  * @property {string=} feeCurrency fee currency (for celo only)
- * @property {import("../../transaction/entity").Fee} fee fee
+ * @property {import("../../transaction/entity").Fee=} fee fee
  */
 /**
  * @typedef {Object} TokenBurnInput
@@ -74,7 +74,7 @@
  * @property {string} amount amount to be transferred
  * @property {string=} meltAuthorityAddress address responsible to burn more tokens (for hathor only)
  * @property {string=} feeCurrency fee currency (for celo only)
- * @property {import("../../transaction/entity").Fee} fee fee
+ * @property {import("../../transaction/entity").Fee=} fee fee
  */
 /**
  * @typedef {Object} TokenApproveInput
