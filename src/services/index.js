@@ -49,13 +49,8 @@ const handleRequestError = (error) => {
 const makeRequest = async ({ method, url, params, headers, body, config }) => {
   try {
     const axios = new AxiosApi(config)
-    let api
-    if (RegExp('/contract/uniswap').exec(url)) {
-      // console.log('Using local token-infra')
-      api = rawAxios.create({ baseURL: 'http://localhost:8080' })
-    } else {
-      api = axios.getInstance()
-    }
+    const api = axios.getInstance()
+
     const response = await api({
       method,
       url,
