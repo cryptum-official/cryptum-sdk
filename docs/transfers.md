@@ -139,6 +139,38 @@ const transaction = await txController.createAvaxCChainTransferTransaction({
   destination: '0x3f2f3D45196D7...15e8f530165eCb93e772',
 })
 ```
+
+## Chiliz
+
+#### `txController.createChilizTransferTransaction(opts)`
+
+Create a transfer transaction in Chiliz blockchain, you can transfer CHZ or any other tokens that were created in its network.
+* `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
+* `opts.tokenSymbol` (string) - token to transfer. If you are transferring chz this parameter should be `CHZ`, otherwise you can leave undefined.
+* `opts.contractAddress` (string) - required if you are transferring a ERC20 token, otherwise leave undefined.
+* `opts.amount` (string)(__required__) - amount to be transferred.
+* `opts.destination` (string)(__required__) - destination address to be transfer to.
+* `opts.fee` - optional fee object.
+  * `opts.fee.gas` (number) - gas value.
+  * `opts.fee.gasPrice` (string) - gas price.
+
+Examples:
+```js
+// transfer CHZ
+const transaction = await txController.createChilizTransferTransaction({
+  wallet,
+  tokenSymbol: 'CHZ',
+  amount: '0.01',
+  destination: '0x3f2f3D45196...5e8f530165eCb93e772',
+})
+// transfer Chiliz token
+const transaction = await txController.createChilizTransferTransaction({
+  wallet,
+  contractAddress: '0xcf1caf3f6aa5...50dd1206a7cc3c76dc10',
+  amount: '0.01',
+  destination: '0x3f2f3D45196D7...15e8f530165eCb93e772',
+})
+```
 ## Bitcoin
 
 #### `txController.createBitcoinTransferTransaction(opts)`

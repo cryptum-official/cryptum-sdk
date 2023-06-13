@@ -69,7 +69,7 @@
 * @property {string} token token name or address to transfer
 * @property {string} destination destination address
 * @property {string | number} amount amount to be transferred
-* @property {string=} tokenId token id to be transferred only for EVMs (ethereum, bsc, celo, polygon, avax)
+* @property {string=} tokenId token id to be transferred only for EVMs (ethereum, bsc, celo, polygon, avax, chiliz)
 * @property {string=} feeCurrency fee currency (for celo only)
 * 
 * @typedef {Object} NftMintInput
@@ -78,7 +78,7 @@
 * @property {string} token token address to mint
 * @property {string} destination destination address
 * @property {string} amount amount to be minted
-* @property {string=} tokenId token id to be minted only for EVMs (ethereum, bsc, celo, polygon, avax)
+* @property {string=} tokenId token id to be minted only for EVMs (ethereum, bsc, celo, polygon, avax, chiliz)
 * @property {string=} uri metadata URI string for EVMs this will be the base URI
 * @property {string=} mintAuthorityAddress mint authority address for hathor only
 * @property {string=} feeCurrency fee currency (for celo only)
@@ -88,7 +88,7 @@
 * @property {string} walletId
 * @property {string} token token address to burn
 * @property {string} amount amount to be burnt
-* @property {string=} tokenId token id to be burnt only for EVMs (ethereum, bsc, celo, polygon, avax)
+* @property {string=} tokenId token id to be burnt only for EVMs (ethereum, bsc, celo, polygon, avax, chiliz)
 * @property {string=} meltAuthorityAddress melt authority address for hathor only
 * @property {string=} feeCurrency fee currency (for celo only)
 

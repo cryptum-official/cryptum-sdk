@@ -1,14 +1,7 @@
-const InvalidException = require("../../errors/InvalidException")
-const { Protocol, TOKEN_TYPES } = require("../blockchain/constants")
+const InvalidException = require('../../errors/InvalidException')
+const { Protocol, TOKEN_TYPES } = require('../blockchain/constants')
 
-module.exports.validateEvmNftTransfer = ({
-  wallet,
-  token,
-  destination,
-  tokenId,
-  amount,
-  protocol,
-}) => {
+module.exports.validateEvmNftTransfer = ({ wallet, token, destination, tokenId, amount, protocol }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
@@ -24,20 +17,15 @@ module.exports.validateEvmNftTransfer = ({
   if (amount && Number(amount) < 0) {
     throw new InvalidException('Invalid amount')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (
+    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(
+      protocol
+    )
+  ) {
     throw new InvalidException('Invalid protocol')
   }
 }
-module.exports.validateEvmTokenCreation = ({
-  wallet,
-  type,
-  name,
-  symbol,
-  uri,
-  amount,
-  protocol,
-  fee
-}) => {
+module.exports.validateEvmTokenCreation = ({ wallet, type, name, symbol, uri, amount, protocol, fee }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
@@ -56,7 +44,7 @@ module.exports.validateEvmTokenCreation = ({
   if (amount && Number(amount) < 0) {
     throw new InvalidException('Invalid amount')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (fee && (!fee.gas || !fee.gasPrice)) {
@@ -66,15 +54,7 @@ module.exports.validateEvmTokenCreation = ({
     )
   }
 }
-module.exports.validateEvmTokenMint = ({
-  wallet,
-  token,
-  destination,
-  amount,
-  protocol,
-  feeCurrency,
-  fee
-}) => {
+module.exports.validateEvmTokenMint = ({ wallet, token, destination, amount, protocol, feeCurrency, fee }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
@@ -87,7 +67,7 @@ module.exports.validateEvmTokenMint = ({
   if (amount !== undefined && (isNaN(amount) || Number(amount) < 0)) {
     throw new InvalidException('Invalid amount')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (feeCurrency && typeof feeCurrency !== 'string') {
@@ -100,14 +80,7 @@ module.exports.validateEvmTokenMint = ({
     )
   }
 }
-module.exports.validateEvmTokenBurn = ({
-  wallet,
-  token,
-  amount,
-  protocol,
-  feeCurrency,
-  fee
-}) => {
+module.exports.validateEvmTokenBurn = ({ wallet, token, amount, protocol, feeCurrency, fee }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
@@ -117,7 +90,7 @@ module.exports.validateEvmTokenBurn = ({
   if (amount !== undefined && (isNaN(amount) || Number(amount) < 0)) {
     throw new InvalidException('Invalid amount')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (feeCurrency && typeof feeCurrency !== 'string') {
@@ -130,16 +103,7 @@ module.exports.validateEvmTokenBurn = ({
     )
   }
 }
-module.exports.validateEvmNftMint = ({
-  wallet,
-  token,
-  tokenId,
-  destination,
-  amount,
-  protocol,
-  feeCurrency,
-  fee
-}) => {
+module.exports.validateEvmNftMint = ({ wallet, token, tokenId, destination, amount, protocol, feeCurrency, fee }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
@@ -155,7 +119,7 @@ module.exports.validateEvmNftMint = ({
   if (amount !== undefined && (isNaN(amount) || Number(amount) < 0)) {
     throw new InvalidException('Invalid amount')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (feeCurrency && typeof feeCurrency !== 'string') {
@@ -167,17 +131,8 @@ module.exports.validateEvmNftMint = ({
       'InvalidTypeException'
     )
   }
-
 }
-module.exports.validateEvmNftBurn = ({
-  wallet,
-  token,
-  tokenId,
-  amount,
-  protocol,
-  feeCurrency,
-  fee
-}) => {
+module.exports.validateEvmNftBurn = ({ wallet, token, tokenId, amount, protocol, feeCurrency, fee }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
@@ -190,7 +145,7 @@ module.exports.validateEvmNftBurn = ({
   if (amount !== undefined && (isNaN(amount) || Number(amount) < 0)) {
     throw new InvalidException('Invalid amount')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(protocol)) {
     throw new InvalidException('Invalid protocol')
   }
   if (feeCurrency && typeof feeCurrency !== 'string') {

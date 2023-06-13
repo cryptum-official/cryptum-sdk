@@ -15,11 +15,13 @@ const validatePrivateKey = (privateKey) => {
 }
 
 const validateCardanoPrivateKey = (privateKey) => {
-  if (!privateKey
-    || !privateKey.spendingPrivateKey
-    || !privateKey.stakingPrivateKey
-    || typeof privateKey.spendingPrivateKey !== 'string'
-    || typeof privateKey.stakingPrivateKey !== 'string') {
+  if (
+    !privateKey ||
+    !privateKey.spendingPrivateKey ||
+    !privateKey.stakingPrivateKey ||
+    typeof privateKey.spendingPrivateKey !== 'string' ||
+    typeof privateKey.stakingPrivateKey !== 'string'
+  ) {
     throw new GenericException('Invalid private key object', 'InvalidTypeException')
   }
 }
@@ -110,14 +112,7 @@ const validateCeloTransferTransactionParams = ({
     throw new GenericException('Invalid fee currency', 'InvalidTypeException')
   }
 }
-const validateSmartContractTransactionParams = ({
-  wallet,
-  fee,
-  testnet,
-  contractAddress,
-  feeCurrency,
-  protocol,
-}) => {
+const validateSmartContractTransactionParams = ({ wallet, fee, testnet, contractAddress, feeCurrency, protocol }) => {
   if (!wallet) {
     throw new GenericException('Invalid wallet', 'InvalidTypeException')
   }
@@ -136,7 +131,7 @@ const validateSmartContractTransactionParams = ({
   if (feeCurrency && typeof feeCurrency !== 'string') {
     throw new GenericException('Invalid fee currency', 'InvalidTypeException')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(protocol)) {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
 }
@@ -174,19 +169,11 @@ const validateSmartContractDeployTransactionParams = ({
   if (feeCurrency && typeof feeCurrency !== 'string') {
     throw new GenericException('Invalid fee currency', 'InvalidTypeException')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(protocol)) {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
 }
-const validateTokenDeployTransactionParams = ({
-  wallet,
-  fee,
-  testnet,
-  tokenType,
-  params,
-  feeCurrency,
-  protocol,
-}) => {
+const validateTokenDeployTransactionParams = ({ wallet, fee, testnet, tokenType, params, feeCurrency, protocol }) => {
   if (!wallet) {
     throw new GenericException('Invalid wallet', 'InvalidTypeException')
   }
@@ -208,7 +195,7 @@ const validateTokenDeployTransactionParams = ({
   if (feeCurrency && typeof feeCurrency !== 'string') {
     throw new GenericException('Invalid fee currency', 'InvalidTypeException')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.AVAXCCHAIN, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
 }
@@ -225,7 +212,7 @@ const validateSmartContractCallParams = ({ contractAddress, contractAbi, method,
   if (params && !Array.isArray(params)) {
     throw new GenericException('Invalid contract params', 'InvalidTypeException')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.AVAXCCHAIN, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
 }
@@ -515,15 +502,7 @@ const validateStellarTrustlineTransactionParams = ({
   }
 }
 
-const validateRippleTrustlineTransactionParams = ({
-  wallet,
-  assetSymbol,
-  issuer,
-  fee,
-  limit,
-  memo,
-  testnet,
-}) => {
+const validateRippleTrustlineTransactionParams = ({ wallet, assetSymbol, issuer, fee, limit, memo, testnet }) => {
   if (!wallet) {
     throw new GenericException('Invalid wallet', 'InvalidTypeException')
   }
@@ -613,19 +592,19 @@ const validateWalletNft = ({ address, protocol, tokenAddresses }) => {
 }
 
 const validateTransferTransactionParams = (input) => {
-  const protocol = input.protocol;
+  const protocol = input.protocol
 
   switch (protocol) {
     case Protocol.ETHEREUM:
     case Protocol.BSC:
     case Protocol.POLYGON:
     case Protocol.AVAXCCHAIN:
+    case Protocol.CHILIZ:
       validateEthereumTransferTransactionParams(input)
-      break;
+      break
     case Protocol.CELO:
       validateCeloTransferTransactionParams(input)
-      break;
-
+      break
   }
 }
 
@@ -657,6 +636,4 @@ module.exports = {
   validateSmartContractTransactionParams,
   validateSmartContractDeployTransactionParams,
   validateSmartContractCallParams,
-  validateRippleTransferTransactionParams,
-  validateStellarTransferTransactionParams
 }

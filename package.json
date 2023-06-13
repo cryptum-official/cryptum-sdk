@@ -1,6 +1,6 @@
 {
   "name": "cryptum-sdk",
-  "version": "0.0.49",
+  "version": "0.0.50",
   "description": "SDK to sync your application with Cryptum services",
   "main": "index.js",
   "repository": "https://github.com/cryptum-official/cryptum-sdk",
@@ -59,7 +59,7 @@
     "mocha": "^9.2.2",
     "nock": "^13.2.4",
     "typescript": "^4.6.3"
-  },
+  }, 
   "files": [
     "index.js",
     "src",

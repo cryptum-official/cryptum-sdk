@@ -13,8 +13,9 @@ const Protocol = {
   HATHOR: 'HATHOR',
   CARDANO: 'CARDANO',
   AVAXCCHAIN: 'AVAXCCHAIN',
+  CHILIZ: 'CHILIZ',
   POLYGON: 'POLYGON',
-  SOLANA:'SOLANA',
+  SOLANA: 'SOLANA',
 }
 module.exports.Protocol = Protocol
 
@@ -61,6 +62,23 @@ module.exports.AVAXCCHAIN_COMMON_CHAIN = {
     chain: {
       chainId: 43114,
       networkId: 1,
+    },
+  },
+}
+
+module.exports.CHLIZ_COMMON_CHAIN = {
+  testnet: {
+    base: 'rinkeby',
+    chain: {
+      chainId: 88882,
+      networkId: 88882,
+    },
+  },
+  mainnet: {
+    base: 'mainnet',
+    chain: {
+      chainId: 88888,
+      networkId: 88888,
     },
   },
 }

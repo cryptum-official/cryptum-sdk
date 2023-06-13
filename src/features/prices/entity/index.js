@@ -13,6 +13,7 @@ class Prices {
     HTR,
     ADA,
     AVAX,
+    CHZ,
   }) {
     this.BRL = BRL;
     this.USD = USD;
@@ -28,6 +29,7 @@ class Prices {
     this.HTR = HTR;
     this.ADA = ADA;
     this.AVAX = AVAX;
+    this.CHZ = CHZ;
   }
 }
 
