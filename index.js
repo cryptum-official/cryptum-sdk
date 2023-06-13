@@ -11,6 +11,7 @@ const { getLootBoxControllerInstance } = require('./src/features/lootBox/control
 const { getUniswapControllerInstance } = require('./src/features/uniswap/controller')
 const { Protocol } = require('./src/services/blockchain/constants')
 const { GenericException } = require('./src/errors')
+const { getKmsControllerInstance } = require('./src/features/kms/controller')
 /**
  * @typedef {object} Config
  * @property {'testnet'|'mainnet'} environment
@@ -117,6 +118,10 @@ class CryptumSDK {
   getUniswapController() {
     return getUniswapControllerInstance(this.config)
   }
-}
+  
+  get kms() { return this.getKmsController() }
+  getKmsController() {
+    return getKmsControllerInstance(this.config)
+  }
 
 module.exports = CryptumSDK

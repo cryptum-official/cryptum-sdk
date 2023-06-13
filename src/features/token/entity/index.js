@@ -28,6 +28,7 @@
  * @property {string} amount amount to be transferred
  * @property {Array<import('../../transaction/entity').Output|import('../../transaction/entity').CardanoOutput>=} destinations destinations (for bitcoin, hathor and cardano transactions only)
  * @property {string=} issuer issuer account of the token to transfer (only for stellar and ripple transactions)
+ * @property {boolean=} createAccount true if this is a transfer to create an account in the blockchain (only for stellar transactions)
  * @property {string=} memo text to be attached to transaction (for stellar and ripple only)
  * @property {string=} feeCurrency fee currency (for celo only)
  * @property {string=} fee fee 
@@ -51,6 +52,8 @@
  * @property {string=} feeCurrency fee currency (for celo only)
  * @property {boolean=} fixedSupply true if this token has fixed supply (for solana only)
  * @property {number=} decimals (for solana only)
+ * @property {import("../../transaction/entity").Fee} fee fee
+
  */
 /**
  * @typedef {Object} TokenMintInput
@@ -61,6 +64,7 @@
  * @property {string} amount amount to be transferred
  * @property {string=} mintAuthorityAddress address responsible to mint more tokens (for hathor only)
  * @property {string=} feeCurrency fee currency (for celo only)
+ * @property {import("../../transaction/entity").Fee} fee fee
  */
 /**
  * @typedef {Object} TokenBurnInput
@@ -70,5 +74,16 @@
  * @property {string} amount amount to be transferred
  * @property {string=} meltAuthorityAddress address responsible to burn more tokens (for hathor only)
  * @property {string=} feeCurrency fee currency (for celo only)
+ * @property {import("../../transaction/entity").Fee} fee fee
+ */
+/**
+ * @typedef {Object} TokenApproveInput
+ * @property {import('../../../services/blockchain/constants').Protocol} protocol
+ * @property {import('../../wallet/entity').Wallet} wallet
+ * @property {string} token token address to invoke the approve method
+ * @property {string} amount amount to be transferred
+ * @property {string} spender address allowed to withdraw tokens from this wallet
+ * @property {string=} feeCurrency fee currency (for celo only)
+ * @property {import("../../transaction/entity").Fee} fee fee
  */
 module.exports = {}

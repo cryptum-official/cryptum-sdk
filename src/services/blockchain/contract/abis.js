@@ -222,7 +222,7 @@ module.exports.ERC721_APPROVE_METHOD_ABI = [
   }
 ]
 
-module.exports.ERC1155_APPROVE_METHOD_ABI = [
+module.exports.ERC1155_SETAPPROVALLFORALL_METHOD_ABI = [
   {
     inputs: [{ internalType: "address", name: "operator", type: "address" }, { internalType: "bool", name: "approved", type: "bool" }],
     name: "setApprovalForAll",

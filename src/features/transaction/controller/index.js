@@ -1,18 +1,14 @@
 module.exports.getTransactionControllerInstance = (config) => new Controller(config)
+const BigNumber = require('bignumber.js')
 const { handleRequestError, getApiMethod, mountHeaders, makeRequest } = require('../../../services')
 const requests = require('./requests.json')
 const Interface = require('./interface')
-const { Protocol, CUSD_CONTRACT_ADDRESS, CEUR_CONTRACT_ADDRESS } = require('../../../services/blockchain/constants')
-const { getTokenAddress, toWei, toHTRUnit } = require('../../../services/blockchain/utils')
+const { Protocol } = require('../../../services/blockchain/constants')
+const { toHTRUnit } = require('../../../services/blockchain/utils')
 const { FeeResponse, TransactionResponse, SignedTransaction, UTXO, TransactionType, Input } = require('../entity')
 const { buildStellarTransferTransaction, buildStellarTrustlineTransaction } = require('../../../services/blockchain/stellar')
 const { buildRippleTransferTransaction, buildRippleTrustlineTransaction } = require('../../../services/blockchain/ripple')
-const {
-  buildAvaxCChainTransferTransaction,
-  buildBscTransferTransaction,
-  buildPolygonTransferTransaction,
-  buildEthereumTransferTransaction,
-} = require('../../../services/blockchain/ethereum')
+
 const {
   buildSolanaTransferTransaction,
   deploySolanaToken,
@@ -31,7 +27,6 @@ const {
 const { buildBitcoinTransferTransaction } = require('../../../services/blockchain/bitcoin')
 const { getWalletControllerInstance } = require('../../wallet/controller')
 const { GenericException, HathorException } = require('../../../errors')
-const { buildCeloTransferTransaction } = require('../../../services/blockchain/celo')
 const {
   validateCeloTransferTransactionParams,
   validateBitcoinTransferTransactionParams,
@@ -49,7 +44,6 @@ const {
 const { buildHathorTransferTransaction, buildHathorTokenTransaction } = require('../../../services/blockchain/hathor')
 const { buildOperation, buildOperationFromInputs } = require('../../../services/blockchain/cardano')
 const CardanoWasm = require('@emurgo/cardano-serialization-lib-nodejs')
-const { TRANSFER_METHOD_ABI, TRANSFER_COMMENT_METHOD_ABI } = require('../../../services/blockchain/contract/abis')
 const { isTestnet } = require('../../../services/utils')
 const { getTokenControllerInstance } = require('../../token/controller')
 const {
@@ -60,6 +54,7 @@ const {
   validateSolanaDeployNFT,
   validateSolanaCustomProgramInput
 } = require('../../../services/validations/solana')
+
 
 class Controller extends Interface {
   /**
@@ -377,67 +372,10 @@ class Controller extends Interface {
    */
   async createCeloTransferTransaction(input) {
     validateCeloTransferTransactionParams(input)
-    let { wallet, tokenSymbol, amount, destination, memo, fee, contractAddress, feeCurrency } = input
-    const testnet = isTestnet(this.config.environment)
-    const protocol = Protocol.CELO
-    let type, method, params, value, contractAbi, decimals = 18
-    if (tokenSymbol !== 'CELO') {
-      ({ decimals } = await getTokenControllerInstance(this.config).getInfo({ tokenAddress: contractAddress, protocol }))
-    }
-    const amountWei = toWei(amount, decimals).toString()
-    if (tokenSymbol === 'CELO') {
-      type = memo ? TransactionType.CALL_CONTRACT_METHOD : TransactionType.TRANSFER
-      method = memo ? 'transferWithComment' : null
-      params = memo ? [destination, amountWei, memo] : null
-      value = memo ? null : amount
-      contractAddress = memo ? getTokenAddress(Protocol.CELO, tokenSymbol, testnet) : null
-      contractAbi = memo ? TRANSFER_COMMENT_METHOD_ABI : null
-    } else {
-      type = TransactionType.CALL_CONTRACT_METHOD
-      method = memo ? 'transferWithComment' : 'transfer'
-      params = memo ? [destination, amountWei, memo] : [destination, amountWei]
-      contractAbi = memo ? TRANSFER_COMMENT_METHOD_ABI : TRANSFER_METHOD_ABI
+    const { amount, contractAddress, destination, fee, feeCurrency, memo, tokenSymbol, wallet } = input;
+    const tc = getTokenControllerInstance(this.config)
+    return await tc.transfer({ amount, protocol: "CELO", token: contractAddress ? contractAddress : tokenSymbol, wallet, destination, fee, memo, feeCurrency })
 
-      if (['cUSD', 'cEUR'].includes(tokenSymbol)) {
-        contractAddress = getTokenAddress(Protocol.CELO, tokenSymbol, testnet)
-      }
-    }
-    if (feeCurrency) {
-      const network = testnet ? 'testnet' : 'mainnet'
-      feeCurrency =
-        feeCurrency === 'cUSD'
-          ? CUSD_CONTRACT_ADDRESS[network]
-          : feeCurrency === 'cEUR'
-            ? CEUR_CONTRACT_ADDRESS[network]
-            : feeCurrency
-    }
-    const { info, networkFee } = await this._getFeeInfo({
-      wallet,
-      type,
-      destination,
-      amount: value,
-      contractAddress,
-      contractAbi,
-      method,
-      params,
-      fee,
-      feeCurrency,
-      protocol,
-    })
-    const signedTx = await buildCeloTransferTransaction({
-      fromPrivateKey: wallet.privateKey,
-      tokenSymbol,
-      amount,
-      destination,
-      memo,
-      fee: networkFee,
-      nonce: info.nonce,
-      testnet,
-      contractAddress,
-      feeCurrency,
-      decimals
-    })
-    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
   }
   /**
    * Create ethereum transfer transaction
@@ -447,36 +385,9 @@ class Controller extends Interface {
    */
   async createEthereumTransferTransaction(input) {
     validateEthereumTransferTransactionParams(input)
-    const { wallet, tokenSymbol, amount, destination, fee, contractAddress } = input
-    const protocol = Protocol.ETHEREUM
-    let decimals
-    if (tokenSymbol !== 'ETH') {
-      ({ decimals } = await getTokenControllerInstance(this.config).getInfo({ tokenAddress: contractAddress, protocol }))
-    }
-    const { info, networkFee } = await this._getFeeInfo({
-      wallet,
-      type: tokenSymbol === 'ETH' ? TransactionType.TRANSFER : TransactionType.CALL_CONTRACT_METHOD,
-      destination,
-      amount: tokenSymbol === 'ETH' ? amount : null,
-      contractAddress,
-      contractAbi: tokenSymbol === 'ETH' ? null : TRANSFER_METHOD_ABI,
-      method: tokenSymbol === 'ETH' ? null : 'transfer',
-      params: tokenSymbol === 'ETH' ? null : [destination, toWei(amount, decimals).toString()],
-      fee,
-      protocol,
-    })
-    const signedTx = await buildEthereumTransferTransaction({
-      fromPrivateKey: wallet.privateKey,
-      tokenSymbol,
-      amount,
-      destination,
-      fee: networkFee,
-      nonce: info.nonce,
-      testnet: isTestnet(this.config.environment),
-      contractAddress,
-      decimals
-    })
-    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
+    const { amount, contractAddress, destination, fee, tokenSymbol, wallet } = input;
+    const tc = getTokenControllerInstance(this.config)
+    return await tc.transfer({ amount, protocol: "ETHEREUM", token: contractAddress ? contractAddress : tokenSymbol, wallet, destination, fee })
   }
   /**
    * Create bsc transfer transaction
@@ -486,36 +397,9 @@ class Controller extends Interface {
    */
   async createBscTransferTransaction(input) {
     validateEthereumTransferTransactionParams(input)
-    const { wallet, tokenSymbol, amount, destination, fee, contractAddress } = input
-    const protocol = Protocol.BSC
-    let decimals
-    if (tokenSymbol !== 'BNB') {
-      ({ decimals } = await getTokenControllerInstance(this.config).getInfo({ tokenAddress: contractAddress, protocol }))
-    }
-    const { info, networkFee } = await this._getFeeInfo({
-      wallet,
-      type: tokenSymbol === 'BNB' ? TransactionType.TRANSFER : TransactionType.CALL_CONTRACT_METHOD,
-      destination,
-      amount: tokenSymbol === 'BNB' ? amount : null,
-      contractAddress,
-      contractAbi: tokenSymbol === 'BNB' ? null : TRANSFER_METHOD_ABI,
-      method: tokenSymbol === 'BNB' ? null : 'transfer',
-      params: tokenSymbol === 'BNB' ? null : [destination, toWei(amount, decimals).toString()],
-      fee,
-      protocol,
-    })
-    const signedTx = await buildBscTransferTransaction({
-      fromPrivateKey: wallet.privateKey,
-      tokenSymbol,
-      amount,
-      destination,
-      fee: networkFee,
-      nonce: info.nonce,
-      testnet: isTestnet(this.config.environment),
-      contractAddress,
-      decimals
-    })
-    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
+    const { amount, contractAddress, destination, fee, tokenSymbol, wallet } = input;
+    const tc = getTokenControllerInstance(this.config)
+    return await tc.transfer({ amount, protocol: "BSC", token: contractAddress ? contractAddress : tokenSymbol, wallet, destination, fee })
   }
   /**
    * Create polygon transfer transaction
@@ -525,36 +409,9 @@ class Controller extends Interface {
    */
   async createPolygonTransferTransaction(input) {
     validateEthereumTransferTransactionParams(input)
-    const { wallet, tokenSymbol, amount, destination, fee, contractAddress } = input
-    const protocol = Protocol.POLYGON
-    let decimals
-    if (tokenSymbol !== 'MATIC') {
-      ({ decimals } = await getTokenControllerInstance(this.config).getInfo({ tokenAddress: contractAddress, protocol }))
-    }
-    const { info, networkFee } = await this._getFeeInfo({
-      wallet,
-      type: tokenSymbol === 'MATIC' ? TransactionType.TRANSFER : TransactionType.CALL_CONTRACT_METHOD,
-      destination,
-      amount: tokenSymbol === 'MATIC' ? amount : null,
-      contractAddress,
-      contractAbi: tokenSymbol === 'MATIC' ? null : TRANSFER_METHOD_ABI,
-      method: tokenSymbol === 'MATIC' ? null : 'transfer',
-      params: tokenSymbol === 'MATIC' ? null : [destination, toWei(amount, decimals).toString()],
-      fee,
-      protocol,
-    })
-    const signedTx = await buildPolygonTransferTransaction({
-      fromPrivateKey: wallet.privateKey,
-      tokenSymbol,
-      amount,
-      destination,
-      fee: networkFee,
-      nonce: info.nonce,
-      testnet: isTestnet(this.config.environment),
-      contractAddress,
-      decimals
-    })
-    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
+    const { amount, contractAddress, destination, fee, tokenSymbol, wallet } = input;
+    const tc = getTokenControllerInstance(this.config)
+    return await tc.transfer({ amount, protocol: "POLYGON", token: contractAddress ? contractAddress : tokenSymbol, wallet, destination, fee })
   }
   /**
   * Create avalanche transfer transaction
@@ -564,36 +421,9 @@ class Controller extends Interface {
   */
   async createAvaxCChainTransferTransaction(input) {
     validateEthereumTransferTransactionParams(input)
-    const { wallet, tokenSymbol, amount, destination, fee, contractAddress } = input
-    const protocol = Protocol.AVAXCCHAIN
-    let decimals
-    if (tokenSymbol !== 'AVAX') {
-      ({ decimals } = await getTokenControllerInstance(this.config).getInfo({ tokenAddress: contractAddress, protocol }))
-    }
-    const { info, networkFee } = await this._getFeeInfo({
-      wallet,
-      type: tokenSymbol === 'AVAX' ? TransactionType.TRANSFER : TransactionType.CALL_CONTRACT_METHOD,
-      destination,
-      amount: tokenSymbol === 'AVAX' ? amount : null,
-      contractAddress,
-      contractAbi: tokenSymbol === 'AVAX' ? null : TRANSFER_METHOD_ABI,
-      method: tokenSymbol === 'AVAX' ? null : 'transfer',
-      params: tokenSymbol === 'AVAX' ? null : [destination, toWei(amount, decimals).toString()],
-      fee,
-      protocol,
-    })
-    const signedTx = await buildAvaxCChainTransferTransaction({
-      fromPrivateKey: wallet.privateKey,
-      tokenSymbol,
-      amount,
-      destination,
-      fee: networkFee,
-      nonce: info.nonce,
-      testnet: isTestnet(this.config.environment),
-      contractAddress,
-      decimals
-    })
-    return new SignedTransaction({ signedTx, protocol, type: TransactionType.TRANSFER })
+    const { amount, contractAddress, destination, fee, tokenSymbol, wallet } = input;
+    const tc = getTokenControllerInstance(this.config)
+    return await tc.transfer({ amount, protocol: "AVAXCCHAIN", token: contractAddress ? contractAddress : tokenSymbol, wallet, destination, fee })
   }
   /**
    * Create bitcoin transfer transaction
@@ -773,11 +603,18 @@ class Controller extends Interface {
       changeAddress,
       nftData,
     } = input
-    let inputSum = 0
-    const amountHTRUnit = toHTRUnit(amount).toNumber()
     const protocol = Protocol.HATHOR
+    let inputSum = 0
+    let amountHTRUnit;
+    if (nftData && type === TransactionType.HATHOR_TOKEN_CREATION) {
+      amountHTRUnit = Math.ceil(new BigNumber(amount).times(0.0001).plus(0.01).times(100).toNumber())
+    } else if (type === TransactionType.HATHOR_NFT_MINT || type === TransactionType.HATHOR_NFT_MELT) {
+      amountHTRUnit = Math.ceil(new BigNumber(amount).times(0.0001).times(100).toNumber())
+    } else {
+      amountHTRUnit = toHTRUnit(amount).toNumber()
+    }
     let utxos = await this.getUTXOs({ address: wallet.address, protocol })
-    if (type === TransactionType.HATHOR_TOKEN_MELT) {
+    if (type === TransactionType.HATHOR_TOKEN_MELT || type === TransactionType.HATHOR_NFT_MELT) {
       utxos = utxos.filter((utxo) => utxo.token === tokenUid)
     } else {
       utxos = utxos.filter((utxo) => utxo.token === '00' || utxo.token === tokenUid)
@@ -789,7 +626,7 @@ class Controller extends Interface {
     for (let i = 0; i < utxos.length; ++i) {
       const tx = await this.getTransactionByHash({ hash: utxos[i].txHash, protocol })
       const output = tx.tx.outputs[utxos[i].index]
-      if (type === TransactionType.HATHOR_TOKEN_MELT) {
+      if (type === TransactionType.HATHOR_TOKEN_MELT || type === TransactionType.HATHOR_NFT_MELT) {
         if (![0, 129].includes(output.token_data)) {
           if (inputSum < amountHTRUnit) {
             inputSum += output.value

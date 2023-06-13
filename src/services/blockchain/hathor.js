@@ -45,6 +45,7 @@ function getTokenDataIndex(output, tokens) {
 }
 
 module.exports.buildHathorTransferTransaction = async function ({ inputs, outputs, tokens, changeAddress, testnet }) {
+  hathorLib.network.setNetwork(testnet ? 'testnet' : 'mainnet');
   let txData = {
     inputs: inputs.map((input) => ({ tx_id: input.txHash, index: input.index })),
     outputs: outputs.map((output) => ({
@@ -118,14 +119,15 @@ module.exports.buildHathorTokenTransaction = async function ({
   nftData,
   testnet,
 }) {
+  hathorLib.network.setNetwork(testnet ? 'testnet' : 'mainnet');
   let txData = {
     inputs: inputs.map((input) => ({ tx_id: input.txHash, index: input.index })),
     outputs: []
   }
-  let tokenAmount = toHTRUnit(amount).toNumber()
-  const isNFT = !!nftData
+  const isNFT = !!nftData || [TransactionType.HATHOR_NFT_MELT, TransactionType.HATHOR_NFT_MINT].includes(type)
+  let tokenAmount = isNFT ? parseInt(amount) : toHTRUnit(amount).toNumber()
   const _dataToken =
-    type === TransactionType.HATHOR_TOKEN_MELT
+    [TransactionType.HATHOR_TOKEN_MELT, TransactionType.HATHOR_NFT_MELT].includes(type)
       ? txData
       : hathorLib.tokens.createMintData(null, null, address, tokenAmount, txData, {
         changeAddress: changeAddress,
@@ -149,16 +151,17 @@ module.exports.buildHathorTokenTransaction = async function ({
         value: 1,
         tokenData: 0
       })
-      tokenAmount += 1
     }
 
-  } else if (type === TransactionType.HATHOR_TOKEN_MINT || type === TransactionType.HATHOR_TOKEN_MELT) {
+  } else if ([
+    TransactionType.HATHOR_NFT_MELT, TransactionType.HATHOR_NFT_MINT, TransactionType.HATHOR_TOKEN_MELT, TransactionType.HATHOR_TOKEN_MINT
+  ].includes(type)) {
     _dataToken.version = hathorLib.constants.DEFAULT_TX_VERSION
     _dataToken.tokens = [tokenUid]
   } else {
     throw new HathorException('Invalid transaction type')
   }
-  if (type === TransactionType.HATHOR_TOKEN_MELT) {
+  if ([TransactionType.HATHOR_NFT_MELT, TransactionType.HATHOR_TOKEN_MELT].includes(type)) {
     if (inputSum > tokenAmount) {
       _dataToken.outputs.push({
         address: changeAddress,
@@ -166,23 +169,23 @@ module.exports.buildHathorTokenTransaction = async function ({
         tokenData: 1
       })
     }
-    const withdrawAmount = hathorLib.tokens.getWithdrawAmount(tokenAmount)
-    if (withdrawAmount > 0) {
+    const withdrawAmountHTR = Math.floor(new BigNumber(tokenAmount).times(0.01).toNumber())
+    if (withdrawAmountHTR > 0) {
       _dataToken.outputs.push({
         address,
-        value: withdrawAmount,
+        value: withdrawAmountHTR,
         tokenData: hathorLib.constants.HATHOR_TOKEN_INDEX,
       })
     }
   } else {
-    const depositAmount = hathorLib.tokensUtils.getDepositAmount(tokenAmount)
-    if (depositAmount < inputSum) {
+    const depositAmountHTR = Math.ceil(new BigNumber(tokenAmount).times(0.01).toNumber())
+    if (depositAmountHTR < inputSum) {
       _dataToken.outputs.push({
         address: changeAddress,
-        value: inputSum - depositAmount,
+        value: inputSum - depositAmountHTR - (isNFT && type === TransactionType.HATHOR_TOKEN_CREATION ? 1 : 0),
         tokenData: hathorLib.constants.HATHOR_TOKEN_INDEX,
       })
-    } else if (depositAmount > inputSum) {
+    } else {
       throw new HathorException('Insufficient funds')
     }
   }
