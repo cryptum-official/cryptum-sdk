@@ -13,7 +13,7 @@ const {
   validateEvmNftTransfer,
   validateEvmTokenCreation,
   validateEvmNftMint,
-  validateEvmNftBurn
+  validateEvmNftBurn,
 } = require('../../../services/validations/evm')
 const { getContractControllerInstance } = require('../../contract/controller')
 const { TransactionType, TransactionResponse, SignedTransaction } = require('../../transaction/entity')
@@ -36,8 +36,13 @@ class Controller extends Interface {
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN:
+      case Protocol.CHILIZ:
       case Protocol.SOLANA:
-        return makeRequest({ method: 'get', url: `/nft/${tokenAddress}/info?protocol=${protocol}`, config: this.config })
+        return makeRequest({
+          method: 'get',
+          url: `/nft/${tokenAddress}/info?protocol=${protocol}`,
+          config: this.config,
+        })
       default:
         throw new InvalidException('Unsupported protocol')
     }
@@ -51,16 +56,22 @@ class Controller extends Interface {
     const { protocol, tokenUid, tokenAddress, tokenId, address } = input
     switch (protocol) {
       case Protocol.HATHOR:
-        return makeRequest({ method: 'get', url: `/nft/${tokenUid}/balance/${address}?protocol=${protocol}`, config: this.config })
+        return makeRequest({
+          method: 'get',
+          url: `/nft/${tokenUid}/balance/${address}?protocol=${protocol}`,
+          config: this.config,
+        })
       case Protocol.ETHEREUM:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN:
+      case Protocol.CHILIZ:
       case Protocol.SOLANA:
         return makeRequest({
           method: 'get',
-          url: `/nft/${tokenAddress}/balance/${address}?protocol=${protocol}&${tokenId ? `tokenId=${tokenId}` : ''}`, config: this.config
+          url: `/nft/${tokenAddress}/balance/${address}?protocol=${protocol}&${tokenId ? `tokenId=${tokenId}` : ''}`,
+          config: this.config,
         })
       default:
         throw new InvalidException('Unsupported protocol')
@@ -75,16 +86,22 @@ class Controller extends Interface {
     const { protocol, tokenUid, tokenAddress, tokenId } = input
     switch (protocol) {
       case Protocol.HATHOR:
-        return makeRequest({ method: 'get', url: `/nft/${tokenUid}/metadata?protocol=${protocol}`, config: this.config })
+        return makeRequest({
+          method: 'get',
+          url: `/nft/${tokenUid}/metadata?protocol=${protocol}`,
+          config: this.config,
+        })
       case Protocol.ETHEREUM:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN:
+      case Protocol.CHILIZ:
       case Protocol.SOLANA:
         return makeRequest({
           method: 'get',
-          url: `/nft/${tokenAddress}/metadata?protocol=${protocol}&tokenId=${tokenId}`, config: this.config
+          url: `/nft/${tokenAddress}/metadata?protocol=${protocol}&tokenId=${tokenId}`,
+          config: this.config,
         })
       default:
         throw new InvalidException('Unsupported protocol')
@@ -97,10 +114,24 @@ class Controller extends Interface {
    */
   async create(input) {
     const {
-      protocol, wallet, symbol, name, amount, uri, mintAuthorityAddress, meltAuthorityAddress, creators, royaltiesFee, collection, maxSupply, feeCurrency, type, fee
+      protocol,
+      wallet,
+      symbol,
+      name,
+      amount,
+      uri,
+      mintAuthorityAddress,
+      meltAuthorityAddress,
+      creators,
+      royaltiesFee,
+      collection,
+      maxSupply,
+      feeCurrency,
+      type,
+      fee,
     } = input
     const tc = getTransactionControllerInstance(this.config)
-    let tx, mint;
+    let tx, mint
     switch (protocol) {
       case Protocol.HATHOR:
         tx = await tc.createHathorTokenTransactionFromWallet({
@@ -115,7 +146,7 @@ class Controller extends Interface {
         })
         break
       case Protocol.SOLANA: {
-        ({ transaction: tx, mint } = await tc.createSolanaNFTTransaction({
+        ;({ transaction: tx, mint } = await tc.createSolanaNFTTransaction({
           wallet,
           maxSupply: maxSupply !== undefined ? Number(maxSupply) : 0,
           amount: Number(amount),
@@ -124,7 +155,7 @@ class Controller extends Interface {
           symbol,
           creators,
           royaltiesFee,
-          collection
+          collection,
         }))
         await tc.sendTransaction(tx)
         return new TransactionResponse({ hash: mint })
@@ -133,15 +164,16 @@ class Controller extends Interface {
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
-      case Protocol.AVAXCCHAIN: {
+      case Protocol.AVAXCCHAIN:
+      case Protocol.CHILIZ: {
         validateEvmTokenCreation(input)
-        const builtTx = await makeRequest(
-          {
-            method: 'post',
-            url: `/tx/build/deploy-token?protocol=${protocol}`,
-            body: { protocol, from: wallet.address, symbol, name, type, feeCurrency, uri, fee }, config: this.config
-          })
-        let signedTx;
+        const builtTx = await makeRequest({
+          method: 'post',
+          url: `/tx/build/deploy-token?protocol=${protocol}`,
+          body: { protocol, from: wallet.address, symbol, name, type, feeCurrency, uri, fee },
+          config: this.config,
+        })
+        let signedTx
         if (protocol === Protocol.CELO) {
           signedTx = await signCeloTx(builtTx, wallet.privateKey)
         } else {
@@ -150,9 +182,9 @@ class Controller extends Interface {
         tx = new SignedTransaction({
           signedTx,
           protocol,
-          type: TransactionType.DEPLOY_CONTRACT
+          type: TransactionType.DEPLOY_CONTRACT,
         })
-        break;
+        break
       }
       default:
         throw new InvalidException('Unsupported protocol')
@@ -167,14 +199,20 @@ class Controller extends Interface {
   async transfer(input) {
     const { protocol, token, wallet, destination, tokenId, amount, destinations, feeCurrency, fee } = input
     const tc = getTransactionControllerInstance(this.config)
-    let tx;
+    let tx
     switch (protocol) {
       case Protocol.HATHOR:
         tx = await tc.createHathorTransferTransactionFromWallet({
           wallet,
-          outputs: destination ? [{
-            address: destination, amount, token
-          }] : destinations
+          outputs: destination
+            ? [
+                {
+                  address: destination,
+                  amount,
+                  token,
+                },
+              ]
+            : destinations,
         })
         break
       case Protocol.SOLANA:
@@ -184,15 +222,16 @@ class Controller extends Interface {
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
-      case Protocol.AVAXCCHAIN: {
+      case Protocol.AVAXCCHAIN:
+      case Protocol.CHILIZ: {
         validateEvmNftTransfer(input)
-        const builtTx = await makeRequest(
-          {
-            method: 'post',
-            url: `/tx/build/transfer-nft?protocol=${protocol}`,
-            body: { token, from: wallet.address, destination, tokenId, amount, feeCurrency, fee }, config: this.config
-          })
-        let signedTx;
+        const builtTx = await makeRequest({
+          method: 'post',
+          url: `/tx/build/transfer-nft?protocol=${protocol}`,
+          body: { token, from: wallet.address, destination, tokenId, amount, feeCurrency, fee },
+          config: this.config,
+        })
+        let signedTx
         if (protocol === Protocol.CELO) {
           signedTx = await signCeloTx(builtTx, wallet.privateKey)
         } else {
@@ -201,9 +240,9 @@ class Controller extends Interface {
         tx = new SignedTransaction({
           signedTx,
           protocol,
-          type: TransactionType.DEPLOY_CONTRACT
+          type: TransactionType.DEPLOY_CONTRACT,
         })
-        break;
+        break
       }
       default:
         throw new InvalidException('Unsupported protocol')
@@ -218,7 +257,7 @@ class Controller extends Interface {
   async mint(input) {
     const { protocol, token, wallet, destination, amount, tokenId, uri, mintAuthorityAddress, feeCurrency, fee } = input
     const tc = getTransactionControllerInstance(this.config)
-    let tx;
+    let tx
     switch (protocol) {
       case Protocol.HATHOR:
         tx = await tc.createHathorTokenTransactionFromWallet({
@@ -243,15 +282,16 @@ class Controller extends Interface {
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
-      case Protocol.AVAXCCHAIN: {
+      case Protocol.AVAXCCHAIN:
+      case Protocol.CHILIZ: {
         validateEvmNftMint(input)
-        const builtTx = await makeRequest(
-          {
-            method: 'post',
-            url: `/tx/build/mint-nft?protocol=${protocol}`,
-            body: { protocol, from: wallet.address, amount, feeCurrency, uri, tokenId, destination, token, fee }, config: this.config
-          })
-        let signedTx;
+        const builtTx = await makeRequest({
+          method: 'post',
+          url: `/tx/build/mint-nft?protocol=${protocol}`,
+          body: { protocol, from: wallet.address, amount, feeCurrency, uri, tokenId, destination, token, fee },
+          config: this.config,
+        })
+        let signedTx
         if (protocol === Protocol.CELO) {
           signedTx = await signCeloTx(builtTx, wallet.privateKey)
         } else {
@@ -260,9 +300,9 @@ class Controller extends Interface {
         tx = new SignedTransaction({
           signedTx,
           protocol,
-          type: TransactionType.DEPLOY_CONTRACT
+          type: TransactionType.DEPLOY_CONTRACT,
         })
-        break;
+        break
       }
       default:
         throw new InvalidException('Unsupported protocol')
@@ -277,7 +317,7 @@ class Controller extends Interface {
   async burn(input) {
     const { protocol, token, wallet, amount, tokenId, feeCurrency, meltAuthorityAddress, fee } = input
     const tc = getTransactionControllerInstance(this.config)
-    let tx;
+    let tx
     switch (protocol) {
       case Protocol.HATHOR:
         tx = await tc.createHathorTokenTransactionFromWallet({
@@ -297,15 +337,16 @@ class Controller extends Interface {
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
-      case Protocol.AVAXCCHAIN: {
+      case Protocol.AVAXCCHAIN:
+      case Protocol.CHILIZ: {
         validateEvmNftBurn(input)
-        const builtTx = await makeRequest(
-          {
-            method: 'post',
-            url: `/tx/build/burn-nft?protocol=${protocol}`,
-            body: { protocol, from: wallet.address, amount, feeCurrency, tokenId, token, fee }, config: this.config
-          })
-        let signedTx;
+        const builtTx = await makeRequest({
+          method: 'post',
+          url: `/tx/build/burn-nft?protocol=${protocol}`,
+          body: { protocol, from: wallet.address, amount, feeCurrency, tokenId, token, fee },
+          config: this.config,
+        })
+        let signedTx
         if (protocol === Protocol.CELO) {
           signedTx = await signCeloTx(builtTx, wallet.privateKey)
         } else {
@@ -314,9 +355,9 @@ class Controller extends Interface {
         tx = new SignedTransaction({
           signedTx,
           protocol,
-          type: TransactionType.DEPLOY_CONTRACT
+          type: TransactionType.DEPLOY_CONTRACT,
         })
-        break;
+        break
       }
       default:
         throw new InvalidException('Unsupported protocol')
@@ -335,7 +376,8 @@ class Controller extends Interface {
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
-      case Protocol.AVAXCCHAIN: {
+      case Protocol.AVAXCCHAIN:
+      case Protocol.CHILIZ: {
         return await getContractControllerInstance(this.config).callMethodTransaction({
           wallet,
           protocol,
@@ -344,7 +386,7 @@ class Controller extends Interface {
           contractAbi: ERC721_APPROVE_METHOD_ABI,
           params: [operator, tokenId],
           feeCurrency,
-          fee
+          fee,
         })
       }
       default:
@@ -363,7 +405,8 @@ class Controller extends Interface {
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
-      case Protocol.AVAXCCHAIN: {
+      case Protocol.AVAXCCHAIN:
+      case Protocol.CHILIZ: {
         return await getContractControllerInstance(this.config).callMethodTransaction({
           wallet,
           protocol,
@@ -372,7 +415,7 @@ class Controller extends Interface {
           contractAbi: ERC1155_SETAPPROVALLFORALL_METHOD_ABI,
           params: [operator, isApproved],
           feeCurrency,
-          fee
+          fee,
         })
       }
       default:

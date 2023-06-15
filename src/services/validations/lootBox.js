@@ -1,8 +1,7 @@
-const { GenericException } = require("../../errors")
-const InvalidException = require("../../errors/InvalidException")
+const { GenericException } = require('../../errors')
+const InvalidException = require('../../errors/InvalidException')
 const BigNumber = require('bignumber.js')
-const { Protocol } = require("../blockchain/constants")
-
+const { Protocol } = require('../blockchain/constants')
 
 module.exports.validateLootBoxDeploy = ({
   protocol,
@@ -11,9 +10,8 @@ module.exports.validateLootBoxDeploy = ({
   symbol,
   royaltyRecipient,
   trustedForwarders,
-  royaltyBps
+  royaltyBps,
 }) => {
-
   const _royaltyBps = new BigNumber(royaltyBps)
   if (royaltyBps && (typeof royaltyBps !== 'number' || _royaltyBps.isNaN() || _royaltyBps.lte(0))) {
     throw new GenericException('Invalid amount', 'InvalidTypeException')
@@ -36,7 +34,11 @@ module.exports.validateLootBoxDeploy = ({
       'InvalidTypeException'
     )
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (
+    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(
+      protocol
+    )
+  ) {
     throw new InvalidException('Invalid protocol')
   }
 }
@@ -50,12 +52,16 @@ module.exports.validateLootBoxCreation = ({
   openStartTimestamp,
   recipient,
   amountDistributedPerOpen,
-  rewardUnits
+  rewardUnits,
 }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (
+    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(
+      protocol
+    )
+  ) {
     throw new InvalidException('Invalid protocol')
   }
   if (!Array.isArray(contents) || !contents.length) {
@@ -87,17 +93,15 @@ module.exports.validateLootBoxCreation = ({
   }
 }
 
-module.exports.validateLootBoxOpening = ({
-  protocol,
-  wallet,
-  lootBoxId,
-  amount,
-  lootBoxAddress
-}) => {
+module.exports.validateLootBoxOpening = ({ protocol, wallet, lootBoxId, amount, lootBoxAddress }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (
+    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(
+      protocol
+    )
+  ) {
     throw new InvalidException('Invalid protocol')
   }
   if (lootBoxId && isNaN(lootBoxId)) {
@@ -119,12 +123,16 @@ module.exports.validateApproveContent = ({
   tokenAddress,
   tokenId,
   tokenType,
-  amount
+  amount,
 }) => {
   if (!wallet) {
     throw new InvalidException('Invalid wallet')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+  if (
+    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(
+      protocol
+    )
+  ) {
     throw new InvalidException('Invalid protocol')
   }
   if (!lootBoxAddress || typeof lootBoxAddress !== 'string') {
@@ -133,23 +141,23 @@ module.exports.validateApproveContent = ({
   if (!tokenAddress || typeof tokenAddress !== 'string') {
     throw new InvalidException('Invalid tokenAddress')
   }
-  if(!tokenType){
+  if (!tokenType) {
     throw new InvalidException('Invalid tokenType')
   }
-  if ((tokenType==='ERC20') && (!amount || typeof amount !== 'string')) {
+  if (tokenType === 'ERC20' && (!amount || typeof amount !== 'string')) {
     throw new InvalidException('Invalid amount')
   }
-  if ((tokenType==='ERC721') && (!tokenId || typeof tokenId !== 'string')) {
+  if (tokenType === 'ERC721' && (!tokenId || typeof tokenId !== 'string')) {
     throw new InvalidException('Invalid tokenId')
   }
 }
 
-module.exports.validateLootBoxGetContent = ({
-  protocol,
-  lootBoxId,
-  lootBoxAddress
-}) => {
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(protocol)) {
+module.exports.validateLootBoxGetContent = ({ protocol, lootBoxId, lootBoxAddress }) => {
+  if (
+    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.POLYGON].includes(
+      protocol
+    )
+  ) {
     throw new InvalidException('Invalid protocol')
   }
   if (lootBoxId && isNaN(lootBoxId)) {
