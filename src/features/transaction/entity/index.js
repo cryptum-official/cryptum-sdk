@@ -456,11 +456,13 @@ class BitcoinTransferTransactionInput extends TransferTransactionInput {
    * @param {import('../../wallet/entity').Wallet=} args.wallet wallet to transfer from
    * @param {Array<Input>=} args.inputs inputs to transfer from
    * @param {Array<Output>} args.outputs outputs to transfer to
+   * @param {string=} args.data add OP_RETURN data
    */
-  constructor({ outputs, inputs, ...args }) {
+  constructor({ outputs, inputs, data, ...args }) {
     super(args)
     this.outputs = outputs
     this.inputs = inputs
+    this.data = data
   }
 }
 class HathorTransferTransactionInput extends TransferTransactionInput {

@@ -91,6 +91,7 @@ class Controller extends Interface {
       createAccount,
       feeCurrency,
       fee,
+      data,
     } = input
     validateTransferTransactionParams(input)
     const tc = getTransactionControllerInstance(this.config)
@@ -156,6 +157,7 @@ class Controller extends Interface {
         tx = await tc.createBitcoinTransferTransaction({
           wallet,
           outputs: destination ? [{ address: destination, amount }] : destinations,
+          data,
           fee,
         })
         break

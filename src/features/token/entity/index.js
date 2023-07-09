@@ -29,6 +29,7 @@
  * @property {Array<import('../../transaction/entity').Output|import('../../transaction/entity').CardanoOutput>=} destinations destinations (for bitcoin, hathor and cardano transactions only)
  * @property {string=} issuer issuer account of the token to transfer (only for stellar and ripple transactions)
  * @property {boolean=} createAccount true if this is a transfer to create an account in the blockchain (only for stellar transactions)
+ * @property {string=} data data (OP_RETURN) to be attached to transaction (for bitcoin only)
  * @property {string=} memo text to be attached to transaction (for stellar and ripple only)
  * @property {string=} feeCurrency fee currency (for celo only)
  * @property {string=} fee fee 
