@@ -217,7 +217,7 @@ const validateSmartContractCallParams = ({ contractAddress, contractAbi, method,
   }
 }
 
-const validateBitcoinTransferTransactionParams = ({ wallet, inputs, outputs }) => {
+const validateBitcoinTransferTransactionParams = ({ wallet, inputs, outputs, data }) => {
   if (wallet && inputs) {
     throw new GenericException('Parameters wallet and inputs can not be sent at the same time', 'InvalidTypeException')
   }
@@ -235,6 +235,15 @@ const validateBitcoinTransferTransactionParams = ({ wallet, inputs, outputs }) =
       'Invalid parameter outputs, it should be an array with length larger than 0',
       'InvalidTypeException'
     )
+  }
+  if (data) {
+    if (typeof data !== 'string') {
+      throw new InvalidTypeException('data', 'string')
+    } else {
+      if (data.length > 80) {
+        throw new InvalidException('The data parameter has to be at most 80 characters long')
+      }
+    }
   }
 }
 const validateHathorTransferTransactionFromWallet = ({ wallet, outputs }) => {

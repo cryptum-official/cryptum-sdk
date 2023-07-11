@@ -503,7 +503,7 @@ class Controller extends Interface {
    */
   async createBitcoinTransferTransaction(input) {
     validateBitcoinTransferTransactionParams(input)
-    let { wallet, inputs, outputs, fee } = input
+    let { wallet, inputs, outputs, fee, data } = input
     const protocol = Protocol.BITCOIN
     if (wallet) {
       const utxos = await this.getUTXOs({ address: wallet.address, protocol })
@@ -528,6 +528,7 @@ class Controller extends Interface {
       inputs,
       outputs,
       fee,
+      data,
       testnet: isTestnet(this.config.environment),
       config: this.config,
     })
