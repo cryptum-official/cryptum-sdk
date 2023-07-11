@@ -21,6 +21,8 @@ const sdk = new CryptumSdk({
 - `opts.destinations` (array of Outputs) - destination outputs.
   - `opts.destinations[].address` (string)(**required**) - recipient address.
   - `opts.destinations[].amount` (string)(**required**) - amount to receive.
+- `opts.data` (string)(**optional**) - OP_RETURN data. (The data must be at most 80 characters long)
+- `opts.fee` (string)(**optional**) - fee amount to pay for transaction in satoshis.
 
 Use `destination` and `amount` if you want to transfer to one address.
 
