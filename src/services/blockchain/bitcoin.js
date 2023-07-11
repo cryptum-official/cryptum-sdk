@@ -7,7 +7,7 @@ const { getTransactionControllerInstance } = require('../../features/transaction
 const { BlockchainException } = require('../../errors/blockchainException')
 const { getWalletControllerInstance } = require('../../features/wallet/controller')
 
-module.exports.buildBitcoinTransferTransaction = async function ({ wallet, inputs, outputs, fee, config }) {
+module.exports.buildBitcoinTransferTransaction = async function ({ wallet, inputs, outputs, fee, data, config }) {
   const tc = getTransactionControllerInstance(config)
   const outputDatas = outputs.map(({ address, amount }) => ({ address, satoshis: toSatoshi(amount).toNumber() }))
   let outputSum = new BigNumber(outputDatas.reduce((prev, cur) => prev + cur.satoshis, 0))
@@ -50,6 +50,7 @@ module.exports.buildBitcoinTransferTransaction = async function ({ wallet, input
     tx.from(selectedInputs)
     tx.to(outputDatas)
     if (change.gt(0)) tx.change(wallet.address)
+    if (data) tx.addData(data)
     tx.sign(wallet.privateKey)
     return tx.serialize()
   } else {
@@ -68,6 +69,7 @@ module.exports.buildBitcoinTransferTransaction = async function ({ wallet, input
       })
     }
     tx.to(outputDatas)
+    if (data) tx.addData(data)
     tx.sign(inputs.map(input => input.privateKey))
     return tx.serialize()
   }

@@ -1,15 +1,15 @@
-const nock = require('nock')
-const chai = require('chai')
-var chaiAsPromised = require('chai-as-promised')
-chai.use(chaiAsPromised)
-const assert = chai.assert
-const { getTokenControllerInstance } = require('../../../../src/features/token/controller')
-const { config, getWallets } = require('../../../wallet/constants')
-const { loadNockMocks } = require('./mocks')
-const token = getTokenControllerInstance(config)
 
-describe.only('Hathor Tokens', () => {
+describe('Hathor Tokens', () => {
+  const nock = require('nock')
+  const chai = require('chai')
+  chai.use(require('chai-as-promised'))
+  const assert = chai.assert
+  const { getTokenControllerInstance } = require('../../../../src/features/token/controller')
+  const { config, getWallets } = require('../../../wallet/constants')
+  const { loadNockMocks } = require('./mocks')
+  const token = getTokenControllerInstance(config)
   let wallets
+
   before(async () => {
     wallets = await getWallets()
     loadNockMocks(nock, wallets)
