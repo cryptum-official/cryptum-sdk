@@ -130,6 +130,7 @@ class CeloStakingController extends Interface {
    * Activate all votes
    * @param {object} input
    * @param {import('../../wallet/entity').Wallet} input.wallet wallet object
+   * @param {string} input.validator
    *
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
@@ -216,7 +217,7 @@ class CeloStakingController extends Interface {
    * Unlock amount
    * @param {object} input
    * @param {import('../../wallet/entity').Wallet} input.wallet wallet object
-   * @param {boolean} input.amount amount to unlock
+   * @param {string} input.amount amount to unlock
    *
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
@@ -450,7 +451,11 @@ class CeloStakingController extends Interface {
 
   async _getMethodAbi(contract, method) {
     // const abi = require(`../abis/${contract}.json`)
-    const abi = await makeRequest({ method: 'get', url: `/contract/${contract}/abi?protocol=CELO`, config: this.config })
+    const abi = await makeRequest({
+      method: 'get',
+      url: `/contract/${contract}/abi?protocol=CELO`,
+      config: this.config,
+    })
     return [abi.find((m) => m.name === method)]
   }
   async _findLesserGreater({ amount, validator, network }) {
