@@ -130,7 +130,7 @@ class CeloStakingController extends Interface {
    * Activate all votes
    * @param {object} input
    * @param {import('../../wallet/entity').Wallet} input.wallet wallet object
-   * @param {string} input.validator
+   * @param {string} input.validator validator group
    *
    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
    */
