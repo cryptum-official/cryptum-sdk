@@ -16,6 +16,7 @@
     - [Configuration](#configuration)
     - [Blockchain queries](docs/queries.md)
     - [Wallets](docs/wallets.md)
+    - [Chainlink](docs/chainlink.md)
     - Tokens (ERC20)
       - [Ethereum and other EVMs](docs/tokens/EVMs.md)
       - [Solana](docs/tokens/solana.md)
