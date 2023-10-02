@@ -1,4 +1,5 @@
 const AxiosApi = require('../axios')
+const rawAxios = require('axios')
 const { GenericException } = require('../errors')
 
 /**
@@ -17,7 +18,7 @@ const { GenericException } = require('../errors')
 const getApiMethod = ({ requests, key, config }) => {
   const axios = new AxiosApi(config)
   const api = axios.getInstance()
-  
+
   const value = requests[key]
   const method = api[value.method.toLowerCase()]
   return method
@@ -49,7 +50,14 @@ const makeRequest = async ({ method, url, params, headers, body, config }) => {
   try {
     const axios = new AxiosApi(config)
     const api = axios.getInstance()
-    const response = await api({ method, url, params, headers: { ...headers, ...mountHeaders(config.apiKey) }, data: body })
+
+    const response = await api({
+      method,
+      url,
+      params,
+      headers: { ...headers, ...mountHeaders(config.apiKey) },
+      data: body,
+    })
     return response.data
   } catch (error) {
     handleRequestError(error)

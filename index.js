@@ -8,6 +8,7 @@ const { getTokenControllerInstance } = require('./src/features/token/controller'
 const { getNftControllerInstance } = require('./src/features/nft/controller')
 const { getContractControllerInstance } = require('./src/features/contract/controller')
 const { getLootBoxControllerInstance } = require('./src/features/lootBox/controller')
+const { getUniswapControllerInstance } = require('./src/features/uniswap/controller')
 const { Protocol } = require('./src/services/blockchain/constants')
 const { GenericException } = require('./src/errors')
 const { getKmsControllerInstance } = require('./src/features/kms/controller')
@@ -113,10 +114,14 @@ class CryptumSDK {
     return getLootBoxControllerInstance(this.config)
   }
 
+  get uniswap() { return this.getUniswapController() }
+  getUniswapController() {
+    return getUniswapControllerInstance(this.config)
+  }
+  
   get kms() { return this.getKmsController() }
   getKmsController() {
     return getKmsControllerInstance(this.config)
   }
-}
 
 module.exports = CryptumSDK
