@@ -15,7 +15,7 @@ const sdk = new CryptumSdk({
 Smart contracts often act in real-time on data such as prices of assets. This is especially true in DeFi.
 For example, Synthetix uses Data Feeds to determine prices on their derivatives platform. Lending and borrowing platforms like AAVE use Data Feeds to ensure the total value of the collateral.
 Data Feeds aggregate many data sources and publish them on-chain using a combination of the Decentralized Data Model and Off-Chain Reporting.
->source [Chainlink Data Feeds]('https://docs.chain.link/data-feeds')
+[Chainlink Data Feeds]('https://docs.chain.link/data-feeds')
 
 
 ## Get Price
