@@ -1,8 +1,8 @@
 # Chainlink
 
 - [Price Feeds](#price-feeds)
-- [Get price](#get-price)
-- [Get prices](#get-prices)
+- [Get price by Address](#get-price-by-address)
+- [Get prices by Asset](#get-prices-by-asset)
 
 Instantiate Cryptum SDK first:
 ```js
@@ -20,7 +20,7 @@ Data Feeds aggregate many data sources and publish them on-chain using a combina
 [Chainlink Data Feeds](https://docs.chain.link/data-feeds)
 
 
-## Get Price
+## Get Price By Address
 
 In our SDK, there are enums of contracts for token pairs on the Ethereum mainnet and testnet. If you cannot find the pair you desire, you can check at [Price Feeds Addresses](https://docs.chain.link/data-feeds/price-feeds/addresses).
 
@@ -34,7 +34,7 @@ const price = await sdk.chainlink.getPricesByAddres({
 })
 ```
 
-## Get Prices
+## Get Prices By Asset
 
 List currency price quotations
 
