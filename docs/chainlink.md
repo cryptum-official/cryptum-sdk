@@ -1,5 +1,7 @@
 # Chainlink
 
+The Cryptum SDK integrates natively with Chainlink, the leading platform for web3 services. Users can interact with Chainlink products within the SDK with a single line of code.
+
 - [Price Feeds](#price-feeds)
 - [Get price by Address](#get-price-by-address)
 - [Get prices by Asset](#get-prices-by-asset)
@@ -17,12 +19,13 @@ const sdk = new CryptumSdk({
 Smart contracts often act in real-time on data such as prices of assets. This is especially true in DeFi.
 For example, Synthetix uses Data Feeds to determine prices on their derivatives platform. Lending and borrowing platforms like AAVE use Data Feeds to ensure the total value of the collateral.
 Data Feeds aggregate many data sources and publish them on-chain using a combination of the Decentralized Data Model and Off-Chain Reporting.
-[Chainlink Data Feeds](https://docs.chain.link/data-feeds)
+
+[Read more about Chainlink Data Feeds](https://docs.chain.link/data-feeds)
 
 
 ## Get Price By Address
 
-In our SDK, there are enums of contracts for token pairs on the Ethereum mainnet and testnet. If you cannot find the pair you desire, you can check at [Price Feeds Addresses](https://docs.chain.link/data-feeds/price-feeds/addresses).
+In our SDK, there are enums of contracts for token pairs on Ethereum mainnet and testnet. If you cannot find the pair you desire, check the available [Price Feeds Addresses](https://docs.chain.link/data-feeds/price-feeds/addresses).
 
 
 ```js

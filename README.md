@@ -42,7 +42,9 @@
 
 ## About The Project
 
-This project provides a handy way to integrage your JavaScript code with Cryptum's backend through simple function calls that do all the heavy lifting for you. Learn more about Cryptum <a href="https://cryptum.io" target="_blank">here</a>.
+This project provides a handy way to integrate your JavaScript code with Cryptum's backend through simple function calls that do all the heavy lifting for you. Learn more about Cryptum <a href="https://cryptum.io" target="_blank">here</a>.
+
+The Cryptum SDK also integrates Chainlink functionality natively, empowering developers with secure and reliable decentralized oracle services. [Read more about the Chainlink integration](docs/chainlink.md).
 
 ## First Steps
 
