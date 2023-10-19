@@ -24,7 +24,7 @@ class Controller extends Interface {
      * @param {import('../entity').PriceFeedInput} input
      * @returns {Promise<import('../entity').PriceFeedResponse>}
      */
-    async getPricesByAddres(input) {
+    async getPricesByAddress(input) {
         const { protocol, address } = input;
         return makeRequest({ method: 'get', url: `/chainlink/pricefeed/${address}?protocol=${protocol}`, config: this.config })
     }
