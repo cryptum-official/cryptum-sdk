@@ -6,14 +6,6 @@ The Cryptum SDK integrates natively with Chainlink, the leading platform for web
 - [Get price by Address](#get-price-by-address)
 - [Get prices by Asset](#get-prices-by-asset)
 
-Instantiate Cryptum SDK first:
-```js
-const sdk = new CryptumSdk({
-  environment: 'testnet',
-  apiKey: 'YOUR-API-KEY'
-})
-```
-
 ## Price Feeds
 
 Smart contracts often act in real-time on data such as prices of assets. This is especially true in DeFi.
@@ -22,6 +14,13 @@ Data Feeds aggregate many data sources and publish them on-chain using a combina
 
 [Read more about Chainlink Data Feeds](https://docs.chain.link/data-feeds)
 
+Instantiate Cryptum SDK first:
+```js
+const sdk = new CryptumSdk({
+  environment: 'testnet',
+  apiKey: 'YOUR-API-KEY'
+})
+```
 
 ## Get Price By Address
 
@@ -31,7 +30,7 @@ In our SDK, there are enums of contracts for token pairs on Ethereum mainnet and
 ```js
 const address = sdk.chainlink.feeds.MAINNET.ETHEREUM.ADA_USD
 
-const price = await sdk.chainlink.getPricesByAddres({
+const price = await sdk.chainlink.getPricesByAddress({
     protocol: "ETHEREUM",
     address: address
 })
