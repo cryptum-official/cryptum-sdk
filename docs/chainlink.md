@@ -8,7 +8,7 @@ The Cryptum SDK integrates natively with Chainlink, the leading platform for web
 - [Automation](#automation)
   - [Create](#create-automation)
   - [Register Upkeep](#register-upkeep)
-  - [List](#list-upkeeps)
+  - [List all upkeeps](#list-all-upkeeps)
   - [Get Info Upkeep](#get-info-upkeep)
   - [Balance](#balance-upkeep)
   - [Add Funds](#add-funds-upkeep)
@@ -89,6 +89,8 @@ Before you begin, you need to ensure that you have a sufficient LINK balance to 
 
 #### Create Automation
 
+Deploy contract responsible for registering and managing new Upkeeps.
+
 ```js
 const { hash } = await sdk.chainlink.createAutomation({
     protocol: 'POLYGON',
@@ -128,7 +130,9 @@ const { hash } = await  sdk.chainlink.registerUpkeep({
 })
 ```
 
-#### List Upkeeps 
+#### List all Upkeeps 
+
+Return the IDs of the upkeeps generated for the provided contract.
 
 ```js
 sdk.chainlink.listUpkeeps({
@@ -139,6 +143,8 @@ sdk.chainlink.listUpkeeps({
 
 #### Get info Upkeep
 
+Retrieve detailed information about the upkeep using its ID.
+
 ```js
 sdk.chainlink.getUpkeep({
     protocol: 'POLYGON',
@@ -147,6 +153,8 @@ sdk.chainlink.getUpkeep({
 ```
 
 #### Balance Upkeep
+
+Get balance e Minimum Balance upkeep by ID.
 
 ```js
 sdk.chainlink.getBalanceUpkeep({
@@ -157,6 +165,8 @@ sdk.chainlink.getBalanceUpkeep({
 ```
 
 #### Add Funds Upkeep
+
+Add funds to the upkeep by ID.
 
 ```js
 sdk.chainlink.addFundsUpkeep({
@@ -229,6 +239,8 @@ Chainlink VRF (Verifiable Random Function) is a provably fair and verifiable ran
 
 #### Create VRF
 
+Deploy contract responsible for request and managing random words.
+
 ```js
 const { hash } = await sdk.chainlink.createVRF({
     protocol,
@@ -243,6 +255,8 @@ const { contractAddress } = await sdk.transaction.getTransactionReceiptByHash({
 
 #### Get Subscription
 
+Get the subscription ID and more information about the generated contract.
+
 ```js
 sdk.chainlink.getSubscriptionVRF({
     protocol,
@@ -252,6 +266,8 @@ sdk.chainlink.getSubscriptionVRF({
 
 #### Get Subscription By Id
 
+Retrieve additional information about the subscription by searching for it using its ID.
+
 ```js
 sdk.chainlink.getSubscriptionByIdVRF({
     protocol,
@@ -260,6 +276,8 @@ sdk.chainlink.getSubscriptionByIdVRF({
 ```
 
 #### TopUp Subscription
+
+Add funds to your subscription.
 
 ```js
 sdk.chainlink.topUpVRF({
@@ -272,6 +290,8 @@ sdk.chainlink.topUpVRF({
 
 #### Request RandomWords
 
+Request new random words, and you can pass the quantity of words to be generated as a parameter. Ensure that there are sufficient funds in your wallet.
+
 ```js
 sdk.chainlink.requestRandomWordsVRF({
     protocol,
@@ -283,6 +303,8 @@ sdk.chainlink.requestRandomWordsVRF({
 
 #### List requests
 
+List all the IDs of the requests made through the provided contract.
+
 ```js
 sdk.chainlink.requestsVRF({
     protocol,
@@ -291,6 +313,9 @@ sdk.chainlink.requestsVRF({
 ```
 
 #### Get Latest Request
+
+Return the ID of the last request made.
+
 ```js
 sdk.chainlink.latestRequestVRF({
     protocol,
@@ -299,6 +324,8 @@ sdk.chainlink.latestRequestVRF({
 ```
 
 #### Get Randomwords
+
+Through the `requestID`, you can query whether the random words have already been generated or not. In case of true, all requested random words will be returned according to the `numWords` argument passed.
 
 ```js
 sdk.chainlink.getRandomWordsVRF({
