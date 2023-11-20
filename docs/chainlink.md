@@ -242,9 +242,14 @@ Chainlink VRF (Verifiable Random Function) is a provably fair and verifiable ran
 Deploy contract responsible for request and managing random words.
 
 ```js
+// This contract is compatible with Upkeep Automation
+// To use the "updateIntervalUpkeep" parameter
+// "updateIntervalUpkeep" == Number of blocks
+// Each "updateIntervalUpkeep" block will perform the action of requesting a random word
 const { hash } = await sdk.chainlink.createVRF({
     protocol,
-    wallet
+    wallet,
+    updateIntervalUpkeep // default: 0
 })
 
 const { contractAddress } = await sdk.transaction.getTransactionReceiptByHash({

@@ -20,6 +20,7 @@
 * @typedef {Object} CreateVRFInput
 * @property {import('../../../services/blockchain/constants').Protocol} protocol
 * @property {import('../../wallet/entity').Wallet} wallet
+* @property {number} updateIntervalUpkeep
 **/
 
 /**
