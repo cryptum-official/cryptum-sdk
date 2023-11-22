@@ -37,12 +37,12 @@ class Controller extends Interface {
      * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
      */
     async createVRF(input) {
-        const { protocol, wallet } = input;
+        const { protocol, wallet, updateIntervalUpkeep } = input;
         const tc = getTransactionControllerInstance(this.config)
         const builtSubscription = await makeRequest({
             method: 'post',
             url: `/chainlink/subscription/build?protocol=${protocol}`,
-            body: { from: wallet.address },
+            body: { from: wallet.address, updateIntervalUpkeep },
             headers: {
                 'Content-Type': 'application/json'
             },
