@@ -53,6 +53,7 @@
 * @property {string} balance
 * @property {string} fulfillments
 * @property {string} owner
+* @property {string} last_block_number
 * @property {string[]} consumers
 **/
 
