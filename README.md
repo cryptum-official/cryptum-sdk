@@ -115,6 +115,10 @@ const sdk = new CryptumSDK({
 
 For more in-depth examples check the docs/ folder and our guides <a href="https://docs.cryptum.io" target="_blank">here</a>.
 
+## Example
+
+To see the SDK implemented in a sample project, visit the [cryptum-lottery](https://github.com/cryptum-official/cryptum-lottery) project and see it in action
+
 ## Contributing
 
 Contributions are what make the open source community an incredible place to learn, inspire and create. Any contribution you make will be **much appreciated**.

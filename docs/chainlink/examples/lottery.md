@@ -18,9 +18,9 @@ In this example, we'll cover the main part of creating VRF and Automation using 
 
 We've developed a sample project utilizing these features, and you can check out the complete implementation at:
 
-[Cryptum - Lottery](https://github.com/Madureiradaniel/cryptum-lottery)
+[Cryptum - Lottery](https://github.com/cryptum-official/cryptum-lottery)
 <p>
-  <a href="https://github.com/Madureiradaniel/cryptum-lottery">
+  <a href="https://github.com/cryptum-official/cryptum-lottery">
     <img src="https://skillicons.dev/icons?i=github" />
   </a>
 </p>
@@ -88,7 +88,7 @@ const sdk = new CryptumSdk({
 })
 ```
 
->Implementation example in: [cryptum-lottery/service/Cryptum.js](https://github.com/Madureiradaniel/cryptum-lottery/blob/master/service/Cryptum.js)
+>Implementation example in: [cryptum-lottery/service/Cryptum.js](https://github.com/cryptum-official/cryptum-lottery/blob/master/service/Cryptum.js)
 
 #### step 2
 
@@ -98,7 +98,7 @@ Then you call the generateWallet() function passing the protocol you want:
 const wallet = await sdk.wallet.generateWallet({ protocol: 'POLYGON' })
 
 ```
->Implementation example in: [cryptum-lottery/controller/Wallet.js](https://github.com/Madureiradaniel/cryptum-lottery/blob/master/controller/Wallet.js)
+>Implementation example in: [cryptum-lottery/controller/Wallet.js](https://github.com/cryptum-official/cryptum-lottery/blob/master/controller/Wallet.js)
 
 #### step 3
 
@@ -127,7 +127,7 @@ const { contractAddress } = await sdk.transaction.getTransactionReceiptByHash({
 return contractAddress
 ```
 
->Implementation example in: [cryptum-lottery/controller/Lottery.js](https://github.com/Madureiradaniel/cryptum-lottery/blob/master/controller/Lottery.js)
+>Implementation example in: [cryptum-lottery/controller/Lottery.js](https://github.com/cryptum-official/cryptum-lottery/blob/master/controller/Lottery.js)
 
 #### step 5
 
@@ -159,7 +159,7 @@ const { contractAddress } = await sdk.transaction.getTransactionReceiptByHash({
 
 return contractAddress
 ```
->Implementation example in: [cryptum-lottery/controller/Lottery.js](https://github.com/Madureiradaniel/cryptum-lottery/blob/master/controller/Lottery.js)
+>Implementation example in: [cryptum-lottery/controller/Lottery.js](https://github.com/cryptum-official/cryptum-lottery/blob/master/controller/Lottery.js)
 
 #### step 7
 
@@ -176,7 +176,7 @@ const { hash } = await sdk.token.transfer({
     destination: contractAddress // contract address generated in step 6
 })
 ```
->Implementation example in: [cryptum-lottery/controller/Lottery.js](https://github.com/Madureiradaniel/cryptum-lottery/blob/master/controller/Lottery.js)
+>Implementation example in: [cryptum-lottery/controller/Lottery.js](https://github.com/cryptum-official/cryptum-lottery/blob/master/controller/Lottery.js)
 
 #### step 8
 
@@ -201,7 +201,7 @@ const { hash } = await sdk.chainlink.registerUpkeep({
 })
 ```
 
->Implementation example in: [cryptum-lottery/controller/Lottery.js](https://github.com/Madureiradaniel/cryptum-lottery/blob/master/controller/Lottery.js)
+>Implementation example in: [cryptum-lottery/controller/Lottery.js](https://github.com/cryptum-official/cryptum-lottery/blob/master/controller/Lottery.js)
 
 #### step 9
 
@@ -231,7 +231,7 @@ Ex. Response:
 */
 ```
 
->Implementation example in: [cryptum-lottery/cron/index.js](https://github.com/Madureiradaniel/cryptum-lottery/blob/master/cron/index.js)
+>Implementation example in: [cryptum-lottery/cron/index.js](https://github.com/cryptum-official/cryptum-lottery/blob/master/cron/index.js)
 
 #### step 10
 
@@ -261,7 +261,7 @@ const upkeep = await sdk.chainlink.getUpkeep({
     upkeepID
 })
 ```
->Implementation example in: [cryptum-lottery/controller/Lottery.js](https://github.com/Madureiradaniel/cryptum-lottery/blob/master/controller/Lottery.js)
+>Implementation example in: [cryptum-lottery/controller/Lottery.js](https://github.com/cryptum-official/cryptum-lottery/blob/master/controller/Lottery.js)
 
 You can also track your subscription and automation through the chainlink website.
 
