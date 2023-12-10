@@ -79,7 +79,7 @@ const cardanoWallet = await sdk.wallet.generateWalletFromPrivateKey({
 #### `sdk.wallet.generateWalletAddressFromXpub(opts)`
 
 Generate a wallet address from xpub for a blockchain protocol:
-* `opts.protocol` (string) (__required__) - blockchain protocol supported: `BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `HATHOR`, `CARDANO`,`AVAXCCHAIN`, `CHILIZ`.
+* `opts.protocol` (string) (__required__) - blockchain protocol supported: `BITCOIN`, `ETHEREUM`, `BSC`, `CELO`, `HATHOR`, `CARDANO`, `AVAXCCHAIN`, `CHILIZ`.
 * `opts.xpub` (string) (__required__) - xpub string.
 * `opts.address` (number) (__required__) - address index.
 
