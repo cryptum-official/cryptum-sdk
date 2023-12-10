@@ -37,7 +37,7 @@
     - [Webhooks](docs/webhooks.md)
     - [Staking](docs/staking/index.md)
 - [Contributing](#contributing)
-  - [What does my PR need to be accepted ?](#what-does-my-pr-need-to-be-accepted-)
+  - [What does my PR need to be accepted?](#what-does-my-pr-need-to-be-accepted-)
 - [License](#license)
 - [Contact](#contact)
 
@@ -106,7 +106,7 @@ To configure cryptum-sdk you need only to provide a config in format JSON.
 const CryptumSDK = require('cryptum-sdk')
 
 const sdk = new CryptumSDK({
-  enviroment: 'development', // 'testnet' or 'development', 'mainnet' or 'production'
+  environment: 'development', // 'testnet' or 'development', 'mainnet' or 'production'
   apiKey: 'my-secret-api-key',
 })
 ```
@@ -126,11 +126,11 @@ Contributions are what make the open source community an incredible place to lea
 1. Fork the project
 2. Create a Branch for your feature (`git checkout -b feature/amazing-feature`)
 3. Insert your changes (`git add .`)
-4. Make a commit with your changes (`git commit -m 'feat(<folder-name>): Inserting a Amazing Feature !`)
+4. Make a commit with your changes (`git commit -m 'feat(<folder-name>): Inserting an Amazing Feature !`)
 5. Push the branch (`git push origin feature/amazing-feature`)
 6. Open a Pull Request
 
-### What does my PR need to be accepted ?
+### What does my PR need to be accepted?
 
 In order for us to accept your PR, you need to adhere to the following standards.
 
