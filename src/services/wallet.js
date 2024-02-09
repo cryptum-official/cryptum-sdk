@@ -36,8 +36,8 @@ const getTestnetDerivationPath = ({ account = 0, change, address }) =>
   getDerivationPath({ purpose: 44, coin: 1, account, change, address })
 const getEthereumDerivationPath = ({ account = 0, change, address }) =>
   getDerivationPath({ purpose: 44, coin: 60, account, change, address })
-const getStratusDerivationPath = ({ account = 0, change, address }) =>    // CONFIRMAR
-  getDerivationPath({ purpose: 44, coin: 60, account, change, address })  // CONFIRMAR
+const getStratusDerivationPath = ({ account = 0, change, address }) =>
+  getDerivationPath({ purpose: 44, coin: 60, account, change, address })
 const getCeloDerivationPath = ({ account = 0, change, address }) =>
   getDerivationPath({ purpose: 44, coin: 52752, account, change, address })
 const getHathorDerivationPath = ({ account = 0, address }) =>

@@ -84,8 +84,6 @@ module.exports.CHLIZ_COMMON_CHAIN = {
   },
 }
 
-// ===================================
-// CONFIRMAR
 module.exports.STRATUS_COMMON_CHAIN = {
   testnet: {
     base: 'goerli',
@@ -102,7 +100,6 @@ module.exports.STRATUS_COMMON_CHAIN = {
     },
   },
 }
-// ===================================
 
 module.exports.POLYGON_COMMON_CHAIN = {
   testnet: {
