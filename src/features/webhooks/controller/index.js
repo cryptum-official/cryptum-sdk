@@ -1,8 +1,6 @@
 module.exports.getWebhooksControllerInstance = (config) => new Controller(config)
-const { handleRequestError } = require('../../../services')
-const { getApiMethod, mountHeaders } = require('../../../services')
+const { makeRequest } = require("../../../services")
 
-const requests = require('./requests.json')
 const Interface = require('./interface')
 
 class Controller extends Interface {
@@ -18,17 +16,14 @@ class Controller extends Interface {
    * @param {Protocol} webhook.protocol
    */
   async createWebhook(webhook) {
-    try {
-      const method = getApiMethod({ requests, key: 'createWebhook', config: this.config })
-      const headers = mountHeaders(this.config.apiKey)
+    const { protocol, address, asset, confirmations, event, url } = webhook
 
-      const response = await method(requests.createWebhook.url, webhook, {
-        headers,
-      })
-      return response.data
-    } catch (error) {
-      handleRequestError(error)
-    }
+    return makeRequest({
+      method: 'post',
+      url: `/webhook?protocol=${protocol}`,
+      body: { address, asset, confirmations, event, url },
+      config: this.config
+    })
   }
   /**
    * Method to get webhooks of the Cryptum
@@ -41,24 +36,19 @@ class Controller extends Interface {
    * @param {string=} input.endDate pagination end date
    */
   async getWebhooks({ asset, protocol, startDate, endDate, limit, offset }) {
-    try {
-      const method = getApiMethod({ requests, key: 'getWebhooks', config: this.config })
-      const headers = mountHeaders(this.config.apiKey)
+    const qs = [`protocol=${protocol}`]
+    if (asset) qs.push(`asset=${asset}`)
+    if (startDate) qs.push(`startDate=${startDate}`)
+    if (endDate) qs.push(`endDate=${endDate}`)
+    if (limit) qs.push(`limit=${limit}`)
+    if (offset) qs.push(`offset=${offset}`)
 
-      const qs = [`protocol=${protocol}`]
-      if (asset) qs.push(`asset=${asset}`)
-      if (startDate) qs.push(`startDate=${startDate}`)
-      if (endDate) qs.push(`endDate=${endDate}`)
-      if (limit) qs.push(`limit=${asset}`)
-      if (offset) qs.push(`offset=${asset}`)
+    return makeRequest({
+      method: 'get',
+      url: `/webhook?${qs.join("&")}`,
+      config: this.config
+    })
 
-      const response = await method(`${requests.getWebhooks.url}?${qs.join('&')}`, {
-        headers,
-      })
-      return response.data
-    } catch (error) {
-      handleRequestError(error)
-    }
   }
   /**
    * Method to destroy an webhook of the Cryptum
@@ -68,17 +58,11 @@ class Controller extends Interface {
    * @param {string} webhookDestroy.protocol
    */
   async destroyWebhook({ webhookId, protocol }) {
-    try {
-      const method = getApiMethod({ requests, key: 'destroyWebhook', config: this.config })
-      const headers = mountHeaders(this.config.apiKey)
-
-      const response = await method(`${requests.destroyWebhook.url}/${webhookId}?protocol=${protocol}`, {
-        headers,
-      })
-      return response.data
-    } catch (error) {
-      handleRequestError(error)
-    }
+    return makeRequest({
+      method: 'delete',
+      url: `/webhook/${webhookId}?protocol=${protocol}`,
+      config: this.config
+    })
   }
 }
 

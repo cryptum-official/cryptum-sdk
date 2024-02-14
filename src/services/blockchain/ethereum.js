@@ -6,6 +6,7 @@ const {
   Protocol,
   AVAXCCHAIN_COMMON_CHAIN,
   CHLIZ_COMMON_CHAIN,
+  STRATUS_COMMON_CHAIN,
 } = require('./constants')
 const { GenericException } = require('../../errors')
 const { isTestnet } = require('../../services/utils')
@@ -15,6 +16,8 @@ const signEthereumTx = (rawTransaction, protocol, fromPrivateKey, network) => {
   let common
   if (protocol === Protocol.ETHEREUM) {
     common = new EthereumCommon({ chain: rawTransaction.chainId })
+  } else if (protocol === Protocol.STRATUS) {
+    common = EthereumCommon.forCustomChain(STRATUS_COMMON_CHAIN[network].base, STRATUS_COMMON_CHAIN[network].chain)
   } else if (protocol === Protocol.BSC) {
     common = EthereumCommon.forCustomChain(BSC_COMMON_CHAIN[network].base, BSC_COMMON_CHAIN[network].chain)
   } else if (protocol === Protocol.AVAXCCHAIN) {

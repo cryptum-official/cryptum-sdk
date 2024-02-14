@@ -419,6 +419,25 @@ class Controller extends Interface {
     })
   }
   /**
+   * Create stratus transfer transaction
+   *
+   * @param {EthereumTransferTransactionInput} input
+   * @returns {Promise<SignedTransaction>} signed transaction data
+   */
+  async createStratusTransferTransaction(input) {
+    validateEthereumTransferTransactionParams(input)
+    const { amount, contractAddress, destination, fee, tokenSymbol, wallet } = input
+    const tc = getTokenControllerInstance(this.config)
+    return await tc.transfer({
+      amount,
+      protocol: 'STRATUS',
+      token: contractAddress ? contractAddress : tokenSymbol,
+      wallet,
+      destination,
+      fee,
+    })
+  }
+  /**
    * Create bsc transfer transaction
    *
    * @param {EthereumTransferTransactionInput} input

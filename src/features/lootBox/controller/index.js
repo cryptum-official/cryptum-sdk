@@ -44,6 +44,7 @@ class Controller extends Interface {
         signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
         break;
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN:
@@ -82,6 +83,7 @@ class Controller extends Interface {
         signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
         break;
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN:
@@ -160,6 +162,7 @@ class Controller extends Interface {
         signedTx = await signCeloTx(rawTransaction, fromPrivateKey)
         break;
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN:
@@ -185,6 +188,7 @@ class Controller extends Interface {
     const cc = getContractControllerInstance(this.config)
     switch (protocol) {
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:

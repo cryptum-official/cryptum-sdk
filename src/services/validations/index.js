@@ -131,7 +131,7 @@ const validateSmartContractTransactionParams = ({ wallet, fee, testnet, contract
   if (feeCurrency && typeof feeCurrency !== 'string') {
     throw new GenericException('Invalid fee currency', 'InvalidTypeException')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.STRATUS, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(protocol)) {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
 }
@@ -169,7 +169,7 @@ const validateSmartContractDeployTransactionParams = ({
   if (feeCurrency && typeof feeCurrency !== 'string') {
     throw new GenericException('Invalid fee currency', 'InvalidTypeException')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.STRATUS, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(protocol)) {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
 }
@@ -195,7 +195,7 @@ const validateTokenDeployTransactionParams = ({ wallet, fee, testnet, tokenType,
   if (feeCurrency && typeof feeCurrency !== 'string') {
     throw new GenericException('Invalid fee currency', 'InvalidTypeException')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.ETHEREUM, Protocol.STRATUS, Protocol.POLYGON].includes(protocol)) {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
 }
@@ -212,7 +212,7 @@ const validateSmartContractCallParams = ({ contractAddress, contractAbi, method,
   if (params && !Array.isArray(params)) {
     throw new GenericException('Invalid contract params', 'InvalidTypeException')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.ETHEREUM, Protocol.POLYGON].includes(protocol)) {
+  if (![Protocol.BSC, Protocol.CELO, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.ETHEREUM, Protocol.STRATUS, Protocol.POLYGON].includes(protocol)) {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
 }
@@ -605,6 +605,7 @@ const validateTransferTransactionParams = (input) => {
 
   switch (protocol) {
     case Protocol.ETHEREUM:
+    case Protocol.STRATUS:
     case Protocol.BSC:
     case Protocol.POLYGON:
     case Protocol.AVAXCCHAIN:
