@@ -406,4 +406,69 @@ class Controller extends Interface {
         })
         return await tc.sendTransaction(tx)
     }
+
+    /**
+    * Get status CCIP
+    * @param {import('../entity').StatusCCIPInput} input
+    * @returns {Promise<import('../entity').ResponseStatusCCIP>}
+    */
+    async getStatusCCIP(input) {
+        const { protocol, messageId, destinationProtocol } = input;
+        return await makeRequest({
+            method: 'get',
+            url: `/chainlink/ccip?protocol=${protocol}&messageId=${messageId}&destinationProtocol=${destinationProtocol}`,
+            config: this.config
+        })
+    }
+
+    /**
+    * Get status CCIP By Hash
+    * @param {object} input
+    * @param {string} input.hash
+    */
+    async getStatusCCIPByHash(input) {
+        const { hash } = input;
+
+        const {data : {  transactionHash } } = await makeRequest({
+            method: 'get',
+            url: `https://ccip.chain.link/api/query?query=TRANSACTION_SEARCH_QUERY&variables={"msgIdOrTxnHash":"${hash}"}`,
+            config: this.config
+        })
+
+        return transactionHash
+    }
+
+    /**
+    * Send token CCIP EOA (Externally Owned Account)
+    * @param {import('../entity').TransferTokenCCIPInput} input
+    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+    */
+    async sendTokenCCIPEoa(input) {
+
+        const { protocol, wallet, to, amount, tokenAddress, destinationProtocol, feeTokenAddress } = input
+        const tc = getTransactionControllerInstance(this.config)
+
+        const builtSendToken = await makeRequest({
+            method: 'post',
+            url: `/chainlink/ccip/sendTokenEOA?protocol=${protocol}`,
+            body: { from: wallet.address, to, amount, tokenAddress, destinationProtocol, feeTokenAddress },
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            config: this.config
+        })
+
+        let hash
+        for (let rawTransaction of builtSendToken) {
+            const signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
+            const tx = new SignedTransaction({
+                signedTx,
+                protocol,
+                type: TransactionType.CALL_CONTRACT_METHOD,
+            })
+            hash = await tc.sendTransaction(tx)
+        }
+
+        return hash
+    }
 }

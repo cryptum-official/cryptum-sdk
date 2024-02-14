@@ -143,11 +143,39 @@
 **/
 
 /**
+* @typedef {Object} TransferTokenCCIPInput
+* @property {import('../../../services/blockchain/constants').Protocol} protocol
+* @property {import('../../wallet/entity').Wallet} wallet
+* @property {string} to
+* @property {string} amount
+* @property {string} tokenAddress
+* @property {import('../../../services/blockchain/constants').Protocol} destinationProtocol
+* @property {string} feeTokenAddress 0x for native token or token address or null for LINK token
+**/
+//{ protocol, messageId, destinationProtocol } 
+
+/**
+* @typedef {Object} StatusCCIPInput
+* @property {import('../../../services/blockchain/constants').Protocol} protocol
+* @property {import('../../../services/blockchain/constants').Protocol} destinationProtocol
+* @property {string} messageId
+**/
+
+/**
 * @typedef {Object} EditGasLimitInput
 * @property {import('../../../services/blockchain/constants').Protocol} protocol
 * @property {import('../../wallet/entity').Wallet} wallet
 * @property {string} upkeepID
 * @property {string} gasLimit
+**/
+
+
+/**
+* @typedef {Object} ResponseStatusCCIP
+* @property {string} messageId
+* @property {string} destinationTransactionHash
+* @property {string} status
+* @property {number} blockNumber
 **/
 
 class PriceFeedResponse {
