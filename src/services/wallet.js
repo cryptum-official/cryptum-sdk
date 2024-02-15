@@ -36,8 +36,6 @@ const getTestnetDerivationPath = ({ account = 0, change, address }) =>
   getDerivationPath({ purpose: 44, coin: 1, account, change, address })
 const getEthereumDerivationPath = ({ account = 0, change, address }) =>
   getDerivationPath({ purpose: 44, coin: 60, account, change, address })
-const getStratusDerivationPath = ({ account = 0, change, address }) =>
-  getDerivationPath({ purpose: 44, coin: 60, account, change, address })
 const getCeloDerivationPath = ({ account = 0, change, address }) =>
   getDerivationPath({ purpose: 44, coin: 52752, account, change, address })
 const getHathorDerivationPath = ({ account = 0, address }) =>
@@ -163,43 +161,7 @@ module.exports.privateKeyToEthAccount = (privateKey) => {
   const web3 = new Web3()
   return web3.eth.accounts.privateKeyToAccount(privateKey)
 }
-/**
- * Get stratus address from private key
- *
- * @param {string} privateKey private key hex string
- * @returns {string} address
- */
-module.exports.getStratusAddressFromPrivateKey = (privateKey) => {
-  const { address } = this.privateKeyToEthAccount(privateKey)
-  return address.toLowerCase()
-}
-/**
- * Derive stratus address, private key and public key
- *
- * @param {string} mnemonic mnemonic seed string
- * @param {object=} derivationPath derivation path object
- * @param {number} derivationPath.account derivation path account index
- * @param {number} derivationPath.change derivation path change index
- * @param {number} derivationPath.address derivation path address index
- * @returns
- */
-module.exports.deriveStratusWalletFromDerivationPath = async (mnemonic, { account = 0, change = 0, address } = {}) => {
-  const accountIndex = account !== undefined ? account : 0
-  const changeIndex = change !== undefined ? change : 0
-  const addressIndex = address !== undefined ? address : 0
-  const derivedPath = hdkey
-    .fromMasterSeed(await mnemonicToSeed(mnemonic))
-    .derivePath(getStratusDerivationPath({ account: accountIndex, change: changeIndex }))
-  const xpub = derivedPath.publicExtendedKey().toString('hex')
-  const wallet = derivedPath.deriveChild(addressIndex).getWallet()
 
-  return {
-    address: wallet.getAddressString().toLocaleLowerCase(),
-    privateKey: wallet.getPrivateKeyString(),
-    publicKey: wallet.getPublicKeyString(),
-    xpub,
-  }
-}
 /**
  * Derive ethereum addresses from extended public key (xpub)
  *
@@ -211,13 +173,6 @@ module.exports.deriveStratusWalletFromDerivationPath = async (mnemonic, { accoun
 module.exports.deriveEthereumAddressFromXpub = async (xpub, { address = 0 } = {}) => {
   const derivedPath = hdkey.fromExtendedKey(xpub).deriveChild(address)
   return derivedPath.getWallet().getAddressString().toLowerCase()
-}
-module.exports.deriveStratusAddressFromXpub = async (xpub, { address = 0 } = {}) => {
-  const derivedPath = hdkey.fromExtendedKey(xpub).deriveChild(address)
-  return derivedPath.getWallet().getAddressString().toLowerCase()
-}
-module.exports.getStratusAddressFromPrivateKey = (privateKey) => {
-  return this.getEthereumAddressFromPrivateKey(privateKey)
 }
 module.exports.getBscAddressFromPrivateKey = (privateKey) => {
   return this.getEthereumAddressFromPrivateKey(privateKey)

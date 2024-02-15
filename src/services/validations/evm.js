@@ -18,9 +18,16 @@ module.exports.validateEvmNftTransfer = ({ wallet, token, destination, tokenId, 
     throw new InvalidException('Invalid amount')
   }
   if (
-    ![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.STRATUS, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(
-      protocol
-    )
+    ![
+      Protocol.BSC,
+      Protocol.CELO,
+      Protocol.ETHEREUM,
+      Protocol.STRATUS,
+      Protocol.BESU,
+      Protocol.AVAXCCHAIN,
+      Protocol.CHILIZ,
+      Protocol.POLYGON,
+    ].includes(protocol)
   ) {
     throw new InvalidException('Invalid protocol')
   }
@@ -44,7 +51,18 @@ module.exports.validateEvmTokenCreation = ({ wallet, type, name, symbol, uri, am
   if (amount && Number(amount) < 0) {
     throw new InvalidException('Invalid amount')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.STRATUS, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(protocol)) {
+  if (
+    ![
+      Protocol.BSC,
+      Protocol.CELO,
+      Protocol.ETHEREUM,
+      Protocol.STRATUS,
+      Protocol.BESU,
+      Protocol.AVAXCCHAIN,
+      Protocol.CHILIZ,
+      Protocol.POLYGON,
+    ].includes(protocol)
+  ) {
     throw new InvalidException('Invalid protocol')
   }
   if (fee && (!fee.gas || !fee.gasPrice)) {
@@ -67,7 +85,18 @@ module.exports.validateEvmTokenMint = ({ wallet, token, destination, amount, pro
   if (amount !== undefined && (isNaN(amount) || Number(amount) < 0)) {
     throw new InvalidException('Invalid amount')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.STRATUS, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(protocol)) {
+  if (
+    ![
+      Protocol.BSC,
+      Protocol.CELO,
+      Protocol.ETHEREUM,
+      Protocol.STRATUS,
+      Protocol.BESU,
+      Protocol.AVAXCCHAIN,
+      Protocol.CHILIZ,
+      Protocol.POLYGON,
+    ].includes(protocol)
+  ) {
     throw new InvalidException('Invalid protocol')
   }
   if (feeCurrency && typeof feeCurrency !== 'string') {
@@ -90,7 +119,18 @@ module.exports.validateEvmTokenBurn = ({ wallet, token, amount, protocol, feeCur
   if (amount !== undefined && (isNaN(amount) || Number(amount) < 0)) {
     throw new InvalidException('Invalid amount')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.STRATUS, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(protocol)) {
+  if (
+    ![
+      Protocol.BSC,
+      Protocol.CELO,
+      Protocol.ETHEREUM,
+      Protocol.STRATUS,
+      Protocol.BESU,
+      Protocol.AVAXCCHAIN,
+      Protocol.CHILIZ,
+      Protocol.POLYGON,
+    ].includes(protocol)
+  ) {
     throw new InvalidException('Invalid protocol')
   }
   if (feeCurrency && typeof feeCurrency !== 'string') {
@@ -119,7 +159,18 @@ module.exports.validateEvmNftMint = ({ wallet, token, tokenId, destination, amou
   if (amount !== undefined && (isNaN(amount) || Number(amount) < 0)) {
     throw new InvalidException('Invalid amount')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.STRATUS, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(protocol)) {
+  if (
+    ![
+      Protocol.BSC,
+      Protocol.CELO,
+      Protocol.ETHEREUM,
+      Protocol.STRATUS,
+      Protocol.BESU,
+      Protocol.AVAXCCHAIN,
+      Protocol.CHILIZ,
+      Protocol.POLYGON,
+    ].includes(protocol)
+  ) {
     throw new InvalidException('Invalid protocol')
   }
   if (feeCurrency && typeof feeCurrency !== 'string') {
@@ -145,7 +196,18 @@ module.exports.validateEvmNftBurn = ({ wallet, token, tokenId, amount, protocol,
   if (amount !== undefined && (isNaN(amount) || Number(amount) < 0)) {
     throw new InvalidException('Invalid amount')
   }
-  if (![Protocol.BSC, Protocol.CELO, Protocol.ETHEREUM, Protocol.STRATUS, Protocol.AVAXCCHAIN, Protocol.CHILIZ, Protocol.POLYGON].includes(protocol)) {
+  if (
+    ![
+      Protocol.BSC,
+      Protocol.CELO,
+      Protocol.ETHEREUM,
+      Protocol.STRATUS,
+      Protocol.BESU,
+      Protocol.AVAXCCHAIN,
+      Protocol.CHILIZ,
+      Protocol.POLYGON,
+    ].includes(protocol)
+  ) {
     throw new InvalidException('Invalid protocol')
   }
   if (feeCurrency && typeof feeCurrency !== 'string') {

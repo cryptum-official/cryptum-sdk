@@ -29,6 +29,7 @@ class Controller extends Interface {
         return makeRequest({ method: 'get', url: `/token/${tokenUid}/info?protocol=${protocol}`, config: this.config })
       case Protocol.ETHEREUM:
       case Protocol.STRATUS:
+      case Protocol.BESU:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
@@ -60,6 +61,7 @@ class Controller extends Interface {
         })
       case Protocol.ETHEREUM:
       case Protocol.STRATUS:
+      case Protocol.BESU:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
@@ -140,6 +142,7 @@ class Controller extends Interface {
         break
       case Protocol.ETHEREUM:
       case Protocol.STRATUS:
+      case Protocol.BESU:
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN:
@@ -233,6 +236,7 @@ class Controller extends Interface {
       case Protocol.CELO:
       case Protocol.ETHEREUM:
       case Protocol.STRATUS:
+      case Protocol.BESU:
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN:
@@ -337,6 +341,7 @@ class Controller extends Interface {
       }
       case Protocol.ETHEREUM:
       case Protocol.STRATUS:
+      case Protocol.BESU:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
@@ -400,6 +405,7 @@ class Controller extends Interface {
       }
       case Protocol.ETHEREUM:
       case Protocol.STRATUS:
+      case Protocol.BESU:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
@@ -440,6 +446,7 @@ class Controller extends Interface {
     switch (protocol) {
       case Protocol.ETHEREUM:
       case Protocol.STRATUS:
+      case Protocol.BESU:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
