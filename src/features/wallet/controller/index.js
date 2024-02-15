@@ -84,6 +84,8 @@ class Controller extends Interface {
         return await this.generateEthereumWallet({ mnemonic, derivation, testnet })
       case Protocol.STRATUS:
         return await this.generateStratusWallet({ mnemonic, derivation, testnet })
+      case Protocol.BESU:
+        return await this.generateBesuWallet({ mnemonic, derivation, testnet })
       case Protocol.CELO:
         return await this.generateCeloWallet({ mnemonic, derivation, testnet })
       case Protocol.STELLAR:
@@ -130,10 +132,9 @@ class Controller extends Interface {
         walletData.address = getBscAddressFromPrivateKey(privateKey)
         break
       case Protocol.ETHEREUM:
-        walletData.address = getEthereumAddressFromPrivateKey(privateKey)
-        break
       case Protocol.STRATUS:
-        walletData.address = getStratusAddressFromPrivateKey(privateKey)
+      case Protocol.BESU:
+        walletData.address = getEthereumAddressFromPrivateKey(privateKey)
         break
       case Protocol.CELO:
         walletData.address = getCeloAddressFromPrivateKey(privateKey)
@@ -185,10 +186,9 @@ class Controller extends Interface {
         walletAddress = deriveBscAddressFromXpub(xpub, { address })
         break
       case Protocol.ETHEREUM:
-        walletAddress = deriveEthereumAddressFromXpub(xpub, { address })
-        break
       case Protocol.STRATUS:
-        walletAddress = deriveStratusAddressFromXpub(xpub, { address })
+      case Protocol.BESU:
+        walletAddress = deriveEthereumAddressFromXpub(xpub, { address })
         break
       case Protocol.CELO:
         walletAddress = deriveCeloAddressFromXpub(xpub, { address })
@@ -203,7 +203,7 @@ class Controller extends Interface {
         walletAddress = deriveAvalancheAddressFromXpub(xpub, { address })
         break
       case Protocol.CHILIZ:
-        walletAddress = deriveChilizAddressFromXpub(xpub, {address})
+        walletAddress = deriveChilizAddressFromXpub(xpub, { address })
         break
       case Protocol.POLYGON:
         walletAddress = derivePolygonAddressFromXpub(xpub, { address })
@@ -238,18 +238,6 @@ class Controller extends Interface {
       address,
       testnet,
       protocol: Protocol.ETHEREUM,
-      xpub,
-    })
-  }
-
-  async generateStratusWallet({ mnemonic, derivation, testnet }) {
-    const { address, privateKey, publicKey, xpub } = await deriveStratusWalletFromDerivationPath(mnemonic, derivation)
-    return new Wallet({
-      privateKey,
-      publicKey,
-      address,
-      testnet,
-      protocol: Protocol.STRATUS,
       xpub,
     })
   }
@@ -328,6 +316,11 @@ class Controller extends Interface {
   async generateStratusWallet({ mnemonic, derivation, testnet }) {
     const wallet = await this.generateEthereumWallet({ mnemonic, derivation, testnet })
     wallet.protocol = Protocol.STRATUS
+    return wallet
+  }
+  async generateBesuWallet({ mnemonic, derivation, testnet }) {
+    const wallet = await this.generateEthereumWallet({ mnemonic, derivation, testnet })
+    wallet.protocol = Protocol.BESU
     return wallet
   }
 

@@ -15,6 +15,7 @@
 - SOLANA (mainnet, devnet)
 - HATHOR (mainnet, testnet)
 - STRATUS (mainnet, testnet)
+- BESU (mainnet, testnet)
 
 ## Ethereum-based blockchains (EVMs)
 
@@ -25,3 +26,4 @@
 - AVAXCCHAIN
 - CHILIZ
 - STRATUS
+- BESU
