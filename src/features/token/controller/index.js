@@ -28,6 +28,7 @@ class Controller extends Interface {
       case Protocol.HATHOR:
         return makeRequest({ method: 'get', url: `/token/${tokenUid}/info?protocol=${protocol}`, config: this.config })
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
@@ -58,6 +59,7 @@ class Controller extends Interface {
           config: this.config,
         })
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
@@ -137,6 +139,7 @@ class Controller extends Interface {
         })
         break
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN:
@@ -229,6 +232,7 @@ class Controller extends Interface {
         return new TransactionResponse({ hash: mint })
       case Protocol.CELO:
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN:
@@ -332,6 +336,7 @@ class Controller extends Interface {
         break
       }
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
@@ -394,6 +399,7 @@ class Controller extends Interface {
         break
       }
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
@@ -433,6 +439,7 @@ class Controller extends Interface {
     const { protocol, token, wallet, spender, amount, feeCurrency, fee } = input
     switch (protocol) {
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:

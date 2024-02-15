@@ -74,7 +74,7 @@ const mountHeaders = (apiKeyCryptum) => {
  * @returns true if protocol is valid, and false if not
  */
 const isValidProtocol = (protocol) => {
-  return protocol === 'ETHEREUM' || protocol === 'BITCOIN'
+  return protocol === 'ETHEREUM' || protocol === 'BITCOIN'  
 }
 
 module.exports = {

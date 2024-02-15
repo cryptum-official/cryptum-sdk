@@ -136,6 +136,12 @@ describe.only('Test Suite of the Services (All project)', function () {
     assert.deepStrictEqual(result, expectedResult)
   })
 
+  it('Check if an STRATUS is an valid protocol : isValidProtocol', async () => {
+    const expectedResult = false
+    const result = isValidProtocol('STRATUS')
+    assert.deepStrictEqual(result, expectedResult)
+  })
+
   it('Check if an BITCOIN is an valid protocol : isValidProtocol', async () => {
     const expectedResult = true
     const result = isValidProtocol('BITCOIN')

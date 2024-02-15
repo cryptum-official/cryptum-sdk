@@ -32,6 +32,7 @@ class Controller extends Interface {
       case Protocol.HATHOR:
         return makeRequest({ method: 'get', url: `/nft/${tokenUid}/info?protocol=${protocol}`, config: this.config })
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
@@ -62,6 +63,7 @@ class Controller extends Interface {
           config: this.config,
         })
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
@@ -92,6 +94,7 @@ class Controller extends Interface {
           config: this.config,
         })
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
@@ -161,6 +164,7 @@ class Controller extends Interface {
         return new TransactionResponse({ hash: mint })
       }
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
@@ -219,6 +223,7 @@ class Controller extends Interface {
         tx = await tc.createSolanaTransferTransaction({ wallet, destination, token, amount, isNFT: true })
         break
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
@@ -279,6 +284,7 @@ class Controller extends Interface {
         break
       }
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
@@ -334,6 +340,7 @@ class Controller extends Interface {
         tx = await tc.createSolanaTokenBurnTransaction({ wallet, token, amount })
         break
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
@@ -373,6 +380,7 @@ class Controller extends Interface {
     const { protocol, token, wallet, tokenId, feeCurrency, operator, fee } = input
     switch (protocol) {
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:
@@ -402,6 +410,7 @@ class Controller extends Interface {
     const { protocol, token, wallet, isApproved, feeCurrency, operator, fee } = input
     switch (protocol) {
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
       case Protocol.CELO:
       case Protocol.BSC:
       case Protocol.POLYGON:

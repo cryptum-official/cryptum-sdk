@@ -16,6 +16,7 @@ const Protocol = {
   CHILIZ: 'CHILIZ',
   POLYGON: 'POLYGON',
   SOLANA: 'SOLANA',
+  STRATUS: 'STRATUS'
 }
 module.exports.Protocol = Protocol
 
@@ -79,6 +80,23 @@ module.exports.CHLIZ_COMMON_CHAIN = {
     chain: {
       chainId: 88888,
       networkId: 88888,
+    },
+  },
+}
+
+module.exports.STRATUS_COMMON_CHAIN = {
+  testnet: {
+    base: 'goerli',
+    chain: {
+      chainId: 2008,
+      networkId: 2008,
+    },
+  },
+  mainnet: {
+    base: 'mainnet',
+    chain: {
+      chainId: 2008,
+      networkId: 2008,
     },
   },
 }
