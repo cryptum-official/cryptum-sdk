@@ -33,8 +33,8 @@ Get the minimum amount to swap.
 
 ### `sdk.swap.getMinimumAmount(opts)`
 Params:
-* `opts.currencyFrom` (string) (__required__) criptocurrency to swap from.
-* `opts.currencyTo` (string) (__required__) criptocurrency to swap to.
+* `opts.currencyFrom` (string) (__required__) cryptocurrency to swap from.
+* `opts.currencyTo` (string) (__required__) cryptocurrency to swap to.
 
 Examples:
 
@@ -52,9 +52,9 @@ Get estimate amount to receive from the swap.
 
 ### `sdk.swap.getEstimateAmount(opts)`
 Params:
-* `opts.currencyFrom` (string) (__required__) criptocurrency to swap from.
-* `opts.currencyTo` (string) (__required__) criptocurrency to swap to.
-* `opts.amount` (string) (__required__) criptocurrency amount to estimate.
+* `opts.currencyFrom` (string) (__required__) cryptocurrency to swap from.
+* `opts.currencyTo` (string) (__required__) cryptocurrency to swap to.
+* `opts.amount` (string) (__required__) cryptocurrency amount to estimate.
 
 Examples:
 

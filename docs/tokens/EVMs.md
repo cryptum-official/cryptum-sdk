@@ -1,4 +1,4 @@
-# Tokens on EVMs (Etherum-based blockchains)
+# Tokens on EVMs (Ethereum-based blockchains)
 
 - [Create ERC20 token](#create-erc20-token)
 - [Transfer tokens](#transfer-tokens)
