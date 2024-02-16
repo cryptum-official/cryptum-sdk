@@ -17,7 +17,7 @@ Get wallet address information from blockchain.
 
 - `opts.address` (string)(**required**) - wallet address.
 - `opts.protocol` (string)(**required**) - blockchain protocol.
-- `opts.tokenAddresses` (array)(**optional**) - array of token addresses. Only for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `CHILIZ`, `BSC`, `POLYGON`, and `SOLANA`.
+- `opts.tokenAddresses` (array)(**optional**) - array of token addresses. Only for [EVMs](./protocols.md#ethereum-based-blockchains-evms).
 
 ```js
 // For Hathor protocol
@@ -182,10 +182,10 @@ const fee = await sdk.transaction.getFee({
 
 Get NFT metadata.
 
-- `opts.tokenAddress` (string) - token address only for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `CHILIZ`, `BSC`, `POLYGON`, and `SOLANA`.
-- `opts.tokenId` (string) - token id for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `CHILIZ`, `BSC`, `POLYGON`, and `SOLANA`.
-- `opts.tokenUid` (string) - token UID for HATHOR.
-- `opts.protocol` (string)(**required**) - blockchain protocol. Only for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `CHILIZ`, `BSC`, `POLYGON`, and `SOLANA` and `HATHOR`.
+- `opts.tokenAddress` (string) - token address only for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `CHILIZ`, `BSC`, `POLYGON`, `SOLANA`, `STRATUS`, `BESU`.
+- `opts.tokenId` (string) - token id for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `CHILIZ`, `BSC`, `POLYGON`, `SOLANA`, `STRATUS`, `BESU`
+- `opts.tokenUid` (string) - token UID for `HATHOR`.
+- `opts.protocol` (string)(**required**) - blockchain protocol. Only for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `CHILIZ`, `BSC`, `POLYGON`, `SOLANA`, `HATHOR`, `STRATUS`, `BESU`.
 
 ```js
 const metadata = await sdk.nft.getMetadata({
@@ -204,8 +204,8 @@ Get NFT balance.
 - `opts.address` (string)(**required**) - wallet address.
 - `opts.tokenAddress` (string) - token address only for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `CHILIZ`, `BSC`, `POLYGON`, and `SOLANA`.
 - `opts.tokenId` (string) - token id for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `CHILIZ`, `BSC`, `POLYGON`, and `SOLANA`.
-- `opts.tokenUid` (string) - token UID for HATHOR.
-- `opts.protocol` (string)(**required**) - blockchain protocol. Only for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `CHILIZ`, `BSC`, `POLYGON`, and `SOLANA` and `HATHOR`.
+- `opts.tokenUid` (string) - token UID for `HATHOR`.
+- `opts.protocol` (string)(**required**) - blockchain protocol. Only for `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `CHILIZ`, `BSC`, `POLYGON`, `SOLANA`, `HATHOR`, `STRATUS`, `BESU`.
 
 ```js
 const metadata = await sdk.nft.getBalance({
