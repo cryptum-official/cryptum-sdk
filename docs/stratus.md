@@ -34,4 +34,4 @@ Stratus is designed for developers looking to leverage the full potential of blo
 
 The Stratus blockchain, in combination with the Cryptum SDK, provides a powerful platform for developing decentralized applications. From simple token transfers to complex dApp functionalities, these guides are designed to help you navigate the Stratus ecosystem and harness its capabilities for your projects.
 
-For more information and the source code for Stratus, visit the official Stratus repository.
+For more information and the source code for Stratus, visit the official [Stratus repository](https://github.com/cloudwalk/stratus).
