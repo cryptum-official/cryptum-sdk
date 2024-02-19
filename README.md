@@ -51,6 +51,8 @@ The Cryptum infrastructure allows clients to integrate and interact with the mos
 
 The Cryptum SDK also integrates Chainlink functionality natively, empowering developers with secure and reliable decentralized oracle services. [Read more about the Chainlink integration](docs/chainlink.md).
 
+Furthermore, the SDK incorporates Stratus, an advanced EVM executor designed with custom storage solutions. This integration ensures a scalable and efficient blockchain platform, optimizing performance for developers. [Discover more about Stratus](docs/stratus.md). 
+
 ## First Steps
 
 ### 📁Creation of Projects and 🔑 API Keys
