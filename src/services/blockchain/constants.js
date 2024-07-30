@@ -16,7 +16,9 @@ const Protocol = {
   CHILIZ: 'CHILIZ',
   POLYGON: 'POLYGON',
   SOLANA: 'SOLANA',
+  ARBITRUM: 'ARBITRUM'
 }
+
 module.exports.Protocol = Protocol
 
 module.exports.CELO_CONTRACT_ADDRESS = {
@@ -83,12 +85,29 @@ module.exports.CHLIZ_COMMON_CHAIN = {
   },
 }
 
+module.exports.ARBITRUM_COMMON_CHAIN = {
+  testnet: {
+    base: 'rinkeby',
+    chain: {
+      chainId: 421614,
+      networkId: 421614,
+    },
+  },
+  mainnet: {
+    base: 'mainnet',
+    chain: {
+      chainId: 42161,
+      networkId: 42161,
+    },
+  },
+}
+
 module.exports.POLYGON_COMMON_CHAIN = {
   testnet: {
     base: 'rinkeby',
     chain: {
-      chainId: 80001,
-      networkId: 80001,
+      chainId: 80002,
+      networkId: 80002,
     },
   },
   mainnet: {

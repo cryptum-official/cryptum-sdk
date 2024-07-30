@@ -178,6 +178,68 @@
 * @property {number} blockNumber
 **/
 
+/**
+* @typedef {Object} CreateCCIP
+* @property {import('../../../services/blockchain/constants').Protocol} protocol
+* @property {import('../../wallet/entity').Wallet} wallet
+**/
+
+/**
+* @typedef {Object} GetCCIP
+* @property {import('../../../services/blockchain/constants').Protocol} protocol
+* @property {string} address
+**/
+
+/**
+* @typedef {Object} AllowlistedSendersCCIP
+* @property {import('../../../services/blockchain/constants').Protocol} protocol
+* @property {string} address
+* @property {string} senderAddress
+**/
+/**
+* @typedef {Object} AllowSenderCCIP
+* @property {import('../../../services/blockchain/constants').Protocol} protocol
+* @property {import('../../wallet/entity').Wallet} wallet
+* @property {string} address
+* @property {string} senderAddress
+* @property {boolean} allowed
+**/
+
+/**
+* @typedef {Object} SendMessageCCIP
+* @property {import('../../../services/blockchain/constants').Protocol} protocol
+* @property {import('../../wallet/entity').Wallet} wallet
+* @property {import('../../../services/blockchain/constants').Protocol} destinationProtocol
+* @property {string} contractAddress
+* @property {string} text
+* @property {string} tokenAddress
+* @property {string} amount
+* @property {string} to
+* @property {boolean} payLink
+**/
+
+/**
+* @typedef {Object} WithdrawCCIP
+* @property {import('../../../services/blockchain/constants').Protocol} protocol
+* @property {import('../../wallet/entity').Wallet} wallet
+* @property {string} contractAddress
+* @property {string} tokenAddress
+* @property {string} to
+**/
+
+/**
+* @typedef {Object} ResponseLastReceivedMessageCCIP
+* @property {string} messageId
+* @property {string} text
+* @property {string} tokenAddress
+* @property {string} tokenAmount
+**/
+
+/**
+* @typedef {Array} ResponseMessagesIdCCIP
+* @property {string} messageId
+**/
+
 class PriceFeedResponse {
   constructor({
     roundId,

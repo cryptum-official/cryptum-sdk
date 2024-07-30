@@ -6,6 +6,7 @@ const {
   Protocol,
   AVAXCCHAIN_COMMON_CHAIN,
   CHLIZ_COMMON_CHAIN,
+  ARBITRUM_COMMON_CHAIN
 } = require('./constants')
 const { GenericException } = require('../../errors')
 const { isTestnet } = require('../../services/utils')
@@ -26,6 +27,8 @@ const signEthereumTx = (rawTransaction, protocol, fromPrivateKey, network) => {
     common = EthereumCommon.forCustomChain(CHLIZ_COMMON_CHAIN[network].base, CHLIZ_COMMON_CHAIN[network].chain)
   } else if (protocol === Protocol.POLYGON) {
     common = EthereumCommon.forCustomChain(POLYGON_COMMON_CHAIN[network].base, POLYGON_COMMON_CHAIN[network].chain)
+  } else if (protocol === Protocol.ARBITRUM) {
+    common = EthereumCommon.forCustomChain(ARBITRUM_COMMON_CHAIN[network].base, ARBITRUM_COMMON_CHAIN[network].chain)
   } else {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
