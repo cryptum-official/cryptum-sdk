@@ -15,7 +15,7 @@ Check out the in-depth guide [here](https://doc.cryptum.io/main/for-developers/s
     
 Deploy a loot box smart contract
 * `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
-* `opts.protocol` (string) (__required__) - [EVMs only](../protocols.md#ethereum-based-blockchains-evms).
+* `opts.protocol` (string) (__required__) - `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `BSC`, `POLYGON`.
 * `opts.name` (string) (**required**) - name of the loot box token.
 * `opts.symbol` (string) (**required**) - symbol of the loot box token.
 * `opts.contractURI` (string) - URI pointing to the loot box token metadata (PS: it uses the same standard as ERC-1155).
@@ -38,7 +38,7 @@ let { hash } = await sdk.lootBox.deploy({
 #### `sdk.lootBox.approve(opts)`
 Approve the loot box contract to use your tokens as rewards.
 * `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
-* `opts.protocol` (string) (__required__) - [EVMs only](../protocols.md#ethereum-based-blockchains-evms).
+* `opts.protocol` (string) (__required__) - `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `BSC`, `POLYGON`.
 * `opts.lootBoxAddress` (string) (**required**) - address of the loot box contract.
 * `opts.tokenAddress` (string) (**required**) - address of the token to be used as a prize.
 * `opts.tokenType` ("ERC721" | "ERC1155" | "ERC20") - type of the token that is being added as a prize.
@@ -65,7 +65,7 @@ await sdk.lootBox.approve({
 
 Creates the loot boxes
 * `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
-* `opts.protocol` (string) (__required__) - [EVMs only](../protocols.md#ethereum-based-blockchains-evms).
+* `opts.protocol` (string) (__required__) - `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `BSC`, `POLYGON`.
 * `opts.lootBoxAddress` (string) (**required**) - address of the loot box contract.
 * `opts.openStartTimestamp` (string) (__required__)- start time from which loot boxes can be opened (PS: Unix timestamp).
 * `opts.recipient` (string) (__required__)- recipient address that will receive the boxes once they're minted. 
@@ -94,7 +94,7 @@ const { hash: creationHash } = await sdk.lootBox.createLootBox({
 #### `sdk.lootBox.open(opts)`
 Opens a loot box.
 * `opts.wallet` (Wallet)(__required__) - wallet to sign the transaction with
-* `opts.protocol` (string) (__required__) - [EVMs only](../protocols.md#ethereum-based-blockchains-evms).
+* `opts.protocol` (string) (__required__) - `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `BSC`, `POLYGON`.
 * `opts.lootBoxId` (string) - (__required__) - ID of the loot box to be opened
 * `opts.lootBoxAddress` (string) (**required**) - address of the loot box contract.
 
@@ -114,7 +114,7 @@ const { hash: openingHash } = await sdk.lootBox.openLootBox({
 
 Gets the possible contents of a loot box.
 
-* `opts.protocol` (string) (__required__) - [EVMs only](../protocols.md#ethereum-based-blockchains-evms).
+* `opts.protocol` (string) (__required__) - `ETHEREUM`, `CELO`, `AVAXCCHAIN`, `BSC`, `POLYGON`.
 * `opts.lootBoxId` (string) - (__required__) - ID of the loot box to be opened
 * `opts.lootBoxAddress` (string) (**required**) - address of the loot box contract.
 

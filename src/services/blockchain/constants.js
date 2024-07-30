@@ -19,6 +19,7 @@ const Protocol = {
   STRATUS: 'STRATUS',
   BESU: 'BESU',
 }
+
 module.exports.Protocol = Protocol
 
 module.exports.CELO_CONTRACT_ADDRESS = {
@@ -122,8 +123,8 @@ module.exports.POLYGON_COMMON_CHAIN = {
   testnet: {
     base: 'rinkeby',
     chain: {
-      chainId: 80001,
-      networkId: 80001,
+      chainId: 80002,
+      networkId: 80002,
     },
   },
   mainnet: {
