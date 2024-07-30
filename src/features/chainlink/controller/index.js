@@ -406,4 +406,243 @@ class Controller extends Interface {
         })
         return await tc.sendTransaction(tx)
     }
+
+    /**
+    * Get status CCIP
+    * @param {import('../entity').StatusCCIPInput} input
+    * @returns {Promise<import('../entity').ResponseStatusCCIP>}
+    */
+    async getStatusCCIP(input) {
+        const { protocol, messageId, destinationProtocol } = input;
+        return await makeRequest({
+            method: 'get',
+            url: `/chainlink/ccip?protocol=${protocol}&messageId=${messageId}&destinationProtocol=${destinationProtocol}`,
+            config: this.config
+        })
+    }
+
+    /**
+    * Get status CCIP By Hash
+    * @param {object} input
+    * @param {string} input.hash
+    */
+    async getStatusCCIPByHash(input) {
+        const { hash } = input;
+
+        const { transactionHash } = await makeRequest({
+            method: 'get',
+            url: `https://ccip.chain.link/api/h/atlas/search?msgIdOrTxnHash=${hash}`,
+            config: this.config
+        })
+        return transactionHash
+    }
+
+    /**
+    * Send token CCIP EOA (Externally Owned Account)
+    * @param {import('../entity').TransferTokenCCIPInput} input
+    * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+    */
+    async sendTokenCCIPEoa(input) {
+
+        const { protocol, wallet, to, amount, tokenAddress, destinationProtocol, feeTokenAddress } = input
+        const tc = getTransactionControllerInstance(this.config)
+
+        const builtSendToken = await makeRequest({
+            method: 'post',
+            url: `/chainlink/ccip/sendTokenEOA?protocol=${protocol}`,
+            body: { from: wallet.address, to, amount, tokenAddress, destinationProtocol, feeTokenAddress },
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            config: this.config
+        })
+
+        let hash
+        for (let rawTransaction of builtSendToken) {
+            const signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
+            const tx = new SignedTransaction({
+                signedTx,
+                protocol,
+                type: TransactionType.CALL_CONTRACT_METHOD,
+            })
+            hash = await tc.sendTransaction(tx)
+        }
+
+        return hash
+    }
+
+    /**
+     * @param {import('../entity').CreateCCIP} input
+     * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+     */
+    async createCCIP(input) {
+        const { protocol, wallet } = input
+        const tc = getTransactionControllerInstance(this.config)
+        const builtCCIP = await makeRequest({
+            method: 'post',
+            url: `/chainlink/ccip/build?protocol=${protocol}`,
+            body: { from: wallet.address },
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            config: this.config
+        })
+        const signedTx = signEthereumTx(builtCCIP, protocol, wallet.privateKey, this.config.environment)
+        const tx = new SignedTransaction({
+            signedTx,
+            protocol,
+            type: TransactionType.DEPLOY_CONTRACT,
+        })
+        return await tc.sendTransaction(tx)
+    }
+
+    /**
+     * Get last received message
+     * @param {import('../entity').GetCCIP} input
+     * @returns {Promise<import('../entity').ResponseLastReceivedMessageCCIP>}
+     */
+    async getLastReceivedMessageDetailsCCIP(input) {
+        const { address, protocol } = input;
+        return await makeRequest({
+            method: 'get',
+            url: `/chainlink/ccip/lastReceivedMessage/${address}?protocol=${protocol}`,
+            config: this.config
+        })
+    }
+
+    /**
+     * Get last sended message
+     * @param {import('../entity').GetCCIP} input
+     * @returns {Promise<import('../entity').ResponseLastReceivedMessageCCIP>}
+     */
+    async getLastSendMessageDetailsCCIP(input) {
+        const { address, protocol } = input;
+        return await makeRequest({
+            method: 'get',
+            url: `/chainlink/ccip/lastsendMessage/${address}?protocol=${protocol}`,
+            config: this.config
+        })
+    }
+
+    /**
+     * Get Received Messages Id
+     * @param {import('../entity').GetCCIP} input
+     * @returns {Promise<import('../entity').ResponseMessagesIdCCIP>}
+     */
+    async getReceivedMessagesIdCCIP(input) {
+        const { address, protocol } = input;
+        return await makeRequest({
+            method: 'get',
+            url: `/chainlink/ccip/receiveMessagesId/${address}?protocol=${protocol}`,
+            config: this.config
+        })
+    }
+
+    /**
+     * Get sended Messages Id
+     * @param {import('../entity').GetCCIP} input
+     * @returns {Promise<import('../entity').ResponseMessagesIdCCIP>}
+     */
+    async getSendMessagesIdCCIP(input) {
+        const { address, protocol } = input;
+        return await makeRequest({
+            method: 'get',
+            url: `/chainlink/ccip/sendMessagesId/${address}?protocol=${protocol}`,
+            config: this.config
+        })
+    }
+
+    /**
+     * Allow listed sender
+     * @param {import('../entity').AllowlistedSendersCCIP} input
+     * @returns {Promise<boolean>}
+     */
+    async allowlistedSendersCCIP(input) {
+        const { address, protocol, senderAddress } = input;
+        return await makeRequest({
+            method: 'get',
+            url: `/chainlink/ccip/allowSenders/${address}/${senderAddress}?protocol=${protocol}`,
+            config: this.config
+        })
+    }
+
+    /**
+     * Allow sender
+     * @param {import('../entity').AllowSenderCCIP} input
+     * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+     */
+    async allowSenderCCIP(input){
+        const { protocol, wallet, address, senderAddress, allowed } = input
+        const tc = getTransactionControllerInstance(this.config)
+        const builtCCIP = await makeRequest({
+            method: 'post',
+            url: `/chainlink/ccip/buildAllowSender?protocol=${protocol}`,
+            body: { from: wallet.address, address, senderAddress, allowed },
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            config: this.config
+        })
+        const signedTx = signEthereumTx(builtCCIP, protocol, wallet.privateKey, this.config.environment)
+        const tx = new SignedTransaction({
+            signedTx,
+            protocol,
+            type: TransactionType.CALL_CONTRACT_METHOD,
+        })
+        return await tc.sendTransaction(tx)
+    }
+
+
+    /**
+     * Send Message
+     * @param {import('../entity').SendMessageCCIP} input
+     * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+     */
+    async sendMessageCCIP(input){
+        const { protocol, wallet, contractAddress, destinationProtocol, text, tokenAddress, amount, to, payLink } = input
+        const tc = getTransactionControllerInstance(this.config)
+        const builtCCIP = await makeRequest({
+            method: 'post',
+            url: `/chainlink/ccip/buildSendMessage?protocol=${protocol}`,
+            body: { from: wallet.address, contractAddress, destinationProtocol, text, tokenAddress, amount, to, payLink },
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            config: this.config
+        })
+        const signedTx = signEthereumTx(builtCCIP, protocol, wallet.privateKey, this.config.environment)
+        const tx = new SignedTransaction({
+            signedTx,
+            protocol,
+            type: TransactionType.CALL_CONTRACT_METHOD,
+        })
+        return await tc.sendTransaction(tx)
+    }
+
+
+    /**
+     * Withdraw contract
+     * @param {import('../entity').WithdrawCCIP} input
+     * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+     */
+    async withdrawCCIP(input){
+        const { protocol, wallet, contractAddress, tokenAddress, to } = input
+        const tc = getTransactionControllerInstance(this.config)
+        const builtCCIP = await makeRequest({
+            method: 'post',
+            url: `/chainlink/ccip/buildWithdraw?protocol=${protocol}`,
+            body: { from: wallet.address, contractAddress,  tokenAddress, to },
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            config: this.config
+        })
+        const signedTx = signEthereumTx(builtCCIP, protocol, wallet.privateKey, this.config.environment)
+        const tx = new SignedTransaction({
+            signedTx,
+            protocol,
+            type: TransactionType.CALL_CONTRACT_METHOD,
+        })
+        return await tc.sendTransaction(tx)
+    }
 }
