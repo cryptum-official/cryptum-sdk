@@ -152,6 +152,17 @@ module.exports.deriveEthereumWalletFromDerivationPath = async (mnemonic, { accou
   }
 }
 /**
+ * Build web3 account from private key
+ *
+ * @param {string} privateKey private key hex string
+ * @returns {object} web3 account object
+ */
+module.exports.privateKeyToEthAccount = (privateKey) => {
+  const web3 = new Web3()
+  return web3.eth.accounts.privateKeyToAccount(privateKey)
+}
+
+/**
  * Derive ethereum addresses from extended public key (xpub)
  *
  * @param {string} xpub extended public key string

@@ -8,6 +8,7 @@ const wallets = {
   stellar: null,
   ripple: null,
   ethereum: null,
+  stratus: null,
   bsc: null,
   celo: null,
   bitcoin: null,
@@ -27,6 +28,10 @@ exports.getWallets = async () => {
   const controller = getWalletControllerInstance(exports.config)
   wallets.ethereum = await controller.generateWallet({
     protocol: Protocol.ETHEREUM,
+    mnemonic,
+  })
+  wallets.stratus = await controller.generateWallet({
+    protocol: Protocol.STRATUS,
     mnemonic,
   })
   wallets.bitcoin = await controller.generateWallet({

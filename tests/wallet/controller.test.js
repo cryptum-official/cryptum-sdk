@@ -57,6 +57,14 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       })
       assert.strictEqual(wallet.address, '0x250f7fc273c792d76327ef37b709a82484fe0168')
     })
+    it('stratus', async () => {
+      const controller = getWalletControllerInstance(config)
+      const wallet = await controller.generateWalletFromPrivateKey({
+        protocol: Protocol.STRATUS,
+        privateKey: '62a0747f04d08305e00618e1f5f750a06d5c0c336d3cf6971ef82a6f25605df2'
+      })
+      assert.strictEqual(wallet.address, '0x250f7fc273c792d76327ef37b709a82484fe0168')
+    })
     it('avaxcchain', async () => {
       const controller = getWalletControllerInstance(config)
       const wallet = await controller.generateWalletFromPrivateKey({
@@ -118,6 +126,18 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
         mnemonic,
       })
       assert.strictEqual(wallet.protocol, Protocol.ETHEREUM)
+      assert.strictEqual(
+        wallet.address,
+        '0xcf61eaf64d895c3c71a8812e9eedc4c179b4ed60'
+      )
+    })
+    it('generate stratus wallet', async () => {
+      const controller = getWalletControllerInstance(config)
+      const wallet = await controller.generateWallet({
+        protocol: Protocol.STRATUS,
+        mnemonic,
+      })
+      assert.strictEqual(wallet.protocol, Protocol.STRATUS)
       assert.strictEqual(
         wallet.address,
         '0xcf61eaf64d895c3c71a8812e9eedc4c179b4ed60'
@@ -259,6 +279,15 @@ describe.only('Test Suite of the Wallet (Controller)', () => {
       const controller = getWalletControllerInstance(config)
       const walletAddress = await controller.generateWalletAddressFromXpub({
         protocol: Protocol.ETHEREUM,
+        xpub: 'xpub6EWLCGwtcyjG8r8qBmF82Le6sA4FhQBfWtxUHvo7GDTZr1ch3FBbYbbCntYjvsRMK22NpvjtC9X87bahssEUpPEdU453fibMFhi3QS5sqjL',
+        address: 0
+      })
+      assert.strictEqual(walletAddress, '0xcf61eaf64d895c3c71a8812e9eedc4c179b4ed60')
+    })
+    it('stratus', async () => {
+      const controller = getWalletControllerInstance(config)
+      const walletAddress = await controller.generateWalletAddressFromXpub({
+        protocol: Protocol.STRATUS,
         xpub: 'xpub6EWLCGwtcyjG8r8qBmF82Le6sA4FhQBfWtxUHvo7GDTZr1ch3FBbYbbCntYjvsRMK22NpvjtC9X87bahssEUpPEdU453fibMFhi3QS5sqjL',
         address: 0
       })

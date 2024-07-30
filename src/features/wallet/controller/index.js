@@ -18,9 +18,11 @@ const {
   deriveStellarWalletFromDerivationPath,
   deriveRippleWalletFromDerivationPath,
   deriveEthereumWalletFromDerivationPath,
+  deriveStratusWalletFromDerivationPath,
   deriveBitcoinAddressFromXpub,
   deriveBscAddressFromXpub,
   deriveEthereumAddressFromXpub,
+  deriveStratusAddressFromXpub,
   deriveCeloAddressFromXpub,
   deriveHathorWalletFromDerivationPath,
   getHathorAddressFromPrivateKey,
@@ -33,6 +35,7 @@ const {
   deriveSolanaWalletFromDerivationPath,
   getChilizAddressFromPrivateKey,
   deriveChilizAddressFromXpub,
+  getStratusAddressFromPrivateKey,
 } = require('../../../services/wallet')
 const { Protocol } = require('../../../services/blockchain/constants')
 const {
@@ -79,6 +82,10 @@ class Controller extends Interface {
         return await this.generateBscWallet({ mnemonic, derivation, testnet })
       case Protocol.ETHEREUM:
         return await this.generateEthereumWallet({ mnemonic, derivation, testnet })
+      case Protocol.STRATUS:
+        return await this.generateStratusWallet({ mnemonic, derivation, testnet })
+      case Protocol.BESU:
+        return await this.generateBesuWallet({ mnemonic, derivation, testnet })
       case Protocol.CELO:
         return await this.generateCeloWallet({ mnemonic, derivation, testnet })
       case Protocol.STELLAR:
@@ -125,6 +132,8 @@ class Controller extends Interface {
         walletData.address = getBscAddressFromPrivateKey(privateKey)
         break
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
+      case Protocol.BESU:
         walletData.address = getEthereumAddressFromPrivateKey(privateKey)
         break
       case Protocol.CELO:
@@ -177,6 +186,8 @@ class Controller extends Interface {
         walletAddress = deriveBscAddressFromXpub(xpub, { address })
         break
       case Protocol.ETHEREUM:
+      case Protocol.STRATUS:
+      case Protocol.BESU:
         walletAddress = deriveEthereumAddressFromXpub(xpub, { address })
         break
       case Protocol.CELO:
@@ -192,7 +203,7 @@ class Controller extends Interface {
         walletAddress = deriveAvalancheAddressFromXpub(xpub, { address })
         break
       case Protocol.CHILIZ:
-        walletAddress = deriveChilizAddressFromXpub(xpub, {address})
+        walletAddress = deriveChilizAddressFromXpub(xpub, { address })
         break
       case Protocol.POLYGON:
         walletAddress = derivePolygonAddressFromXpub(xpub, { address })
@@ -300,6 +311,17 @@ class Controller extends Interface {
       testnet,
       protocol: Protocol.CARDANO,
     })
+  }
+
+  async generateStratusWallet({ mnemonic, derivation, testnet }) {
+    const wallet = await this.generateEthereumWallet({ mnemonic, derivation, testnet })
+    wallet.protocol = Protocol.STRATUS
+    return wallet
+  }
+  async generateBesuWallet({ mnemonic, derivation, testnet }) {
+    const wallet = await this.generateEthereumWallet({ mnemonic, derivation, testnet })
+    wallet.protocol = Protocol.BESU
+    return wallet
   }
 
   async generateAvalancheWallet({ mnemonic, derivation, testnet }) {
