@@ -143,7 +143,7 @@ const { contractAddress } = await sdk.transaction.getTransactionReceiptByHash({
 
 console.log('contractAddress: ', contractAddress)
 ```
-#### Add Founds
+#### Add Funds
 
 You need to add funds to the generated contracts. Add ETH, LINK, and CCIP-BnM to your wallet.
 
