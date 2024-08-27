@@ -4,6 +4,10 @@ Chainlink CCIP provides a single simple interface through which dApps and web3 e
 
 [Read more about Chainlink CCIP](https://docs.chain.link/ccip)
 
+## Supported Networks
+
+ETHEREUM, AVAXCCHAIN, POLYGON, BINANCECHAIN, CELO
+
 ### Before you begin
 
 Before you begin, you need to ensure that you have a sufficient LINK.
