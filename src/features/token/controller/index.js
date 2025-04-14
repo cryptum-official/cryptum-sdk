@@ -14,7 +14,6 @@ const { getTransactionControllerInstance } = require('../../transaction/controll
 const { TransactionType, TransactionResponse, SignedTransaction } = require('../../transaction/entity')
 const Interface = require('./interface')
 const { signEthereumTx } = require('../../../services/blockchain/ethereum')
-const { signCeloTx } = require('../../../services/blockchain/celo')
 
 class Controller extends Interface {
   /**
@@ -119,27 +118,6 @@ class Controller extends Interface {
         tx = await tc.createSolanaTransferTransaction({ wallet, destination, token, amount })
         break
       case Protocol.CELO:
-        builtTx = await makeRequest({
-          method: 'post',
-          url: `/tx/build/transfer-token?protocol=${protocol}`,
-          body: {
-            tokenSymbol: token,
-            from: wallet.address,
-            destination,
-            amount,
-            fee,
-            contractAddress: token,
-            feeCurrency,
-            memo,
-          },
-          config: this.config,
-        })
-        tx = new SignedTransaction({
-          signedTx: await signCeloTx(builtTx, wallet.privateKey),
-          protocol,
-          type: TransactionType.TRANSFER,
-        })
-        break
       case Protocol.ETHEREUM:
       case Protocol.STRATUS:
       case Protocol.BESU:
@@ -150,7 +128,15 @@ class Controller extends Interface {
         builtTx = await makeRequest({
           method: 'post',
           url: `/tx/build/transfer-token?protocol=${protocol}`,
-          body: { tokenSymbol: token, from: wallet.address, destination, amount, fee, contractAddress: token },
+          body: {
+            tokenSymbol: token,
+            from: wallet.address,
+            destination,
+            amount,
+            fee,
+            feeCurrency,
+            contractAddress: token,
+          },
           config: this.config,
         })
         tx = new SignedTransaction({
@@ -259,12 +245,8 @@ class Controller extends Interface {
           },
           config: this.config,
         })
-        let signedTx
-        if (protocol === Protocol.CELO) {
-          signedTx = await signCeloTx(builtTx, wallet.privateKey)
-        } else {
-          signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
-        }
+        let signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
+
         tx = new SignedTransaction({
           signedTx,
           protocol,
@@ -354,12 +336,8 @@ class Controller extends Interface {
           body: { protocol, token, from: wallet.address, destination, amount, feeCurrency, fee },
           config: this.config,
         })
-        let signedTx
-        if (protocol === Protocol.CELO) {
-          signedTx = await signCeloTx(builtTx, wallet.privateKey)
-        } else {
-          signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
-        }
+        let signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
+
         tx = new SignedTransaction({
           signedTx,
           protocol,
@@ -418,12 +396,8 @@ class Controller extends Interface {
           body: { protocol, token, from: wallet.address, amount, feeCurrency, fee },
           config: this.config,
         })
-        let signedTx
-        if (protocol === Protocol.CELO) {
-          signedTx = await signCeloTx(builtTx, wallet.privateKey)
-        } else {
-          signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
-        }
+        let signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
+
         tx = new SignedTransaction({
           signedTx,
           protocol,

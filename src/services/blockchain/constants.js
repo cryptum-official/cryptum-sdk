@@ -136,6 +136,23 @@ module.exports.POLYGON_COMMON_CHAIN = {
   },
 }
 
+module.exports.CELO_COMMON_CHAIN = {
+  testnet: {
+    base: 'sepolia',
+    chain: {
+      chainId: 44787,
+      networkId: 44787,
+    },
+  },
+  mainnet: {
+    base: 'mainnet',
+    chain: {
+      chainId: 42220,
+      networkId: 42220,
+    },
+  },
+}
+
 module.exports.CELO_ACCOUNTS_ADDRESS = {
   testnet: '0xed7f51A34B4e71fbE69B3091FcF879cD14bD73A9',
   mainnet: '0x7d21685C17607338b313a7174bAb6620baD0aaB7',
