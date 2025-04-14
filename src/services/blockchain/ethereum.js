@@ -1,4 +1,4 @@
-const { Transaction: EthereumTransaction } = require('@ethereumjs/tx')
+const { TransactionFactory } = require('@ethereumjs/tx')
 const { default: EthereumCommon } = require('@ethereumjs/common')
 const {
   BSC_COMMON_CHAIN,
@@ -8,6 +8,7 @@ const {
   CHLIZ_COMMON_CHAIN,
   STRATUS_COMMON_CHAIN,
   BESU_COMMON_CHAIN,
+  CELO_COMMON_CHAIN,
 } = require('./constants')
 const { GenericException } = require('../../errors')
 const { isTestnet } = require('../../services/utils')
@@ -32,10 +33,18 @@ const signEthereumTx = (rawTransaction, protocol, fromPrivateKey, network) => {
     common = EthereumCommon.forCustomChain(CHLIZ_COMMON_CHAIN[network].base, CHLIZ_COMMON_CHAIN[network].chain)
   } else if (protocol === Protocol.POLYGON) {
     common = EthereumCommon.forCustomChain(POLYGON_COMMON_CHAIN[network].base, POLYGON_COMMON_CHAIN[network].chain)
+  } else if (protocol === Protocol.CELO) {
+    common = EthereumCommon.custom(CELO_COMMON_CHAIN[network].chain)
   } else {
     throw new GenericException('Invalid protocol', 'InvalidTypeException')
   }
-  const tx = new EthereumTransaction(rawTransaction, { common })
+
+  if (rawTransaction.gas && rawTransaction.gasLimit === undefined) {
+    rawTransaction.gasLimit = rawTransaction.gas
+    delete rawTransaction.gas
+  }
+
+  const tx = TransactionFactory.fromTxData(rawTransaction, { common })
   const signedTx = tx.sign(Buffer.from(fromPrivateKey.substring(2), 'hex'))
   return `0x${signedTx.serialize().toString('hex')}`
 }

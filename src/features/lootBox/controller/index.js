@@ -6,10 +6,15 @@ const { Protocol } = require('../../../services/blockchain/constants')
 const Interface = require('./interface')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { SignedTransaction, TransactionType } = require('../../transaction/entity')
-const { signCeloTx } = require('../../../services/blockchain/celo')
-const { validateLootBoxDeploy, validateLootBoxCreation, validateLootBoxGetContent, validateLootBoxOpening, validateApproveContent } = require('../../../services/validations/lootBox')
+const {
+  validateLootBoxDeploy,
+  validateLootBoxCreation,
+  validateLootBoxGetContent,
+  validateLootBoxOpening,
+  validateApproveContent,
+} = require('../../../services/validations/lootBox')
 const { getContractControllerInstance } = require('../../contract/controller')
-const { LOOTBOX_CONTENT_ABI } = require("../../../services/blockchain/contract/abis")
+const { LOOTBOX_CONTENT_ABI } = require('../../../services/blockchain/contract/abis')
 const { getTokenControllerInstance } = require('../../../../dist/src/features/token/controller')
 const { getNftControllerInstance } = require('../../../../dist/src/features/nft/controller')
 
@@ -31,32 +36,33 @@ class Controller extends Interface {
     if (!royaltyBps) {
       data.royaltyBps = 1000
     }
-    const rawTransaction = await makeRequest(
-      {
-        method: 'post',
-        url: `/contract/lootBox/deploy?protocol=${protocol}`,
-        body: data, config: this.config
-      })
+    const rawTransaction = await makeRequest({
+      method: 'post',
+      url: `/contract/lootBox/deploy?protocol=${protocol}`,
+      body: data,
+      config: this.config,
+    })
 
-    let signedTx;
+    let signedTx
     switch (protocol) {
       case Protocol.CELO:
-        signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
-        break;
       case Protocol.ETHEREUM:
       case Protocol.STRATUS:
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN:
         signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
-        break;
+        break
       default:
         throw new InvalidException('Unsupported protocol')
     }
     return await tc.sendTransaction(
       new SignedTransaction({
-        signedTx, protocol, type: TransactionType.LOOTBOX_DEPLOY
-      }))
+        signedTx,
+        protocol,
+        type: TransactionType.LOOTBOX_DEPLOY,
+      })
+    )
   }
 
   /**
@@ -69,40 +75,40 @@ class Controller extends Interface {
     const tc = getTransactionControllerInstance(this.config)
     const { protocol, lootBoxId, amount, lootBoxAddress, wallet } = input
 
-    const rawTransaction = await makeRequest(
-      {
-        method: 'post', url: `/contract/lootBox/${lootBoxAddress}/open/${lootBoxId}?protocol=${protocol}`,
-        config: this.config,
-        body: { amount: amount ? amount : 1, from: wallet.address }
-      }
-    )
+    const rawTransaction = await makeRequest({
+      method: 'post',
+      url: `/contract/lootBox/${lootBoxAddress}/open/${lootBoxId}?protocol=${protocol}`,
+      config: this.config,
+      body: { amount: amount ? amount : 1, from: wallet.address },
+    })
 
-    let signedTx;
+    let signedTx
     switch (protocol) {
       case Protocol.CELO:
-        signedTx = await signCeloTx(rawTransaction, wallet.privateKey)
-        break;
       case Protocol.ETHEREUM:
       case Protocol.STRATUS:
       case Protocol.BSC:
       case Protocol.POLYGON:
       case Protocol.AVAXCCHAIN:
         signedTx = signEthereumTx(rawTransaction, protocol, wallet.privateKey, this.config.environment)
-        break;
+        break
       default:
         throw new InvalidException('Unsupported protocol')
     }
 
     return await tc.sendTransaction(
       new SignedTransaction({
-        signedTx, protocol, type: TransactionType.LOOTBOX_DEPLOY
-      }))
+        signedTx,
+        protocol,
+        type: TransactionType.LOOTBOX_DEPLOY,
+      })
+    )
   }
   /**
- * Create lootBox
- * @param {import('../entity').CreateLootBoxInput} input
- * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
- */
+   * Create lootBox
+   * @param {import('../entity').CreateLootBoxInput} input
+   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+   */
   async createLootBox(input) {
     const tc = getTransactionControllerInstance(this.config)
     validateLootBoxCreation(input)
@@ -115,7 +121,7 @@ class Controller extends Interface {
       openStartTimestamp,
       recipient,
       amountDistributedPerOpen,
-      rewardUnits
+      rewardUnits,
     } = input
     const data = {
       from: wallet.address,
@@ -125,7 +131,7 @@ class Controller extends Interface {
       openStartTimestamp,
       recipient,
       amountDistributedPerOpen,
-      rewardUnits
+      rewardUnits,
     }
     if (!data.rewardUnits) {
       data.rewardUnits = Array(contents.length).fill('1')
@@ -136,31 +142,27 @@ class Controller extends Interface {
 
     const fromPrivateKey = wallet.privateKey
 
-    data.contents?.forEach((r => {
-      if (r.tokenType === "ERC1155") {
+    data.contents?.forEach((r) => {
+      if (r.tokenType === 'ERC1155') {
         r.tokenType = 2
-      } else if (r.tokenType === "ERC721") {
+      } else if (r.tokenType === 'ERC721') {
         r.tokenType = 1
-      } else if (r.tokenType === "ERC20") {
+      } else if (r.tokenType === 'ERC20') {
         r.tokenType = 0
-      }
-      else {
+      } else {
         throw new InvalidException('Invalid Token Type')
       }
-    }))
-    const rawTransaction = await makeRequest(
-      {
-        method: 'post',
-        url: `/contract/lootBox/${lootBoxAddress}/create?protocol=${protocol}`,
-        body: data,
-        config: this.config
-      })
+    })
+    const rawTransaction = await makeRequest({
+      method: 'post',
+      url: `/contract/lootBox/${lootBoxAddress}/create?protocol=${protocol}`,
+      body: data,
+      config: this.config,
+    })
 
-    let signedTx = "";
+    let signedTx = ''
     switch (protocol) {
       case Protocol.CELO:
-        signedTx = await signCeloTx(rawTransaction, fromPrivateKey)
-        break;
       case Protocol.ETHEREUM:
       case Protocol.STRATUS:
       case Protocol.BSC:
@@ -173,14 +175,17 @@ class Controller extends Interface {
     }
     return await tc.sendTransaction(
       new SignedTransaction({
-        signedTx, protocol, type: TransactionType.LOOTBOX_CREATE
-      }))
+        signedTx,
+        protocol,
+        type: TransactionType.LOOTBOX_CREATE,
+      })
+    )
   }
   /**
- * Get lootBox content
- * @param {import('../entity').GetLootBoxContentInput} input
- * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
- */
+   * Get lootBox content
+   * @param {import('../entity').GetLootBoxContentInput} input
+   * @returns {Promise<import('../../transaction/entity').TransactionResponse>}
+   */
   async getLootBoxContent(input) {
     validateLootBoxGetContent(input)
     const { lootBoxAddress, lootBoxId, protocol } = input
@@ -196,7 +201,7 @@ class Controller extends Interface {
         return await cc.callMethod({
           contractAbi: LOOTBOX_CONTENT_ABI,
           contractAddress: lootBoxAddress,
-          method: "getLootBoxContents",
+          method: 'getLootBoxContents',
           params: [lootBoxId],
           protocol,
         })
@@ -222,7 +227,13 @@ class Controller extends Interface {
       case 'ERC721':
         return await nftController.approve({ protocol, token: tokenAddress, tokenId, wallet, operator: lootBoxAddress })
       case 'ERC1155':
-        return await nftController.setApprovalForAll({ protocol, isApproved: "true", operator: lootBoxAddress, token: tokenAddress, wallet })
+        return await nftController.setApprovalForAll({
+          protocol,
+          isApproved: 'true',
+          operator: lootBoxAddress,
+          token: tokenAddress,
+          wallet,
+        })
     }
   }
 }

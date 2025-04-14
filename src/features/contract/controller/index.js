@@ -1,14 +1,14 @@
 module.exports.getContractControllerInstance = (config) => new Controller(config)
 
 const { makeRequest } = require('../../../services')
-const { signCeloTx } = require('../../../services/blockchain/celo')
 const { Protocol } = require('../../../services/blockchain/constants')
 const { SUPPORTS_INTERFACE_ABI } = require('../../../services/blockchain/contract/abis')
 const { signEthereumTx } = require('../../../services/blockchain/ethereum')
-const { validateSmartContractCallParams,
+const {
+  validateSmartContractCallParams,
   validateSmartContractTransactionParams,
   validateTokenDeployTransactionParams,
-  validateSmartContractDeployTransactionParams
+  validateSmartContractDeployTransactionParams,
 } = require('../../../services/validations')
 const { getTransactionControllerInstance } = require('../../transaction/controller')
 const { TransactionType, SignedTransaction } = require('../../transaction/entity')
@@ -28,7 +28,7 @@ class Controller extends Interface {
       method: 'post',
       url: `/tx/call-method?protocol=${protocol}`,
       body: { from, contractAddress, contractAbi, method, params },
-      config: this.config
+      config: this.config,
     })
     return new SmartContractCallResponse(data)
   }
@@ -44,7 +44,7 @@ class Controller extends Interface {
       contractAbi: SUPPORTS_INTERFACE_ABI,
       contractAddress,
       method: 'supportsInterface',
-      params: [interfaceId]
+      params: [interfaceId],
     })
     return result
   }
@@ -65,18 +65,13 @@ class Controller extends Interface {
   async buildMethodTransaction(input) {
     validateSmartContractTransactionParams(input)
     const { wallet, fee, value, contractAddress, contractAbi, method, params, protocol, feeCurrency } = input
-    const builtTx = await makeRequest(
-      {
-        method: 'post',
-        url: `/tx/build/method-transaction?protocol=${protocol}`,
-        body: { protocol, from: wallet.address, fee, value, contractAddress, contractAbi, method, params, feeCurrency }, config: this.config
-      })
-    let signedTx;
-    if (protocol === Protocol.CELO) {
-      signedTx = await signCeloTx(builtTx, wallet.privateKey)
-    } else {
-      signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
-    }
+    const builtTx = await makeRequest({
+      method: 'post',
+      url: `/tx/build/method-transaction?protocol=${protocol}`,
+      body: { protocol, from: wallet.address, fee, value, contractAddress, contractAbi, method, params, feeCurrency },
+      config: this.config,
+    })
+    let signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
 
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.CALL_CONTRACT_METHOD })
   }
@@ -97,18 +92,14 @@ class Controller extends Interface {
   async buildDeployTransaction(input) {
     validateSmartContractDeployTransactionParams(input)
     const { wallet, fee, params, protocol, feeCurrency, source, contractName } = input
-    const builtTx = await makeRequest(
-      {
-        method: 'post',
-        url: `/tx/build/deploy-contract?protocol=${protocol}`,
-        body: { from: wallet.address, fee, params, protocol, feeCurrency, source, contractName }, config: this.config
-      })
-    let signedTx;
-    if (protocol === Protocol.CELO) {
-      signedTx = await signCeloTx(builtTx, wallet.privateKey)
-    } else {
-      signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
-    }
+    const builtTx = await makeRequest({
+      method: 'post',
+      url: `/tx/build/deploy-contract?protocol=${protocol}`,
+      body: { from: wallet.address, fee, params, protocol, feeCurrency, source, contractName },
+      config: this.config,
+    })
+    let signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
+
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT })
   }
   /**
@@ -128,22 +119,16 @@ class Controller extends Interface {
   async buildDeployTokenTransaction(input) {
     validateTokenDeployTransactionParams(input)
     const { wallet, fee, params, protocol, feeCurrency, tokenType } = input
-    const builtTx = await makeRequest(
-      {
-        method: 'post',
-        url: `/tx/build/deploy-token?protocol=${protocol}`,
-        body: { from: wallet.address, fee, params, protocol, feeCurrency, type: tokenType }, config: this.config
-      })
-    let signedTx;
-    if (protocol === Protocol.CELO) {
-      signedTx = await signCeloTx(builtTx, wallet.privateKey)
-    } else {
-      signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
-    }
+    const builtTx = await makeRequest({
+      method: 'post',
+      url: `/tx/build/deploy-token?protocol=${protocol}`,
+      body: { from: wallet.address, fee, params, protocol, feeCurrency, type: tokenType },
+      config: this.config,
+    })
+    let signedTx = signEthereumTx(builtTx, protocol, wallet.privateKey, this.config.environment)
 
     return new SignedTransaction({ signedTx, protocol, type: TransactionType.DEPLOY_CONTRACT })
   }
 }
-
 
 module.exports.ContractController = Controller
