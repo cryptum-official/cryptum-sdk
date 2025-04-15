@@ -15,8 +15,8 @@ const {
 } = require('../../../services/validations/lootBox')
 const { getContractControllerInstance } = require('../../contract/controller')
 const { LOOTBOX_CONTENT_ABI } = require('../../../services/blockchain/contract/abis')
-const { getTokenControllerInstance } = require('../../../../dist/src/features/token/controller')
-const { getNftControllerInstance } = require('../../../../dist/src/features/nft/controller')
+const { getTokenControllerInstance } = require('../../token/controller')
+const { getNftControllerInstance } = require('../../nft/controller')
 
 class Controller extends Interface {
   /**
